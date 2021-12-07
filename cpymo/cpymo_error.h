@@ -1,0 +1,13 @@
+#ifndef INCLUDE_CPYMO_ERROR
+#define INCLUDE_CPYMO_ERROR
+
+typedef int error_t;
+
+#define CPYMO_ERR_SUCC 0
+#define CPYMO_ERR_NOT_FOUND (-1)
+#define CPYMO_ERR_CAN_NOT_OPEN_FILE (-2)
+#define CPYMO_ERR_BAD_FILE_FORMAT (-3)
+#define CPYMO_ERR_INVALID_ARG (-4)
+#define CPYMO_ERR_OUT_OF_MEM (-5)
+
+#endif
