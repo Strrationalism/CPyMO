@@ -12,4 +12,4 @@ include_directories ("./endianness.h/")
 
 add_subdirectory ("cpymo")
 add_subdirectory ("cpymo-tool")
-
+add_subdirectory ("cpymo-backends/sdl2")
