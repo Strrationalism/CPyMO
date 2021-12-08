@@ -5,7 +5,7 @@ include_directories ("../cpymo")
 add_library (libcpymotool STATIC
 	"cpymo_tool_package.h" "cpymo_tool_package.c")
 
-link_libraries (libcpymo libcpymotool)
-
 add_executable (cpymo-tool 
 	"main.c" )
+
+target_link_libraries (cpymo-tool PRIVATE libcpymo libcpymotool)
