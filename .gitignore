@@ -4,3 +4,7 @@
 
 /out
 /.vs
+/makefiles/3ds/build
+/makefiles/3ds/cpymo.smdh
+/makefiles/3ds/cpymo.elf
+/makefiles/3ds/cpymo.3dsx
