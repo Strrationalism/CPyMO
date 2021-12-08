@@ -9,10 +9,3 @@ include_directories ("./endianness.h/")
 add_subdirectory ("cpymo")
 add_subdirectory ("cpymo-tool")
 
-include_directories ("./cpymo")
-
-add_executable (cpymo-tool 
-	"cpymo-tool/main.c" )
-
-target_link_libraries (cpymo-tool cpymo)
-target_link_libraries (cpymo-tool cpymotool)
