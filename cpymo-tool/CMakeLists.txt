@@ -2,13 +2,13 @@ cmake_minimum_required (VERSION 3.8)
 
 include_directories ("../cpymo")
 
-add_library (cpymotool STATIC
-	"cpymo_tool_package.h" "cpymo_tool_package.c")
+aux_source_directory("." SRC)
 
-include_directories ("../cpymo")
+set (CPYMO_COMPONENTS
+	"../cpymo/cpymo_error.h" "../cpymo/cpymo_error.c"
+	"../cpymo/cpymo_package.h" "../cpymo/cpymo_package.c")
 
 add_executable (cpymo-tool
-	"main.c" )
+	${CPYMO_COMPONENTS}
+	${SRC})
 
-add_subdirectory ("../cpymo")
-target_link_libraries (cpymo-tool cpymotool)
