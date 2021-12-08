@@ -103,7 +103,11 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 
 		const char *filename_start1 = strrchr(path, '/') + 1;
 		const char *filename_start2 = strrchr(path, '\\') + 1;
-		const char *filename = max(max(filename_start1, filename_start2), path);
+		const char *filename = filename_start1;
+
+		if (filename_start2 > filename) filename = filename_start2;
+		if (path > filename) filename = path;
+
 		const char *ext_start = strrchr(filename, '.');
 
 		size_t j = 0;

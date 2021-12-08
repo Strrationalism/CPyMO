@@ -8,4 +8,5 @@ add_library (libcpymotool STATIC
 add_executable (cpymo-tool 
 	"main.c" )
 
-target_link_libraries (cpymo-tool PRIVATE libcpymo libcpymotool)
+target_link_libraries (cpymo-tool libcpymo)
+target_link_libraries (cpymo-tool libcpymotool)
