@@ -8,5 +8,6 @@ add_library (cpymotool STATIC
 add_executable (cpymo-tool 
 	"main.c" )
 
+link_directories (../cpymo)
 target_link_libraries (cpymo-tool cpymo)
 target_link_libraries (cpymo-tool cpymotool)
