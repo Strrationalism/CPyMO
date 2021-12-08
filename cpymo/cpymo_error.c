@@ -1,4 +1,5 @@
 #include "cpymo_error.h"
+#include <utf8.h>
 
 const char * cpymo_error_message(error_t err) {
 	switch (err) {
