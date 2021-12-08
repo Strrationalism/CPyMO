@@ -9,6 +9,7 @@ typedef int error_t;
 #define CPYMO_ERR_BAD_FILE_FORMAT (-3)
 #define CPYMO_ERR_INVALID_ARG (-4)
 #define CPYMO_ERR_OUT_OF_MEM (-5)
+#define CPYMO_ERR_UNKNOWN (-65536)
 
 extern const char * cpymo_error_message(error_t err);
 
