@@ -33,3 +33,6 @@ Unpack a pymo package:
     cpymo-tool unpack <pak-file> <extension_without "."> <output-dir>
 ```
 
+## 编译到任天堂3DS平台
+
+首先你需要确保已经安装了devkitPro及其中的3DS开发套件，在其控制台中，于`./makefiles/3ds/`目录下执行`make`即可生成3DSX程序。
