@@ -1,0 +1,3 @@
+[submodule "endianness.h"]
+	path = endianness.h
+	url = https://github.com/rofl0r/endianness.h.git
