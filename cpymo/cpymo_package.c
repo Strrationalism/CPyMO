@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <endianness.h>
 
 error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 {
@@ -17,6 +18,8 @@ error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 			1, 
 			out_package->stream);
 
+	out_package->file_count = end_le32toh(out_package->file_count);
+
 	if (count != 1) {
 		fclose(out_package->stream);
 		return CPYMO_ERR_BAD_FILE_FORMAT;
@@ -26,12 +29,19 @@ error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 
 	if (out_package->files == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	
+	#pragma warning(disable: 6029)
 	count =
 		fread(
 			out_package->files,
 			sizeof(cpymo_package_index),
 			out_package->file_count,
 			out_package->stream);
+
+	for (uint32_t i = 0; i < out_package->file_count; ++i) {
+		cpymo_package_index *file = &out_package->files[i];
+		file->file_length = end_le32toh(file->file_length);
+		file->file_offset = end_le32toh(file->file_offset);
+	}
 
 	if (count != out_package->file_count) {
 		cpymo_package_close(out_package);
