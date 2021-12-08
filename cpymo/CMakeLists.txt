@@ -6,4 +6,3 @@ add_library (cpymolib STATIC
 
 link_libraries (cpymolib)
 
-add_executable (cpymo "main.c")

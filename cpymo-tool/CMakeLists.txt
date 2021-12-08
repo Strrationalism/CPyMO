@@ -9,6 +9,6 @@ set (CPYMO_COMPONENTS
 	"../cpymo/cpymo_package.h" "../cpymo/cpymo_package.c")
 
 add_executable (cpymo-tool
-	${CPYMO_COMPONENTS}
 	${SRC})
 
+target_link_libraries (cpymo-tool cpymolib)

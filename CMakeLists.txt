@@ -2,6 +2,10 @@
 
 project ("cpymo")
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+
 add_definitions (-D_CRT_SECURE_NO_WARNINGS)
 
 include_directories ("./endianness.h/")
