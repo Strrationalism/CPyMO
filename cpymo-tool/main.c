@@ -10,7 +10,7 @@ void help() {
 	printf("Unpack a pymo package:\n");
 	printf("    cpymo-tool unpack <pak-file> <extension-with \".\"> <output-dir>\n");
 	printf("Pack a pymo package:\n");
-	printf("    cpymo-tool pack <out-pak-file> <files-to-pack...>");
+	printf("    cpymo-tool pack <out-pak-file> <files-to-pack...>\n");
 	printf("\n");
 }
 
