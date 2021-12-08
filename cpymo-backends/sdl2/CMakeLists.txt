@@ -2,5 +2,8 @@ cmake_minimum_required (VERSION 3.8)
 
 include_directories("../../cpymo")
 
-link_libraries (cpymolib)
+add_subdirectory ("SDL")
+
+include_directories ("SDL2/include")
+link_libraries (cpymolib SDL2::SDL2main SDL2::SDL2-static)
 add_executable(cpymo "main.c")
