@@ -39,6 +39,6 @@ jobs:
       uses: actions/upload-artifact@v2.3.0
       with:
         name: Build Artifact on ${{ matrix.os }}
-        path: ./build
+        path: ./build/build/*
 
       
