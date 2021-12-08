@@ -8,6 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 
 add_definitions (-D_CRT_SECURE_NO_WARNINGS)
 
+include_directories ("./stb/")
 include_directories ("./endianness.h/")
 include_directories ("./utf8.h/")
 
