@@ -5,9 +5,3 @@ include_directories ("../cpymo")
 add_library (cpymotool STATIC
 	"cpymo_tool_package.h" "cpymo_tool_package.c")
 
-add_executable (cpymo-tool 
-	"main.c" )
-
-link_directories (../cpymo)
-target_link_libraries (cpymo-tool cpymo)
-target_link_libraries (cpymo-tool cpymotool)
