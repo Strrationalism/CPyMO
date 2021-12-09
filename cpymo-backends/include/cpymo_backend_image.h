@@ -7,12 +7,24 @@
 
 struct cpymo_backend_image;
 
-error_t cpymo_backend_image_load(cpymo_backend_image **out_image, const char *path);
-error_t cpymo_backend_image_move(cpymo_backend_image **out_image, const void *pixels, int width, int height, int channels);
-error_t cpymo_backend_image_font(cpymo_backend_image **out_image, const char *utf8str);
-error_t cpymo_backend_image_update(cpymo_backend_image *image, const void *pixels);
+error_t cpymo_backend_image_load(
+	cpymo_backend_image **out_image, const char *path);
+
+error_t cpymo_backend_image_move(
+	cpymo_backend_image **out_image, const void *pixels_moveintoimage, int width, int height, int channels);
+
+error_t cpymo_backend_image_font(
+	cpymo_backend_image **out_image, const char *utf8str);
+
+error_t cpymo_backend_image_update(
+	cpymo_backend_image *image, const void *pixels_moveintoimage);
+
+error_t cpymo_backend_image_attach_transparent_mask(
+	cpymo_backend_image *image, const void *pixels_moveintoimage);
+
 
 void cpymo_backend_image_free(cpymo_backend_image *image);
+
 
 int cpymo_backend_image_width(const cpymo_backend_image *img);
 int cpymo_backend_image_height(const cpymo_backend_image *img);
@@ -38,8 +50,8 @@ enum cpymo_backend_image_draw_type {
 
 
 void cpymo_backend_image_draw(
-	const cpymo_backend_image *image,
 	float dstx, float dsty, float dstw, float dsth,
+	const cpymo_backend_image *src,
 	int srcx, int srcy, int srcw, int srch, float alpha,
 	cpymo_backend_image_draw_type draw_type);
 
