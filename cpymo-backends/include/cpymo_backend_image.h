@@ -56,9 +56,14 @@ void cpymo_backend_image_draw(
 	cpymo_backend_image_draw_type draw_type);
 
 
-void cpymo_backend_image_fillcolor(
-	cpymo_color col,
-	float alpha);
+void cpymo_backend_image_draw_lines(
+	const float *xyxy, size_t count,
+	cpymo_color color, float alpha,
+	cpymo_backend_image_draw_type draw_type);
 
+void cpymo_backend_image_fill_rects(
+	const float *xywh, size_t count,
+	cpymo_color color, float alpha,
+	cpymo_backend_image_draw_type draw_type);
 
 #endif

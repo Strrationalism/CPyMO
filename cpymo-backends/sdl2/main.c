@@ -79,18 +79,23 @@ int main(int argc, char **argv)
 		&window,
 		&renderer) != 0) {
 		SDL_Log("Error: Can not create window and renderer: %s", SDL_GetError());
+		return -1;
 	}
 
 	SDL_SetWindowTitle(window, gameconfig.gametitle);
-
 	set_window_icon(gamedir);
 	
-
+	if (SDL_RenderSetLogicalSize(renderer, gameconfig.imagesize_w, gameconfig.imagesize_h) != 0) {
+		SDL_Log("Error: Can not set logical size: %s", SDL_GetError());
+		return -1;
+	}
+	
 	SDL_Event event;
 	while (1) {
-		SDL_PollEvent(&event);
-		if (event.type == SDL_QUIT)
-			break;
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT)
+				goto EXIT;
+		}
 
 
 		// TODO: This is for temp using
@@ -99,6 +104,8 @@ int main(int argc, char **argv)
 		SDL_RenderClear(renderer);
 		SDL_RenderPresent(renderer);
 	}
+
+	EXIT:
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
