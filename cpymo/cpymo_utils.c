@@ -36,3 +36,18 @@ int cpymo_utils_clamp(int v, int minv, int maxv)
 	else if (v < minv) return minv;
 	else return v;
 }
+
+void cpymo_utils_replace_str_newline_n(char *str)
+{
+	char prev_char = '?';
+	
+	while (*str) {
+		if (prev_char == '\\' && *str == 'n') {
+			*str = '\n';
+			*(str - 1) = ' ';
+		}
+
+		prev_char = *str;
+		str++;
+	}
+}

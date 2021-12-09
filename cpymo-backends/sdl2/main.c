@@ -12,8 +12,13 @@ cpymo_gameconfig gameconfig;
 SDL_Window *window;
 SDL_Renderer *renderer;
 
-static void set_window_icon(const char *icon_path) {
+static void set_window_icon(const char *gamedir) 
+{
 	int w, h, channel;
+	char icon_path[4096];
+
+	sprintf(icon_path, "%s/icon.png", gamedir);
+
 	stbi_uc *icon = stbi_load(icon_path, &w, &h, &channel, 4);
 	if (icon == NULL) return;
 
@@ -30,21 +35,27 @@ static void set_window_icon(const char *icon_path) {
 	stbi_image_free(icon);
 }
 
-int main(int argc, char **argv) {
+static void load_gameconfig(const char *gamedir) 
+{
+	char buf[4096];
+	sprintf(buf, "%s/gameconfig.txt", gamedir);
+
+	error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, buf);
+	if (err != CPYMO_ERR_SUCC) {
+		printf("Error: Cannot parse gameconfig.txt. (%s)", cpymo_error_message(err));
+		exit(-1);
+	}
+}
+
+int main(int argc, char **argv) 
+{
 	const char *gamedir = "./";
 
 	if (argc == 2) {
 		gamedir = argv[1];
 	}
 
-	char buf[256];
-	sprintf(buf, "%s/gameconfig.txt", gamedir);
-
-	error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, buf);
-	if (err != CPYMO_ERR_SUCC) {
-		printf("Error: Cannot parse gameconfig.txt. (%s)", cpymo_error_message(err));
-		return -1;
-	}
+	load_gameconfig(gamedir);
 
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
@@ -72,8 +83,7 @@ int main(int argc, char **argv) {
 
 	SDL_SetWindowTitle(window, gameconfig.gametitle);
 
-	sprintf(buf, "%s/icon.png", gamedir);
-	set_window_icon(buf);
+	set_window_icon(gamedir);
 	
 
 	SDL_Event event;

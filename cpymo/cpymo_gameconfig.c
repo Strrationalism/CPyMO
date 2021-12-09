@@ -17,6 +17,7 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	D("gametitle") {
 		SPAN span = POP;
 		SETUP(gametitle, span);
+		cpymo_utils_replace_str_newline_n(o->gametitle);
 		return;
 	}
 
