@@ -140,6 +140,16 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 		return;
 	}
 
+	D("imagesize") {
+		o->imagesize_w = cpymo_parser_stream_span_atoi(POP);
+		o->imagesize_h = cpymo_parser_stream_span_atoi(POP);
+
+		if (o->imagesize_w == 0) o->imagesize_w = 800;
+		if (o->imagesize_h == 0) o->imagesize_h = 600;
+
+		return;
+	}
+
 	#undef SPAN
 	#undef SETUP
 	#undef SETUP_EXT

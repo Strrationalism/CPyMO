@@ -118,7 +118,9 @@ void cpymo_parser_stream_span_trim_end(cpymo_parser_stream_span * span)
 
 void cpymo_parser_stream_span_copy(char *dst, size_t buffer_size, cpymo_parser_stream_span span)
 {
-	size_t copy_count = min(buffer_size - 1, span.len);
+	size_t copy_count = buffer_size - 1;
+	if (span.len < copy_count) copy_count = span.len;
+
 	strncpy(dst, span.begin, copy_count);
 	dst[copy_count] = '\0';
 }

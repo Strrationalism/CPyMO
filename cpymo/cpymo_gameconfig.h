@@ -21,6 +21,7 @@ typedef struct {
 	uint16_t nameboxorg_x, nameboxorg_y;
 	uint16_t msgtb_t, msgtb_b;
 	uint16_t msglr_l, msglr_r;
+	uint16_t imagesize_w, imagesize_h;
 	cpymo_color textcolor;
 
 	unsigned fontaa : 1;
