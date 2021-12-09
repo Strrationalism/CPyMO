@@ -80,7 +80,7 @@ cpymo_parser_stream_span cpymo_parser_curline_readuntil(cpymo_parser * parser, c
 	span.len = 0;
 
 	char ch;
-	while (ch = cpymo_parser_curline_readchar(parser)) {
+	while ((ch = cpymo_parser_curline_readchar(parser))) {
 		if (ch == until) break;
 		span.len++;
 	}
@@ -154,7 +154,7 @@ cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span)
 	if (span.begin[0] != '#') return cpymo_color_error();
 
 	for (size_t i = 0; i < 6; ++i) 
-		if (span.begin[i + 1] < 0 || !isxdigit(span.begin[i + 1]))
+		if (span.begin[i + 1] < 0 || !isxdigit((int)span.begin[i + 1]))
 			return cpymo_color_error();
 	
 	cpymo_color c;

@@ -33,7 +33,7 @@ include $(DEVKITARM)/3ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	cpymo
 BUILD		:=	build
-SOURCES		:=	../../cpymo ../../cpymo-backends/3ds
+SOURCES		:=	../../cpymo ../../cpymo-backends/3ds ../../cpymo-backends/include
 DATA		:=	data
 INCLUDES	:=	../../endianness.h ../../utf8.h ../../stb
 GRAPHICS	:=	gfx

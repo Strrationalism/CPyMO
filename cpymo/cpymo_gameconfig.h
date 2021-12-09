@@ -8,7 +8,7 @@
 #include "cpymo_color.h"
 
 typedef struct {
-	char gametitle[64];
+	char gametitle[256];
 	char startscript[64];
 	char cgprefix[64];
 	char bgformat[4];			// without '.'
