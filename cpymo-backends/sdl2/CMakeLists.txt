@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.8)
 
-include_directories("../../cpymo" "../include")
+include_directories("../../cpymo")
 
 add_subdirectory ("SDL")
 

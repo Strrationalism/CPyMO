@@ -11,6 +11,7 @@ add_definitions (-D_CRT_SECURE_NO_WARNINGS)
 include_directories ("./stb/")
 include_directories ("./endianness.h/")
 include_directories ("./utf8.h/")
+include_directories ("cpymo-backends/include/")
 
 add_subdirectory ("cpymo")
 add_subdirectory ("cpymo-tool")
