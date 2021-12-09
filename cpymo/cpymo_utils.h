@@ -1,0 +1,10 @@
+#ifndef INCLUDE_CPYMO_UTILS
+#define INCLUDE_CPYMO_UTILS
+
+#include "cpymo_error.h"
+#include <stdint.h>
+
+error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len);
+int cpymo_utils_clamp(int v, int minv, int maxv);
+
+#endif
