@@ -1,5 +1,5 @@
-#ifndef INCLUDE_PYMO_PACKAGE
-#define INCLUDE_PYMO_PACKAGE
+#ifndef INCLUDE_CPYMO_PACKAGE
+#define INCLUDE_CPYMO_PACKAGE
 
 #include <stdio.h>
 #include <stdint.h>
