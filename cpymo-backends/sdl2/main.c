@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <cpymo_error.h>
 #include <SDL.h>
-#include <cpymo_gameconfig.h>
+#include <cpymo_engine.h>
 #include <cpymo_parser.h>
 #include <string.h>
 
@@ -11,6 +11,7 @@
 cpymo_gameconfig gameconfig;
 SDL_Window *window;
 SDL_Renderer *renderer;
+cpymo_engine engine;
 
 static void set_window_icon(const char *gamedir) 
 {
@@ -89,20 +90,33 @@ int main(int argc, char **argv)
 		SDL_Log("Error: Can not set logical size: %s", SDL_GetError());
 		return -1;
 	}
+
+	error_t error = cpymo_engine_init(&engine, &gameconfig);
+	if (error != CPYMO_ERR_SUCC) {
+		SDL_Log("Error: Can not init cpymo engine, %s", cpymo_error_message(error));
+	}
 	
 	SDL_Event event;
 	while (1) {
+		bool redraw_by_event = false;
+
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT)
 				goto EXIT;
+			else if (event.type == SDL_WINDOWEVENT)
+				redraw_by_event = true;
 		}
 
+		bool need_to_redraw = false;
 
-		// TODO: This is for temp using
-		// Need to design a well screen update method.
-		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
-		SDL_RenderClear(renderer);
-		SDL_RenderPresent(renderer);
+		cpymo_engine_update(&engine, 16, &need_to_redraw);
+
+		if (need_to_redraw || redraw_by_event) {
+			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
+			SDL_RenderClear(renderer);
+			cpymo_engine_draw(&engine);
+			SDL_RenderPresent(renderer);
+		}
 	}
 
 	EXIT:

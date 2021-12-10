@@ -6,5 +6,5 @@ add_library (cpymolib STATIC
 	"cpymo_parser.h" "cpymo_parser.c"
 	"cpymo_gameconfig.h" "cpymo_gameconfig.c" 
 	"cpymo_utils.h" "cpymo_utils.c" 
-	"cpymo_color.h" "cpymo_color.c")
+	"cpymo_color.h" "cpymo_color.c" "cpymo_engine.h" "cpymo_engine.c")
 
