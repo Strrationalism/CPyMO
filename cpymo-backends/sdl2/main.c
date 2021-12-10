@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 			SDL_RenderClear(renderer);
 			cpymo_engine_draw(&engine);
 			SDL_RenderPresent(renderer);
-		}
+		} else SDL_Delay(50);
 	}
 
 	EXIT:
