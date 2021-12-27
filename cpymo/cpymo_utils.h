@@ -2,6 +2,7 @@
 #define INCLUDE_CPYMO_UTILS
 
 #include "cpymo_error.h"
+#include <stddef.h>
 #include <stdbool.h>
 
 error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len);
