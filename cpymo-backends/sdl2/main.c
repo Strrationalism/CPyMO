@@ -3,12 +3,19 @@
 #include <SDL.h>
 #include <cpymo_engine.h>
 #include <cpymo_parser.h>
+#include <cpymo_assetloader.h>
 #include <string.h>
 
+#define STBI_NO_PSD
+#define STBI_NO_TGA
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PNM
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 cpymo_gameconfig gameconfig;
+cpymo_assetloader assetloader;
 SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
@@ -57,6 +64,12 @@ int main(int argc, char **argv)
 	}
 
 	load_gameconfig(gamedir);
+	error_t err = 
+		cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
+
+	if (err != CPYMO_ERR_SUCC) {
+		SDL_Log("Error: cpymo_assetloader_init (%s)", cpymo_error_message(err));
+	}
 
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
@@ -125,6 +138,8 @@ int main(int argc, char **argv)
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
+
+	cpymo_assetloader_free(&assetloader);
 
 	return 0;
 }

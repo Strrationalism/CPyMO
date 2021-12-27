@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <ctype.h>
 
 error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 {
@@ -14,7 +15,7 @@ error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 	*len = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
-	*outbuf = malloc(*len);
+	*outbuf = (char *)malloc(*len);
 	if (*outbuf == NULL) {
 		fclose(f);
 		return CPYMO_ERR_OUT_OF_MEM;
@@ -49,5 +50,15 @@ void cpymo_utils_replace_str_newline_n(char *str)
 
 		prev_char = *str;
 		str++;
+	}
+}
+
+bool cpymo_utils_string_equals_ignore_case(const char * str1, const char * str2)
+{
+	if (*str1 == '\0' && *str2 == '\0') return true;
+	else if (*str1 == '\0' || *str2 == '\0') return false;
+	else {
+		if (toupper(*str1) == toupper(*str2)) return cpymo_utils_string_equals_ignore_case(str1 + 1, str2 + 1);
+		else return false;
 	}
 }

@@ -5,6 +5,8 @@ error_t cpymo_engine_init(cpymo_engine * engine, cpymo_gameconfig * gameconfig)
 	engine->gameconfig = gameconfig;
 	engine->image1 = NULL;
 	engine->draw = true;
+
+	return CPYMO_ERR_SUCC;
 }
 
 void cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)

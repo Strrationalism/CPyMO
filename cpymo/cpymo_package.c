@@ -1,4 +1,5 @@
 #include "cpymo_package.h"
+#include "cpymo_utils.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -25,11 +26,10 @@ error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
-	out_package->files = malloc(sizeof(cpymo_package_index) * out_package->file_count);
+	out_package->files = (cpymo_package_index *)malloc(sizeof(cpymo_package_index) * out_package->file_count);
 
 	if (out_package->files == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	
-	#pragma warning(disable: 6029)
 	count =
 		fread(
 			out_package->files,
@@ -60,7 +60,7 @@ void cpymo_package_close(cpymo_package * package)
 error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, const char * filename)
 {
 	for (uint32_t i = 0; i < package->file_count; ++i) {
-		if (strcmp(package->files[i].file_name, filename) == 0) {
+		if (cpymo_utils_string_equals_ignore_case(package->files[i].file_name, filename)) {
 			*out_index = package->files[i];
 			return CPYMO_ERR_SUCC;
 		}
@@ -69,7 +69,7 @@ error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *
 	return CPYMO_ERR_NOT_FOUND;
 }
 
-error_t cpymo_package_read_file(char * out_buffer, const cpymo_package * package, const cpymo_package_index * index)
+error_t cpymo_package_read_file(char *out_buffer, const cpymo_package * package, const cpymo_package_index * index)
 {
 	fseek(package->stream, index->file_offset, SEEK_SET);
 	const size_t count = fread(out_buffer, index->file_length, 1, package->stream);
