@@ -14,8 +14,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-cpymo_gameconfig gameconfig;
-cpymo_assetloader assetloader;
 SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
@@ -43,18 +41,6 @@ static void set_window_icon(const char *gamedir)
 	stbi_image_free(icon);
 }
 
-static void load_gameconfig(const char *gamedir) 
-{
-	char buf[4096];
-	sprintf(buf, "%s/gameconfig.txt", gamedir);
-
-	error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, buf);
-	if (err != CPYMO_ERR_SUCC) {
-		printf("Error: Cannot parse gameconfig.txt. (%s)", cpymo_error_message(err));
-		exit(-1);
-	}
-}
-
 int main(int argc, char **argv) 
 {
 	const char *gamedir = "./";
@@ -63,12 +49,10 @@ int main(int argc, char **argv)
 		gamedir = argv[1];
 	}
 
-	load_gameconfig(gamedir);
-	error_t err = 
-		cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
+	error_t err = cpymo_engine_init(&engine, gamedir);
 
 	if (err != CPYMO_ERR_SUCC) {
-		SDL_Log("Error: cpymo_assetloader_init (%s)", cpymo_error_message(err));
+		SDL_Log("Error: cpymo_engine_init (%s)", cpymo_error_message(err));
 	}
 
 	if (SDL_Init(
@@ -87,8 +71,8 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 
 	if (SDL_CreateWindowAndRenderer(
-		gameconfig.imagesize_w,
-		gameconfig.imagesize_h,
+		engine.gameconfig.imagesize_w,
+		engine.gameconfig.imagesize_h,
 		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE,
 		&window,
 		&renderer) != 0) {
@@ -96,17 +80,12 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	SDL_SetWindowTitle(window, gameconfig.gametitle);
+	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
 	set_window_icon(gamedir);
 	
-	if (SDL_RenderSetLogicalSize(renderer, gameconfig.imagesize_w, gameconfig.imagesize_h) != 0) {
+	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
 		SDL_Log("Error: Can not set logical size: %s", SDL_GetError());
 		return -1;
-	}
-
-	error_t error = cpymo_engine_init(&engine, &gameconfig);
-	if (error != CPYMO_ERR_SUCC) {
-		SDL_Log("Error: Can not init cpymo engine, %s", cpymo_error_message(error));
 	}
 	
 	SDL_Event event;
@@ -139,7 +118,7 @@ int main(int argc, char **argv)
 
 	SDL_Quit();
 
-	cpymo_assetloader_free(&assetloader);
+	cpymo_engine_free(&engine);
 
 	return 0;
 }

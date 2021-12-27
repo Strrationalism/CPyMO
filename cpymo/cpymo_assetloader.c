@@ -5,7 +5,7 @@
 #include <memory.h>
 #include <assert.h>
 
-error_t cpymo_assetloader_init(cpymo_assetloader * out, cpymo_gameconfig * config, const char * gamedir)
+error_t cpymo_assetloader_init(cpymo_assetloader * out, const cpymo_gameconfig * config, const char * gamedir)
 {
 	error_t err;
 	const size_t gamedir_strlen = strlen(gamedir);
@@ -66,7 +66,7 @@ error_t cpymo_assetloader_init(cpymo_assetloader * out, cpymo_gameconfig * confi
 
 	chbuf[gamedir_strlen] = '\0';
 	
-	out->gamedir = realloc(out->gamedir, gamedir_strlen + 1);
+	out->gamedir = realloc((void *)out->gamedir, gamedir_strlen + 1);
 	
 	return CPYMO_ERR_SUCC;
 }
@@ -78,7 +78,7 @@ void cpymo_assetloader_free(cpymo_assetloader * loader)
 		if (loader->use_pkg_chara) cpymo_package_close(&loader->pkg_chara);
 		if (loader->use_pkg_se) cpymo_package_close(&loader->pkg_se);
 		if (loader->use_pkg_voice) cpymo_package_close(&loader->pkg_voice);
-		free(loader->gamedir);
+		free((void *)loader->gamedir);
 	}
 }
 

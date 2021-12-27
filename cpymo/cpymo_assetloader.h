@@ -12,7 +12,7 @@ typedef struct {
 	const char *gamedir;
 } cpymo_assetloader;
 
-error_t cpymo_assetloader_init(cpymo_assetloader *out, cpymo_gameconfig *config, const char *gamedir);
+error_t cpymo_assetloader_init(cpymo_assetloader *out, const cpymo_gameconfig *config, const char *gamedir);
 void cpymo_assetloader_free(cpymo_assetloader *loader);
 
 error_t cpymo_assetloader_load_bg(char **out_buffer, size_t *buf_size, const char *bg_name, const cpymo_assetloader *loader);
