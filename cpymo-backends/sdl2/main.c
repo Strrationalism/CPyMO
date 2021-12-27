@@ -21,11 +21,13 @@ cpymo_engine engine;
 static void set_window_icon(const char *gamedir) 
 {
 	int w, h, channel;
-	char icon_path[4096];
+	char *icon_path = (char *)malloc(strlen(gamedir) + 10);
+	if (icon_path == NULL) return;
 
 	sprintf(icon_path, "%s/icon.png", gamedir);
 
 	stbi_uc *icon = stbi_load(icon_path, &w, &h, &channel, 4);
+	free(icon_path);
 	if (icon == NULL) return;
 
 	SDL_Surface *surface =
