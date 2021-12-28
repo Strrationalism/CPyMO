@@ -77,7 +77,7 @@ void cpymo_backend_image_draw(
 	dst_rect.w = dstw;
 	dst_rect.h = dsth;
 
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha * 255);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, (Uint8)(alpha * 255));
 
 	if (0 != SDL_RenderCopyF(
 		renderer,
@@ -91,15 +91,15 @@ void cpymo_backend_image_draw(
 
 void cpymo_backend_image_draw_lines(const float *xyxy_points, size_t points_count, cpymo_color color, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha * 255);
-	if (SDL_RenderDrawLinesF(renderer, (const SDL_FPoint *)xyxy_points, points_count) != 0)
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, (Uint8)(alpha * 255));
+	if (SDL_RenderDrawLinesF(renderer, (const SDL_FPoint *)xyxy_points, (int)points_count) != 0)
 		SDL_Log("Warning: SDL_RenderDrawLinesF failed: %s", SDL_GetError());
 }
 
 void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_color color, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha * 255);
-	if (SDL_RenderFillRectsF(renderer, (SDL_FRect *)xywh, count) != 0)
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, (Uint8)(alpha * 255));
+	if (SDL_RenderFillRectsF(renderer, (SDL_FRect *)xywh, (int)count) != 0)
 		SDL_Log("Warning: SDL_RenderFillRectsF failed, %s", SDL_GetError());
 }
 

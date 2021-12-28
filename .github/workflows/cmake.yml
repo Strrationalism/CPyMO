@@ -39,6 +39,8 @@ jobs:
       uses: actions/upload-artifact@v2.3.0
       with:
         name: Build Artifact on ${{ runner.os }}
-        path: ./build/build/*cpymo*
+        path: |
+            ./build/build/*cpymo*
+            ./build/build/MinSizeRel/*cpymo*
 
       
