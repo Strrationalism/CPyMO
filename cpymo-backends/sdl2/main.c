@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <cpymo_error.h>
 #include <SDL.h>
@@ -13,6 +14,10 @@
 #define STBI_NO_PNM
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#if _WIN32 && !NDEBUG
+#include <crtdbg.h>
+#endif
 
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -121,6 +126,10 @@ int main(int argc, char **argv)
 	SDL_Quit();
 
 	cpymo_engine_free(&engine);
+
+	#if _WIN32 && !NDEBUG
+	_CrtDumpMemoryLeaks();
+	#endif
 
 	return 0;
 }
