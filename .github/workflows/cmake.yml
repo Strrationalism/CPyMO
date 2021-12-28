@@ -38,7 +38,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: Build Artifact on ${{ matrix.os }}
-        path: ./build/build/*
+        name: Build Artifact on ${{ runner.os }}
+        path: ./build/build/*cpymo*
 
       
