@@ -4,12 +4,16 @@
 #include "cpymo_assetloader.h"
 #include "cpymo_gameconfig.h"
 #include "cpymo_error.h"
+#include "cpymo_interpreter.h"
 
-typedef struct {
+struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
 	cpymo_assetloader assetloader;
+	cpymo_interpreter interpreter;
 	bool draw;
-} cpymo_engine;
+};
+
+typedef struct cpymo_engine cpymo_engine;
 
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir);
 void cpymo_engine_free(cpymo_engine *engine);

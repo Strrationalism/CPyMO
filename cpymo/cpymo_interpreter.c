@@ -1,4 +1,5 @@
 #include "cpymo_interpreter.h"
+#include "cpymo_engine.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -49,16 +50,20 @@ error_t cpymo_interpreter_init_snapshot(cpymo_interpreter * out, const cpymo_int
 	error_t err = cpymo_interpreter_init_script(out, snapshot->script_name, loader);
 	if (err != CPYMO_ERR_SUCC) return err;
 
-	while (snapshot->cur_line != out->script_parser.cur_line)
-		if (!cpymo_parser_next_line(&out->script_parser))
-			return CPYMO_ERR_BAD_FILE_FORMAT;
-
-	return CPYMO_ERR_SUCC;
+	return cpymo_interpreter_goto_line(out, snapshot->cur_line);
 }
 
 void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 {
 	free(interpreter->script_content);
+}
+
+error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t line)
+{
+	while (line != interpreter->script_parser.cur_line)
+		if (!cpymo_parser_next_line(&interpreter->script_parser))
+			return CPYMO_ERR_BAD_FILE_FORMAT;
+	return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, const char * label)
@@ -117,7 +122,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	char buf[4096];
 	cpymo_parser_stream_span_copy(buf, 4096, command);
 
-	printf("[%s]", buf);
+	printf("[%d: %s]", parser->cur_line, buf);
 
 	while (!parser->is_line_end) {
 		cpymo_parser_stream_span arg = cpymo_parser_curline_pop_commacell(parser);

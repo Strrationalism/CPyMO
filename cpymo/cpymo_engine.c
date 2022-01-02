@@ -22,6 +22,13 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	err = cpymo_assetloader_init(&out->assetloader, &out->gameconfig, gamedir);
 	if (err != CPYMO_ERR_SUCC) return err;
 
+	// create script interpreter
+	err = cpymo_interpreter_init_boot(&out->interpreter, out->gameconfig.startscript);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_assetloader_free(&out->assetloader);
+		return err;
+	}
+
 	// states
 	out->draw = false;
 
@@ -30,6 +37,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine * engine)
 {
+	cpymo_interpreter_free(&engine->interpreter);
 	cpymo_assetloader_free(&engine->assetloader);
 }
 

@@ -3,8 +3,7 @@
 #include <cpymo_error.h>
 #include <SDL.h>
 #include <cpymo_engine.h>
-#include <cpymo_parser.h>
-#include <cpymo_assetloader.h>
+#include <cpymo_interpreter.h>
 #include <string.h>
 
 #define STBI_NO_PSD
@@ -57,6 +56,11 @@ int main(int argc, char **argv)
 	}
 
 	error_t err = cpymo_engine_init(&engine, gamedir);
+
+	/*cpymo_interpreter interpreter;
+	cpymo_interpreter_init_script(&interpreter, "go_h", &engine.assetloader);
+
+	while (cpymo_interpreter_execute_step(&interpreter, &engine) == CPYMO_ERR_SUCC);*/
 
 	if (err != CPYMO_ERR_SUCC) {
 		SDL_Log("Error: cpymo_engine_init (%s)", cpymo_error_message(err));
