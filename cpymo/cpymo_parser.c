@@ -75,13 +75,18 @@ char cpymo_parser_curline_readchar(cpymo_parser * parser)
 
 cpymo_parser_stream_span cpymo_parser_curline_readuntil(cpymo_parser * parser, char until)
 {
+	return cpymo_parser_curline_readuntil_or(parser, until, '\0');
+}
+
+cpymo_parser_stream_span cpymo_parser_curline_readuntil_or(cpymo_parser * parser, char until1, char until2)
+{
 	cpymo_parser_stream_span span;
 	span.begin = parser->stream.begin + parser->cur_pos;
 	span.len = 0;
 
 	char ch;
 	while ((ch = cpymo_parser_curline_readchar(parser))) {
-		if (ch == until) break;
+		if (ch == until1 || ch == until2) break;
 		span.len++;
 	}
 
@@ -93,6 +98,14 @@ cpymo_parser_stream_span cpymo_parser_curline_pop_commacell(cpymo_parser * parse
 	cpymo_parser_stream_span span = cpymo_parser_curline_readuntil(parser, ',');
 	cpymo_parser_stream_span_trim(&span);
 	return span;
+}
+
+cpymo_parser_stream_span cpymo_parser_curline_pop_command(cpymo_parser * parser)
+{
+	cpymo_parser_curline_readuntil(parser, '#');
+	cpymo_parser_stream_span command = cpymo_parser_curline_readuntil_or(parser, ' ', '\t');
+	cpymo_parser_stream_span_trim(&command);
+	return command;
 }
 
 void cpymo_parser_stream_span_trim_start(cpymo_parser_stream_span * span)
@@ -163,4 +176,16 @@ cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span)
 	c.b = from_hex_char(span.begin[5]) * 16 + from_hex_char(span.begin[6]);
 
 	return c;
+}
+
+bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const char * str)
+{
+	if (*str == '\0' && span.len == 0) return true;
+	else if (*str == '\0' || span.len == 0) return false;
+	else if (*str == span.begin[0]) {
+		span.begin++;
+		span.len--;
+		return cpymo_parser_stream_span_equals_str(span, str + 1);
+	}
+	else return false;
 }

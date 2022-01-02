@@ -8,6 +8,7 @@ const char * cpymo_error_message(error_t err) {
 	case CPYMO_ERR_BAD_FILE_FORMAT: return "Bad file format.";
 	case CPYMO_ERR_INVALID_ARG: return "Invalid arguments.";
 	case CPYMO_ERR_OUT_OF_MEM: return "Out of memory.";
+	case CPYMO_ERR_NO_MORE_CONTENT: return "No more content.";
 	default: return "Unknown error.";
 	}
 }
