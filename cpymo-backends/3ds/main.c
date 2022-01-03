@@ -13,7 +13,7 @@ int main(void) {
 	gfxSetDoubleBuffering(GFX_BOTTOM, false);
 
 	const char *gamename = select_game();
-	if (gamedir == NULL) {
+	if (gamename == NULL) {
 		gfxExit();
 		return 0;
 	}
