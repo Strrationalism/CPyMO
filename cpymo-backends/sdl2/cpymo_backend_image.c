@@ -13,9 +13,9 @@ error_t cpymo_backend_image_load_immutable(
 			height, 
 			channels * 8, 
 			channels * width, 
-			0x00FF0000, 
-			0x0000FF00, 
 			0x000000FF, 
+			0x0000FF00, 
+			0x00FF0000, 
 			0xFF000000);
 
 	if (surface == NULL) {

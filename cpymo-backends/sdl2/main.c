@@ -35,7 +35,7 @@ static void set_window_icon(const char *gamedir)
 	if (icon == NULL) return;
 
 	SDL_Surface *surface =
-		SDL_CreateRGBSurfaceFrom(icon, w, h, channel * 8, channel * w, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		SDL_CreateRGBSurfaceFrom(icon, w, h, channel * 8, channel * w, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
 	if (surface == NULL) {
 		stbi_image_free(icon);
@@ -56,8 +56,6 @@ int main(int argc, char **argv)
 	}
 
 	error_t err = cpymo_engine_init(&engine, gamedir);
-
-	while (cpymo_interpreter_execute_step(engine.interpreter, &engine) == CPYMO_ERR_SUCC);
 
 	if (err != CPYMO_ERR_SUCC) {
 		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));

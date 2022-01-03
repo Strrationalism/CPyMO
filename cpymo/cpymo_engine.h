@@ -13,7 +13,6 @@ struct cpymo_engine {
 	cpymo_vars vars;
 	cpymo_interpreter *interpreter;
 	char *title;
-	bool draw;
 };
 
 typedef struct cpymo_engine cpymo_engine;
