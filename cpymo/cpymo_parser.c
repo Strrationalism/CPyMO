@@ -189,3 +189,15 @@ bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const ch
 	}
 	else return false;
 }
+
+bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_stream_span b)
+{
+	if (a.len == 0 && b.len == 0) return true;
+	else if (a.len == 0 || b.len == 0) return false;
+	else if (a.begin[0] == b.begin[0]) {
+		a.begin++; a.len--;
+		b.begin++; b.len--;
+		return cpymo_parser_stream_span_equals(a, b);
+	}
+	else return false;
+}

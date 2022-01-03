@@ -57,13 +57,10 @@ int main(int argc, char **argv)
 
 	error_t err = cpymo_engine_init(&engine, gamedir);
 
-	/*cpymo_interpreter interpreter;
-	cpymo_interpreter_init_script(&interpreter, "go_h", &engine.assetloader);
-
-	while (cpymo_interpreter_execute_step(&interpreter, &engine) == CPYMO_ERR_SUCC);*/
+	//while (cpymo_interpreter_execute_step(&engine.interpreter, &engine) == CPYMO_ERR_SUCC);
 
 	if (err != CPYMO_ERR_SUCC) {
-		SDL_Log("Error: cpymo_engine_init (%s)", cpymo_error_message(err));
+		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));
 	}
 
 	if (SDL_Init(
@@ -72,7 +69,7 @@ int main(int argc, char **argv)
 		SDL_INIT_GAMECONTROLLER |
 		SDL_INIT_JOYSTICK |
 		SDL_INIT_VIDEO) != 0) {
-		SDL_Log("Error: Unable to initialize SDL: %s", SDL_GetError());
+		SDL_Log("[Error] Unable to initialize SDL: %s", SDL_GetError());
 		return -1;
 	}
 
@@ -87,7 +84,7 @@ int main(int argc, char **argv)
 		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE,
 		&window,
 		&renderer) != 0) {
-		SDL_Log("Error: Can not create window and renderer: %s", SDL_GetError());
+		SDL_Log("[Error] Can not create window and renderer: %s", SDL_GetError());
 		return -1;
 	}
 
@@ -95,7 +92,7 @@ int main(int argc, char **argv)
 	set_window_icon(gamedir);
 	
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
-		SDL_Log("Error: Can not set logical size: %s", SDL_GetError());
+		SDL_Log("[Error] Can not set logical size: %s", SDL_GetError());
 		return -1;
 	}
 	

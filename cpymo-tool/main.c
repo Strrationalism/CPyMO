@@ -17,7 +17,7 @@ void help() {
 int process_err(error_t e) {
 	if (e == CPYMO_ERR_SUCC) return 0;
 	else {
-		printf("Error: %s", cpymo_error_message(e));
+		printf("[Error] %s", cpymo_error_message(e));
 		return -1;
 	}
 }

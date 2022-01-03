@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <setjmp.h>
 
 error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_script_name)
 {
@@ -66,7 +67,7 @@ error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t li
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, const char * label)
+error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_parser_stream_span label)
 {
 	cpymo_parser_reset(&interpreter->script_parser);
 
@@ -78,14 +79,10 @@ error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, const char
 			cpymo_parser_stream_span cur_label = 
 				cpymo_parser_curline_pop_commacell(&interpreter->script_parser);
 
-			if (cpymo_parser_stream_span_equals_str(cur_label, label)) {
+			if (cpymo_parser_stream_span_equals(cur_label, label)) {
 				cpymo_parser_next_line(&interpreter->script_parser);
 				return CPYMO_ERR_SUCC;
 			}
-		}
-
-		if (!cpymo_parser_next_line(&interpreter->script_parser)) {
-			return CPYMO_ERR_NOT_FOUND;
 		}
 	}
 }
@@ -98,14 +95,17 @@ cpymo_interpreter_snapshot cpymo_interpreter_get_snapshot(const cpymo_interprete
 	return out;
 }
 
-static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_parser *parser, cpymo_engine *engine);
+static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont);
 
 error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_engine *engine)
 {
+	jmp_buf cont;
+	setjmp(cont);
+
 	cpymo_parser_stream_span command =
 		cpymo_parser_curline_pop_command(&interpreter->script_parser);
 
-	error_t err = cpymo_interpreter_dispatch(command, &interpreter->script_parser, engine);
+	error_t err = cpymo_interpreter_dispatch(command, interpreter, engine, cont);
 	if (err != CPYMO_ERR_SUCC) {
 		cpymo_parser_next_line(&interpreter->script_parser);
 		return err;
@@ -117,20 +117,68 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	return CPYMO_ERR_SUCC;
 }
 
-static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_parser *parser, cpymo_engine *engine)
+#define D(CMD) \
+	else if (cpymo_parser_stream_span_equals_str(command, CMD))
+
+#define POP_ARG(X) \
+	cpymo_parser_stream_span X = cpymo_parser_curline_pop_commacell(&interpreter->script_parser); \
+	cpymo_parser_stream_span_trim(&X)
+
+#define IS_EMPTY(X) \
+	cpymo_parser_stream_span_equals_str(X, "")
+	
+#define ENSURE(X) \
+	{ if (IS_EMPTY(X)) return CPYMO_ERR_INVALID_ARG; }
+
+#define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, 1); return CPYMO_ERR_UNKNOWN; }
+
+#define CONT_NEXTLINE { \
+	if (cpymo_parser_next_line(&interpreter->script_parser))	\
+		{ longjmp(cont, 1); return CPYMO_ERR_UNKNOWN; }	\
+	else return CPYMO_ERR_NO_MORE_CONTENT; }
+
+static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
 {
-	char buf[4096];
-	cpymo_parser_stream_span_copy(buf, 4096, command);
-
-	printf("[%d: %s]", parser->cur_line, buf);
-
-	while (!parser->is_line_end) {
-		cpymo_parser_stream_span arg = cpymo_parser_curline_pop_commacell(parser);
-		cpymo_parser_stream_span_copy(buf, 4096, arg);
-		printf("%s;", buf);
+	if (IS_EMPTY(command)) {
+		CONT_NEXTLINE;
 	}
 
-	printf("\n");
+	D("goto") {
+		POP_ARG(label);
+		ENSURE(label);
+		cpymo_interpreter_goto_label(interpreter, label);
+		
+		CONT_WITH_CURRENT_CONTEXT;
+	}
 
-	return CPYMO_ERR_SUCC;
+	D("change") {
+		POP_ARG(script_name_span);
+		ENSURE(script_name_span);
+
+		char script_name[sizeof(interpreter->script_name)];
+		cpymo_parser_stream_span_copy(script_name, sizeof(script_name), script_name_span);
+
+		cpymo_interpreter_free(interpreter);
+		cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader);
+
+		CONT_WITH_CURRENT_CONTEXT;
+	}
+
+	D("label") {
+		CONT_NEXTLINE;
+	}
+	
+	else {
+		char buf[32];
+		cpymo_parser_stream_span_copy(buf, 32, command);
+
+		fprintf(
+			stderr,
+			"[Warning] Unknown command \"%s\" in script %s(%u).\n",
+			buf,
+			interpreter->script_name,
+			interpreter->script_parser.cur_line + 1);
+
+		CONT_NEXTLINE;
+	}
 }

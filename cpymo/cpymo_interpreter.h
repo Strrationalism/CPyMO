@@ -24,7 +24,7 @@ error_t cpymo_interpreter_init_snapshot(cpymo_interpreter *out, const cpymo_inte
 void cpymo_interpreter_free(cpymo_interpreter *interpreter);
 
 error_t cpymo_interpreter_goto_line(cpymo_interpreter *interpreter, uint64_t line);
-error_t cpymo_interpreter_goto_label(cpymo_interpreter *interpreter, const char *label);
+error_t cpymo_interpreter_goto_label(cpymo_interpreter *interpreter, cpymo_parser_stream_span label);
 error_t cpymo_interpreter_execute_step(cpymo_interpreter *interpreter, struct cpymo_engine *engine);
 
 cpymo_interpreter_snapshot cpymo_interpreter_get_snapshot(const cpymo_interpreter * interpreter);

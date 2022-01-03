@@ -46,19 +46,19 @@ error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const cha
 
 		FILE *out = fopen(out_file_path, "wb");
 		if (out == NULL) {
-			printf("Error: Can not write %s.\n", out_file_path);
+			printf("[Error] Can not write %s.\n", out_file_path);
 			continue;
 		}
 
 		error_t err = cpymo_package_read_file(buf, &pkg, file_index);
 		if (err != CPYMO_ERR_SUCC) {
-			printf("Error: Can not read file, error code: %d.\n", err);
+			printf("[Error] Can not read file, error code: %d.\n", err);
 			fclose(out);
 			continue;
 		}
 
 		if (fwrite(buf, file_index->file_length, 1, out) != 1) {
-			printf("Error: Can not write to file.");
+			printf("[Error] Can not write to file.");
 		}
 
 		fclose(out);
@@ -133,7 +133,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 
 	FILE *out_pak = fopen(out_pack_path, "wb");
 	if (out_pak == NULL) {
-		printf("Error: Can not open %s.", out_pack_path);
+		printf("[Error] Can not open %s.", out_pack_path);
 		free(index);
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 	}
@@ -141,7 +141,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 	uint32_t file_count_store = end_htole32(file_count);
 	size_t count = fwrite(&file_count_store, sizeof(uint32_t), 1, out_pak);
 	if (count != 1) {
-		printf("Error: Can not write file_count to package.");
+		printf("[Error] Can not write file_count to package.");
 		free(index);
 		fclose(out_pak);
 		return CPYMO_ERR_UNKNOWN;
@@ -151,7 +151,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 	free(index);
 
 	if (count != file_count) {
-		printf("Error: Can not write file index to package.");
+		printf("[Error] Can not write file index to package.");
 		fclose(out_pak);
 	}
 
@@ -160,7 +160,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 
 		FILE *f = fopen(path, "rb");
 		if (f == NULL) {
-			printf("Error: Can not open file %s.", path);
+			printf("[Error] Can not open file %s.", path);
 			fclose(out_pak);
 			free(buf);
 			return CPYMO_ERR_CAN_NOT_OPEN_FILE;
@@ -171,7 +171,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 		fseek(f, 0, SEEK_SET);
 
 		if (fread(buf, length, 1, f) != 1) {
-			printf("Error: Can not read file %s.", path);
+			printf("[Error] Can not read file %s.", path);
 			fclose(out_pak);
 			fclose(f);
 			free(buf);
@@ -181,7 +181,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 		fclose(f);
 
 		if (fwrite(buf, length, 1, out_pak) != 1) {
-			printf("Error: Can not write %s to package.", path);
+			printf("[Error] Can not write %s to package.", path);
 			fclose(out_pak);
 			free(buf);
 			return CPYMO_ERR_UNKNOWN;
