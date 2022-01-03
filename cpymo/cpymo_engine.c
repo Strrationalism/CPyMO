@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cpymo_backend_input.h>
 
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 {
@@ -70,11 +71,20 @@ void cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redr
 
 void cpymo_engine_draw(cpymo_engine *engine)
 {
+	float xywh0[] = {
+		0,0,800,600
+	};
+
+	cpymo_color col;
+	col.r = 255;
+	col.g = 255;
+	col.b = 255;
+	cpymo_backend_image_fill_rects(xywh0, 1, col, 1, cpymo_backend_image_draw_type_bg);
+
 	float xywh[] = {
 		200,100,400,400
 	};
 
-	cpymo_color col;
 	col.r = 128;
 	col.g = 255;
 	col.b = 128;

@@ -64,8 +64,8 @@ int main(int argc, char **argv)
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
 		SDL_INIT_AUDIO |
-		SDL_INIT_GAMECONTROLLER |
-		SDL_INIT_JOYSTICK |
+		//SDL_INIT_GAMECONTROLLER |		// Game Controller would support in future.
+		//SDL_INIT_JOYSTICK |
 		SDL_INIT_VIDEO) != 0) {
 		SDL_Log("[Error] Unable to initialize SDL: %s", SDL_GetError());
 		return -1;
