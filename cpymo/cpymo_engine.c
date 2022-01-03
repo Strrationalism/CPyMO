@@ -35,9 +35,21 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	err = cpymo_interpreter_init_boot(out->interpreter, out->gameconfig.startscript);
 	if (err != CPYMO_ERR_SUCC) {
 		free(out->interpreter);
+		cpymo_vars_free(&out->vars);
 		cpymo_assetloader_free(&out->assetloader);
 		return err;
 	}
+
+	// create title
+	out->title = (char *)malloc(1);
+	if (out->title == NULL) {
+		cpymo_interpreter_free(out->interpreter);
+		free(out->interpreter);
+		cpymo_vars_free(&out->vars);
+		cpymo_assetloader_free(&out->assetloader);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+	out->title[0] = '\0';
 
 	// states
 	out->draw = false;
@@ -51,6 +63,7 @@ void cpymo_engine_free(cpymo_engine * engine)
 	free(engine->interpreter);
 	cpymo_vars_free(&engine->vars);
 	cpymo_assetloader_free(&engine->assetloader);
+	free(engine->title);
 }
 
 void cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)

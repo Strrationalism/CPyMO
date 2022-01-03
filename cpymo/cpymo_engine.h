@@ -12,6 +12,7 @@ struct cpymo_engine {
 	cpymo_assetloader assetloader;
 	cpymo_vars vars;
 	cpymo_interpreter *interpreter;
+	char *title;
 	bool draw;
 };
 

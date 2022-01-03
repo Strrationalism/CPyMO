@@ -167,7 +167,22 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_NEXTLINE;
 	}
 
-	/*** 3. Variables, Selection, Jump ***/
+	/*** I. Text ***/
+	D("title") {
+		POP_ARG(title);
+
+		cpymo_parser_stream_span_trim(&title);
+		char *buf = (char *)malloc(title.len + 1);
+		if (buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+		free(engine->title);
+		engine->title = buf;
+		cpymo_parser_stream_span_copy(engine->title, title.len + 1, title);
+		
+		CONT_NEXTLINE;
+	}
+
+	/*** III. Variables, Selection, Jump ***/
 	D("set") {
 		POP_ARG(name); ENSURE(name);
 		POP_ARG(value_str); ENSURE(value_str);
