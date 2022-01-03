@@ -23,8 +23,15 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	if (err != CPYMO_ERR_SUCC) return err;
 
 	// create script interpreter
-	err = cpymo_interpreter_init_boot(&out->interpreter, out->gameconfig.startscript);
+	out->interpreter = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
+	if (out->interpreter == NULL) {
+		cpymo_assetloader_free(&out->assetloader);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	err = cpymo_interpreter_init_boot(out->interpreter, out->gameconfig.startscript);
 	if (err != CPYMO_ERR_SUCC) {
+		free(out->interpreter);
 		cpymo_assetloader_free(&out->assetloader);
 		return err;
 	}
@@ -37,7 +44,8 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine * engine)
 {
-	cpymo_interpreter_free(&engine->interpreter);
+	cpymo_interpreter_free(engine->interpreter);
+	free(engine->interpreter);
 	cpymo_assetloader_free(&engine->assetloader);
 }
 

@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
 	error_t err = cpymo_engine_init(&engine, gamedir);
 
-	//while (cpymo_interpreter_execute_step(&engine.interpreter, &engine) == CPYMO_ERR_SUCC);
+	while (cpymo_interpreter_execute_step(engine.interpreter, &engine) == CPYMO_ERR_SUCC);
 
 	if (err != CPYMO_ERR_SUCC) {
 		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));

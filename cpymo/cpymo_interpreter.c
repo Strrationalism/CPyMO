@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
+#include <assert.h>
 
 error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_script_name)
 {
@@ -13,6 +14,7 @@ error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_
 		"#change %s";
 
 	out->script_name[0] = '\0';
+	out->caller = NULL;
 	
 	size_t script_len = strlen(script_format) + 64;
 	out->script_content = (char *)malloc(script_len);
@@ -33,6 +35,8 @@ error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * scri
 {
 	if (strlen(script_name) >= 63) return CPYMO_ERR_OUT_OF_MEM;
 	strcpy(out->script_name, script_name);
+
+	out->caller = NULL;
 
 	out->script_content = NULL;
 	size_t script_len = 0;
@@ -56,6 +60,15 @@ error_t cpymo_interpreter_init_snapshot(cpymo_interpreter * out, const cpymo_int
 
 void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 {
+	cpymo_interpreter *caller = interpreter->caller;
+	while (caller) {
+		cpymo_interpreter *to_free = caller;
+		caller = caller->caller;
+
+		free(to_free->script_content);
+		free(to_free);
+	}
+
 	free(interpreter->script_content);
 }
 
@@ -87,7 +100,7 @@ error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_pars
 	}
 }
 
-cpymo_interpreter_snapshot cpymo_interpreter_get_snapshot(const cpymo_interpreter * interpreter)
+cpymo_interpreter_snapshot cpymo_interpreter_get_snapshot_current_callstack(const cpymo_interpreter * interpreter)
 {
 	cpymo_interpreter_snapshot out;
 	strcpy(out.script_name, interpreter->script_name);
@@ -139,6 +152,8 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 
 static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
 {
+	error_t err;
+
 	if (IS_EMPTY(command)) {
 		CONT_NEXTLINE;
 	}
@@ -146,7 +161,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("goto") {
 		POP_ARG(label);
 		ENSURE(label);
-		cpymo_interpreter_goto_label(interpreter, label);
+		if ((err = cpymo_interpreter_goto_label(interpreter, label)) != CPYMO_ERR_SUCC)
+			return err;
 		
 		CONT_WITH_CURRENT_CONTEXT;
 	}
@@ -159,13 +175,52 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		cpymo_parser_stream_span_copy(script_name, sizeof(script_name), script_name_span);
 
 		cpymo_interpreter_free(interpreter);
-		cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader);
+		if ((err = cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader)) != CPYMO_ERR_SUCC)
+			return err;
 
 		CONT_WITH_CURRENT_CONTEXT;
 	}
 
 	D("label") {
 		CONT_NEXTLINE;
+	}
+
+	D("call") {
+		POP_ARG(script_name_span);
+		ENSURE(script_name_span);
+		cpymo_parser_next_line(&interpreter->script_parser);
+
+		char script_name[sizeof(interpreter->script_name)];
+		cpymo_parser_stream_span_copy(script_name, sizeof(script_name), script_name_span);
+
+		cpymo_interpreter *callee = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
+		if (callee == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+		if ((err = cpymo_interpreter_init_script(callee, script_name, &engine->assetloader)) != CPYMO_ERR_SUCC) {
+			free(callee);
+			return err;
+		}
+
+		assert(engine->interpreter == interpreter);
+
+		engine->interpreter = callee;
+		callee->caller = interpreter;
+
+		return cpymo_interpreter_execute_step(callee, engine);
+	}
+
+	D("ret") {
+		if (interpreter->caller == NULL) return CPYMO_ERR_NO_MORE_CONTENT;
+
+		assert(engine->interpreter == interpreter);
+
+		cpymo_interpreter *caller = interpreter->caller;
+
+		engine->interpreter = interpreter->caller;
+		free(interpreter->script_content);
+		free(interpreter);
+
+		return cpymo_interpreter_execute_step(caller, engine);
 	}
 	
 	else {

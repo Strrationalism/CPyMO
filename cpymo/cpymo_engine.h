@@ -9,7 +9,7 @@
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
 	cpymo_assetloader assetloader;
-	cpymo_interpreter interpreter;
+	cpymo_interpreter *interpreter;
 	bool draw;
 };
 
