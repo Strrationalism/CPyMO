@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <assert.h>
+#include <ctype.h>
 
 error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_script_name)
 {
@@ -97,6 +98,14 @@ error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_pars
 				return CPYMO_ERR_SUCC;
 			}
 		}
+		else {
+			if (!cpymo_parser_next_line(&interpreter->script_parser)) {
+				char label_name[32];
+				cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
+				fprintf(stderr, "[Error] Can not find label %s in script %s.", label_name, interpreter->script_name);
+				return CPYMO_ERR_NOT_FOUND;
+			}
+		}
 	}
 }
 
@@ -158,6 +167,50 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_NEXTLINE;
 	}
 
+	/*** 3. Variables, Selection, Jump ***/
+	D("set") {
+		POP_ARG(name); ENSURE(name);
+		POP_ARG(value_str); ENSURE(value_str);
+		
+		int *v = NULL;
+		if ((err = cpymo_vars_access_create(&engine->vars, name, &v)) != CPYMO_ERR_SUCC)
+			return err;
+
+		*v = cpymo_parser_stream_span_atoi(value_str);
+			
+		CONT_NEXTLINE;
+	}
+
+	D("add") {
+		POP_ARG(name); ENSURE(name);
+		POP_ARG(value); ENSURE(value);
+
+		int *v = NULL;
+		if ((err = cpymo_vars_access_create(&engine->vars, name, &v)) != CPYMO_ERR_SUCC)
+			return err;
+
+		*v += cpymo_parser_stream_span_atoi(value);
+
+		CONT_NEXTLINE;
+	}
+
+	D("sub") {
+		POP_ARG(name); ENSURE(name);
+		POP_ARG(value); ENSURE(value);
+
+		int *v = NULL;
+		if ((err = cpymo_vars_access_create(&engine->vars, name, &v)) != CPYMO_ERR_SUCC)
+			return err;
+
+		*v -= cpymo_parser_stream_span_atoi(value);
+
+		CONT_NEXTLINE;
+	}
+
+	D("label") {
+		CONT_NEXTLINE;
+	}
+
 	D("goto") {
 		POP_ARG(label);
 		ENSURE(label);
@@ -181,8 +234,107 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_WITH_CURRENT_CONTEXT;
 	}
 
-	D("label") {
+	D("if") {
+		POP_ARG(condition); ENSURE(condition);
+
+		cpymo_parser parser;
+		cpymo_parser_init(&parser, condition.begin, condition.len);
+
+		cpymo_parser_stream_span left;
+		left.begin = condition.begin;
+		left.len = 0;
+
+		while (left.len < condition.len) {
+			char ch = left.begin[left.len];
+			if (ch == '>' || ch == '<' || ch == '=' || ch == '!') 
+				break;
+			left.len++;
+		}
+
+		if (left.len >= condition.len) goto BAD_EXPRESSION;
+
+		cpymo_parser_stream_span op;
+		op.begin = left.begin + left.len;
+		op.len = 1;
+
+		if (op.begin[0] == '!') {
+			op.len++;
+			if (op.len + left.len >= condition.len) goto BAD_EXPRESSION;
+			if (op.begin[1] != '=') goto BAD_EXPRESSION;
+		}
+
+		if ((op.begin[0] == '>' || op.begin[0] == '<')) {
+			if (op.len + 1 + left.len < condition.len) {
+				if (op.begin[1] == '=')
+					op.len++;
+			}
+		}
+
+		cpymo_parser_stream_span right;
+		right.begin = op.begin + op.len;
+		right.len = condition.len - op.len - left.len;
+
+		cpymo_parser_stream_span_trim(&left);
+		cpymo_parser_stream_span_trim(&op);
+		cpymo_parser_stream_span_trim(&right);
+
+		if (IS_EMPTY(left) || IS_EMPTY(right) || IS_EMPTY(op)) 
+			goto BAD_EXPRESSION;
+
+		bool is_constant = true;
+		for (size_t i = 0; i < right.len; ++i) {
+			if (!isdigit(right.begin[i])) {
+				is_constant = false;
+				break;
+			}
+		}
+
+		int lv, rv;
+		{
+			int *plv = cpymo_vars_access(&engine->vars, left);
+			lv = plv ? *plv : 0;
+
+			if (is_constant)
+				rv = cpymo_parser_stream_span_atoi(right);
+			else {
+				int *prv = cpymo_vars_access(&engine->vars, right);
+				rv = prv ? *prv : 0;
+			}
+		}
+
+		bool run_sub_command;
+		if (cpymo_parser_stream_span_equals_str(op, "="))
+			run_sub_command = lv == rv;
+		else if (cpymo_parser_stream_span_equals_str(op, "!="))
+			run_sub_command = lv != rv;
+		else if (cpymo_parser_stream_span_equals_str(op, ">"))
+			run_sub_command = lv > rv;
+		else if (cpymo_parser_stream_span_equals_str(op, ">="))
+			run_sub_command = lv >= rv;
+		else if (cpymo_parser_stream_span_equals_str(op, "<"))
+			run_sub_command = lv < rv;
+		else if (cpymo_parser_stream_span_equals_str(op, "<="))
+			run_sub_command = lv <= rv;
+		else goto BAD_EXPRESSION;
+
+		if (run_sub_command) {
+			cpymo_parser_stream_span sub_command =
+				cpymo_parser_curline_readuntil_or(&interpreter->script_parser, ' ', '\t');
+
+			cpymo_parser_stream_span_trim(&sub_command);
+			return cpymo_interpreter_dispatch(sub_command, interpreter, engine, cont);
+		}
+		
+
 		CONT_NEXTLINE;
+
+	BAD_EXPRESSION:
+		char *condition_str = (char *)malloc(condition.len + 1);
+		if (condition_str == NULL) return CPYMO_ERR_OUT_OF_MEM;
+		cpymo_parser_stream_span_copy(condition_str, condition.len + 1, condition);
+		fprintf(stderr, "[Error] Bad if expression \"%s\".", condition_str);
+		free(condition_str);
+		return CPYMO_ERR_INVALID_ARG;
 	}
 
 	D("call") {
@@ -221,6 +373,33 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		free(interpreter);
 
 		return cpymo_interpreter_execute_step(caller, engine);
+	}
+
+	D("rand") {
+		POP_ARG(var_name); ENSURE(var_name);
+		POP_ARG(min_val_str); ENSURE(min_val_str);
+		POP_ARG(max_val_str); ENSURE(max_val_str);
+
+		int min_val = cpymo_parser_stream_span_atoi(min_val_str);
+		int max_val = cpymo_parser_stream_span_atoi(max_val_str);
+
+		if (max_val - min_val <= 0) {
+			fprintf(
+				stderr,
+				"[Error] In script %s(%d), max value must bigger than min value for rand command.",
+				interpreter->script_name,
+				interpreter->script_parser.cur_line);
+
+			return CPYMO_ERR_INVALID_ARG;
+		}
+
+		int *p = NULL;
+		if ((err = cpymo_vars_access_create(&engine->vars, var_name, &p)) != CPYMO_ERR_SUCC)
+			return err;
+
+		*p = min_val + rand() % (max_val - min_val + 1);
+
+		CONT_NEXTLINE;
 	}
 	
 	else {

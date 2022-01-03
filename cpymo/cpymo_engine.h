@@ -5,10 +5,12 @@
 #include "cpymo_gameconfig.h"
 #include "cpymo_error.h"
 #include "cpymo_interpreter.h"
+#include "cpymo_vars.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
 	cpymo_assetloader assetloader;
+	cpymo_vars vars;
 	cpymo_interpreter *interpreter;
 	bool draw;
 };

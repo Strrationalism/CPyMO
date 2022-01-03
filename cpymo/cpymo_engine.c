@@ -22,6 +22,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	err = cpymo_assetloader_init(&out->assetloader, &out->gameconfig, gamedir);
 	if (err != CPYMO_ERR_SUCC) return err;
 
+	// create vars
+	cpymo_vars_init(&out->vars);
+
 	// create script interpreter
 	out->interpreter = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
 	if (out->interpreter == NULL) {
@@ -46,6 +49,7 @@ void cpymo_engine_free(cpymo_engine * engine)
 {
 	cpymo_interpreter_free(engine->interpreter);
 	free(engine->interpreter);
+	cpymo_vars_free(&engine->vars);
 	cpymo_assetloader_free(&engine->assetloader);
 }
 

@@ -80,13 +80,18 @@ cpymo_parser_stream_span cpymo_parser_curline_readuntil(cpymo_parser * parser, c
 
 cpymo_parser_stream_span cpymo_parser_curline_readuntil_or(cpymo_parser * parser, char until1, char until2)
 {
+	return cpymo_parser_curline_readuntil_or3(parser, until1, until2, '\0');
+}
+
+cpymo_parser_stream_span cpymo_parser_curline_readuntil_or3(cpymo_parser * parser, char until1, char until2, char until3)
+{
 	cpymo_parser_stream_span span;
 	span.begin = parser->stream.begin + parser->cur_pos;
 	span.len = 0;
 
 	char ch;
 	while ((ch = cpymo_parser_curline_readchar(parser))) {
-		if (ch == until1 || ch == until2) break;
+		if (ch == until1 || ch == until2 || ch == until3) break;
 		span.len++;
 	}
 
@@ -141,6 +146,7 @@ void cpymo_parser_stream_span_copy(char *dst, size_t buffer_size, cpymo_parser_s
 int cpymo_parser_stream_span_atoi(cpymo_parser_stream_span span)
 {
 	char buf[16];
+	cpymo_parser_stream_span_trim(&span);
 	cpymo_parser_stream_span_copy(buf, sizeof(buf), span);
 	return atoi(buf);
 }
