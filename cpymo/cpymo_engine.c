@@ -13,7 +13,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	char *path = (char *)malloc(gamedir_strlen + 16);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	strncpy(path, gamedir, gamedir_strlen);
+	strcpy(path, gamedir);
 	strcpy(path + gamedir_strlen, "/gameconfig.txt");
 	error_t err = cpymo_gameconfig_parse_from_file(&out->gameconfig, path);
 	free(path);

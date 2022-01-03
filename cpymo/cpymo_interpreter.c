@@ -298,7 +298,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		bool is_constant = true;
 		for (size_t i = 0; i < right.len; ++i) {
-			if (!isdigit(right.begin[i])) {
+			if (!isdigit((int)right.begin[i])) {
 				is_constant = false;
 				break;
 			}

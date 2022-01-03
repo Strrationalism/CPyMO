@@ -14,7 +14,7 @@ const char * select_game()
 	}
 
 	Handle handle;
-	error = FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, "/pymo/"));
+	error = FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, "/pymogames/"));
 	if (R_FAILED(error)) {
 		FSUSER_CloseArchive(archive);
 		fsExit();
