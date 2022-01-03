@@ -332,7 +332,12 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			char *condition_str = (char *)malloc(condition.len + 1);
 			if (condition_str == NULL) return CPYMO_ERR_OUT_OF_MEM;
 			cpymo_parser_stream_span_copy(condition_str, condition.len + 1, condition);
-			fprintf(stderr, "[Error] Bad if expression \"%s\".", condition_str);
+			fprintf(
+				stderr, 
+				"[Error] Bad if expression \"%s\" in script %s(%u).", 
+				condition_str,
+				interpreter->script_name,
+				(unsigned)interpreter->script_parser.cur_line);
 			free(condition_str);
 			return CPYMO_ERR_INVALID_ARG;
 		}
@@ -387,9 +392,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		if (max_val - min_val <= 0) {
 			fprintf(
 				stderr,
-				"[Error] In script %s(%d), max value must bigger than min value for rand command.",
+				"[Error] In script %s(%u), max value must bigger than min value for rand command.",
 				interpreter->script_name,
-				interpreter->script_parser.cur_line);
+				(unsigned)interpreter->script_parser.cur_line);
 
 			return CPYMO_ERR_INVALID_ARG;
 		}
@@ -412,7 +417,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			"[Warning] Unknown command \"%s\" in script %s(%u).\n",
 			buf,
 			interpreter->script_name,
-			interpreter->script_parser.cur_line + 1);
+			(unsigned)interpreter->script_parser.cur_line + 1);
 
 		CONT_NEXTLINE;
 	}
