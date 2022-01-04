@@ -6,7 +6,7 @@
 #include <utf8.h>
 #include <stdbool.h>
 
-typedef void * cpymo_backend_image;
+typedef void *cpymo_backend_image;
 
 error_t cpymo_backend_image_load_immutable(
 	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, int channels);
@@ -25,6 +25,13 @@ void cpymo_backend_image_free(cpymo_backend_image image);
 
 
 error_t cpymo_backend_image_size(cpymo_backend_image img, int *w, int *h);
+
+
+typedef void *cpymo_backend_image_screenshot;
+
+error_t cpymo_backend_image_screenshot_create(cpymo_backend_image_screenshot *out);
+
+error_t cpymo_backend_image_blit_screenshot(cpymo_backend_image_screenshot *out);
 
 
 /* Screen Coord in backend renderer
