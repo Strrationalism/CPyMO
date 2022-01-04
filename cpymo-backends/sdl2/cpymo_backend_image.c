@@ -4,15 +4,23 @@
 extern SDL_Renderer *renderer;
 
 error_t cpymo_backend_image_load_immutable(
-	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, int channels)
+	cpymo_backend_image *out_image, void *px, int w, int h, enum cpymo_backend_image_format fmt)
 {
+	int channels;
+
+	switch (fmt) {
+	case cpymo_backend_image_format_r: channels = 1; break;
+	case cpymo_backend_image_format_rgb: channels = 3; break;
+	case cpymo_backend_image_format_rgba: channels = 4; break;
+	}
+
 	SDL_Surface *surface =
 		SDL_CreateRGBSurfaceFrom(
-			pixels_moveintoimage,
-			width, 
-			height, 
+			px,
+			w, 
+			h, 
 			channels * 8, 
-			channels * width, 
+			channels * w, 
 			0x000000FF, 
 			0x0000FF00, 
 			0x00FF0000, 
@@ -35,7 +43,7 @@ error_t cpymo_backend_image_load_immutable(
 	}
 
 	*out_image = (cpymo_backend_image)tex;
-	free(pixels_moveintoimage);
+	free(px);
 	return CPYMO_ERR_SUCC;
 }
 

@@ -8,11 +8,14 @@
 
 typedef void *cpymo_backend_image;
 
-error_t cpymo_backend_image_load_immutable(
-	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, int channels);
+enum cpymo_backend_image_format {
+	cpymo_backend_image_format_r,
+	cpymo_backend_image_format_rgb,
+	cpymo_backend_image_format_rgba,
+};
 
-error_t cpymo_backend_image_load_immutable_mask(
-	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, int channels);
+error_t cpymo_backend_image_load_immutable(
+	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, enum cpymo_backend_image_format);
 
 error_t cpymo_backend_image_font(
 	cpymo_backend_image *out_image, const char *utf8str, float size, cpymo_color color, bool aa);
