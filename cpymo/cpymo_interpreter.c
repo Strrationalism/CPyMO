@@ -168,6 +168,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	/*** I. Text ***/
+	D("waitkey") {
+		cpymo_wait_for_seconds(engine, 5.0f);
+		return CPYMO_ERR_SUCC;
+	}
+
 	D("title") {
 		POP_ARG(title);
 
@@ -394,6 +399,15 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		free(interpreter);
 
 		return cpymo_interpreter_execute_step(caller, engine);
+	}
+
+	D("wait") {
+		POP_ARG(wait_ms_str);
+		ENSURE(wait_ms_str);
+
+		float wait_sec = (float)cpymo_parser_stream_span_atoi(wait_ms_str) / 1000.0f;
+		cpymo_wait_for_seconds(engine, wait_sec);
+		return CPYMO_ERR_SUCC;
 	}
 
 	D("rand") {

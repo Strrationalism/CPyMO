@@ -23,7 +23,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/MO1_Test");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
@@ -62,7 +62,15 @@ int main(void) {
 
 		osTickCounterUpdate(&tickCounter);
 		double deltaTime = osTickCounterRead(&tickCounter) / 1000.0;
-		cpymo_engine_update(&engine, (float)deltaTime, &redraw);	// delta_time error!!!
+		err = cpymo_engine_update(&engine, (float)deltaTime, &redraw);
+		switch(err) {
+		case CPYMO_ERR_NO_MORE_CONTENT: goto EXIT;
+		case CPYMO_ERR_SUCC: break;
+		default: {
+			printf("[Error] %s.\n", cpymo_error_message(err));
+			while(1) gspWaitForVBlank();
+		}
+		}
 
 		float slider = osGet3DSliderState();
 		if(slider != prevSlider) {
@@ -92,6 +100,8 @@ int main(void) {
 			gspWaitForVBlank();
 		}
 	}
+
+	EXIT:
 	
 	C2D_Fini();
 	C3D_Fini();
