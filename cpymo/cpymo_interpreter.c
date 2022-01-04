@@ -187,6 +187,19 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_NEXTLINE;
 	}
 
+	/*** II. Video ***/
+	D("flash") {
+		POP_ARG(col_str); ENSURE(col_str);
+		POP_ARG(time_str); ENSURE(time_str);
+
+		cpymo_color col = cpymo_parser_stream_span_as_color(col_str);
+		float time = cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+
+		cpymo_flash_start(engine, col, time);
+
+		return CPYMO_ERR_SUCC;
+	}
+
 	/*** III. Variables, Selection, Jump ***/
 	D("set") {
 		POP_ARG(name); ENSURE(name);

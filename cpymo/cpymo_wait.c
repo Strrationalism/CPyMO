@@ -2,7 +2,7 @@
 #include "cpymo_engine.h"
 #include <assert.h>
 
-void cpymo_wait_register_and_callback(cpymo_wait * wait, cpymo_wait_for wait_for, cpymo_wait_over_callback cb)
+void cpymo_wait_register_with_callback(cpymo_wait * wait, cpymo_wait_for wait_for, cpymo_wait_over_callback cb)
 {
 	assert(wait->wating_for == NULL);
 	assert(wait->callback == NULL);
@@ -44,4 +44,10 @@ void cpymo_wait_for_seconds(cpymo_engine * engine, float seconds)
 {
 	engine->wait.wait_for_seconds = seconds;
 	cpymo_wait_register(&engine->wait, &cpymo_wait_second_waiter);
+}
+
+void cpymo_wait_callback_after_seconds(cpymo_engine * engine, float seconds, cpymo_wait_over_callback cb)
+{
+	engine->wait.wait_for_seconds = seconds;
+	cpymo_wait_register_with_callback(&engine->wait, &cpymo_wait_second_waiter, cb);
 }

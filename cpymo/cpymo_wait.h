@@ -28,15 +28,16 @@ static inline bool cpymo_wait_is_wating(cpymo_wait *wait)
 	return wait->wating_for != NULL;
 }
 
-void cpymo_wait_register_and_callback(cpymo_wait *wait, cpymo_wait_for wait_for, cpymo_wait_over_callback cb);
+void cpymo_wait_register_with_callback(cpymo_wait *wait, cpymo_wait_for wait_for, cpymo_wait_over_callback cb);
 
 static inline void cpymo_wait_register(cpymo_wait *wait, cpymo_wait_for wait_for)
 {
-	cpymo_wait_register_and_callback(wait, wait_for, NULL);
+	cpymo_wait_register_with_callback(wait, wait_for, NULL);
 }
 
 error_t cpymo_wait_update(cpymo_wait *wait, struct cpymo_engine *engine, float delta_time);
 
 void cpymo_wait_for_seconds(struct cpymo_engine *engine, float seconds);
+void cpymo_wait_callback_after_seconds(struct cpymo_engine *engine, float seconds, cpymo_wait_over_callback);
 
 #endif

@@ -55,8 +55,12 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init wait
 	cpymo_wait_reset(&out->wait);
 
+	// init flash
+	cpymo_flash_reset(&out->flash);
+
 	// states
 	out->skipping = false;
+	out->redraw = true;
 
 	return CPYMO_ERR_SUCC;
 }
@@ -73,7 +77,8 @@ void cpymo_engine_free(cpymo_engine * engine)
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
 	error_t err;
-	*redraw = false;
+	*redraw = engine->redraw;
+	engine->redraw = false;
 
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
@@ -91,6 +96,8 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 			if (err != CPYMO_ERR_SUCC) return err;
 		}
 	}
+
+	*redraw |= engine->redraw;
 
 	return CPYMO_ERR_SUCC;
 }
@@ -116,4 +123,6 @@ void cpymo_engine_draw(cpymo_engine *engine)
 	col.b = 128;
 
 	cpymo_backend_image_fill_rects(xywh, 1, col, 1, cpymo_backend_image_draw_type_chara);
+
+	cpymo_flash_draw(engine);
 }

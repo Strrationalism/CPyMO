@@ -8,6 +8,7 @@
 #include "cpymo_interpreter.h"
 #include "cpymo_vars.h"
 #include "cpymo_wait.h"
+#include "cpymo_flash.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -16,8 +17,11 @@ struct cpymo_engine {
 	cpymo_interpreter *interpreter;
 	cpymo_input prev_input, input;
 	cpymo_wait wait;
+	cpymo_flash flash;
 	bool skipping;
 	char *title;
+
+	bool redraw;
 };
 
 typedef struct cpymo_engine cpymo_engine;
@@ -28,9 +32,10 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool *re
 void cpymo_engine_draw(cpymo_engine *engine);
 
 static inline bool cpymo_engine_skipping(cpymo_engine *engine)
-{
-	return engine->input.skip || engine->skipping;
-}
+{ return engine->input.skip || engine->skipping; }
+
+static inline void cpymo_engine_request_redraw(cpymo_engine *engine)
+{ engine->redraw = true; }
 
 #define CPYMO_INPUT_JUST_PRESSED(PENGINE, KEY) \
 	(!PENGINE->prev_input.KEY && PENGINE->input.KEY)
