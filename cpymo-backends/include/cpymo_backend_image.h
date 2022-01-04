@@ -11,6 +11,9 @@ typedef void *cpymo_backend_image;
 error_t cpymo_backend_image_load_immutable(
 	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, int channels);
 
+error_t cpymo_backend_image_load_immutable_mask(
+	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, int channels);
+
 error_t cpymo_backend_image_font(
 	cpymo_backend_image *out_image, const char *utf8str, float size, cpymo_color color, bool aa);
 
