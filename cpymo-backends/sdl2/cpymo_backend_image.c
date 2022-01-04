@@ -25,6 +25,8 @@ error_t cpymo_backend_image_load_immutable(
 
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surface);
 
+	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+
 	SDL_FreeSurface(surface);
 
 	if (tex == NULL) {
@@ -109,6 +111,8 @@ error_t cpymo_backend_image_create_mutable(cpymo_backend_image *out_image, int w
 		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	if (tex == NULL) return CPYMO_ERR_UNKNOWN;
+
+	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 
 	*out_image = tex;
 	return CPYMO_ERR_SUCC;

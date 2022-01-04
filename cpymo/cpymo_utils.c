@@ -31,13 +31,6 @@ error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 	return CPYMO_ERR_SUCC;
 }
 
-int cpymo_utils_clamp(int v, int minv, int maxv)
-{
-	if (v > maxv) return maxv;
-	else if (v < minv) return minv;
-	else return v;
-}
-
 void cpymo_utils_replace_str_newline_n(char *str)
 {
 	char prev_char = '?';

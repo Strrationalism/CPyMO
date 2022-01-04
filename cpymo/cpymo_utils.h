@@ -6,7 +6,16 @@
 #include <stdbool.h>
 
 error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len);
-int cpymo_utils_clamp(int v, int minv, int maxv);
+
+static inline int cpymo_utils_clamp(int v, int minv, int maxv)
+{
+	if (v > maxv) return maxv;
+	else if (v < minv) return minv;
+	else return v;
+}
+
+static inline float cpymo_utils_lerp(float a, float b, float t) 
+{ return (b - a) * t + a; }
 
 void cpymo_utils_replace_str_newline_n(char *str);
 

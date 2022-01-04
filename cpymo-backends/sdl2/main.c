@@ -93,6 +93,8 @@ int main(int argc, char **argv)
 		SDL_Log("[Error] Can not set logical size: %s", SDL_GetError());
 		return -1;
 	}
+
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	
 	Uint64 prev_ticks = SDL_GetTicks64();
 	SDL_Event event;

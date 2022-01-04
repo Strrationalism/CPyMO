@@ -58,6 +58,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init flash
 	cpymo_flash_reset(&out->flash);
 
+	// init fade 
+	cpymo_fade_reset(&out->fade);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -125,4 +128,5 @@ void cpymo_engine_draw(cpymo_engine *engine)
 	cpymo_backend_image_fill_rects(xywh, 1, col, 1, cpymo_backend_image_draw_type_chara);
 
 	cpymo_flash_draw(engine);
+	cpymo_fade_draw(engine);
 }

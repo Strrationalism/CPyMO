@@ -9,6 +9,7 @@
 #include "cpymo_vars.h"
 #include "cpymo_wait.h"
 #include "cpymo_flash.h"
+#include "cpymo_fade.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -18,6 +19,7 @@ struct cpymo_engine {
 	cpymo_input prev_input, input;
 	cpymo_wait wait;
 	cpymo_flash flash;
+	cpymo_fade fade;
 	bool skipping;
 	char *title;
 
@@ -39,6 +41,17 @@ static inline void cpymo_engine_request_redraw(cpymo_engine *engine)
 
 #define CPYMO_INPUT_JUST_PRESSED(PENGINE, KEY) \
 	(!PENGINE->prev_input.KEY && PENGINE->input.KEY)
+
+static inline bool cpymo_input_foward_key_just_pressed(cpymo_engine *e)
+{
+	return
+		CPYMO_INPUT_JUST_PRESSED(e, ok) ||
+		CPYMO_INPUT_JUST_PRESSED(e, mouse_button) ||
+		CPYMO_INPUT_JUST_PRESSED(e, down) ||
+		CPYMO_INPUT_JUST_PRESSED(e, cancel) ||
+		CPYMO_INPUT_JUST_PRESSED(e, up) ||
+		cpymo_engine_skipping(e);
+}
 
 #endif
 
