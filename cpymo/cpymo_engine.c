@@ -55,6 +55,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init wait
 	cpymo_wait_reset(&out->wait);
 
+	// states
+	out->skipping = false;
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -71,7 +74,9 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 {
 	error_t err;
 	*redraw = false;
-	cpymo_input input = cpymo_input_snapshot();
+
+	engine->prev_input = engine->input;
+	engine->input = cpymo_input_snapshot();
 
 	err = cpymo_wait_update(&engine->wait, engine, delta_time_sec);
 	if (err != CPYMO_ERR_SUCC) return err;
@@ -80,8 +85,6 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 		err = cpymo_interpreter_execute_step(engine->interpreter, engine);
 		if (err != CPYMO_ERR_SUCC) return err;
 	}
-
-	engine->prev_input = input;
 
 	return CPYMO_ERR_SUCC;
 }

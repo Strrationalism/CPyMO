@@ -109,11 +109,10 @@ int main(int argc, char **argv)
 		bool need_to_redraw = false;
 
 		Uint64 ticks = SDL_GetTicks64();
-		err =
-			cpymo_engine_update(
-				&engine, 
-				(float)(ticks - prev_ticks) * 0.001f, 
-				&need_to_redraw);
+		err = cpymo_engine_update(
+			&engine, 
+			(float)(ticks - prev_ticks) * 0.001f, 
+			&need_to_redraw);
 
 		switch (err) {
 		case CPYMO_ERR_SUCC: break;

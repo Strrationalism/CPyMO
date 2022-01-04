@@ -5,7 +5,7 @@
 cpymo_input cpymo_input_snapshot()
 {
     cpymo_input out;
-    u32 keys = hidKeysDown();
+    u32 keys = hidKeysHeld();
 
     if((keys & KEY_SELECT)) aptExit();
 

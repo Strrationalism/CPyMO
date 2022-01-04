@@ -27,6 +27,15 @@ error_t cpymo_wait_update(cpymo_wait *wait, cpymo_engine * engine, float delta_t
 
 static bool cpymo_wait_second_waiter(struct cpymo_engine *e, float delta_time)
 {
+	if(
+		CPYMO_INPUT_JUST_PRESSED(e, ok) || 
+		CPYMO_INPUT_JUST_PRESSED(e, mouse_button) ||
+		CPYMO_INPUT_JUST_PRESSED(e, down) ||
+		CPYMO_INPUT_JUST_PRESSED(e, cancel) ||
+		CPYMO_INPUT_JUST_PRESSED(e, up) ||
+		cpymo_engine_skipping(e))
+		e->wait.wait_for_seconds = -1;
+
 	e->wait.wait_for_seconds -= delta_time;
 	return e->wait.wait_for_seconds <= 0;
 }

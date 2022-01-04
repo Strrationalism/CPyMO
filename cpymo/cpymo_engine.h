@@ -14,8 +14,9 @@ struct cpymo_engine {
 	cpymo_assetloader assetloader;
 	cpymo_vars vars;
 	cpymo_interpreter *interpreter;
-	cpymo_input prev_input;
+	cpymo_input prev_input, input;
 	cpymo_wait wait;
+	bool skipping;
 	char *title;
 };
 
@@ -25,6 +26,14 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir);
 void cpymo_engine_free(cpymo_engine *engine);
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool *redraw);
 void cpymo_engine_draw(cpymo_engine *engine);
+
+static inline bool cpymo_engine_skipping(cpymo_engine *engine)
+{
+	return engine->input.skip || engine->skipping;
+}
+
+#define CPYMO_INPUT_JUST_PRESSED(PENGINE, KEY) \
+	(!PENGINE->prev_input.KEY && PENGINE->input.KEY)
 
 #endif
 
