@@ -61,6 +61,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init fade 
 	cpymo_fade_reset(&out->fade);
 
+	// init bg
+	cpymo_bg_init(&out->bg);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -70,6 +73,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine * engine)
 {
+	cpymo_bg_free(&engine->bg);
 	cpymo_interpreter_free(engine->interpreter);
 	free(engine->interpreter);
 	cpymo_vars_free(&engine->vars);
@@ -100,6 +104,8 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 		}
 	}
 
+	cpymo_bg_update(&engine->bg, redraw);
+
 	*redraw |= engine->redraw;
 
 	return CPYMO_ERR_SUCC;
@@ -107,26 +113,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 void cpymo_engine_draw(cpymo_engine *engine)
 {
-	float xywh0[] = {
-		0,0,800,600
-	};
-
-	cpymo_color col;
-	col.r = 255;
-	col.g = 255;
-	col.b = 255;
-	cpymo_backend_image_fill_rects(xywh0, 1, col, 1, cpymo_backend_image_draw_type_bg);
-
-	float xywh[] = {
-		200,100,400,400
-	};
-
-	col.r = 128;
-	col.g = 255;
-	col.b = 128;
-
-	cpymo_backend_image_fill_rects(xywh, 1, col, 1, cpymo_backend_image_draw_type_chara);
-
+	cpymo_bg_draw(&engine->bg);
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);
 }

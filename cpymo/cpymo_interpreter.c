@@ -188,6 +188,37 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	/*** II. Video ***/
+	D("bg") {
+		POP_ARG(bg_name); ENSURE(bg_name);
+		POP_ARG(transition);
+		POP_ARG(time_str);
+		POP_ARG(x_str);
+		POP_ARG(y_str);
+
+		float x, y, time;
+		if (IS_EMPTY(time_str)) time = 0.3f; else time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+		if (IS_EMPTY(x_str)) x = 0.0f; else x = (float)cpymo_parser_stream_span_atoi(x_str);
+		if (IS_EMPTY(y_str)) y = 0.0f; else y = (float)cpymo_parser_stream_span_atoi(y_str);
+
+		if (IS_EMPTY(transition)) {
+			transition.begin = "BG_ALPHA";
+			transition.len = strlen(transition.begin);
+		}
+
+		error_t err = cpymo_bg_command(
+			engine,
+			&engine->bg,
+			bg_name,
+			transition,
+			x,
+			y
+		);
+
+		cpymo_wait_for_seconds(engine, time);
+
+		return err;
+	}
+
 	D("flash") {
 		POP_ARG(col_str); ENSURE(col_str);
 		POP_ARG(time_str); ENSURE(time_str);

@@ -10,6 +10,7 @@
 #include "cpymo_wait.h"
 #include "cpymo_flash.h"
 #include "cpymo_fade.h"
+#include "cpymo_bg.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -20,6 +21,7 @@ struct cpymo_engine {
 	cpymo_wait wait;
 	cpymo_flash flash;
 	cpymo_fade fade;
+	cpymo_bg bg;
 	bool skipping;
 	char *title;
 
