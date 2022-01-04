@@ -94,6 +94,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	
+	Uint64 prev_ticks = SDL_GetTicks64();
 	SDL_Event event;
 	while (1) {
 		bool redraw_by_event = false;
@@ -107,7 +108,9 @@ int main(int argc, char **argv)
 
 		bool need_to_redraw = false;
 
-		cpymo_engine_update(&engine, 16, &need_to_redraw);
+		Uint64 ticks = SDL_GetTicks64();
+		cpymo_engine_update(&engine, (float)(ticks - prev_ticks) * 0.001f, &need_to_redraw);
+		prev_ticks = ticks;
 
 		if (need_to_redraw || redraw_by_event) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);

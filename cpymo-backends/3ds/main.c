@@ -7,9 +7,9 @@
 
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2;
+float render_3d_offset;
 
-#define SCREEN_WIDTH  400
-#define SCREEN_HEIGHT 240
+extern void cpymo_backend_image_init(float, float);
 
 int main(void) {
 	gfxInitDefault();
@@ -17,18 +17,20 @@ int main(void) {
 	consoleInit(GFX_BOTTOM, NULL);
 	gfxSetDoubleBuffering(GFX_BOTTOM, false);
 
-	const char *gamename = "DAICHYAN_s60v3";	//select_game();
+	/*const char *gamename = "DAICHYAN_s60v3";	//select_game();
 	if (gamename == NULL) {
 		gfxExit();
 		return 0;
-	}
+	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/MO1_Test");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
 		return -1;
 	}
+
+	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 
 	if (!C3D_Init(C3D_DEFAULT_CMDBUF_SIZE)) {
 		cpymo_engine_free(&engine);
@@ -48,16 +50,19 @@ int main(void) {
 	screen1 = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	screen2 = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
 
-	u32 clr = C2D_Color32(0x00, 0x00, 0xFF, 0xFF);
-	u32 wtf = C2D_Color32(0xFF, 0xFF, 0xFF, 0xFF);
+	const u32 clr = C2D_Color32(0, 0, 0, 0);
 
-	float prevSlider = osGet3DSliderState();
+	float prevSlider = NAN;
+	TickCounter tickCounter;
+	osTickCounterStart(&tickCounter);
 	while (aptMainLoop()) {
 		hidScanInput();
 
 		bool redraw = false;
 
-		cpymo_engine_update(&engine, 0.16f, &redraw);	// delta_time error!!!
+		osTickCounterUpdate(&tickCounter);
+		double deltaTime = osTickCounterRead(&tickCounter) / 1000.0;
+		cpymo_engine_update(&engine, (float)deltaTime, &redraw);	// delta_time error!!!
 
 		float slider = osGet3DSliderState();
 		if(slider != prevSlider) {
@@ -71,22 +76,23 @@ int main(void) {
 			C2D_TargetClear(screen2, clr);
 
 			C2D_SceneBegin(screen1);
-
-			C2D_DrawRectangle(200 - 25 - 5 * slider, 120 - 25, -1.0f, 50, 50, wtf, wtf, wtf, wtf);
+			render_3d_offset = slider;
+			cpymo_engine_draw(&engine);
 
 			if(slider > 0){
-				printf("Drawing 3D...\n");
 				C2D_SceneBegin(screen2);
-
-				C2D_DrawRectangle(200 - 25 + 5 * slider, 120 - 25, -1.0f, 50, 50, wtf, wtf, wtf, wtf);
+				render_3d_offset = -slider;
+				cpymo_engine_draw(&engine);
 			}
 
 			C3D_FrameEnd(0);
+		} else {
+			gspWaitForVBlank();
+			gspWaitForVBlank();
+			gspWaitForVBlank();
 		}
-
-		gspWaitForVBlank();
 	}
-
+	
 	C2D_Fini();
 	C3D_Fini();
 
