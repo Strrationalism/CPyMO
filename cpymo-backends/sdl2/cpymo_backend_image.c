@@ -1,5 +1,6 @@
 #include "cpymo_backend_image.h"
 #include <SDL.h>
+#include <assert.h>
 
 extern SDL_Renderer *renderer;
 
@@ -12,6 +13,7 @@ error_t cpymo_backend_image_load_immutable(
 	case cpymo_backend_image_format_r: channels = 1; break;
 	case cpymo_backend_image_format_rgb: channels = 3; break;
 	case cpymo_backend_image_format_rgba: channels = 4; break;
+	default: assert(false);
 	}
 
 	SDL_Surface *surface =
