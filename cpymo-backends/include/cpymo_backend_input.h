@@ -4,17 +4,19 @@
 #include <stdbool.h>
 
 typedef struct {
+	float mouse_x;
+	float mouse_y;
+
+	bool mouse_position_useable : 1;
+	bool mouse_button : 1;
+
 	bool up : 1;
 	bool down : 1;
 	bool ok : 1;
 	bool cancel : 1;
 	bool skip : 1;
 	bool hide_window : 1;
-	bool mouse_button : 1;
-
-	bool mouse_position_useable : 1;
-	float mouse_x;
-	float mouse_y;
+	bool auto_mode : 1;
 } cpymo_input;
 
 /* Mouse Coord

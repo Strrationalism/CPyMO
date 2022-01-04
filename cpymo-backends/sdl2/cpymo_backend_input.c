@@ -18,6 +18,7 @@ cpymo_input cpymo_input_snapshot()
 	out.cancel = keyboard[SDL_SCANCODE_ESCAPE] || keyboard[SDL_SCANCODE_CANCEL];
 	out.skip = keyboard[SDL_SCANCODE_LCTRL] || keyboard[SDL_SCANCODE_RCTRL];
 	out.hide_window = keyboard[SDL_SCANCODE_LSHIFT] || keyboard[SDL_SCANCODE_RSHIFT];
+	out.auto_mode = keyboard[SDL_SCANCODE_LALT] || keyboard[SDL_SCANCODE_RALT];
 
 	float scale_x, scale_y;
 	SDL_RenderGetScale(renderer, &scale_x, &scale_y);
