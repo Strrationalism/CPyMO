@@ -4,7 +4,8 @@
 
 /out
 /.vs
-/makefiles/3ds/build
-/makefiles/3ds/cpymo.smdh
-/makefiles/3ds/cpymo.elf
-/makefiles/3ds/cpymo.3dsx
+/cpymo-backends/3ds/.vscode
+/cpymo-backends/3ds/build
+/cpymo-backends/3ds/cpymo.smdh
+/cpymo-backends/3ds/cpymo.elf
+/cpymo-backends/3ds/cpymo.3dsx

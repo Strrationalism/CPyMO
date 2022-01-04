@@ -1,6 +1,7 @@
 #ifndef INCLUDE_CPYMO_ENGINE
 #define INCLUDE_CPYMO_ENGINE
 
+#include <cpymo_backend_input.h>
 #include "cpymo_assetloader.h"
 #include "cpymo_gameconfig.h"
 #include "cpymo_error.h"
@@ -12,6 +13,7 @@ struct cpymo_engine {
 	cpymo_assetloader assetloader;
 	cpymo_vars vars;
 	cpymo_interpreter *interpreter;
+	cpymo_input prev_input;
 	char *title;
 };
 

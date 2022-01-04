@@ -67,6 +67,34 @@ void cpymo_engine_free(cpymo_engine * engine)
 void cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
 	*redraw = false;
+
+	cpymo_input input = cpymo_input_snapshot();
+
+	if (!engine->prev_input.ok && input.ok)
+		printf("Ok Pressed!\n");
+
+	if (!engine->prev_input.cancel && input.cancel)
+		printf("Cancel Pressed!\n");
+
+	if (!engine->prev_input.down && input.down)
+		printf("Down Pressed!\n");
+
+	if (!engine->prev_input.up && input.up)
+		printf("Up Pressed!\n");
+
+	if (!engine->prev_input.auto_mode && input.auto_mode)
+		printf("Auto Pressed!\n");
+
+	if (!engine->prev_input.hide_window && input.hide_window)
+		printf("Hide Pressed!\n");
+
+	if (!engine->prev_input.skip && input.skip)
+		printf("Skip Pressed!\n");
+
+	if (!engine->prev_input.mouse_button && input.mouse_button)
+		printf("Mouse Pressed!\n");
+
+	engine->prev_input = input;
 }
 
 void cpymo_engine_draw(cpymo_engine *engine)

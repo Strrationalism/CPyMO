@@ -6,13 +6,14 @@
 #include "select_game.h"
 
 cpymo_engine engine;
-C3D_RenderTarget *screen;
+C3D_RenderTarget *screen1, *screen2;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
 
 int main(void) {
 	gfxInitDefault();
+	gfxSet3D(true);
 	consoleInit(GFX_BOTTOM, NULL);
 	gfxSetDoubleBuffering(GFX_BOTTOM, false);
 
@@ -44,26 +45,41 @@ int main(void) {
 
 	C2D_Prepare();
 
-	screen = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	screen1 = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	screen2 = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
 
 	u32 clr = C2D_Color32(0x00, 0x00, 0xFF, 0xFF);
 	u32 wtf = C2D_Color32(0xFF, 0xFF, 0xFF, 0xFF);
-	
 
+	float prevSlider = osGet3DSliderState();
 	while (aptMainLoop()) {
 		hidScanInput();
 
-		u32 kDown = hidKeysDown();
+		bool redraw = false;
 
-		if (kDown & KEY_START) break;
+		cpymo_engine_update(&engine, 0.16f, &redraw);	// delta_time error!!!
 
-		{
+		float slider = osGet3DSliderState();
+		if(slider != prevSlider) {
+			redraw = true;
+			prevSlider = slider;
+		}
+
+		if(redraw) {
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-			C2D_TargetClear(screen, clr);
+			C2D_TargetClear(screen1, clr);
+			C2D_TargetClear(screen2, clr);
 
-			C2D_SceneBegin(screen);
+			C2D_SceneBegin(screen1);
 
-			C2D_DrawRectangle(200 - 25, 120 - 25, -1.0f, 50, 50, wtf, wtf, wtf, wtf);
+			C2D_DrawRectangle(200 - 25 - 5 * slider, 120 - 25, -1.0f, 50, 50, wtf, wtf, wtf, wtf);
+
+			if(slider > 0){
+				printf("Drawing 3D...\n");
+				C2D_SceneBegin(screen2);
+
+				C2D_DrawRectangle(200 - 25 + 5 * slider, 120 - 25, -1.0f, 50, 50, wtf, wtf, wtf, wtf);
+			}
 
 			C3D_FrameEnd(0);
 		}
