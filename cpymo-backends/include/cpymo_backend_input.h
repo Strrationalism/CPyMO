@@ -11,7 +11,10 @@ typedef struct {
 	bool skip : 1;
 	bool hide_window : 1;
 	bool mouse_button : 1;
+
 	bool mouse_position_useable : 1;
+	float mouse_x;
+	float mouse_y;
 } cpymo_input;
 
 /* Mouse Coord
@@ -22,6 +25,6 @@ typedef struct {
  * returns true if mouse position is useable.
  * returns false if mouse position is not useable.
  */
-cpymo_input cpymo_input_snapshot(float *mouse_x, float *mouse_y);
+cpymo_input cpymo_input_snapshot();
 
 #endif

@@ -6,7 +6,7 @@ extern SDL_Renderer *renderer;
 extern SDL_Window *window;
 extern cpymo_engine engine;
 
-cpymo_input cpymo_input_snapshot(float *mouse_x, float *mouse_y)
+cpymo_input cpymo_input_snapshot()
 {
 	cpymo_input out;
 
@@ -31,19 +31,19 @@ cpymo_input cpymo_input_snapshot(float *mouse_x, float *mouse_y)
 	SDL_Rect viewport;
 	SDL_RenderGetViewport(renderer, &viewport);
 
-	*mouse_x = ((float)mx / scale_x - viewport.x) / (float)viewport.w;
-	*mouse_y = ((float)my / scale_y - viewport.y) / (float)viewport.h;
+	out.mouse_x = ((float)mx / scale_x - viewport.x) / (float)viewport.w;
+	out.mouse_y = ((float)my / scale_y - viewport.y) / (float)viewport.h;
 
 	if (
-		*mouse_x >= 1.0f 
-		|| *mouse_x < 0.0f 
-		|| *mouse_y >= 1.0f 
-		|| *mouse_y < 0.0f 
+		out.mouse_x >= 1.0f 
+		|| out.mouse_x < 0.0f 
+		|| out.mouse_y >= 1.0f 
+		|| out.mouse_y < 0.0f 
 		|| SDL_GetMouseFocus() != window)
 		out.mouse_position_useable = false;
 
-	*mouse_x *= engine.gameconfig.imagesize_w;
-	*mouse_y *= engine.gameconfig.imagesize_h;
+	out.mouse_x *= engine.gameconfig.imagesize_w;
+	out.mouse_y *= engine.gameconfig.imagesize_h;
 
 	return out;
 }
