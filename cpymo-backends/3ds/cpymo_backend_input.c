@@ -7,7 +7,7 @@ cpymo_input cpymo_input_snapshot()
     cpymo_input out;
     u32 keys = hidKeysDown();
 
-    if((keys & KEY_SELECT)) exit(0);   // FAST-EXIT
+    if((keys & KEY_SELECT)) aptExit();
 
     out.ok = (keys & KEY_A) > 0;
     out.skip = (keys & KEY_R) > 0;
