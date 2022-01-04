@@ -366,7 +366,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("call") {
 		POP_ARG(script_name_span);
 		ENSURE(script_name_span);
-		cpymo_parser_next_line(&interpreter->script_parser);
+		//cpymo_parser_next_line(&interpreter->script_parser);
 
 		char script_name[sizeof(interpreter->script_name)];
 		cpymo_parser_stream_span_copy(script_name, sizeof(script_name), script_name_span);

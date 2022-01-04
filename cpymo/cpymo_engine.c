@@ -83,7 +83,13 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 	if (!cpymo_wait_is_wating(&engine->wait)) {
 		err = cpymo_interpreter_execute_step(engine->interpreter, engine);
-		if (err != CPYMO_ERR_SUCC) return err;
+
+		if (cpymo_wait_is_wating(&engine->wait)) {
+			if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_NO_MORE_CONTENT) return err;
+		}
+		else {
+			if (err != CPYMO_ERR_SUCC) return err;
+		}
 	}
 
 	return CPYMO_ERR_SUCC;

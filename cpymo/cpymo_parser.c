@@ -107,10 +107,19 @@ cpymo_parser_stream_span cpymo_parser_curline_pop_commacell(cpymo_parser * parse
 
 cpymo_parser_stream_span cpymo_parser_curline_pop_command(cpymo_parser * parser)
 {
-	cpymo_parser_curline_readuntil(parser, '#');
-	cpymo_parser_stream_span command = cpymo_parser_curline_readuntil_or(parser, ' ', '\t');
-	cpymo_parser_stream_span_trim(&command);
-	return command;
+	cpymo_parser_stream_span before_command = cpymo_parser_curline_readuntil(parser, '#');
+	cpymo_parser_stream_span_trim(&before_command);
+	if (before_command.len == 0) {
+		cpymo_parser_stream_span command = cpymo_parser_curline_readuntil_or(parser, ' ', '\t');
+		cpymo_parser_stream_span_trim(&command);
+		return command;
+	} 
+	else {
+		cpymo_parser_stream_span ret;
+		ret.begin = NULL;
+		ret.len = 0;
+		return ret;
+	}
 }
 
 void cpymo_parser_stream_span_trim_start(cpymo_parser_stream_span * span)
