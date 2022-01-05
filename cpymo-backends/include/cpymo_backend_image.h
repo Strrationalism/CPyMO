@@ -17,6 +17,9 @@ enum cpymo_backend_image_format {
 error_t cpymo_backend_image_load_immutable(
 	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, enum cpymo_backend_image_format);
 
+error_t cpymo_backend_image_load_immutable_with_mask(
+	cpymo_backend_image *out_image, void *px_rgb24_moveinto, void *mask_a8_moveinto, int w, int h);
+
 error_t cpymo_backend_image_font(
 	cpymo_backend_image *out_image, const char *utf8str, float size, cpymo_color color, bool aa);
 
