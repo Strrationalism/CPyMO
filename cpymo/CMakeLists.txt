@@ -15,5 +15,7 @@ add_library (cpymolib STATIC
 	"cpymo_flash.h" "cpymo_flash.c" 
 	"cpymo_fade.h" "cpymo_fade.c"
 	"cpymo_tween.h" 
-	"cpymo_bg.h" "cpymo_bg.c" "cpymo_anime.h" "cpymo_anime.c")
+	"cpymo_bg.h" "cpymo_bg.c" 
+	"cpymo_anime.h" "cpymo_anime.c" 
+	"cpymo_select_img.h" "cpymo_select_img.c")
 

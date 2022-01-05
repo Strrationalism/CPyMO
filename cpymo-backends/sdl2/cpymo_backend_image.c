@@ -98,7 +98,8 @@ void cpymo_backend_image_draw(
 	dst_rect.w = dstw;
 	dst_rect.h = dsth;
 
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, (Uint8)(alpha * 255));
+	const Uint8 a = (Uint8)(alpha * 255);
+	SDL_SetTextureAlphaMod((SDL_Texture *)src, a);
 
 	if (0 != SDL_RenderCopyF(
 		renderer,

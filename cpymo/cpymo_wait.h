@@ -8,7 +8,7 @@
 struct cpymo_engine;
 
 typedef bool (*cpymo_wait_for)(struct cpymo_engine *, float);	// wait until it's returns true.
-typedef error_t (*cpymo_wait_over_callback)(struct cpymo_engine *);
+typedef error_t (*cpymo_wait_over_callback)(struct cpymo_engine *);	// You can register next wait operation in callback.
 
 typedef struct {
 	cpymo_wait_for wating_for;

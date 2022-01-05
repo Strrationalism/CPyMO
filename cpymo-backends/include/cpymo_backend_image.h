@@ -58,6 +58,7 @@ enum cpymo_backend_image_draw_type {
 	cpymo_backend_image_draw_type_text_say,
 	cpymo_backend_image_draw_type_text_text,
 	cpymo_backend_image_draw_type_text_ui,
+	cpymo_backend_image_draw_type_sel_img,
 	cpymo_backend_image_draw_type_effect
 };
 

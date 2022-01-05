@@ -16,9 +16,10 @@ error_t cpymo_wait_update(cpymo_wait *wait, cpymo_engine * engine, float delta_t
 	error_t err = CPYMO_ERR_SUCC;
 	if (cpymo_wait_is_wating(wait)) {
 		if (wait->wating_for(engine, delta_time)) {
-			if (wait->callback) 
-				err = wait->callback(engine);
+			cpymo_wait_over_callback cb = wait->callback;
 			cpymo_wait_reset(wait);
+
+			if (cb) err = cb(engine);
 		}
 	}
 

@@ -26,7 +26,7 @@ cpymo_input cpymo_input_snapshot()
 	int mx, my;
 	Uint32 mouse_state = SDL_GetMouseState(&mx, &my);
 
-	out.mouse_button = (mouse_state & SDL_BUTTON_LMASK) > 0;
+	out.mouse_button = (mouse_state & SDL_BUTTON_LMASK) != 0;
 	out.mouse_position_useable = true;
 
 	SDL_Rect viewport;

@@ -21,6 +21,13 @@ void cpymo_vars_free(cpymo_vars *to_free);
 void cpymo_vars_clear_locals(cpymo_vars *vars);
 
 int *cpymo_vars_access(cpymo_vars *vars, cpymo_parser_stream_span name);
+
+static inline int cpymo_vars_get(cpymo_vars * vars, cpymo_parser_stream_span name)
+{
+	int *v = cpymo_vars_access(vars, name);
+	return v == NULL ? 0 : *v;
+}
+
 error_t cpymo_vars_access_create(cpymo_vars *vars, cpymo_parser_stream_span name, int **ptr_to_val);
 
 #endif

@@ -26,7 +26,7 @@ static inline void cpymo_fade_reset(cpymo_fade *fade)
 	fade->col.b = 255;
 }
 
-void cpymo_fade_draw(struct cpymo_engine *);
+void cpymo_fade_draw(const struct cpymo_engine *);
 
 void cpymo_fade_start_fadeout(struct cpymo_engine *, float time, cpymo_color col);
 void cpymo_fade_start_fadein(struct cpymo_engine *, float time);

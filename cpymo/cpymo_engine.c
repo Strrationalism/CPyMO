@@ -67,6 +67,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init anime
 	cpymo_anime_init(&out->anime);
 
+	// init select_img/select_imgs
+	cpymo_select_img_init(&out->select_img);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -76,6 +79,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine * engine)
 {
+	cpymo_select_img_free(&engine->select_img);
 	cpymo_anime_free(&engine->anime);
 	cpymo_bg_free(&engine->bg);
 	cpymo_interpreter_free(engine->interpreter);
@@ -94,6 +98,14 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
 
+	err = cpymo_bg_update(&engine->bg, redraw);
+	if (err != CPYMO_ERR_SUCC) return err;
+
+	cpymo_anime_update(&engine->anime, delta_time_sec, redraw);
+
+	err = cpymo_select_img_update(engine);
+	if (err != CPYMO_ERR_SUCC) return err;
+
 	err = cpymo_wait_update(&engine->wait, engine, delta_time_sec);
 	if (err != CPYMO_ERR_SUCC) return err;
 
@@ -108,18 +120,16 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 		}
 	}
 
-	cpymo_bg_update(&engine->bg, redraw);
-	cpymo_anime_update(&engine->anime, delta_time_sec, redraw);
-
 	*redraw |= engine->redraw;
 
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_engine_draw(cpymo_engine *engine)
+void cpymo_engine_draw(const cpymo_engine *engine)
 {
 	cpymo_bg_draw(&engine->bg);
 	cpymo_anime_draw(&engine->anime);
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);
+	cpymo_select_img_draw(&engine->select_img);
 }

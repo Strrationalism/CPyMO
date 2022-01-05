@@ -28,7 +28,7 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 void cpymo_bg_free(cpymo_bg *);
 
 error_t cpymo_bg_update(cpymo_bg *, bool *redraw);
-void cpymo_bg_draw(cpymo_bg *);
+void cpymo_bg_draw(const cpymo_bg *);
 
 error_t cpymo_bg_command(
 	struct cpymo_engine *engine,

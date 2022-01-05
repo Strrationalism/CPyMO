@@ -2,7 +2,7 @@
 #include "cpymo_engine.h"
 #include <cpymo_backend_image.h>
 
-void cpymo_fade_draw(cpymo_engine *engine)
+void cpymo_fade_draw(const cpymo_engine *engine)
 {
 	if (engine->fade.state != cpymo_fade_disabled) {
 		float xywh[] = {

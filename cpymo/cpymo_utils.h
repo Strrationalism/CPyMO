@@ -14,6 +14,13 @@ static inline int cpymo_utils_clamp(int v, int minv, int maxv)
 	else return v;
 }
 
+static inline float cpymo_utils_clampf(float v, float minv, float maxv)
+{
+	if (v > maxv) return maxv;
+	else if (v < minv) return minv;
+	else return v;
+}
+
 static inline float cpymo_utils_lerp(float a, float b, float t) 
 { return (b - a) * t + a; }
 

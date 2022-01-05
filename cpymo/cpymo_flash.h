@@ -16,6 +16,6 @@ static inline void cpymo_flash_reset(cpymo_flash *flash) {
 }
 
 void cpymo_flash_start(struct cpymo_engine *engine, cpymo_color col, float time);
-void cpymo_flash_draw(struct cpymo_engine *engine);
+void cpymo_flash_draw(const struct cpymo_engine *engine);
 
 #endif

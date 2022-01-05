@@ -12,6 +12,7 @@
 #include "cpymo_fade.h"
 #include "cpymo_bg.h"
 #include "cpymo_anime.h"
+#include "cpymo_select_img.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -24,6 +25,8 @@ struct cpymo_engine {
 	cpymo_fade fade;
 	cpymo_bg bg;
 	cpymo_anime anime;
+	cpymo_select_img select_img;
+
 	bool skipping;
 	char *title;
 
@@ -35,7 +38,7 @@ typedef struct cpymo_engine cpymo_engine;
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir);
 void cpymo_engine_free(cpymo_engine *engine);
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool *redraw);
-void cpymo_engine_draw(cpymo_engine *engine);
+void cpymo_engine_draw(const cpymo_engine *engine);
 
 static inline bool cpymo_engine_skipping(cpymo_engine *engine)
 { return engine->input.skip || engine->skipping; }

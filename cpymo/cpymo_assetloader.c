@@ -4,6 +4,7 @@
 #include <string.h>
 #include <memory.h>
 #include <assert.h>
+#include <stb_image.h>
 
 error_t cpymo_assetloader_init(cpymo_assetloader * out, const cpymo_gameconfig * config, const char * gamedir)
 {
@@ -229,5 +230,71 @@ error_t cpymo_assetloader_load_system(char ** out_buffer, size_t * buf_size, con
 	return cpymo_assetloader_load_filesystem_file(
 		out_buffer, buf_size, "system", system_name,
 		ext, loader);
+}
+
+error_t cpymo_assetloader_load_system_image(
+	cpymo_backend_image * out_image, 
+	int *out_width, int *out_height,
+	cpymo_parser_stream_span filename_span,
+	const char * ext, 
+	const cpymo_assetloader * loader,
+	bool load_mask)
+{
+	char filename[128];
+	cpymo_parser_stream_span_copy(filename, sizeof(filename) - 10, filename_span);
+	char *buf = NULL;
+	size_t buf_size = 0;
+	error_t err = cpymo_assetloader_load_system(&buf, &buf_size, filename, "png", loader);
+	if (err != CPYMO_ERR_SUCC) return err;
+
+	int w, h, c;
+	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &c, 4);
+	free(buf);
+
+	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
+
+	cpymo_backend_image img;
+	if (load_mask) {
+		strcat(filename, "_mask");
+		char *mask_buf = NULL; size_t mask_size = 0;
+		err = cpymo_assetloader_load_system(&mask_buf, &mask_size, filename, "png", loader);
+		if (err != CPYMO_ERR_SUCC) mask_buf = NULL;
+
+		int mw, mh, mc;
+		stbi_uc *mask_px = NULL;
+		if (err == CPYMO_ERR_SUCC) {
+			mask_px = stbi_load_from_memory((stbi_uc *)mask_buf, (int)mask_size, &mw, &mh, &mc, 1);
+		}
+
+		if (mask_buf) free(mask_buf);
+
+		if (mask_px) {
+			if (mw != w || mh != h) {
+				free(mask_px);
+				goto LOAD_WITHOUT_MASK;
+			}
+			else {
+				err = cpymo_backend_image_load_immutable_with_mask(
+					&img, px, mask_px, w, h);
+			}
+		}
+		else {
+			goto LOAD_WITHOUT_MASK;
+		}
+	}
+	else {
+	LOAD_WITHOUT_MASK:
+		err = cpymo_backend_image_load_immutable(&img, px, w, h, cpymo_backend_image_format_rgba);
+	}
+
+	if (err != CPYMO_ERR_SUCC) {
+		free(px);
+		return err;
+	}
+
+	*out_image = img;
+	*out_width = w;
+	*out_height = h;
+	return CPYMO_ERR_SUCC;
 }
 

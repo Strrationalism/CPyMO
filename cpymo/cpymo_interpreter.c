@@ -152,6 +152,10 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 #define ENSURE(X) \
 	{ if (IS_EMPTY(X)) return CPYMO_ERR_INVALID_ARG; }
 
+#define POS(OUT_X, OUT_Y, IN_X, IN_Y) \
+	float OUT_X = cpymo_parser_stream_span_atoi(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
+	float OUT_Y = cpymo_parser_stream_span_atoi(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
+
 #define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, 1); return CPYMO_ERR_UNKNOWN; }
 
 #define CONT_NEXTLINE { \
@@ -258,10 +262,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(is_loop_s); ENSURE(is_loop_s);
 
 		int frames = cpymo_parser_stream_span_atoi(frames_str);
-		float x = cpymo_parser_stream_span_atoi(x_str) / 100.0f * engine->gameconfig.imagesize_w;
-		float y = cpymo_parser_stream_span_atoi(y_str) / 100.0f * engine->gameconfig.imagesize_h;
+		
 		float interval = cpymo_parser_stream_span_atoi(interval_str) / 1000.0f;
-		bool is_loop = cpymo_parser_stream_span_atoi(is_loop_s) > 0;
+		bool is_loop = cpymo_parser_stream_span_atoi(is_loop_s) != 0;
+
+		POS(x, y, x_str, y_str);
 
 		error_t err = cpymo_anime_on(engine, frames, filename, x, y, interval, is_loop);
 		if (err != CPYMO_ERR_SUCC) {
@@ -493,6 +498,41 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return cpymo_interpreter_execute_step(caller, engine);
 	}
 
+	D("select_img") {
+		POP_ARG(choices_str); ENSURE(choices_str);
+		POP_ARG(filename); ENSURE(filename);
+
+		size_t choices = (size_t)cpymo_parser_stream_span_atoi(choices_str);
+		if (choices) {
+			error_t err = cpymo_select_img_configuare_begin(engine, choices, filename);
+			if (err != CPYMO_ERR_SUCC) return err;
+
+			for (size_t i = 0; i < choices; ++i) {
+				POP_ARG(x_str); ENSURE(x_str);
+				POP_ARG(y_str); ENSURE(y_str);
+				POP_ARG(v_str); ENSURE(v_str);
+
+				bool enabled;
+				if (cpymo_parser_stream_span_equals_str(v_str, "0"))
+					enabled = false;
+				else if (cpymo_parser_stream_span_equals_str(v_str, "1"))
+					enabled = true;
+				else enabled = cpymo_vars_get(&engine->vars, v_str) != 0;
+
+				POS(x, y, x_str, y_str);
+				
+				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled);
+			}
+
+			POP_ARG(init_position);
+			int init_position_i = cpymo_parser_stream_span_atoi(init_position);
+
+			cpymo_select_img_configuare_end(engine, init_position_i);
+		}
+
+		return CPYMO_ERR_SUCC;
+	}
+	
 	D("wait") {
 		POP_ARG(wait_ms_str);
 		ENSURE(wait_ms_str);

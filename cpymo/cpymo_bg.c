@@ -18,7 +18,7 @@ error_t cpymo_bg_update(cpymo_bg *bg, bool *redraw)
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_bg_draw(cpymo_bg *bg)
+void cpymo_bg_draw(const cpymo_bg *bg)
 {
 	if (bg->current_bg) {
 		cpymo_backend_image_draw(
