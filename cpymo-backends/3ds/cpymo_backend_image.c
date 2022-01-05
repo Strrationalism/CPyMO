@@ -20,6 +20,8 @@ static float game_width, game_height;
 static float viewport_width, viewport_height;
 static float offset_x, offset_y;
 
+const extern bool fill_screen;
+
 void cpymo_backend_image_init(float game_w, float game_h)
 {
     game_width = game_w;
@@ -42,13 +44,25 @@ void cpymo_backend_image_init(float game_w, float game_h)
 }
 
 static void trans_size(float *w, float *h) {
-    *w = *w / game_width * viewport_width;
-    *h = *h / game_height * viewport_height;
+    if(fill_screen) {
+        *w = *w / game_width * (400 + 20);
+        *h = *h / game_height * 240;
+    }
+    else {
+        *w = *w / game_width * viewport_width;
+        *h = *h / game_height * viewport_height;
+    }
 }
 
 static void trans_pos(float *x, float *y) {
-    *x = *x / game_width * viewport_width + offset_x;
-    *y = *y / game_height * viewport_height + offset_y;
+    if(fill_screen) {
+        *x = *x / game_width * (400 + 20) - 10;
+        *y = *y / game_height * 240;
+    }
+    else {
+        *x = *x / game_width * viewport_width + offset_x;
+        *y = *y / game_height * viewport_height + offset_y;
+    }
 }
 
 void cpymo_backend_image_fill_rects(

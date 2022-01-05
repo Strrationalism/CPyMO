@@ -4,6 +4,7 @@
 #include <citro3d.h>
 #include <citro2d.h>
 #include "select_game.h"
+#include <stdbool.h>
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -16,10 +17,13 @@
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2;
 float render_3d_offset;
+bool fill_screen;
 
 extern void cpymo_backend_image_init(float, float);
 
 int main(void) {
+	fill_screen = false;
+	
 	gfxInitDefault();
 	gfxSet3D(true);
 	consoleInit(GFX_BOTTOM, NULL);
@@ -67,6 +71,11 @@ int main(void) {
 		hidScanInput();
 
 		bool redraw = false;
+
+		if(hidKeysDown() & KEY_SELECT) {
+			redraw = true;
+			fill_screen = !fill_screen;
+		}
 
 		osTickCounterUpdate(&tickCounter);
 		double deltaTime = osTickCounterRead(&tickCounter) / 1000.0;
