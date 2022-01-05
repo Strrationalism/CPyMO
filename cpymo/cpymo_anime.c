@@ -1,7 +1,7 @@
 #include "cpymo_anime.h"
 #include "cpymo_engine.h"
 #include <stb_image.h>
-
+#include <string.h>
 void cpymo_anime_draw(const cpymo_anime *anime)
 {
 	if (anime->anime_image) {
@@ -42,7 +42,38 @@ error_t cpymo_anime_on(
 	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
 
 	cpymo_backend_image img;
-	err = cpymo_backend_image_load_immutable(&img, px, w, h, cpymo_backend_image_format_rgba);
+	if (cpymo_gameconfig_is_symbian(&engine->gameconfig)) {
+		strcat(filename, "_mask");
+		char *mask_buf = NULL; size_t mask_size = 0;
+		err = cpymo_assetloader_load_system(&mask_buf, &mask_size, filename, "png", &engine->assetloader);
+		if (err != CPYMO_ERR_SUCC) mask_buf = NULL;
+
+		int mw, mh, mc;
+		stbi_uc *mask_px = NULL;
+		if (err == CPYMO_ERR_SUCC) {
+			mask_px = stbi_load_from_memory((stbi_uc *)mask_buf, (int)mask_size, &mw, &mh, &mc, 1);
+		}
+
+		if (mask_buf) free(mask_buf);
+
+		if (mask_px) {
+			if (mw != w || mh != h) {
+				free(mask_px);
+				goto LOAD_WITHOUT_MASK;
+			}
+			else {
+				err = cpymo_backend_image_load_immutable_with_mask(
+					&img, px, mask_px, w, h);
+			}
+		}
+		else {
+			goto LOAD_WITHOUT_MASK;
+		}
+	}
+	else {
+		LOAD_WITHOUT_MASK:
+		err = cpymo_backend_image_load_immutable(&img, px, w, h, cpymo_backend_image_format_rgba);
+	}
 
 	if (err != CPYMO_ERR_SUCC) {
 		free(px);

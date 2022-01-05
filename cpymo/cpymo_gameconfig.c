@@ -151,6 +151,13 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 		return;
 	}
 
+	D("platform") {
+		cpymo_parser_stream_span plat = POP;
+		cpymo_parser_stream_span_trim(&plat);
+		SETUP(platform, plat);
+		return;
+	}
+
 	#undef SPAN
 	#undef SETUP
 	#undef SETUP_EXT

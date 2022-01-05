@@ -4,6 +4,7 @@
 #include <citro3d.h>
 #include <citro2d.h>
 #include <assert.h>
+#include <cpymo_utils.h>
 
 static float offset_3d(enum cpymo_backend_image_draw_type type)
 {
@@ -204,4 +205,16 @@ void cpymo_backend_image_draw(
     p.pos.h = dsth;
 
     C2D_DrawImage(cimg, &p, NULL);
+}
+
+error_t cpymo_backend_image_load_immutable_with_mask(
+	cpymo_backend_image *out_image, 
+    void *px_rgbx32_moveinto, 
+    void *mask_a8_moveinto, 
+    int w, 
+    int h)
+{
+	cpymo_utils_attach_mask_to_rgba(px_rgbx32_moveinto, mask_a8_moveinto, w, h);
+	free(mask_a8_moveinto);
+	return cpymo_backend_image_load_immutable(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
 }

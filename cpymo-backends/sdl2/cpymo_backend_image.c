@@ -1,6 +1,7 @@
 #include "cpymo_backend_image.h"
 #include <SDL.h>
 #include <assert.h>
+#include "cpymo_utils.h"
 
 extern SDL_Renderer *renderer;
 
@@ -47,6 +48,14 @@ error_t cpymo_backend_image_load_immutable(
 	*out_image = (cpymo_backend_image)tex;
 	free(px);
 	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_backend_image_load_immutable_with_mask(
+	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h)
+{
+	cpymo_utils_attach_mask_to_rgba(px_rgbx32_moveinto, mask_a8_moveinto, w, h);
+	free(mask_a8_moveinto);
+	return cpymo_backend_image_load_immutable(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
 }
 
 void cpymo_backend_image_free(cpymo_backend_image image)

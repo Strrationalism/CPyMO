@@ -55,3 +55,15 @@ bool cpymo_utils_string_equals_ignore_case(const char * str1, const char * str2)
 		else return false;
 	}
 }
+
+void cpymo_utils_attach_mask_to_rgba(void *rgba_, void *mask_, int w, int h)
+{
+	char *rgba = (char *)rgba_;
+	char *mask = (char *)mask_;
+
+	for (int y = 0; y < h; ++y) {
+		for (int x = 0; x < w; ++x) {
+			rgba[(y * w + x) * 4 + 3] = mask[y * w + x];
+		}
+	}
+}
