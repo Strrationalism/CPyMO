@@ -30,4 +30,13 @@ static inline int cpymo_vars_get(cpymo_vars * vars, cpymo_parser_stream_span nam
 
 error_t cpymo_vars_access_create(cpymo_vars *vars, cpymo_parser_stream_span name, int **ptr_to_val);
 
+static inline error_t cpymo_vars_set(cpymo_vars *vars, cpymo_parser_stream_span name, int v) {
+	int *p = NULL;
+	error_t err = cpymo_vars_access_create(vars, name, &p);
+	if (err != CPYMO_ERR_SUCC) return err;
+
+	*p = v;
+	return CPYMO_ERR_SUCC;
+}
+
 #endif

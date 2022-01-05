@@ -122,6 +122,14 @@ cpymo_parser_stream_span cpymo_parser_curline_pop_command(cpymo_parser * parser)
 	}
 }
 
+cpymo_parser_stream_span cpymo_parser_stream_span_pure(const char *s)
+{
+	cpymo_parser_stream_span r;
+	r.begin = s;
+	r.len = strlen(s);
+	return r;
+}
+
 void cpymo_parser_stream_span_trim_start(cpymo_parser_stream_span * span)
 {
 	size_t i;

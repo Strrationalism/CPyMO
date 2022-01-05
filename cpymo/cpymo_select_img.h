@@ -22,7 +22,7 @@ typedef struct {
 	int select_img_image_w, select_img_image_h;
 
 	cpymo_tween alpha;
-	size_t current_selection;
+	int current_selection;
 	size_t all_selections;
 	bool save_enabled;
 	bool input_enabled;

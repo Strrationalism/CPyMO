@@ -29,6 +29,7 @@ cpymo_parser_stream_span cpymo_parser_curline_readuntil_or(cpymo_parser *parser,
 cpymo_parser_stream_span cpymo_parser_curline_readuntil_or3(cpymo_parser *parser, char until1, char until2, char until3);
 cpymo_parser_stream_span cpymo_parser_curline_pop_commacell(cpymo_parser *parser);
 cpymo_parser_stream_span cpymo_parser_curline_pop_command(cpymo_parser *parser);
+cpymo_parser_stream_span cpymo_parser_stream_span_pure(const char *);
 
 void cpymo_parser_stream_span_trim_start(cpymo_parser_stream_span *span);
 void cpymo_parser_stream_span_trim_end(cpymo_parser_stream_span *span);

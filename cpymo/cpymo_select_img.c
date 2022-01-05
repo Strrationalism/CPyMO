@@ -2,7 +2,7 @@
 #include "cpymo_engine.h"
 #include <assert.h>
 
-static const float fade_in_time = 0.5f;
+static const float fade_in_time = 0.25f;
 
 void cpymo_select_img_reset(cpymo_select_img *img)
 {
@@ -70,7 +70,7 @@ void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, 
 	sel->x = x;
 	sel->y = y;
 	sel->w = e->select_img.select_img_image_w / 2;
-	sel->h = e->select_img.select_img_image_h / e->select_img.all_selections;
+	sel->h = e->select_img.select_img_image_h / (int)e->select_img.all_selections;
 
 	sel->enabled = enabled;
 }
@@ -151,15 +151,56 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 	cpymo_wait_register(&e->wait, &cpymo_select_img_wait);
 }
 
-error_t cpymo_select_img_update(cpymo_engine * engine)
+static void cpymo_select_img_move(cpymo_select_img *o, int move) {
+	assert(move == 1 || move == -1);
+	
+	o->current_selection += move;
+	while (o->current_selection < 0) o->current_selection += (int)o->all_selections;
+	while (o->current_selection >= o->all_selections) o->current_selection -= (int)o->all_selections;
+
+	if (o->selections[o->current_selection].image == NULL)
+		cpymo_select_img_move(o, move);
+}
+
+error_t cpymo_select_img_update(cpymo_engine *e)
 {
+	cpymo_select_img *o = &e->select_img;
+
+	if (o->selections && o->input_enabled) {
+		if (CPYMO_INPUT_JUST_PRESSED(e, down)) {
+			cpymo_select_img_move(o, 1);
+			cpymo_engine_request_redraw(e);
+		}
+
+		if (CPYMO_INPUT_JUST_PRESSED(e, up)) {
+			cpymo_select_img_move(o, -1);
+			cpymo_engine_request_redraw(e);
+		}
+
+		if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+			error_t err = cpymo_vars_set(
+				&e->vars,
+				cpymo_parser_stream_span_pure("FSEL"), 
+				o->current_selection);
+			if (err != CPYMO_ERR_SUCC) return err;
+
+			o->input_enabled = false;
+			cpymo_tween_to(&o->alpha, 0.0f, fade_in_time);
+		}
+	}
+
+	if (o->selections && !o->input_enabled) {
+		if (cpymo_tween_finished(&o->alpha))
+			cpymo_select_img_reset(o);
+	}
+
 	return CPYMO_ERR_SUCC;
 }
 
 void cpymo_select_img_draw(const cpymo_select_img *o)
 {
 	if (o->selections) {
-		for (size_t i = 0; i < o->all_selections; ++i) {
+		for (int i = 0; i < (int)o->all_selections; ++i) {
 			const cpymo_select_img_selection *sel = &o->selections[i];
 			if (sel->image) {
 				const bool selected = o->current_selection == i;
