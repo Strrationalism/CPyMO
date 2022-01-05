@@ -20,6 +20,7 @@ float render_3d_offset;
 bool fill_screen;
 
 extern void cpymo_backend_image_init(float, float);
+extern void cpymo_backend_image_fill_screen_edges();
 
 int main(void) {
 	fill_screen = false;
@@ -35,7 +36,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_android");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
@@ -103,11 +104,13 @@ int main(void) {
 			C2D_SceneBegin(screen1);
 			render_3d_offset = slider;
 			cpymo_engine_draw(&engine);
+			cpymo_backend_image_fill_screen_edges();
 
 			if(slider > 0){
 				C2D_SceneBegin(screen2);
 				render_3d_offset = -slider;
 				cpymo_engine_draw(&engine);
+				cpymo_backend_image_fill_screen_edges();
 			}
 
 			C3D_FrameEnd(0);

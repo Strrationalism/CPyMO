@@ -6,6 +6,9 @@
 #include <assert.h>
 #include <cpymo_utils.h>
 
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include <stb_image_resize.h>
+
 static float offset_3d(enum cpymo_backend_image_draw_type type)
 {
     switch(type) {
@@ -66,6 +69,23 @@ static void trans_pos(float *x, float *y) {
     }
 }
 
+void cpymo_backend_image_fill_screen_edges()
+{
+    if(!fill_screen) {
+        const u32 col = C2D_Color32(0, 0, 0, 255);
+
+        if(offset_x > 0.5f) {
+            C2D_DrawRectSolid(-10 * render_3d_offset, 0, 0, offset_x, 240, col);
+            C2D_DrawRectSolid(-10 * render_3d_offset + offset_x + viewport_width, 0, 0, offset_x, 240, col);
+        }
+
+        if(offset_y > 0.5f) {
+            C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
+            C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
+        }
+    }
+}
+
 void cpymo_backend_image_fill_rects(
 	const float *xywh, size_t count,
 	cpymo_color color, float alpha,
@@ -100,6 +120,7 @@ typedef struct {
     u16 real_height;
     u16 pad_width;
     u16 pad_height;
+    float scale;
 } cpymo_backend_image_3ds;
 
 error_t cpymo_backend_image_load_immutable(
@@ -111,6 +132,7 @@ error_t cpymo_backend_image_load_immutable(
 {
     int pad_width = pad_tex_size(width);
     int pad_height = pad_tex_size(height);
+    float scale = 1.0f;
 
     int channels;
     GPU_TEXCOLOR tex_fmt;
@@ -120,6 +142,37 @@ error_t cpymo_backend_image_load_immutable(
     case cpymo_backend_image_format_rgba: tex_fmt = GPU_RGBA8; channels = 4; break;
     default: assert(false);
     };
+
+    if(width > 1024 || height > 1024) {
+        
+        int max_edge = width > height ? width : height;
+        scale = 1024.0f / max_edge;
+        assert(scale > 0 && scale <= 1.0f);
+
+        int new_width = cpymo_utils_clamp((int)(scale * width), 8, 1024);
+        int new_height = cpymo_utils_clamp((int)(scale * height), 8, 1024);
+
+        printf("[Load Texture] Scaling: %d, %d => %d, %d\n", width ,height ,new_width, new_height);
+
+        void *new_px = malloc(new_width * new_height * channels);
+        if(new_px == NULL) return CPYMO_ERR_OUT_OF_MEM;
+        
+        if(!stbir_resize_uint8(
+            pixels_moveintoimage, width, height, width * channels, 
+            new_px, new_width, new_height, new_width * channels, channels))
+        {
+            free(new_px);
+            return CPYMO_ERR_UNKNOWN;
+        }
+
+        width = new_width;
+        height = new_height;
+        pad_width = pad_tex_size(width);
+        pad_height = pad_tex_size(height);
+
+        free(pixels_moveintoimage);
+        pixels_moveintoimage = new_px;
+    }
 
     printf("[Load Texture] C: %d, W: %d, H: %d, PW: %d, PH: %d\n",
     channels, width, height, pad_width, pad_height);
@@ -131,6 +184,7 @@ error_t cpymo_backend_image_load_immutable(
     img->real_height = (u16)height;
     img->pad_width = (u16)pad_width;
     img->pad_height = (u16)pad_height;
+    img->scale = scale;
 
     if(!C3D_TexInit(&img->tex, (u16)pad_height, (u16)pad_width, tex_fmt)) {
         free(img);
@@ -178,12 +232,12 @@ void cpymo_backend_image_draw(
     cpymo_backend_image_3ds *img = (cpymo_backend_image_3ds *)src;
     
     Tex3DS_SubTexture sub;
-    sub.width = (u16)srcw;
-    sub.height = (u16)srch;
-    sub.left = (float)srcx / (float)img->pad_width;
-    sub.right = (float)(srcx + srcw) / (float)img->pad_width;
-    sub.top = (float)srcy / (float)img->pad_height;
-    sub.bottom = (float)(srcy + srch) / (float)img->pad_height;
+    sub.width = (u16)(srcw * img->scale);
+    sub.height = (u16)(srch * img->scale);
+    sub.left = img->scale * (float)srcx / (float)img->pad_width;
+    sub.right = img->scale * (float)(srcx + srcw) / (float)img->pad_width;
+    sub.top = img->scale * (float)srcy / (float)img->pad_height;
+    sub.bottom = img->scale * (float)(srcy + srch) / (float)img->pad_height;
 
     C2D_Image cimg;
     cimg.subtex = &sub;
