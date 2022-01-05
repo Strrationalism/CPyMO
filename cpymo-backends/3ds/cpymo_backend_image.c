@@ -106,6 +106,9 @@ error_t cpymo_backend_image_load_immutable(
     default: assert(false);
     };
 
+    printf("[Load Texture] C: %d, W: %d, H: %d, PW: %d, PH: %d\n",
+    channels, width, height, pad_width, pad_height);
+
     cpymo_backend_image_3ds *img = (cpymo_backend_image_3ds *)malloc(sizeof(cpymo_backend_image_3ds));
     if(img == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
@@ -120,6 +123,8 @@ error_t cpymo_backend_image_load_immutable(
     }
 
     C3D_TexSetFilter(&img->tex, GPU_LINEAR, GPU_LINEAR);
+
+    memset(img->tex.data, 0, img->tex.size);
     
     for(u32 x = 0; x < width; x++) {
         for(u32 y = 0; y < height; y++) {

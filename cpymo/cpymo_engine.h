@@ -11,6 +11,7 @@
 #include "cpymo_flash.h"
 #include "cpymo_fade.h"
 #include "cpymo_bg.h"
+#include "cpymo_anime.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -22,6 +23,7 @@ struct cpymo_engine {
 	cpymo_flash flash;
 	cpymo_fade fade;
 	cpymo_bg bg;
+	cpymo_anime anime;
 	bool skipping;
 	char *title;
 

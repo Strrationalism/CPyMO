@@ -64,6 +64,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init bg
 	cpymo_bg_init(&out->bg);
 
+	// init anime
+	cpymo_anime_init(&out->anime);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -73,6 +76,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine * engine)
 {
+	cpymo_anime_free(&engine->anime);
 	cpymo_bg_free(&engine->bg);
 	cpymo_interpreter_free(engine->interpreter);
 	free(engine->interpreter);
@@ -105,6 +109,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	}
 
 	cpymo_bg_update(&engine->bg, redraw);
+	cpymo_anime_update(&engine->anime, delta_time_sec, redraw);
 
 	*redraw |= engine->redraw;
 
@@ -114,6 +119,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 void cpymo_engine_draw(cpymo_engine *engine)
 {
 	cpymo_bg_draw(&engine->bg);
+	cpymo_anime_draw(&engine->anime);
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);
 }

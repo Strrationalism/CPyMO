@@ -24,8 +24,8 @@ void cpymo_bg_draw(cpymo_bg *bg)
 		cpymo_backend_image_draw(
 			bg->current_bg_x,
 			bg->current_bg_y,
-			bg->current_bg_w,
-			bg->current_bg_h,
+			(float)bg->current_bg_w,
+			(float)bg->current_bg_h,
 			bg->current_bg,
 			0,
 			0,
@@ -58,11 +58,11 @@ error_t cpymo_bg_command(
 	if (err != CPYMO_ERR_SUCC) return err;
 
 	int w, h, channels;
-	stbi_uc *pixels = stbi_load_from_memory((stbi_uc *)buf, buf_size, &w, &h, &channels, 3);
+	stbi_uc *pixels = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &channels, 3);
 	free(buf);
 
 	if (pixels == NULL)
-		return CPYMO_ERR_UNKNOWN;
+		return CPYMO_ERR_BAD_FILE_FORMAT;
 
 	err = cpymo_backend_image_load_immutable(
 		&bg->current_bg,

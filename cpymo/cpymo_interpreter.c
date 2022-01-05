@@ -249,6 +249,36 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return CPYMO_ERR_SUCC;
 	}
 
+	D("anime_on") {
+		POP_ARG(frames_str); ENSURE(frames_str);
+		POP_ARG(filename); ENSURE(filename);
+		POP_ARG(x_str); ENSURE(x_str);
+		POP_ARG(y_str); ENSURE(y_str);
+		POP_ARG(interval_str); ENSURE(interval_str);
+		POP_ARG(is_loop_s); ENSURE(is_loop_s);
+
+		int frames = cpymo_parser_stream_span_atoi(frames_str);
+		float x = cpymo_parser_stream_span_atoi(x_str) / 100.0f * engine->gameconfig.imagesize_w;
+		float y = cpymo_parser_stream_span_atoi(y_str) / 100.0f * engine->gameconfig.imagesize_h;
+		float interval = cpymo_parser_stream_span_atoi(interval_str) / 1000.0f;
+		bool is_loop = cpymo_parser_stream_span_atoi(is_loop_s) > 0;
+
+		error_t err = cpymo_anime_on(engine, frames, filename, x, y, interval, is_loop);
+		if (err != CPYMO_ERR_SUCC) {
+			char anime_name[16];
+			cpymo_parser_stream_span_copy(anime_name, sizeof(anime_name), filename);
+			fprintf(stderr, "[Warning] Can not load anime %s in script %s(%u).", 
+				anime_name, interpreter->script_name, (unsigned)interpreter->script_parser.cur_line);
+		}
+
+		CONT_NEXTLINE;
+	}
+	
+	D("anime_off") {
+		cpymo_anime_off(&engine->anime);
+		CONT_NEXTLINE;
+	}
+
 	/*** III. Variables, Selection, Jump ***/
 	D("set") {
 		POP_ARG(name); ENSURE(name);
