@@ -5,6 +5,14 @@
 #include <citro2d.h>
 #include "select_game.h"
 
+#define STBI_NO_PSD
+#define STBI_NO_TGA
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PNM
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2;
 float render_3d_offset;
@@ -23,7 +31,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/Playground");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();

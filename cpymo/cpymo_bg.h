@@ -16,7 +16,7 @@ typedef struct {
 	bool redraw;
 } cpymo_bg;
 
-static void cpymo_bg_init(cpymo_bg *bg)
+static inline void cpymo_bg_init(cpymo_bg *bg)
 {
 	bg->current_bg = NULL; 
 	bg->current_bg_x = 0;
