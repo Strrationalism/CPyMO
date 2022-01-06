@@ -199,18 +199,14 @@ error_t cpymo_bg_command(
 			&cpymo_bg_wait_for_progression,
 			&cpymo_bg_progression_over_callback);
 	}
-	else if (cpymo_parser_stream_span_equals_str(transition, "BG_FADE")) {
+	else {	//if (cpymo_parser_stream_span_equals_str(transition, "BG_FADE")) {	
+		// Mask transition is not supported yet.
 		bg->transform_progression = cpymo_tween_create(time);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_fade;
 		cpymo_wait_register_with_callback(
 			&engine->wait,
 			&cpymo_bg_wait_for_progression_fade,
 			&cpymo_bg_progression_over_callback);
-	}
-	else {
-		printf("[Warning] Unsupported bg transition.\n");
-		cpymo_bg_transfer(bg);
-		cpymo_wait_for_seconds(engine, time);
 	}
 
 	return CPYMO_ERR_SUCC;

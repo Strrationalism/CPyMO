@@ -233,7 +233,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
 			if(o->selections[o->all_selections-1].image)
-				return cpymo_select_img_ok(e, o->all_selections - 1);
+				return cpymo_select_img_ok(e, (int)o->all_selections - 1);
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {

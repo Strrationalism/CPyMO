@@ -63,16 +63,6 @@ void cpymo_backend_image_free(cpymo_backend_image image)
 	SDL_DestroyTexture((SDL_Texture *)image);
 }
 
-error_t cpymo_backend_image_size(cpymo_backend_image img, int *w, int *h)
-{
-	if (SDL_QueryTexture((SDL_Texture *)img, NULL, NULL, w, h) != 0) {
-		SDL_Log("Warning: SDL_QueryTexture failed, %s", SDL_GetError());
-		return CPYMO_ERR_UNKNOWN;
-	}
-
-	return CPYMO_ERR_SUCC;
-}
-
 void cpymo_backend_image_draw(
 	float dstx, 
 	float dsty, 
@@ -111,13 +101,6 @@ void cpymo_backend_image_draw(
 	}
 }
 
-void cpymo_backend_image_draw_lines(const float *xyxy_points, size_t points_count, cpymo_color color, float alpha, enum cpymo_backend_image_draw_type draw_type)
-{
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, (Uint8)(alpha * 255));
-	if (SDL_RenderDrawLinesF(renderer, (const SDL_FPoint *)xyxy_points, (int)points_count) != 0)
-		SDL_Log("Warning: SDL_RenderDrawLinesF failed: %s", SDL_GetError());
-}
-
 void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_color color, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, (Uint8)(alpha * 255));
@@ -125,7 +108,7 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 		SDL_Log("Warning: SDL_RenderFillRectsF failed, %s", SDL_GetError());
 }
 
-error_t cpymo_backend_image_create_mutable(cpymo_backend_image *out_image, int width, int height)
+/*error_t cpymo_backend_image_create_mutable(cpymo_backend_image *out_image, int width, int height)
 {
 	SDL_Texture *tex =
 		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
@@ -152,4 +135,4 @@ error_t cpymo_backend_image_update_mutable(cpymo_backend_image image, void * pix
 	free(pixels_moveintoimage);
 
 	return CPYMO_ERR_SUCC;
-}
+}*/

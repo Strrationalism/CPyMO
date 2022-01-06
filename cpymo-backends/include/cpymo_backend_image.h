@@ -20,27 +20,17 @@ error_t cpymo_backend_image_load_immutable(
 error_t cpymo_backend_image_load_immutable_with_mask(
 	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h);
 
-error_t cpymo_backend_image_font(
+/*error_t cpymo_backend_image_font(
 	cpymo_backend_image *out_image, const char *utf8str, float size, cpymo_color color, bool aa);
 
 error_t cpymo_backend_image_create_mutable(
 	cpymo_backend_image *out_image, int width, int height);
 
 error_t cpymo_backend_image_update_mutable(
-	cpymo_backend_image image, void *pixels_moveintoimage);
+	cpymo_backend_image image, void *pixels_moveintoimage);*/
 
 
 void cpymo_backend_image_free(cpymo_backend_image image);
-
-
-error_t cpymo_backend_image_size(cpymo_backend_image img, int *w, int *h);
-
-
-typedef void *cpymo_backend_image_screenshot;
-
-error_t cpymo_backend_image_screenshot_create(cpymo_backend_image_screenshot *out);
-
-error_t cpymo_backend_image_blit_screenshot(cpymo_backend_image_screenshot *out);
 
 
 /* Screen Coord in backend renderer
@@ -67,11 +57,6 @@ void cpymo_backend_image_draw(
 	float dstx, float dsty, float dstw, float dsth,
 	cpymo_backend_image src,
 	int srcx, int srcy, int srcw, int srch, float alpha,
-	enum cpymo_backend_image_draw_type draw_type);
-
-void cpymo_backend_image_draw_lines(
-	const float *xyxy_points, size_t points_count,
-	cpymo_color color, float alpha,
 	enum cpymo_backend_image_draw_type draw_type);
 
 void cpymo_backend_image_fill_rects(
