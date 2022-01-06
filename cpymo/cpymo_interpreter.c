@@ -200,7 +200,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(y_str);
 
 		float x, y, time;
-		if (IS_EMPTY(time_str)) time = 0.3f; else time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+
+		if (cpymo_parser_stream_span_equals_str(time_str, "BG_VERYFAST")) time = 0.1f;
+		if (cpymo_parser_stream_span_equals_str(time_str, "BG_FAST")) time = 0.175f;
+		else if (cpymo_parser_stream_span_equals_str(time_str, "BG_NORMAL")) time = 0.25f;
+		else if (cpymo_parser_stream_span_equals_str(time_str, "BG_SLOW")) time = 0.5f;
+		else if (cpymo_parser_stream_span_equals_str(time_str, "BG_VERYSLOW")) time = 1.0f;
+		else if (!IS_EMPTY(time_str))
+			time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+		else time = 0.3f;
+		
+
 		if (IS_EMPTY(x_str)) x = 0.0f; else x = (float)cpymo_parser_stream_span_atoi(x_str);
 		if (IS_EMPTY(y_str)) y = 0.0f; else y = (float)cpymo_parser_stream_span_atoi(y_str);
 
@@ -215,10 +225,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			bg_name,
 			transition,
 			x,
-			y
+			y,
+			time
 		);
-
-		cpymo_wait_for_seconds(engine, time);
 
 		return err;
 	}
@@ -387,6 +396,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			}
 		}
 
+		if ((op.begin[0] == '<')) {
+			if (op.len + 1 + left.len < condition.len) {
+				if (op.begin[1] == '>')
+					op.len++;
+			}
+		}
+
 		cpymo_parser_stream_span right;
 		right.begin = op.begin + op.len;
 		right.len = condition.len - op.len - left.len;
@@ -422,7 +438,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		bool run_sub_command;
 		if (cpymo_parser_stream_span_equals_str(op, "="))
 			run_sub_command = lv == rv;
-		else if (cpymo_parser_stream_span_equals_str(op, "!="))
+		else if (cpymo_parser_stream_span_equals_str(op, "!=") || cpymo_parser_stream_span_equals_str(op, "<>"))
 			run_sub_command = lv != rv;
 		else if (cpymo_parser_stream_span_equals_str(op, ">"))
 			run_sub_command = lv > rv;

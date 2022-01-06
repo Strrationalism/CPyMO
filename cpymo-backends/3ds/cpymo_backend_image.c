@@ -147,7 +147,7 @@ error_t cpymo_backend_image_load_immutable(
     if(width > 1024 || height > 1024) {
         
         int max_edge = width > height ? width : height;
-        scale = 1024.0f / max_edge;
+        scale = 512.0f / max_edge;
         assert(scale > 0 && scale <= 1.0f);
 
         int new_width = cpymo_utils_clamp((int)(scale * width), 8, 1024);

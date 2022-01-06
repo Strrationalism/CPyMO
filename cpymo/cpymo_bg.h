@@ -3,6 +3,7 @@
 
 #include <cpymo_backend_image.h>
 #include "cpymo_parser.h"
+#include "cpymo_tween.h"
 
 struct cpymo_engine;
 
@@ -14,13 +15,22 @@ typedef struct {
 	int current_bg_w, current_bg_h;
 
 	bool redraw;
+
+	// Transformation Effect
+	cpymo_backend_image transform_next_bg;
+	float transform_next_bg_x, transform_next_bg_y;
+	int transform_next_bg_w, transform_next_bg_h;
+	cpymo_tween transform_progression;
+	void (*transform_draw)(const struct cpymo_engine *);
 } cpymo_bg;
 
 static inline void cpymo_bg_init(cpymo_bg *bg)
 {
-	bg->current_bg = NULL; 
+	bg->current_bg = NULL;
 	bg->current_bg_x = 0;
 	bg->current_bg_y = 0;
+	bg->transform_next_bg = NULL;
+	bg->transform_draw = NULL;
 
 	bg->redraw = false;
 }
@@ -28,7 +38,9 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 void cpymo_bg_free(cpymo_bg *);
 
 error_t cpymo_bg_update(cpymo_bg *, bool *redraw);
+
 void cpymo_bg_draw(const cpymo_bg *);
+void cpymo_bg_draw_transform_effect(const struct cpymo_engine *);
 
 error_t cpymo_bg_command(
 	struct cpymo_engine *engine,
@@ -36,6 +48,7 @@ error_t cpymo_bg_command(
 	cpymo_parser_stream_span bgname,
 	cpymo_parser_stream_span transition,
 	float x,
-	float y);
+	float y,
+	float time);
 
 #endif

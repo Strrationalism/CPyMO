@@ -2,10 +2,14 @@
 #include "cpymo_engine.h"
 #include <stb_image.h>
 #include <math.h>
+#include <assert.h>
 
 void cpymo_bg_free(cpymo_bg *bg)
 {
 	if (bg->current_bg)
+		cpymo_backend_image_free(bg->current_bg);
+
+	if(bg->transform_next_bg)
 		cpymo_backend_image_free(bg->current_bg);
 }
 
@@ -37,18 +41,78 @@ void cpymo_bg_draw(const cpymo_bg *bg)
 	}
 }
 
+void cpymo_bg_draw_transform_effect(const cpymo_engine * e)
+{
+	if(e->bg.transform_draw)
+		e->bg.transform_draw(e);
+}
+
+static void cpymo_bg_draw_transform_effect_alpha(const cpymo_engine *e)
+{
+	const cpymo_bg *bg = &e->bg;
+
+	assert(bg->transform_next_bg);
+	cpymo_backend_image_draw(
+		bg->transform_next_bg_x,
+		bg->transform_next_bg_y,
+		(float)bg->transform_next_bg_w,
+		(float)bg->transform_next_bg_h,
+		bg->transform_next_bg,
+		0,
+		0,
+		bg->transform_next_bg_w,
+		bg->transform_next_bg_h,
+		cpymo_tween_value(&bg->transform_progression),
+		cpymo_backend_image_draw_type_bg
+	);
+}
+
+static void cpymo_bg_transfer(cpymo_bg *bg)
+{
+	assert(bg->transform_next_bg);
+
+	if (bg->current_bg)
+		cpymo_backend_image_free(bg->current_bg);
+	bg->current_bg = bg->transform_next_bg;
+	bg->transform_next_bg = NULL;
+
+	bg->current_bg_w = bg->transform_next_bg_w;
+	bg->current_bg_h = bg->transform_next_bg_h;
+	bg->current_bg_x = bg->transform_next_bg_x;
+	bg->current_bg_y = bg->transform_next_bg_y;
+	bg->transform_draw = NULL;
+
+	bg->redraw = true;
+}
+
+static bool cpymo_bg_wait_for_progression(cpymo_engine *engine, float delta_time)
+{
+	cpymo_engine_request_redraw(engine);
+
+	if (cpymo_input_foward_key_just_pressed(engine))
+		cpymo_tween_finish(&engine->bg.transform_progression);
+
+	cpymo_tween_update(&engine->bg.transform_progression, delta_time);
+	return cpymo_tween_finished(&engine->bg.transform_progression);
+}
+
+static error_t cpymo_bg_progression_over_callback(cpymo_engine *e)
+{
+	cpymo_engine_request_redraw(e);
+	if (e->bg.transform_next_bg)
+		cpymo_bg_transfer(&e->bg);
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_bg_command(
 	cpymo_engine *engine,
 	cpymo_bg *bg,
 	cpymo_parser_stream_span bgname,
 	cpymo_parser_stream_span transition,
 	float x,
-	float y)
+	float y,
+	float time)
 {
-	if (bg->current_bg)
-		cpymo_backend_image_free(bg->current_bg);
-	bg->current_bg = NULL;
-
 	char bg_name[40];
 	cpymo_parser_stream_span_copy(bg_name, sizeof(bg_name), bgname);
 
@@ -64,8 +128,9 @@ error_t cpymo_bg_command(
 	if (pixels == NULL)
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 
+	cpymo_backend_image img;
 	err = cpymo_backend_image_load_immutable(
-		&bg->current_bg,
+		&img,
 		pixels,
 		w,
 		h,
@@ -76,20 +141,40 @@ error_t cpymo_bg_command(
 		return err;
 	}
 
+	if (bg->transform_next_bg)
+		cpymo_backend_image_free(bg->transform_next_bg);
+
+	bg->transform_next_bg = img;
+	bg->transform_next_bg_w = w;
+	bg->transform_next_bg_h = h;
+
 	// In pymo, when x = y = 0 and bg smaller than screen, bg will be centered.
 	if (fabs(x) < 1 && fabs(y) < 1 && w <= engine->gameconfig.imagesize_w && h <= engine->gameconfig.imagesize_h) {
-		bg->current_bg_x = (float)(engine->gameconfig.imagesize_w - w) / 2.0f;
-		bg->current_bg_y = (float)(engine->gameconfig.imagesize_h - h) / 2.0f;
+		bg->transform_next_bg_x = (float)(engine->gameconfig.imagesize_w - w) / 2.0f;
+		bg->transform_next_bg_y = (float)(engine->gameconfig.imagesize_h - h) / 2.0f;
 	} 
 	else {
-		bg->current_bg_x = -(x / 100.0f) * (float)w;
-		bg->current_bg_y = -(y / 100.0f) * (float)h;
+		bg->transform_next_bg_x = -(x / 100.0f) * (float)w;
+		bg->transform_next_bg_y = -(y / 100.0f) * (float)h;
 	}
 
-	bg->current_bg_w = w;
-	bg->current_bg_h = h;
-
-	bg->redraw = true;
+	if (cpymo_parser_stream_span_equals_str(transition, "BG_NOFADE")) {
+		cpymo_bg_transfer(bg);
+	}
+	else if (cpymo_parser_stream_span_equals_str(transition, "BG_ALPHA")) {
+		bg->transform_progression = cpymo_tween_create(time);
+		bg->transform_draw = &cpymo_bg_draw_transform_effect_alpha;
+		cpymo_wait_register_with_callback(
+			&engine->wait,
+			&cpymo_bg_wait_for_progression,
+			&cpymo_bg_progression_over_callback);
+	}
+	else {
+		printf("[Warning] Unsupported bg transition.\n");
+		cpymo_bg_transfer(bg);
+		cpymo_wait_for_seconds(engine, time);
+	}
 
 	return CPYMO_ERR_SUCC;
 }
+

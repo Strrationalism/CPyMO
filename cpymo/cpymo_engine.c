@@ -80,7 +80,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		|| out->gameconfig.scripttype[2] != 'm'
 		|| out->gameconfig.scripttype[3] != '\0')
 	{
-		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.startscript);
+		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.scripttype);
 	}
 
 	return CPYMO_ERR_SUCC;
@@ -100,6 +100,7 @@ void cpymo_engine_free(cpymo_engine * engine)
 
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
+	delta_time_sec = cpymo_utils_clampf(delta_time_sec, 0.001f, 0.15f);
 	error_t err;
 	*redraw = engine->redraw;
 	engine->redraw = false;
@@ -141,4 +142,5 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);
 	cpymo_select_img_draw(&engine->select_img);
+	cpymo_bg_draw_transform_effect(engine);
 }
