@@ -159,6 +159,38 @@ error_t cpymo_assetloader_load_bg(char ** out_buffer, size_t * buf_size, const c
 		loader);
 }
 
+error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{
+	char bg_name[40];
+	cpymo_parser_stream_span_copy(bg_name, sizeof(bg_name), name);
+
+	char *buf = NULL;
+	size_t buf_size = 0;
+	error_t err = cpymo_assetloader_load_bg(&buf, &buf_size, bg_name, loader);
+	if (err != CPYMO_ERR_SUCC) return err;
+
+	int channels;
+	stbi_uc *pixels = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, w, h, &channels, 3);
+	free(buf);
+
+	if (pixels == NULL)
+		return CPYMO_ERR_BAD_FILE_FORMAT;
+
+	err = cpymo_backend_image_load_immutable(
+		img,
+		pixels,
+		*w,
+		*h,
+		cpymo_backend_image_format_rgb);
+
+	if (err != CPYMO_ERR_SUCC) {
+		free(pixels);
+		return err;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_assetloader_load_chara(char ** out_buffer, size_t * buf_size, const char * chara_name, const cpymo_assetloader * loader)
 {
 	return cpymo_assetloader_load_file(

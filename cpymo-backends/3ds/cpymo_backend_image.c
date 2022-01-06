@@ -76,8 +76,8 @@ void cpymo_backend_image_fill_screen_edges()
         const u32 col = C2D_Color32(0, 0, 0, 255);
 
         if(offset_x > 0.5f) {
-            C2D_DrawRectSolid(-10 * render_3d_offset, 0, 0, offset_x, 240, col);
-            C2D_DrawRectSolid(-10 * render_3d_offset + offset_x + viewport_width, 0, 0, offset_x, 240, col);
+            C2D_DrawRectSolid(-10 * render_3d_offset - 10, 0, 0, offset_x + 10, 240, col);
+            C2D_DrawRectSolid(-10 * render_3d_offset + offset_x + viewport_width, 0, 0, offset_x + 10, 240, col);
         }
 
         if(offset_y > 0.5f) {
