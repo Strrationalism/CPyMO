@@ -520,7 +520,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				else enabled = cpymo_vars_get(&engine->vars, v_str) != 0;
 
 				POS(x, y, x_str, y_str);
-				
+
 				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled);
 			}
 
@@ -529,6 +529,43 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 			cpymo_select_img_configuare_end(engine, init_position_i);
 		}
+		else return CPYMO_ERR_INVALID_ARG;
+
+		return CPYMO_ERR_SUCC;
+	}
+
+	D("select_imgs") {
+		POP_ARG(choices_str); ENSURE(choices_str);
+
+		size_t choices = (size_t)cpymo_parser_stream_span_atoi(choices_str);
+		if (choices) {
+			error_t err = cpymo_select_img_configuare_begin(engine, choices, cpymo_parser_stream_span_pure(""));
+			if (err != CPYMO_ERR_SUCC) return err;
+
+			for (size_t i = 0; i < choices; ++i) {
+				POP_ARG(filename); ENSURE(filename);
+				POP_ARG(x_str); ENSURE(x_str);
+				POP_ARG(y_str); ENSURE(y_str);
+				POP_ARG(v_str); ENSURE(v_str);
+
+				bool enabled;
+				if (cpymo_parser_stream_span_equals_str(v_str, "0"))
+					enabled = false;
+				else if (cpymo_parser_stream_span_equals_str(v_str, "1"))
+					enabled = true;
+				else enabled = cpymo_vars_get(&engine->vars, v_str) != 0;
+
+				POS(x, y, x_str, y_str);
+
+				cpymo_select_img_configuare_select_imgs_selection(engine, filename, x, y, enabled);
+			}
+
+			POP_ARG(init_position);
+			int init_position_i = cpymo_parser_stream_span_atoi(init_position);
+
+			cpymo_select_img_configuare_end(engine, init_position_i);
+		}
+		else return CPYMO_ERR_INVALID_ARG;
 
 		return CPYMO_ERR_SUCC;
 	}

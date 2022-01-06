@@ -96,6 +96,7 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 
 	sel->x = x;
 	sel->y = y;
+	sel->w /= 2;
 	sel->enabled = enabled;
 
 	return CPYMO_ERR_SUCC;
