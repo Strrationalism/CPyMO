@@ -23,12 +23,20 @@ extern void cpymo_backend_image_init(float, float);
 extern void cpymo_backend_image_fill_screen_edges();
 
 int main(void) {
+	bool is_new_3ds = false;
+	APT_CheckNew3DS(&is_new_3ds);
+	
 	fill_screen = false;
 	
 	gfxInitDefault();
 	gfxSet3D(true);
 	consoleInit(GFX_BOTTOM, NULL);
 	gfxSetDoubleBuffering(GFX_BOTTOM, false);
+
+	if(is_new_3ds) {
+		printf("[Info] New3DS\n");
+		osSetSpeedupEnable(true);
+	}
 
 	/*const char *gamename = "DAICHYAN_s60v3";	//select_game();
 	if (gamename == NULL) {
@@ -122,6 +130,7 @@ int main(void) {
 	}
 
 	EXIT:
+	cpymo_engine_free(&engine);
 	
 	C2D_Fini();
 	C3D_Fini();

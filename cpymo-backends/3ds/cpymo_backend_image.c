@@ -258,7 +258,9 @@ void cpymo_backend_image_draw(
     p.pos.w = dstw;
     p.pos.h = dsth;
 
-    C2D_DrawImage(cimg, &p, NULL);
+    C2D_ImageTint tint;
+    C2D_AlphaImageTint(&tint, alpha);
+    C2D_DrawImage(cimg, &p, &tint);
 }
 
 error_t cpymo_backend_image_load_immutable_with_mask(
