@@ -1,6 +1,7 @@
 #include "cpymo_vars.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <ctype.h>
 
 void cpymo_vars_init(cpymo_vars * out)
 {
@@ -72,5 +73,19 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_parser_stream_span nam
 
 		return CPYMO_ERR_SUCC;
 	}
+}
+
+int cpymo_vars_eval(cpymo_vars * vars, cpymo_parser_stream_span expr)
+{
+	bool is_constant = true;
+	for (size_t i = 0; i < expr.len; ++i) {
+		if (!isdigit((int)expr.begin[i])) {
+			is_constant = false;
+			break;
+		}
+	}
+
+	if (is_constant) return cpymo_parser_stream_span_atoi(expr);
+	else return cpymo_vars_get(vars, expr);
 }
 

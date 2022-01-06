@@ -39,4 +39,6 @@ static inline error_t cpymo_vars_set(cpymo_vars *vars, cpymo_parser_stream_span 
 	return CPYMO_ERR_SUCC;
 }
 
+int cpymo_vars_eval(cpymo_vars *vars, cpymo_parser_stream_span expr);
+
 #endif

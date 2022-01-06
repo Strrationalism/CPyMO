@@ -180,7 +180,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("title") {
 		POP_ARG(title);
 
-		cpymo_parser_stream_span_trim(&title);
 		char *buf = (char *)malloc(title.len + 1);
 		if (buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
@@ -219,7 +218,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			transition.len = strlen(transition.begin);
 		}
 
-		error_t err = cpymo_bg_command(
+		err = cpymo_bg_command(
 			engine,
 			&engine->bg,
 			bg_name,
@@ -277,7 +276,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		POS(x, y, x_str, y_str);
 
-		error_t err = cpymo_anime_on(engine, frames, filename, x, y, interval, is_loop);
+		err = cpymo_anime_on(engine, frames, filename, x, y, interval, is_loop);
 		if (err != CPYMO_ERR_SUCC) {
 			char anime_name[16];
 			cpymo_parser_stream_span_copy(anime_name, sizeof(anime_name), filename);
@@ -297,12 +296,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("set") {
 		POP_ARG(name); ENSURE(name);
 		POP_ARG(value_str); ENSURE(value_str);
-		
-		int *v = NULL;
-		if ((err = cpymo_vars_access_create(&engine->vars, name, &v)) != CPYMO_ERR_SUCC)
-			return err;
 
-		*v = cpymo_parser_stream_span_atoi(value_str);
+		err = cpymo_vars_set(
+			&engine->vars, name, 
+			cpymo_vars_eval(&engine->vars, value_str));
+		CPYMO_THROW(err);
 			
 		CONT_NEXTLINE;
 	}
@@ -312,10 +310,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(value); ENSURE(value);
 
 		int *v = NULL;
-		if ((err = cpymo_vars_access_create(&engine->vars, name, &v)) != CPYMO_ERR_SUCC)
-			return err;
+		err = cpymo_vars_access_create(&engine->vars, name, &v);
+		CPYMO_THROW(err);
 
-		*v += cpymo_parser_stream_span_atoi(value);
+		*v += cpymo_vars_eval(&engine->vars, value);
 
 		CONT_NEXTLINE;
 	}
@@ -325,10 +323,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(value); ENSURE(value);
 
 		int *v = NULL;
-		if ((err = cpymo_vars_access_create(&engine->vars, name, &v)) != CPYMO_ERR_SUCC)
-			return err;
+		err = cpymo_vars_access_create(&engine->vars, name, &v);
+		CPYMO_THROW(err);
 
-		*v -= cpymo_parser_stream_span_atoi(value);
+		*v -= cpymo_vars_eval(&engine->vars, value);
 
 		CONT_NEXTLINE;
 	}
@@ -340,8 +338,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("goto") {
 		POP_ARG(label);
 		ENSURE(label);
-		if ((err = cpymo_interpreter_goto_label(interpreter, label)) != CPYMO_ERR_SUCC)
-			return err;
+		err = cpymo_interpreter_goto_label(interpreter, label);
+		CPYMO_THROW(err);
 		
 		CONT_WITH_CURRENT_CONTEXT;
 	}
@@ -354,8 +352,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		cpymo_parser_stream_span_copy(script_name, sizeof(script_name), script_name_span);
 
 		cpymo_interpreter_free(interpreter);
-		if ((err = cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader)) != CPYMO_ERR_SUCC)
-			return err;
+		err = cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader);
+		CPYMO_THROW(err);
 
 		CONT_WITH_CURRENT_CONTEXT;
 	}
@@ -414,26 +412,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		if (IS_EMPTY(left) || IS_EMPTY(right) || IS_EMPTY(op)) 
 			goto BAD_EXPRESSION;
 
-		bool is_constant = true;
-		for (size_t i = 0; i < right.len; ++i) {
-			if (!isdigit((int)right.begin[i])) {
-				is_constant = false;
-				break;
-			}
-		}
-
-		int lv, rv;
-		{
-			int *plv = cpymo_vars_access(&engine->vars, left);
-			lv = plv ? *plv : 0;
-
-			if (is_constant)
-				rv = cpymo_parser_stream_span_atoi(right);
-			else {
-				int *prv = cpymo_vars_access(&engine->vars, right);
-				rv = prv ? *prv : 0;
-			}
-		}
+		const int lv = cpymo_vars_eval(&engine->vars, left);
+		const int rv = cpymo_vars_eval(&engine->vars, right);
 
 		bool run_sub_command;
 		if (cpymo_parser_stream_span_equals_str(op, "="))
@@ -527,14 +507,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				POP_ARG(x_str); ENSURE(x_str);
 				POP_ARG(y_str); ENSURE(y_str);
 				POP_ARG(v_str); ENSURE(v_str);
-
-				bool enabled;
-				if (cpymo_parser_stream_span_equals_str(v_str, "0"))
-					enabled = false;
-				else if (cpymo_parser_stream_span_equals_str(v_str, "1"))
-					enabled = true;
-				else enabled = cpymo_vars_get(&engine->vars, v_str) != 0;
-
+				const bool enabled = cpymo_vars_eval(&engine->vars, v_str) != 0;
 				POS(x, y, x_str, y_str);
 
 				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled);
@@ -563,14 +536,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				POP_ARG(x_str); ENSURE(x_str);
 				POP_ARG(y_str); ENSURE(y_str);
 				POP_ARG(v_str); ENSURE(v_str);
-
-				bool enabled;
-				if (cpymo_parser_stream_span_equals_str(v_str, "0"))
-					enabled = false;
-				else if (cpymo_parser_stream_span_equals_str(v_str, "1"))
-					enabled = true;
-				else enabled = cpymo_vars_get(&engine->vars, v_str) != 0;
-
+				const bool enabled = cpymo_vars_eval(&engine->vars, v_str);
 				POS(x, y, x_str, y_str);
 
 				cpymo_select_img_configuare_select_imgs_selection(engine, filename, x, y, enabled);
@@ -613,11 +579,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			return CPYMO_ERR_INVALID_ARG;
 		}
 
-		int *p = NULL;
-		if ((err = cpymo_vars_access_create(&engine->vars, var_name, &p)) != CPYMO_ERR_SUCC)
-			return err;
-
-		*p = min_val + rand() % (max_val - min_val + 1);
+		err = cpymo_vars_set(&engine->vars, var_name, min_val + rand() % (max_val - min_val + 1));
+		CPYMO_THROW(err);
 
 		CONT_NEXTLINE;
 	}
