@@ -74,6 +74,15 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	out->skipping = false;
 	out->redraw = true;
 
+	// checks
+	if (out->gameconfig.scripttype[0] != 'p'
+		|| out->gameconfig.scripttype[1] != 'y'
+		|| out->gameconfig.scripttype[2] != 'm'
+		|| out->gameconfig.scripttype[3] != '\0')
+	{
+		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.startscript);
+	}
+
 	return CPYMO_ERR_SUCC;
 }
 
