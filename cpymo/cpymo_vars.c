@@ -62,7 +62,7 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_parser_stream_span nam
 			return CPYMO_ERR_OUT_OF_MEM;
 		}
 
-		cpymo_parser_stream_span_copy(var->name, sizeof(var->name), name);
+		cpymo_parser_stream_span_copy(var->name, name.len + 1, name);
 
 		struct cpymo_var **parent = name.begin[0] == 'S' ? &vars->globals : &vars->locals;
 
