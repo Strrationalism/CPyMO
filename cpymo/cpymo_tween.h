@@ -37,6 +37,15 @@ static inline void cpymo_tween_to(cpymo_tween *tween, float target, float time)
 static inline bool cpymo_tween_finished(const cpymo_tween *tween)
 { return tween->current_time >= tween->all_time; }
 
+static inline bool cpymo_tween_finished_after(const cpymo_tween *tween, float after_seconds)
+{ return tween->current_time + after_seconds >= tween->all_time; }
+
+static inline float cpymo_tween_progress_after(const cpymo_tween *tween, float after_seconds)
+{ return cpymo_utils_clampf((tween->current_time + after_seconds) / tween->all_time, 0.0f, 1.0f); }
+
+static inline float cpymo_tween_value_after(const cpymo_tween *tween, float after_seconds)
+{ return cpymo_utils_lerp(tween->begin_value, tween->end_value, cpymo_tween_progress_after(tween, after_seconds)); }
+
 static inline void cpymo_tween_finish(cpymo_tween *tween)
 { tween->current_time = tween->all_time; }
 

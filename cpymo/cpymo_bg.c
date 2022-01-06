@@ -67,6 +67,23 @@ static void cpymo_bg_draw_transform_effect_alpha(const cpymo_engine *e)
 	);
 }
 
+static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
+{
+	float alpha;
+	const float progression = cpymo_tween_value(&e->bg.transform_progression);
+
+	if (progression < 0.5f) alpha = progression * 2.0f;
+	else alpha = 1.0f - (progression - 0.5f) * 2.0f;
+
+	cpymo_color col;
+	col.r = 0;
+	col.g = 0;
+	col.b = 0;
+
+	float xywh[] = { 0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h};
+	cpymo_backend_image_fill_rects(xywh, 1, col, alpha, cpymo_backend_image_draw_type_bg);
+}
+
 static void cpymo_bg_transfer(cpymo_bg *bg)
 {
 	assert(bg->transform_next_bg);
@@ -102,6 +119,19 @@ static error_t cpymo_bg_progression_over_callback(cpymo_engine *e)
 	if (e->bg.transform_next_bg)
 		cpymo_bg_transfer(&e->bg);
 	return CPYMO_ERR_SUCC;
+}
+
+static bool cpymo_bg_wait_for_progression_fade(cpymo_engine *engine, float delta_time)
+{
+	cpymo_tween *tween = &engine->bg.transform_progression;
+	if (cpymo_tween_value(tween) < 0.5f && cpymo_tween_value_after(tween, delta_time) >= 0.5f) {
+		if (engine->bg.transform_next_bg) {
+			cpymo_bg_transfer(&engine->bg);
+			engine->bg.transform_draw = &cpymo_bg_draw_transform_effect_fade;
+		}
+	}
+
+	return cpymo_bg_wait_for_progression(engine, delta_time);
 }
 
 error_t cpymo_bg_command(
@@ -167,6 +197,14 @@ error_t cpymo_bg_command(
 		cpymo_wait_register_with_callback(
 			&engine->wait,
 			&cpymo_bg_wait_for_progression,
+			&cpymo_bg_progression_over_callback);
+	}
+	else if (cpymo_parser_stream_span_equals_str(transition, "BG_FADE")) {
+		bg->transform_progression = cpymo_tween_create(time);
+		bg->transform_draw = &cpymo_bg_draw_transform_effect_fade;
+		cpymo_wait_register_with_callback(
+			&engine->wait,
+			&cpymo_bg_wait_for_progression_fade,
 			&cpymo_bg_progression_over_callback);
 	}
 	else {
