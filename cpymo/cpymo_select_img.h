@@ -21,11 +21,9 @@ typedef struct {
 	cpymo_backend_image select_img_image;
 	int select_img_image_w, select_img_image_h;
 
-	cpymo_tween alpha;
 	int current_selection;
 	size_t all_selections;
 	bool save_enabled;
-	bool input_enabled;
 } cpymo_select_img;
 
 void cpymo_select_img_reset(cpymo_select_img *img);

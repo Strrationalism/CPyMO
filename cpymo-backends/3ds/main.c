@@ -44,7 +44,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/MO1_android");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
@@ -81,11 +81,6 @@ int main(void) {
 
 		bool redraw = false;
 
-		if(hidKeysDown() & KEY_SELECT) {
-			redraw = true;
-			fill_screen = !fill_screen;
-		}
-
 		osTickCounterUpdate(&tickCounter);
 		double deltaTime = osTickCounterRead(&tickCounter) / 1000.0;
 		err = cpymo_engine_update(&engine, (float)deltaTime, &redraw);
@@ -102,6 +97,11 @@ int main(void) {
 		if(slider != prevSlider) {
 			redraw = true;
 			prevSlider = slider;
+		}
+
+		if (hidKeysDown() & KEY_SELECT) {
+			redraw = true;
+			fill_screen = !fill_screen;
 		}
 
 		if(redraw) {

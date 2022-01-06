@@ -14,4 +14,6 @@ typedef int error_t;
 
 extern const char * cpymo_error_message(error_t err);
 
+#define CPYMO_THROW(ERR) if (ERR != CPYMO_ERR_SUCC) return ERR;
+
 #endif

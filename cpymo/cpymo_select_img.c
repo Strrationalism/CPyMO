@@ -2,8 +2,6 @@
 #include "cpymo_engine.h"
 #include <assert.h>
 
-static const float fade_in_time = 0.25f;
-
 void cpymo_select_img_reset(cpymo_select_img *img)
 {
 	if (img->select_img_image) {
@@ -53,7 +51,6 @@ error_t cpymo_select_img_configuare_begin(
 
 	engine->select_img.current_selection = 0;
 	engine->select_img.all_selections = selections;
-	engine->select_img.input_enabled = false;
 
 	return CPYMO_ERR_SUCC;
 }
@@ -106,12 +103,29 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 
 static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 {
-	if (!cpymo_tween_finished(&e->select_img.alpha))
-		cpymo_engine_request_redraw(e);
-
-	cpymo_tween_update(&e->select_img.alpha, dt);
 	return e->select_img.selections == NULL;
 }
+
+static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, const cpymo_engine *e) {
+	assert(sel >= 0 && sel < o->all_selections);
+
+	if (!e->input.mouse_position_useable) return false;
+	cpymo_select_img_selection *s = &o->selections[sel];
+	if (s->image) {
+		float left = s->x - (float)s->w / 2.0f;
+		float top = s->y - (float)s->h / 2.0f;
+		float right = s->x + (float)s->w / 2.0f;
+		float bottom = s->y + (float)s->h / 2.0f;
+
+		float x = e->input.mouse_x;
+		float y = e->input.mouse_y;
+
+		return x >= left && x <= right && y >= top && y <= bottom;
+	}
+
+	return false;
+}
+
 
 void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 {
@@ -119,10 +133,8 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 	assert(e->select_img.all_selections);
 	assert(e->select_img.current_selection == e->select_img.all_selections);
 
-	e->select_img.alpha = cpymo_tween_create(fade_in_time);
 	e->select_img.current_selection = init_position >= 0 ? init_position : 0;
 	e->select_img.save_enabled = init_position == -1;
-	e->select_img.input_enabled = true;
 
 	// In pymo, if all options are disabled, it will enable every option.
 	bool all_is_disabled = true;
@@ -148,7 +160,17 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 		}
 	}
 
+	for (int i = 0; i < e->select_img.all_selections; ++i) {
+		if (cpymo_select_img_mouse_in_selection(&e->select_img, i, e)) {
+			if (i != e->select_img.current_selection) {
+				e->select_img.current_selection = i;
+				break;
+			}
+		}
+	}
+
 	cpymo_wait_register(&e->wait, &cpymo_select_img_wait);
+	cpymo_engine_request_redraw(e);
 }
 
 static void cpymo_select_img_move(cpymo_select_img *o, int move) {
@@ -162,11 +184,27 @@ static void cpymo_select_img_move(cpymo_select_img *o, int move) {
 		cpymo_select_img_move(o, move);
 }
 
+static error_t cpymo_select_img_ok(cpymo_engine *e, int sel)
+{
+	const char *out_var = cpymo_gameconfig_is_mo1(&e->gameconfig) ? "F91" : "FSEL";
+
+	error_t err = cpymo_vars_set(
+		&e->vars,
+		cpymo_parser_stream_span_pure(out_var),
+		sel);
+	if (err != CPYMO_ERR_SUCC) return err;
+
+	cpymo_select_img_reset(&e->select_img);
+	cpymo_engine_request_redraw(e);
+
+	return err;
+}
+
 error_t cpymo_select_img_update(cpymo_engine *e)
 {
 	cpymo_select_img *o = &e->select_img;
 
-	if (o->selections && o->input_enabled) {
+	if (o->selections) {
 		if (CPYMO_INPUT_JUST_PRESSED(e, down)) {
 			cpymo_select_img_move(o, 1);
 			cpymo_engine_request_redraw(e);
@@ -177,21 +215,34 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 			cpymo_engine_request_redraw(e);
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
-			error_t err = cpymo_vars_set(
-				&e->vars,
-				cpymo_parser_stream_span_pure("FSEL"), 
-				o->current_selection);
-			if (err != CPYMO_ERR_SUCC) return err;
-
-			o->input_enabled = false;
-			cpymo_tween_to(&o->alpha, 0.0f, fade_in_time);
+		if (cpymo_input_mouse_moved(e) && e->input.mouse_position_useable) {
+			for (int i = 0; i < o->all_selections; ++i) {
+				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
+					if (i != o->current_selection) {
+						o->current_selection = i;
+						cpymo_engine_request_redraw(e);
+					}
+				}
+			}
 		}
-	}
 
-	if (o->selections && !o->input_enabled) {
-		if (cpymo_tween_finished(&o->alpha))
-			cpymo_select_img_reset(o);
+		if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+			return cpymo_select_img_ok(e, o->current_selection);
+		}
+
+		if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
+			if(o->selections[o->all_selections-1].image)
+				return cpymo_select_img_ok(e, o->all_selections - 1);
+		}
+
+		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+			for (int i = 0; i < o->all_selections; ++i) {
+				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
+					o->current_selection = i;
+					return cpymo_select_img_ok(e, i);
+				}
+			}
+		}
 	}
 
 	return CPYMO_ERR_SUCC;
@@ -214,7 +265,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o)
 					o->select_img_image ? i * sel->h : 0,
 					sel->w,
 					sel->h,
-					cpymo_tween_value(&o->alpha),
+					1.0f,
 					cpymo_backend_image_draw_type_sel_img
 				);
 			}

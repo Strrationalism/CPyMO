@@ -14,6 +14,7 @@ static float offset_3d(enum cpymo_backend_image_draw_type type)
     switch(type) {
         case cpymo_backend_image_draw_type_bg: return -10.0f;
         case cpymo_backend_image_draw_type_chara: return -5.0f;
+        case cpymo_backend_image_draw_type_sel_img: return 5.0f;
         default: return 0.0f;
     }
 }

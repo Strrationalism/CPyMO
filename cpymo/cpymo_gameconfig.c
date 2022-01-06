@@ -158,6 +158,13 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 		return;
 	}
 
+	D("scripttype") {
+		cpymo_parser_stream_span s = POP;
+		cpymo_parser_stream_span_trim(&s);
+		SETUP(scripttype, s);
+		return;
+	}
+
 	#undef SPAN
 	#undef SETUP
 	#undef SETUP_EXT
