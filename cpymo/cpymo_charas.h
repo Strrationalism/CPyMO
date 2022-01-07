@@ -46,6 +46,12 @@ error_t cpymo_charas_kill(
 	int chara_id,
 	float time);
 
+error_t cpymo_chara_convert_to_mode0_pos(
+	struct cpymo_engine *e,
+	struct cpymo_chara *c,
+	int coord_mode,
+	float *x, float *y);
+
 void cpymo_charas_wait(struct cpymo_engine *);
 
 void cpymo_charas_kill_all(struct cpymo_engine *, float time);

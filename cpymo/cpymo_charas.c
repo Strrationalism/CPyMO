@@ -88,7 +88,7 @@ void cpymo_charas_draw(const cpymo_charas *c)
 	}
 }
 
-static error_t cpymo_chara_convert_to_mode0_pos(
+error_t cpymo_chara_convert_to_mode0_pos(
 	cpymo_engine *e,
 	struct cpymo_chara *c,
 	int coord_mode,

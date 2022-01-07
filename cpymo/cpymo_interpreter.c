@@ -430,45 +430,63 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	D("chara_scroll") {
 		POP_ARG(coord_mode_str); ENSURE(coord_mode_str);
-		int coord_mode = cpymo_parser_stream_span_atoi(coord_mode_str);
-
 		POP_ARG(chara_id_str); ENSURE(chara_id_str);
+		POP_ARG(filename_or_endx); ENSURE(filename_or_endx);
+		POP_ARG(startx_str_or_endy); ENSURE(startx_str_or_endy);
+		POP_ARG(starty_str_or_time); ENSURE(starty_str_or_time);
+		POP_ARG(endx_str);
+
+		int coord_mode = cpymo_parser_stream_span_atoi(coord_mode_str);
 		int chara_id = cpymo_parser_stream_span_atoi(chara_id_str);
 
-		POP_ARG(filename); ENSURE(filename);
+		if (!IS_EMPTY(endx_str)) {
 
-		POP_ARG(startx_str); ENSURE(startx_str);
-		POP_ARG(starty_str); ENSURE(starty_str);
-		POS(startx, starty, startx_str, starty_str);
+			POP_ARG(endy_str); ENSURE(endy_str);
+			POP_ARG(begin_alpha_str); ENSURE(begin_alpha_str);
+			POP_ARG(layer_str); ENSURE(layer_str);
+			POP_ARG(time_str); ENSURE(time_str);
 
-		POP_ARG(endx_str); ENSURE(endx_str);
-		POP_ARG(endy_str); ENSURE(endy_str);
-		POS(endx, endy, endx_str, endy_str);
+			POS(startx, starty, startx_str_or_endy, starty_str_or_time);
+			POS(endx, endy, endx_str, endy_str);
+			int layer = cpymo_parser_stream_span_atoi(layer_str);
+			float begin_alpha = 1.0f - (float)cpymo_parser_stream_span_atoi(begin_alpha_str) / 255.0f;
+			float time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
 
-		POP_ARG(begin_alpha_str); ENSURE(begin_alpha_str);
-		float begin_alpha = 1.0f - (float)cpymo_parser_stream_span_atoi(begin_alpha_str) / 255.0f;
+			struct cpymo_chara *c = NULL;
+			err = cpymo_charas_new_chara(
+				engine,
+				&c,
+				filename_or_endx,
+				chara_id,
+				layer,
+				coord_mode,
+				startx, starty,
+				begin_alpha,
+				time);
+			CPYMO_THROW(err);
 
-		POP_ARG(layer_str); ENSURE(layer_str);
-		int layer = cpymo_parser_stream_span_atoi(layer_str);
+			err = cpymo_chara_convert_to_mode0_pos(engine, c, coord_mode, &endx, &endy);
+			CPYMO_THROW(err);
 
-		POP_ARG(time_str); ENSURE(time_str);
-		float time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+			cpymo_tween_to(&c->pos_x, endx, time);
+			cpymo_tween_to(&c->pos_y, endy, time);
+		}
+		else {
+			POS(endx, endy, filename_or_endx, startx_str_or_endy);
+			float time = (float)cpymo_parser_stream_span_atoi(starty_str_or_time) / 1000.0f;
 
-		struct cpymo_chara *c = NULL;
-		err = cpymo_charas_new_chara(
-			engine,
-			&c,
-			filename,
-			chara_id,
-			layer,
-			coord_mode,
-			startx, starty,
-			begin_alpha,
-			time);
-		CPYMO_THROW(err);
+			struct cpymo_chara *c = NULL;
+			err = cpymo_charas_find(
+				&engine->charas,
+				&c,
+				chara_id);
 
-		cpymo_tween_to(&c->pos_x, endx, time);
-		cpymo_tween_to(&c->pos_y, endy, time);
+			err = cpymo_chara_convert_to_mode0_pos(engine, c, coord_mode, &endx, &endy);
+			CPYMO_THROW(err);
+
+			cpymo_tween_to(&c->pos_x, endx, time);
+			cpymo_tween_to(&c->pos_y, endy, time);
+		}
 
 		cpymo_charas_wait(engine);
 
