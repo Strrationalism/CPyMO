@@ -13,6 +13,16 @@ void cpymo_charas_free(cpymo_charas *c)
 	}
 }
 
+/*static void print_charas(cpymo_charas *c)
+{
+	printf("==== charas ====\n");
+	struct cpymo_chara *ch = c->chara;
+	while (ch) {
+		printf("ID: %d, W: %d, H: %d, PTR: %p\n", ch->chara_id, ch->img_w, ch->img_h, ch->img);
+		ch = ch->next;
+	}
+}*/
+
 static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 {
 	cpymo_engine_request_redraw(e);
@@ -176,6 +186,8 @@ error_t cpymo_charas_new_chara(
 	
 
 	*out = ch;
+
+	//print_charas(&e->charas);
 
 	return CPYMO_ERR_SUCC;
 }

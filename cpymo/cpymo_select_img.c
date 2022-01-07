@@ -1,5 +1,6 @@
 #include "cpymo_select_img.h"
 #include "cpymo_engine.h"
+#include <memory.h>
 #include <assert.h>
 
 void cpymo_select_img_reset(cpymo_select_img *img)
@@ -30,8 +31,7 @@ error_t cpymo_select_img_configuare_begin(
 		(cpymo_select_img_selection *)malloc(sizeof(cpymo_select_img_selection) * selections);
 	if (engine->select_img.selections == NULL) return CPYMO_ERR_SUCC;
 
-	for (size_t i = 0; i < selections; ++i)
-		engine->select_img.selections[i].image = NULL;
+	memset(engine->select_img.selections, 0, sizeof(cpymo_select_img_selection) * selections);
 
 	if (image_name_or_empty_when_select_imgs.len > 0) {
 		error_t err = cpymo_assetloader_load_system_image(
@@ -108,7 +108,7 @@ static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 }
 
 static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, const cpymo_engine *e) {
-	assert(sel >= 0 && sel < o->all_selections);
+	assert(sel >= 0 && sel < (int)o->all_selections);
 
 	if (!e->input.mouse_position_useable) return false;
 	cpymo_select_img_selection *s = &o->selections[sel];
@@ -161,7 +161,7 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 		}
 	}
 
-	for (int i = 0; i < e->select_img.all_selections; ++i) {
+	for (int i = 0; i < (int)e->select_img.all_selections; ++i) {
 		if (cpymo_select_img_mouse_in_selection(&e->select_img, i, e)) {
 			if (i != e->select_img.current_selection) {
 				e->select_img.current_selection = i;
@@ -179,7 +179,7 @@ static void cpymo_select_img_move(cpymo_select_img *o, int move) {
 	
 	o->current_selection += move;
 	while (o->current_selection < 0) o->current_selection += (int)o->all_selections;
-	while (o->current_selection >= o->all_selections) o->current_selection -= (int)o->all_selections;
+	while (o->current_selection >= (int)o->all_selections) o->current_selection -= (int)o->all_selections;
 
 	if (o->selections[o->current_selection].image == NULL)
 		cpymo_select_img_move(o, move);
@@ -217,7 +217,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 		}
 
 		if (cpymo_input_mouse_moved(e) && e->input.mouse_position_useable) {
-			for (int i = 0; i < o->all_selections; ++i) {
+			for (int i = 0; i < (int)o->all_selections; ++i) {
 				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
 					if (i != o->current_selection) {
 						o->current_selection = i;
@@ -237,7 +237,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
-			for (int i = 0; i < o->all_selections; ++i) {
+			for (int i = 0; i < (int)o->all_selections; ++i) {
 				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
 					o->current_selection = i;
 					return cpymo_select_img_ok(e, i);

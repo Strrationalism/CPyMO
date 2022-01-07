@@ -467,8 +467,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			time);
 		CPYMO_THROW(err);
 
-		cpymo_tween_to(&c->alpha, endx, time);
-		cpymo_tween_to(&c->alpha, endy, time);
+		cpymo_tween_to(&c->pos_x, endx, time);
+		cpymo_tween_to(&c->pos_y, endy, time);
 
 		cpymo_charas_wait(engine);
 

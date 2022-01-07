@@ -9,9 +9,22 @@ typedef struct {
 	float begin_value, end_value;
 } cpymo_tween;
 
+static inline void cpymo_tween_assign(cpymo_tween *tween, float value)
+{
+	tween->all_time = 1.0f;
+	tween->current_time = 1.0f;
+	tween->begin_value = value;
+	tween->end_value = value;
+}
+
 static inline cpymo_tween cpymo_tween_create_value(float all_time, float begin_value, float end_value)
 {
 	cpymo_tween t;
+	if (all_time <= 0.0f) {
+		cpymo_tween_assign(&t, end_value);
+		return t;
+	}
+
 	t.all_time = all_time;
 	t.current_time = 0;
 	t.begin_value = begin_value;
@@ -48,12 +61,5 @@ static inline float cpymo_tween_value_after(const cpymo_tween *tween, float afte
 
 static inline void cpymo_tween_finish(cpymo_tween *tween)
 { tween->current_time = tween->all_time; }
-
-static inline void cpymo_tween_assign(cpymo_tween *tween, float value)
-{
-	cpymo_tween_finish(tween);
-	tween->begin_value = value;
-	tween->end_value = value;
-}
 
 #endif
