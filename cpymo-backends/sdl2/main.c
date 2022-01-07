@@ -76,6 +76,10 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 
+#if !NDEBUG
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+#endif
+
 	if (SDL_CreateWindowAndRenderer(
 		engine.gameconfig.imagesize_w,
 		engine.gameconfig.imagesize_h,
@@ -121,6 +125,7 @@ int main(int argc, char **argv)
 		case CPYMO_ERR_NO_MORE_CONTENT: goto EXIT;
 		default: {
 			SDL_Log("[Error] %s.", cpymo_error_message(err));
+			goto EXIT;
 		}
 		}
 

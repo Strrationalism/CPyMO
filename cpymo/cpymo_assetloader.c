@@ -97,7 +97,7 @@ static error_t cpymo_assetloader_load_filesystem_file(
 			+ strlen(asset_type)
 			+ strlen(asset_name)
 			+ strlen(asset_ext_name)
-			+ 4);
+			+ 8);
 
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
@@ -228,6 +228,7 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, i
 	int iw, ih, ic;
 	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &iw, &ih, &ic, 4);
 	free(buf);
+	buf = NULL;
 
 	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
 
@@ -235,19 +236,19 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, i
 	*h = ih;
 
 	if (cpymo_gameconfig_is_symbian(loader->game_config)) {
-		buf = NULL;
 		err = cpymo_assetloader_load_chara_mask(&buf, &buf_size, chname, loader);
-		if (err != CPYMO_ERR_SUCC) {
-			free(px);
-			return err;
+
+		int mw = 0, mh = 0, mc = 0;
+		stbi_uc *mask_px = NULL;
+
+		if (err == CPYMO_ERR_SUCC) {
+			mask_px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &mw, &mh, &mc, 1);
+			free(buf);
+			buf = NULL;
 		}
 
-		int mw, mh, mc;
-		stbi_uc *mask_px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &mw, &mh, &mc, 1);
-		free(buf);
-
-		if (mw != iw || mh != ih) {
-			if (mask_px) {
+		if (mask_px) {
+			if (mw != iw || mh != ih) {
 				free(mask_px);
 				mask_px = NULL;
 			}
