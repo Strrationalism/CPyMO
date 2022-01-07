@@ -21,6 +21,7 @@ error_t cpymo_assetloader_load_bg(char **out_buffer, size_t *buf_size, const cha
 error_t cpymo_assetloader_load_bg_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara(char **out_buffer, size_t *buf_size, const char *chara_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara_mask(char **out_buffer, size_t *buf_size, const char *chara_name, const cpymo_assetloader *loader);
+error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_voice(char **out_buffer, size_t *buf_size, const char *voice_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_se(char **out_buffer, size_t *buf_size, const char *se_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_bgm(char **out_buffer, size_t *buf_size, const char *bgm_name, const cpymo_assetloader *loader);

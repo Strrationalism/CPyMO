@@ -191,6 +191,100 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	/*** II. Video ***/
+	D("chara") {
+		int chara_ids[16];
+		int layers[16];
+		float pos_x_s[16];
+		cpymo_parser_stream_span filenames[16];
+		size_t command_buffer_size = 0;
+
+		float time = 0.3f;
+		while (true) {
+			POP_ARG(chara_id_or_time_str);
+			POP_ARG(filename);
+			POP_ARG(pos_x_str);
+			POP_ARG(layer_str);
+
+			int chara_id_or_time = cpymo_parser_stream_span_atoi(chara_id_or_time_str);
+			
+			if (IS_EMPTY(filename) && IS_EMPTY(pos_x_str) && IS_EMPTY(layer_str)) {
+				time = (float)chara_id_or_time / 1000.0f;
+				break;
+			}
+
+			int chara_id = chara_id_or_time;
+
+			ENSURE(filename);
+			ENSURE(pos_x_str);
+			ENSURE(layer_str);
+
+			if (command_buffer_size >= 16) {
+				fprintf(stderr, "[Warning] chara command buffer was overflow.");
+			} 
+			else {
+				chara_ids[command_buffer_size] = chara_id;
+				layers[command_buffer_size] = cpymo_parser_stream_span_atoi(layer_str);
+				pos_x_s[command_buffer_size] =
+					(float)cpymo_parser_stream_span_atoi(pos_x_str) / 100.0f * (float)engine->gameconfig.imagesize_w;
+				filenames[command_buffer_size] = filename;
+				command_buffer_size++;
+			}
+		}
+
+		for (size_t i = 0; i < command_buffer_size; ++i) {
+			if (cpymo_parser_stream_span_equals_str(filenames[i], "NULL")) {
+				cpymo_charas_kill(engine, chara_ids[i], time);
+			}
+			else {
+				struct cpymo_chara *ch;
+				err = cpymo_charas_new_chara(
+					engine, 
+					&ch, 
+					filenames[i], 
+					chara_ids[i], 
+					layers[i], 
+					5, 
+					pos_x_s[i], 
+					0, 
+					0,
+					time);
+				CPYMO_THROW(err);
+			}
+		}
+
+		cpymo_charas_wait(engine);
+
+		return CPYMO_ERR_SUCC;
+	}
+
+	D("chara_cls") {
+		POP_ARG(id_str); ENSURE(id_str);
+		POP_ARG(time_str);
+
+		float time = IS_EMPTY(time_str) ? 0.3f : (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+		if (cpymo_parser_stream_span_equals_str(id_str, "a"))
+			cpymo_charas_kill_all(engine, time);
+		else cpymo_charas_kill(engine, cpymo_parser_stream_span_atoi(id_str), time);
+
+		cpymo_charas_wait(engine);
+		return CPYMO_ERR_SUCC;
+	}
+
+	D("chara_pos") {
+		POP_ARG(id_str); ENSURE(id_str);
+		POP_ARG(x_str); ENSURE(x_str);
+		POP_ARG(y_str); ENSURE(y_str);
+		POP_ARG(coord_mode_str);
+
+		int id = cpymo_parser_stream_span_atoi(id_str);
+		POS(x, y, x_str, y_str);
+
+		int coord_mode = IS_EMPTY(coord_mode_str) ? 5 : cpymo_parser_stream_span_atoi(coord_mode_str);
+
+		cpymo_charas_pos(engine, id, coord_mode, x, y);
+		return CPYMO_ERR_SUCC;
+	}
+
 	D("bg") {
 		POP_ARG(bg_name); ENSURE(bg_name);
 		POP_ARG(transition);
@@ -258,6 +352,126 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(time_str); ENSURE(time_str);
 		float time = cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
 		cpymo_fade_start_fadein(engine, time);
+		return CPYMO_ERR_SUCC;
+	}
+
+	D("chara_y") {
+		int chara_ids[16];
+		int layers[16];
+		float pos_x_s[16];
+		float pos_y_s[16];
+		cpymo_parser_stream_span filenames[16];
+		size_t command_buffer_size = 0;
+
+		POP_ARG(coord_mode_str); ENSURE(coord_mode_str);
+		int coord_mode = cpymo_parser_stream_span_atoi(coord_mode_str);
+
+		float time = 0.3f;
+		while (true) {
+			POP_ARG(chara_id_or_time_str);
+			POP_ARG(filename);
+			POP_ARG(pos_x_str);
+			POP_ARG(pos_y_str);
+			POP_ARG(layer_str);
+
+			int chara_id_or_time = cpymo_parser_stream_span_atoi(chara_id_or_time_str);
+
+			if (IS_EMPTY(filename) && IS_EMPTY(pos_x_str) && IS_EMPTY(pos_y_str) && IS_EMPTY(layer_str)) {
+				time = (float)chara_id_or_time / 1000.0f;
+				break;
+			}
+
+			int chara_id = chara_id_or_time;
+
+			ENSURE(filename);
+			ENSURE(pos_x_str);
+			ENSURE(pos_y_str);
+			ENSURE(layer_str);
+
+			if (command_buffer_size >= 16) {
+				fprintf(stderr, "[Warning] chara command buffer was overflow.");
+			}
+			else {
+				chara_ids[command_buffer_size] = chara_id;
+				layers[command_buffer_size] = cpymo_parser_stream_span_atoi(layer_str);
+				POS(pos_x, pos_y, pos_x_str, pos_y_str);
+				pos_x_s[command_buffer_size] = pos_x;
+				pos_y_s[command_buffer_size] = pos_y;
+				filenames[command_buffer_size] = filename;
+				command_buffer_size++;
+			}
+		}
+
+		for (size_t i = 0; i < command_buffer_size; ++i) {
+			if (cpymo_parser_stream_span_equals_str(filenames[i], "NULL")) {
+				cpymo_charas_kill(engine, chara_ids[i], time);
+			}
+			else {
+				struct cpymo_chara *ch;
+				err = cpymo_charas_new_chara(
+					engine,
+					&ch,
+					filenames[i],
+					chara_ids[i],
+					layers[i],
+					coord_mode,
+					pos_x_s[i],
+					pos_y_s[i],
+					0,
+					time);
+				CPYMO_THROW(err);
+			}
+		}
+
+		cpymo_charas_wait(engine);
+
+		return CPYMO_ERR_SUCC;
+	}
+
+	D("chara_scroll") {
+		POP_ARG(coord_mode_str); ENSURE(coord_mode_str);
+		int coord_mode = cpymo_parser_stream_span_atoi(coord_mode_str);
+
+		POP_ARG(chara_id_str); ENSURE(chara_id_str);
+		int chara_id = cpymo_parser_stream_span_atoi(chara_id_str);
+
+		POP_ARG(filename); ENSURE(filename);
+
+		POP_ARG(startx_str); ENSURE(startx_str);
+		POP_ARG(starty_str); ENSURE(starty_str);
+		POS(startx, starty, startx_str, starty_str);
+
+		POP_ARG(endx_str); ENSURE(endx_str);
+		POP_ARG(endy_str); ENSURE(endy_str);
+		POS(endx, endy, endx_str, endy_str);
+
+		POP_ARG(begin_alpha_str); ENSURE(begin_alpha_str);
+		float begin_alpha = 1.0f - (float)cpymo_parser_stream_span_atoi(begin_alpha_str) / 255.0f;
+
+		POP_ARG(layer_str); ENSURE(layer_str);
+		int layer = cpymo_parser_stream_span_atoi(layer_str);
+
+		POP_ARG(time_str); ENSURE(time_str);
+		float time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+
+		struct cpymo_chara *c = NULL;
+		err = cpymo_charas_new_chara(
+			engine,
+			&c,
+			filename,
+			chara_id,
+			layer,
+			coord_mode,
+			startx, starty,
+			begin_alpha,
+			time);
+		CPYMO_THROW(err);
+
+		cpymo_tween_to(&c->alpha, endx, time);
+		cpymo_tween_to(&c->alpha, endy, time);
+
+		cpymo_charas_wait(engine);
+
 		return CPYMO_ERR_SUCC;
 	}
 

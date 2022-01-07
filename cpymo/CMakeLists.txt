@@ -17,5 +17,6 @@ add_library (cpymolib STATIC
 	"cpymo_tween.h" 
 	"cpymo_bg.h" "cpymo_bg.c" 
 	"cpymo_anime.h" "cpymo_anime.c" 
-	"cpymo_select_img.h" "cpymo_select_img.c")
+	"cpymo_select_img.h" "cpymo_select_img.c" 
+	"cpymo_charas.h" "cpymo_charas.c")
 

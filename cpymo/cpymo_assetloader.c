@@ -202,9 +202,7 @@ error_t cpymo_assetloader_load_chara(char ** out_buffer, size_t * buf_size, cons
 
 error_t cpymo_assetloader_load_chara_mask(char ** out_buffer, size_t * buf_size, const char * chara_name, const cpymo_assetloader * loader)
 {
-	char *filename = (char *)malloc(strlen(chara_name) + 6);
-	if (filename == NULL) return CPYMO_ERR_OUT_OF_MEM;
-
+	char filename[64];
 	sprintf(filename, "%s_mask", chara_name);
 
 	error_t err = cpymo_assetloader_load_file(
@@ -213,9 +211,59 @@ error_t cpymo_assetloader_load_chara_mask(char ** out_buffer, size_t * buf_size,
 		loader->use_pkg_chara, &loader->pkg_chara,
 		loader);
 
-	free(filename);
-
 	return err;
+}
+
+error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{
+	char *buf = NULL;
+	size_t buf_size;
+
+	char chname[48];
+	cpymo_parser_stream_span_copy(chname, sizeof(chname), name);
+
+	error_t err = cpymo_assetloader_load_chara(&buf, &buf_size, chname, loader);
+	CPYMO_THROW(err);
+
+	int iw, ih, ic;
+	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &iw, &ih, &ic, 4);
+	free(buf);
+
+	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
+
+	*w = iw;
+	*h = ih;
+
+	if (cpymo_gameconfig_is_symbian(loader->game_config)) {
+		buf = NULL;
+		err = cpymo_assetloader_load_chara_mask(&buf, &buf_size, chname, loader);
+		if (err != CPYMO_ERR_SUCC) {
+			free(px);
+			return err;
+		}
+
+		int mw, mh, mc;
+		stbi_uc *mask_px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &mw, &mh, &mc, 1);
+		free(buf);
+
+		if (mw != iw || mh != ih) {
+			if (mask_px) {
+				free(mask_px);
+				mask_px = NULL;
+			}
+		}
+
+		if (mask_px == NULL) {
+			fprintf(stderr, "[Warning] Can not load mask in chara %s.\n", chname);
+			return cpymo_backend_image_load_immutable(img, px, iw, ih, cpymo_backend_image_format_rgba);
+		} 
+		else {
+			return cpymo_backend_image_load_immutable_with_mask(img, px, mask_px, iw, ih);
+		}
+	}
+	else {
+		return cpymo_backend_image_load_immutable(img, px, iw, ih, cpymo_backend_image_format_rgba);
+	}
 }
 
 error_t cpymo_assetloader_load_voice(char ** out_buffer, size_t * buf_size, const char * voice_name, const cpymo_assetloader * loader)

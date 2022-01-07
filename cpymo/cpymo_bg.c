@@ -84,7 +84,7 @@ static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
 	cpymo_backend_image_fill_rects(xywh, 1, col, alpha, cpymo_backend_image_draw_type_bg);
 }
 
-static void cpymo_bg_transfer(cpymo_bg *bg)
+static void cpymo_bg_transfer_operate(cpymo_bg *bg)
 {
 	assert(bg->transform_next_bg);
 
@@ -102,6 +102,14 @@ static void cpymo_bg_transfer(cpymo_bg *bg)
 	bg->redraw = true;
 }
 
+static void cpymo_bg_transfer(cpymo_engine *e)
+{
+	cpymo_bg_transfer_operate(&e->bg);
+
+	// After transfer
+	cpymo_charas_fast_kill_all(&e->charas);
+}
+
 static bool cpymo_bg_wait_for_progression(cpymo_engine *engine, float delta_time)
 {
 	cpymo_engine_request_redraw(engine);
@@ -117,7 +125,7 @@ static error_t cpymo_bg_progression_over_callback(cpymo_engine *e)
 {
 	cpymo_engine_request_redraw(e);
 	if (e->bg.transform_next_bg)
-		cpymo_bg_transfer(&e->bg);
+		cpymo_bg_transfer(e);
 	return CPYMO_ERR_SUCC;
 }
 
@@ -126,7 +134,7 @@ static bool cpymo_bg_wait_for_progression_fade(cpymo_engine *engine, float delta
 	cpymo_tween *tween = &engine->bg.transform_progression;
 	if (cpymo_tween_value(tween) < 0.5f && cpymo_tween_value_after(tween, delta_time) >= 0.5f) {
 		if (engine->bg.transform_next_bg) {
-			cpymo_bg_transfer(&engine->bg);
+			cpymo_bg_transfer(engine);
 			engine->bg.transform_draw = &cpymo_bg_draw_transform_effect_fade;
 		}
 	}
@@ -166,7 +174,7 @@ error_t cpymo_bg_command(
 	}
 
 	if (cpymo_parser_stream_span_equals_str(transition, "BG_NOFADE")) {
-		cpymo_bg_transfer(bg);
+		cpymo_bg_transfer(engine);
 	}
 	else if (cpymo_parser_stream_span_equals_str(transition, "BG_ALPHA")) {
 		bg->transform_progression = cpymo_tween_create(time);

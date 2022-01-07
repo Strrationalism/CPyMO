@@ -49,4 +49,11 @@ static inline float cpymo_tween_value_after(const cpymo_tween *tween, float afte
 static inline void cpymo_tween_finish(cpymo_tween *tween)
 { tween->current_time = tween->all_time; }
 
+static inline void cpymo_tween_assign(cpymo_tween *tween, float value)
+{
+	cpymo_tween_finish(tween);
+	tween->begin_value = value;
+	tween->end_value = value;
+}
+
 #endif

@@ -13,6 +13,7 @@
 #include "cpymo_bg.h"
 #include "cpymo_anime.h"
 #include "cpymo_select_img.h"
+#include "cpymo_charas.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -26,6 +27,7 @@ struct cpymo_engine {
 	cpymo_bg bg;
 	cpymo_anime anime;
 	cpymo_select_img select_img;
+	cpymo_charas charas;
 
 	bool skipping;
 	char *title;
