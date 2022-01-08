@@ -277,12 +277,13 @@ error_t cpymo_charas_pos(cpymo_engine *e, int chara_id, int coord_mode, float x,
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_charas_stop_all_anime(cpymo_charas *c)
+static void cpymo_charas_stop_all_anime(cpymo_engine *e)
 {
+	cpymo_charas *c = &e->charas;
 	struct cpymo_chara *ch = c->chara;
 	
-	float last_pos_x = c->anime_pos[(c->anime_pos_count - 1) * 2];
-	float last_pos_y = c->anime_pos[(c->anime_pos_count - 1) * 2 + 1];
+	float last_pos_x = c->anime_pos[(c->anime_pos_count - 1) * 2] * (float)e->gameconfig.imagesize_w / 540.0f;
+	float last_pos_y = c->anime_pos[(c->anime_pos_count - 1) * 2 + 1] * (float)e->gameconfig.imagesize_h / 360.0f;
 
 	while (ch) {
 		ch->play_anime = false;
@@ -311,7 +312,7 @@ void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
 static error_t cpymo_charas_anime_finished_callback(cpymo_engine *e)
 {
 	cpymo_engine_request_redraw(e);
-	cpymo_charas_stop_all_anime(&e->charas);
+	cpymo_charas_stop_all_anime(e);
 	return CPYMO_ERR_SUCC;
 }
 
