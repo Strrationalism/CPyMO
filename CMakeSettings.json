@@ -124,7 +124,7 @@
         },
         {
           "name": "SDL_XINPUT",
-          "value": "False",
+          "value": "True",
           "type": "BOOL"
         },
         {
