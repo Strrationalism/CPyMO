@@ -147,7 +147,7 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 {
 	cpymo_bg_draw(&engine->bg);
 	cpymo_scroll_draw(&engine->scroll);
-	cpymo_charas_draw(&engine->charas);
+	cpymo_charas_draw(engine);
 	cpymo_anime_draw(&engine->anime);
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);

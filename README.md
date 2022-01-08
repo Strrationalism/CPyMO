@@ -8,6 +8,8 @@ pymo原版参见：https://github.com/pymo/pymo
 pymo官网：https://www.pymogames.com/    
 原作者：chen_xin_ming    
 
+感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。
+
 主要目标：
 
 * 兼容原版pymo的游戏、存档的情况下运行游戏

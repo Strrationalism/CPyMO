@@ -394,6 +394,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		int loops = cpymo_parser_stream_span_atoi(loop_str);
 
 		float *buffer = (float *)malloc(64 * sizeof(float));
+		if (buffer == NULL) return CPYMO_ERR_OUT_OF_MEM;
 		size_t offsets = 0;
 
 		while (offsets < 32) {

@@ -41,7 +41,7 @@ static inline void cpymo_charas_init(cpymo_charas *cpymo_charas)
 
 void cpymo_charas_free(cpymo_charas *);
 
-void cpymo_charas_draw(const cpymo_charas *);
+void cpymo_charas_draw(const struct cpymo_engine *);
 
 error_t cpymo_charas_new_chara(
 	struct cpymo_engine *, struct cpymo_chara **out,

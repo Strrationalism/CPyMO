@@ -71,17 +71,18 @@ static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 	return !waiting;
 }
 
-void cpymo_charas_draw(const cpymo_charas *c)
+void cpymo_charas_draw(const cpymo_engine *e)
 {
-	struct cpymo_chara *pcur = c->chara;
+	const cpymo_charas *c = &e->charas;
+	const struct cpymo_chara *pcur = c->chara;
 	while (pcur) {
 		float anime_offset_x = 0;
 		float anime_offset_y = 0;
 
 		if (pcur->play_anime) {
 			assert(c->anime_pos_current * 2 + 1 < c->anime_pos_count * 2);
-			anime_offset_x = c->anime_pos[c->anime_pos_current * 2];
-			anime_offset_y = c->anime_pos[c->anime_pos_current * 2 + 1];
+			anime_offset_x = c->anime_pos[c->anime_pos_current * 2] * (float)e->gameconfig.imagesize_w / 540.0f;
+			anime_offset_y = c->anime_pos[c->anime_pos_current * 2 + 1] * (float)e->gameconfig.imagesize_h / 360.0f;
 		}
 
 		cpymo_backend_image_draw(
@@ -279,8 +280,15 @@ error_t cpymo_charas_pos(cpymo_engine *e, int chara_id, int coord_mode, float x,
 void cpymo_charas_stop_all_anime(cpymo_charas *c)
 {
 	struct cpymo_chara *ch = c->chara;
+	
+	float last_pos_x = c->anime_pos[(c->anime_pos_count - 1) * 2];
+	float last_pos_y = c->anime_pos[(c->anime_pos_count - 1) * 2 + 1];
+
 	while (ch) {
 		ch->play_anime = false;
+		cpymo_tween_assign(&ch->pos_x, last_pos_x + cpymo_tween_value(&ch->pos_x));
+		cpymo_tween_assign(&ch->pos_y, last_pos_y + cpymo_tween_value(&ch->pos_y));
+
 		ch = ch->next;
 	}
 
@@ -290,6 +298,7 @@ void cpymo_charas_stop_all_anime(cpymo_charas *c)
 	c->anime_owned = false;
 	c->anime_pos = NULL;
 	c->anime_pos_current = 0;
+	c->anime_loop = 0;
 }
 
 void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
@@ -308,6 +317,9 @@ static error_t cpymo_charas_anime_finished_callback(cpymo_engine *e)
 
 static bool cpymo_charas_wait_for_anime(cpymo_engine *e, float delta_time)
 {
+	if (cpymo_input_foward_key_just_pressed(e)) 
+		return true;
+
 	cpymo_charas *c = &e->charas;
 
 	c->anime_timer += delta_time;
@@ -336,6 +348,8 @@ void cpymo_charas_play_anime(
 {
 	cpymo_charas *c = &e->charas;
 	assert(c->anime_pos == NULL);
+
+	cpymo_engine_request_redraw(e);
 
 	c->anime_period = period;
 	c->anime_pos_current = 0;
