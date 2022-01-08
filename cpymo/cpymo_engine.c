@@ -73,6 +73,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init charas
 	cpymo_charas_init(&out->charas);
 
+	// init scroll
+	cpymo_scroll_init(&out->scroll);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -91,6 +94,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine * engine)
 {
+	cpymo_scroll_free(&engine->scroll);
 	cpymo_charas_free(&engine->charas);
 	cpymo_select_img_free(&engine->select_img);
 	cpymo_anime_free(&engine->anime);
@@ -142,6 +146,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 void cpymo_engine_draw(const cpymo_engine *engine)
 {
 	cpymo_bg_draw(&engine->bg);
+	cpymo_scroll_draw(&engine->scroll);
 	cpymo_charas_draw(&engine->charas);
 	cpymo_anime_draw(&engine->anime);
 	cpymo_flash_draw(engine);

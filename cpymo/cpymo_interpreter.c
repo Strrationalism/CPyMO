@@ -362,6 +362,23 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return CPYMO_ERR_SUCC;
 	}
 
+	D("scroll") {
+		POP_ARG(filename); ENSURE(filename);
+		POP_ARG(sx_str); ENSURE(sx_str);
+		POP_ARG(sy_str); ENSURE(sy_str);
+		POP_ARG(ex_str); ENSURE(ex_str);
+		POP_ARG(ey_str); ENSURE(ey_str);
+		POP_ARG(time_str); ENSURE(time_str);
+
+		float sx = (float)cpymo_parser_stream_span_atoi(sx_str);
+		float sy = (float)cpymo_parser_stream_span_atoi(sy_str);
+		float ex = (float)cpymo_parser_stream_span_atoi(ex_str);
+		float ey = (float)cpymo_parser_stream_span_atoi(ey_str);
+		float time = (float)cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
+
+		return cpymo_scroll_start(engine, filename, sx, sy, ex, ey, time);
+	}
+
 	D("chara_y") {
 		int chara_ids[16];
 		int layers[16];

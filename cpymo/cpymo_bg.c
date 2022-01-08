@@ -108,6 +108,7 @@ static void cpymo_bg_transfer(cpymo_engine *e)
 
 	// After transfer
 	cpymo_charas_fast_kill_all(&e->charas);
+	cpymo_scroll_reset(&e->scroll);
 }
 
 static bool cpymo_bg_wait_for_progression(cpymo_engine *engine, float delta_time)

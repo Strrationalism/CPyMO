@@ -14,6 +14,7 @@
 #include "cpymo_anime.h"
 #include "cpymo_select_img.h"
 #include "cpymo_charas.h"
+#include "cpymo_scroll.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -28,6 +29,7 @@ struct cpymo_engine {
 	cpymo_anime anime;
 	cpymo_select_img select_img;
 	cpymo_charas charas;
+	cpymo_scroll scroll;
 
 	bool skipping;
 	char *title;

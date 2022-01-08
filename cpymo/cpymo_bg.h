@@ -37,6 +37,9 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 
 void cpymo_bg_free(cpymo_bg *);
 
+static inline void cpymo_bg_reset(cpymo_bg *bg)
+{ cpymo_bg_free(bg); cpymo_bg_init(bg); }
+
 error_t cpymo_bg_update(cpymo_bg *, bool *redraw);
 
 void cpymo_bg_draw(const cpymo_bg *);
