@@ -15,15 +15,29 @@ struct cpymo_chara {
 	cpymo_tween pos_x, pos_y, alpha;
 	int img_w, img_h;
 
+	bool play_anime;
+
 	struct cpymo_chara *next;
 };
 
 typedef struct {
 	struct cpymo_chara *chara;
+
+	float *anime_pos;
+	int anime_loop;
+	float anime_period;
+	float anime_timer;
+	size_t anime_pos_count, anime_pos_current;
+	bool anime_owned;
 } cpymo_charas;
 
 static inline void cpymo_charas_init(cpymo_charas *cpymo_charas)
-{ cpymo_charas->chara = NULL; }
+{ 
+	cpymo_charas->chara = NULL;
+	cpymo_charas->anime_pos = NULL;
+	cpymo_charas->anime_owned = false;
+	cpymo_charas->anime_pos_current = 0;
+}
 
 void cpymo_charas_free(cpymo_charas *);
 
@@ -63,5 +77,15 @@ error_t cpymo_charas_pos(
 	int chara_id, 
 	int coord_mode, 
 	float x, float y);
+
+void cpymo_charas_stop_all_anime(cpymo_charas *c);
+void cpymo_charas_set_play_anime(cpymo_charas *c, int id);
+void cpymo_charas_play_anime(
+	struct cpymo_engine *e, 
+	float period, 
+	int loop_num, 
+	float *offsets, 
+	size_t offsets_xy_count,
+	bool offsets_owned);
 
 #endif

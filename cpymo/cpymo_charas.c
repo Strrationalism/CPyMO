@@ -1,6 +1,7 @@
 #include "cpymo_charas.h"
-#include <assert.h>
 #include "cpymo_engine.h"
+#include <assert.h>
+#include <stdlib.h>
 
 void cpymo_charas_free(cpymo_charas *c)
 {
@@ -11,6 +12,9 @@ void cpymo_charas_free(cpymo_charas *c)
 		cpymo_backend_image_free(to_free->img);
 		free(to_free);
 	}
+
+	if (c->anime_owned && c->anime_pos)
+		free(c->anime_pos);
 }
 
 /*static void print_charas(cpymo_charas *c)
@@ -71,9 +75,18 @@ void cpymo_charas_draw(const cpymo_charas *c)
 {
 	struct cpymo_chara *pcur = c->chara;
 	while (pcur) {
+		float anime_offset_x = 0;
+		float anime_offset_y = 0;
+
+		if (pcur->play_anime) {
+			assert(c->anime_pos_current * 2 + 1 < c->anime_pos_count * 2);
+			anime_offset_x = c->anime_pos[c->anime_pos_current * 2];
+			anime_offset_y = c->anime_pos[c->anime_pos_current * 2 + 1];
+		}
+
 		cpymo_backend_image_draw(
-			cpymo_tween_value(&pcur->pos_x),
-			cpymo_tween_value(&pcur->pos_y),
+			cpymo_tween_value(&pcur->pos_x) + anime_offset_x,
+			cpymo_tween_value(&pcur->pos_y) + anime_offset_y,
 			(float)pcur->img_w,
 			(float)pcur->img_h,
 			pcur->img,
@@ -156,6 +169,7 @@ error_t cpymo_charas_new_chara(
 		return err;
 	}
 
+	ch->play_anime = false;
 	ch->chara_id = chara_id;
 	ch->layer = layer;
 	ch->alive = true;
@@ -260,4 +274,79 @@ error_t cpymo_charas_pos(cpymo_engine *e, int chara_id, int coord_mode, float x,
 	cpymo_engine_request_redraw(e);
 
 	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_charas_stop_all_anime(cpymo_charas *c)
+{
+	struct cpymo_chara *ch = c->chara;
+	while (ch) {
+		ch->play_anime = false;
+		ch = ch->next;
+	}
+
+	if (c->anime_owned && c->anime_pos)
+		free(c->anime_pos);
+
+	c->anime_owned = false;
+	c->anime_pos = NULL;
+	c->anime_pos_current = 0;
+}
+
+void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
+{
+	struct cpymo_chara *ch = NULL;
+	if (cpymo_charas_find(c, &ch, id) == CPYMO_ERR_SUCC)
+		ch->play_anime = true;
+}
+
+static error_t cpymo_charas_anime_finished_callback(cpymo_engine *e)
+{
+	cpymo_engine_request_redraw(e);
+	cpymo_charas_stop_all_anime(&e->charas);
+	return CPYMO_ERR_SUCC;
+}
+
+static bool cpymo_charas_wait_for_anime(cpymo_engine *e, float delta_time)
+{
+	cpymo_charas *c = &e->charas;
+
+	c->anime_timer += delta_time;
+	while (c->anime_timer >= c->anime_period) {
+		cpymo_engine_request_redraw(e);
+
+		c->anime_timer -= c->anime_period;
+		c->anime_pos_current++;
+
+		if (c->anime_pos_current >= c->anime_pos_count) {
+			c->anime_pos_current = 0;
+			c->anime_loop--;
+		}
+	}
+
+	return c->anime_loop <= 0;
+}
+
+void cpymo_charas_play_anime(
+	cpymo_engine *e,
+	float period,
+	int loop_num,
+	float *offsets,
+	size_t offsets_xy_count,
+	bool offsets_owned)
+{
+	cpymo_charas *c = &e->charas;
+	assert(c->anime_pos == NULL);
+
+	c->anime_period = period;
+	c->anime_pos_current = 0;
+	c->anime_pos_count = offsets_xy_count;
+	c->anime_pos = offsets;
+	c->anime_loop = loop_num;
+	c->anime_owned = offsets_owned;
+	c->anime_timer = 0;
+
+	cpymo_wait_register_with_callback(
+		&e->wait, 
+		&cpymo_charas_wait_for_anime,
+		&cpymo_charas_anime_finished_callback);
 }

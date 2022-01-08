@@ -137,7 +137,7 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 		fprintf(stderr,
 			"[Error] Invalid arguments in script %s(%d).", 
 			interpreter->script_name, 
-			interpreter->script_parser.cur_line);
+			(int)interpreter->script_parser.cur_line);
 	}
 
 	if (!cpymo_parser_next_line(&interpreter->script_parser))
@@ -360,6 +360,78 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		float time = cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
 		cpymo_fade_start_fadein(engine, time);
 		return CPYMO_ERR_SUCC;
+	}
+
+	#define CHARA_QUAKE(NAME, ...) \
+		D(NAME) { \
+			static float offsets[] = { __VA_ARGS__}; \
+			cpymo_charas_play_anime( \
+				engine, 0.1f, 1, \
+				offsets, \
+				sizeof(offsets) / sizeof(float) / 2, \
+				false); \
+			\
+			while (true) { \
+				POP_ARG(id); \
+				if (IS_EMPTY(id)) break; \
+				\
+				cpymo_charas_set_play_anime(&engine->charas, cpymo_parser_stream_span_atoi(id)); \
+			} \
+			\
+			return CPYMO_ERR_SUCC; \
+		}
+
+	CHARA_QUAKE("chara_quake", -10, 3, 10, 3, -6, 2, 5, 2, -4, 1, 3, 0, -1, 0, 0, 0)
+	CHARA_QUAKE("chara_down", 0, 7, 0, 16, 0, 12, 0, 16, 0, 7, 0, 0)
+	CHARA_QUAKE("chara_up", 0, -16, 0, 0, 0, -6, 0, 0)
+	#undef CHARA_QUAKE
+
+	D("chara_anime") {
+		POP_ARG(id_str); ENSURE(id_str);
+		POP_ARG(peroid_str); ENSURE(peroid_str);
+		POP_ARG(loop_str); ENSURE(loop_str);
+
+		int loops = cpymo_parser_stream_span_atoi(loop_str);
+
+		float *buffer = (float *)malloc(64 * sizeof(float));
+		size_t offsets = 0;
+
+		while (offsets < 32) {
+			POP_ARG(x_str);
+			if (IS_EMPTY(x_str)) break;
+
+			POP_ARG(y_str); 
+			if (IS_EMPTY(y_str)) break;
+
+			float x = (float)cpymo_parser_stream_span_atoi(x_str);
+			float y = (float)cpymo_parser_stream_span_atoi(y_str);
+			buffer[offsets * 2] = x;
+			buffer[offsets * 2 + 1] = y;
+			offsets++;
+		}
+
+		if (offsets > 0 || loops <= 0) {
+			cpymo_charas_play_anime(
+				engine,
+				(float)cpymo_parser_stream_span_atoi(peroid_str) / 1000.0f,
+				loops,
+				buffer,
+				offsets,
+				true);
+
+			cpymo_charas_set_play_anime(&engine->charas, cpymo_parser_stream_span_atoi(id_str));
+
+			return CPYMO_ERR_SUCC;
+		}
+		else {
+			free(buffer);
+			fprintf(
+				stderr,
+				"[Error] chara_anime has invalid argument in script %s(%u)",
+				interpreter->script_name,
+				(unsigned)interpreter->script_parser.cur_line);
+			CONT_NEXTLINE;
+		}
 	}
 
 	D("scroll") {
