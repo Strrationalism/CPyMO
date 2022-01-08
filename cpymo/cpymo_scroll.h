@@ -19,7 +19,7 @@ static inline void cpymo_scroll_init(cpymo_scroll *s)
 { s->img = NULL; }
 
 static inline void cpymo_scroll_free(cpymo_scroll *s)
-{ if (s->img) cpymo_backend_image_free(s); }
+{ if (s->img) cpymo_backend_image_free(s->img); }
 
 static inline void cpymo_scroll_reset(cpymo_scroll *s)
 { cpymo_scroll_free(s); cpymo_scroll_init(s); }

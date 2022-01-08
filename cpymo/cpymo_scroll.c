@@ -62,6 +62,7 @@ error_t cpymo_scroll_start(cpymo_engine *e, cpymo_parser_stream_span bgname, flo
 	s->all_time = time;
 
 	cpymo_wait_register_with_callback(&e->wait, cpymo_scroll_wait, cpymo_scroll_callback);
+	cpymo_engine_request_redraw(e);
 
 	return CPYMO_ERR_SUCC;
 }
