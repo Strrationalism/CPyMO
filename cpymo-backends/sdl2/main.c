@@ -22,6 +22,9 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
 
+extern error_t cpymo_backend_font_init(const char *gamedir);
+extern void cpymo_backend_font_free();
+
 static void set_window_icon(const char *gamedir) 
 {
 	int w, h, channel;
@@ -64,9 +67,8 @@ int main(int argc, char **argv)
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
 		SDL_INIT_AUDIO |
-		//SDL_INIT_GAMECONTROLLER |		// Game Controller would support in future.
-		//SDL_INIT_JOYSTICK |
 		SDL_INIT_VIDEO) != 0) {
+		cpymo_engine_free(&engine);
 		SDL_Log("[Error] Unable to initialize SDL: %s", SDL_GetError());
 		return -1;
 	}
@@ -86,7 +88,9 @@ int main(int argc, char **argv)
 		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE,
 		&window,
 		&renderer) != 0) {
+		cpymo_engine_free(&engine);
 		SDL_Log("[Error] Can not create window and renderer: %s", SDL_GetError());
+		SDL_Quit();
 		return -1;
 	}
 
@@ -95,10 +99,22 @@ int main(int argc, char **argv)
 	
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
 		SDL_Log("[Error] Can not set logical size: %s", SDL_GetError());
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		cpymo_engine_free(&engine);
+		SDL_Quit();
 		return -1;
 	}
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+	if (cpymo_backend_font_init(gamedir) != CPYMO_ERR_SUCC) {
+		SDL_Log("[Error] Can not find font file, try put default.ttf into <gamedir>/system/.");
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		cpymo_engine_free(&engine);
+		SDL_Quit();
+	}
 	
 	Uint64 prev_ticks = SDL_GetTicks64();
 	SDL_Event event;
@@ -140,6 +156,8 @@ int main(int argc, char **argv)
 	}
 
 	EXIT:
+
+	cpymo_backend_font_free();
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
