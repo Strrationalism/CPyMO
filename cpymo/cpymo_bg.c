@@ -22,12 +22,24 @@ error_t cpymo_bg_update(cpymo_bg *bg, bool *redraw)
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_bg_draw(const cpymo_bg *bg)
+void cpymo_bg_draw(const cpymo_engine *e)
 {
+	const cpymo_bg *bg = &e->bg;
+
 	if (bg->current_bg) {
+		float follow_chara_anime_x = 0;
+		float follow_chara_anime_y = 0;
+
+		if (bg->follow_chara_quake) {
+			const cpymo_charas *c = &e->charas;
+			assert(c->anime_pos_current * 2 + 1 < c->anime_pos_count * 2);
+			follow_chara_anime_x = c->anime_pos[c->anime_pos_current * 2] * (float)e->gameconfig.imagesize_w / 540.0f;
+			follow_chara_anime_y = c->anime_pos[c->anime_pos_current * 2 + 1] * (float)e->gameconfig.imagesize_h / 360.0f;
+		}
+
 		cpymo_backend_image_draw(
-			bg->current_bg_x,
-			bg->current_bg_y,
+			bg->current_bg_x + follow_chara_anime_x,
+			bg->current_bg_y + follow_chara_anime_y,
 			(float)bg->current_bg_w,
 			(float)bg->current_bg_h,
 			bg->current_bg,

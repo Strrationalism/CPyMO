@@ -344,6 +344,16 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return CPYMO_ERR_SUCC;
 	}
 
+	D("quake") {
+		static float offsets[] = { -1, -2, 4, 3, 6, -4, 5, 3, 2, -1, 0, 0 };
+		cpymo_charas_play_anime(
+			engine, 0.06f, 1, offsets,
+			sizeof(offsets) / sizeof(float) / 2, false);
+		cpymo_charas_set_all_chara_play_anime(&engine->charas);
+		cpymo_bg_follow_chara_quake(&engine->bg, true);
+		return CPYMO_ERR_SUCC;
+	}
+
 	D("fade_out") {
 		POP_ARG(col_str); ENSURE(col_str);
 		POP_ARG(time_str); ENSURE(time_str);

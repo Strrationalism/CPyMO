@@ -79,6 +79,7 @@ error_t cpymo_charas_pos(
 	float x, float y);
 
 void cpymo_charas_set_play_anime(cpymo_charas *c, int id);
+void cpymo_charas_set_all_chara_play_anime(cpymo_charas *c);
 void cpymo_charas_play_anime(
 	struct cpymo_engine *e, 
 	float period, 

@@ -75,11 +75,12 @@ void cpymo_charas_draw(const cpymo_engine *e)
 {
 	const cpymo_charas *c = &e->charas;
 	const struct cpymo_chara *pcur = c->chara;
+
 	while (pcur) {
 		float anime_offset_x = 0;
 		float anime_offset_y = 0;
-
 		if (pcur->play_anime) {
+			assert(c->anime_pos != NULL);
 			assert(c->anime_pos_current * 2 + 1 < c->anime_pos_count * 2);
 			anime_offset_x = c->anime_pos[c->anime_pos_current * 2] * (float)e->gameconfig.imagesize_w / 540.0f;
 			anime_offset_y = c->anime_pos[c->anime_pos_current * 2 + 1] * (float)e->gameconfig.imagesize_h / 360.0f;
@@ -300,6 +301,8 @@ static void cpymo_charas_stop_all_anime(cpymo_engine *e)
 	c->anime_pos = NULL;
 	c->anime_pos_current = 0;
 	c->anime_loop = 0;
+
+	cpymo_bg_follow_chara_quake(&e->bg, false);
 }
 
 void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
@@ -307,6 +310,15 @@ void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
 	struct cpymo_chara *ch = NULL;
 	if (cpymo_charas_find(c, &ch, id) == CPYMO_ERR_SUCC)
 		ch->play_anime = true;
+}
+
+void cpymo_charas_set_all_chara_play_anime(cpymo_charas *c)
+{
+	struct cpymo_chara *ch = c->chara;
+	while (ch) {
+		ch->play_anime = true;
+		ch = ch->next;
+	}
 }
 
 static error_t cpymo_charas_anime_finished_callback(cpymo_engine *e)

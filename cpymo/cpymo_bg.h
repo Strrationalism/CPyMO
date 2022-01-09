@@ -7,8 +7,6 @@
 
 struct cpymo_engine;
 
-/*** Simple Impl ***/
-
 typedef struct {
 	cpymo_backend_image current_bg;
 	float current_bg_x, current_bg_y;
@@ -22,6 +20,9 @@ typedef struct {
 	int transform_next_bg_w, transform_next_bg_h;
 	cpymo_tween transform_progression;
 	void (*transform_draw)(const struct cpymo_engine *);
+
+	// Quake
+	bool follow_chara_quake;
 } cpymo_bg;
 
 static inline void cpymo_bg_init(cpymo_bg *bg)
@@ -31,6 +32,7 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 	bg->current_bg_y = 0;
 	bg->transform_next_bg = NULL;
 	bg->transform_draw = NULL;
+	bg->follow_chara_quake = false;
 
 	bg->redraw = false;
 }
@@ -42,7 +44,7 @@ static inline void cpymo_bg_reset(cpymo_bg *bg)
 
 error_t cpymo_bg_update(cpymo_bg *, bool *redraw);
 
-void cpymo_bg_draw(const cpymo_bg *);
+void cpymo_bg_draw(const struct cpymo_engine *);
 void cpymo_bg_draw_transform_effect(const struct cpymo_engine *);
 
 error_t cpymo_bg_command(
@@ -53,5 +55,8 @@ error_t cpymo_bg_command(
 	float x,
 	float y,
 	float time);
+
+static inline void cpymo_bg_follow_chara_quake(cpymo_bg *bg, bool enabled)
+{ bg->follow_chara_quake = enabled; }
 
 #endif

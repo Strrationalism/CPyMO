@@ -145,7 +145,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 void cpymo_engine_draw(const cpymo_engine *engine)
 {
-	cpymo_bg_draw(&engine->bg);
+	cpymo_bg_draw(engine);
 	cpymo_scroll_draw(&engine->scroll);
 	cpymo_charas_draw(engine);
 	cpymo_anime_draw(&engine->anime);
