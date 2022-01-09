@@ -36,7 +36,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	char *path = (char *)malloc(strlen(gamedir) + 24);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	sprintf(path, "%s/system/default.ttf", gamedir);
-	error_t err = cpymo_backend_font_try_load_font(path, false);
+	error_t err = cpymo_backend_font_try_load_font(path);
 	free(path);
 	if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
 
