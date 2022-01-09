@@ -9,7 +9,7 @@ static stbtt_fontinfo font;
 static unsigned char *ttf_buffer = NULL;
 
 
-static error_t cpymo_backend_font_try_load_font(const char *path, bool isTTC)
+static error_t cpymo_backend_font_try_load_font(const char *path)
 {
 	size_t buf_size = 0;
 	
@@ -45,32 +45,32 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	path = (char *)malloc(strlen(windir) + 16);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	#define TRY_LOAD(NAME, ISTTC) \
+	#define TRY_LOAD(NAME) \
 		sprintf(path, "%s/fonts/%s", windir, NAME); \
-		err = cpymo_backend_font_try_load_font(path, ISTTC); \
+		err = cpymo_backend_font_try_load_font(path); \
 		if (err == CPYMO_ERR_SUCC) { \
 			free(path); \
 			return CPYMO_ERR_SUCC; \
 		}
 
-	TRY_LOAD("msyh.ttc", true);
-	TRY_LOAD("msyhbd.ttc", true);
-	TRY_LOAD("msyhl.ttc", true);
-	TRY_LOAD("msyi.ttf", false);
-	TRY_LOAD("meiryo.ttc", true);
-	TRY_LOAD("meiryob.ttc", true);
-	TRY_LOAD("mingliub.ttc", true);
-	TRY_LOAD("msgothic.ttc", true);
-	TRY_LOAD("msjh.ttc", true);
-	TRY_LOAD("msjhbd.ttc", true);
-	TRY_LOAD("msjhl.ttc", true);
-	TRY_LOAD("msmincho.ttc", true);
-	TRY_LOAD("simhei.ttf", false);
-	TRY_LOAD("simkai.ttf", false);
-	TRY_LOAD("simsun.ttc", true);
-	TRY_LOAD("simsunb.ttf", false);
-	TRY_LOAD("simfang.ttf", false);
-	TRY_LOAD("SIMLI.ttf", false);
+	TRY_LOAD("msyh.ttc");
+	TRY_LOAD("msyhbd.ttc");
+	TRY_LOAD("msyhl.ttc");
+	TRY_LOAD("msyi.ttf");
+	TRY_LOAD("meiryo.ttc");
+	TRY_LOAD("meiryob.ttc");
+	TRY_LOAD("mingliub.ttc");
+	TRY_LOAD("msgothic.ttc");
+	TRY_LOAD("msjh.ttc");
+	TRY_LOAD("msjhbd.ttc");
+	TRY_LOAD("msjhl.ttc");
+	TRY_LOAD("msmincho.ttc");
+	TRY_LOAD("simhei.ttf");
+	TRY_LOAD("simkai.ttf");
+	TRY_LOAD("simsun.ttc");
+	TRY_LOAD("simsunb.ttf");
+	TRY_LOAD("simfang.ttf");
+	TRY_LOAD("SIMLI.ttf");
 
 	free(path);
 #endif
