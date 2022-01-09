@@ -2,6 +2,7 @@
 #include "cpymo_engine.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 void cpymo_charas_free(cpymo_charas *c)
 {
@@ -71,6 +72,10 @@ static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 	return !waiting;
 }
 
+static inline float smooth_alpha(float x) {
+	return -x * x + 2 * x;
+};
+
 void cpymo_charas_draw(const cpymo_engine *e)
 {
 	const cpymo_charas *c = &e->charas;
@@ -96,7 +101,7 @@ void cpymo_charas_draw(const cpymo_engine *e)
 			0,
 			pcur->img_w,
 			pcur->img_h,
-			cpymo_tween_value(&pcur->alpha),
+			smooth_alpha(cpymo_tween_value(&pcur->alpha)),
 			cpymo_backend_image_draw_type_chara);
 
 		pcur = pcur->next;
