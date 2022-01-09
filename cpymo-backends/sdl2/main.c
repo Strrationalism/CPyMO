@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 
 	if (err != CPYMO_ERR_SUCC) {
 		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));
+		return -1;
 	}
 
 	if (SDL_Init(
@@ -114,6 +115,7 @@ int main(int argc, char **argv)
 		SDL_DestroyWindow(window);
 		cpymo_engine_free(&engine);
 		SDL_Quit();
+		return -1;
 	}
 	
 	Uint64 prev_ticks = SDL_GetTicks64();
