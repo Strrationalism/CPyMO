@@ -40,6 +40,9 @@ GRAPHICS	:=	gfx
 GFXBUILD	:=	$(BUILD)
 #ROMFS		:=	romfs
 #GFXBUILD	:=	$(ROMFS)/gfx
+APP_TITLE   := cpymo
+APP_AUTHOR  := Seng-Jik
+APP_DESCRIPTION := Open source galgame simulator.
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -181,12 +184,21 @@ endif
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD)
+	@rm -fr cpymo.cia
+	@rm -fr cpymo-strip.elf
 
 #---------------------------------------------------------------------------------
 $(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@tex3ds -i $< -H $(BUILD)/$*.h -d $(DEPSDIR)/$*.d -o $(GFXBUILD)/$*.t3x
+	
+$(TARGET)-strip.elf: $(BUILD)
+	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
+	
+cia: $(TARGET)-strip.elf
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner  banner
+	@echo Built cpymo.cia
 
 #---------------------------------------------------------------------------------
 else
