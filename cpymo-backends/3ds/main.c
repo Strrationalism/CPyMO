@@ -22,6 +22,9 @@ bool fill_screen;
 extern void cpymo_backend_image_init(float, float);
 extern void cpymo_backend_image_fill_screen_edges();
 
+extern error_t cpymo_backend_text_sys_init();
+extern void cpymo_backend_text_sys_free();
+
 int main(void) {
 	bool is_new_3ds = false;
 	APT_CheckNew3DS(&is_new_3ds);
@@ -69,7 +72,33 @@ int main(void) {
 	C2D_Prepare();
 
 	screen1 = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	if(screen1 == NULL) {
+		C2D_Fini();
+		C3D_Fini();
+		cpymo_engine_free(&engine);
+		gfxExit();
+		return -1;
+	}
+
 	screen2 = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+	if(screen2 == NULL) {
+		C3D_RenderTargetDelete(screen1);
+		C2D_Fini();
+		C3D_Fini();
+		cpymo_engine_free(&engine);
+		gfxExit();
+		return -1;
+	}
+
+	if(cpymo_backend_text_sys_init() != CPYMO_ERR_SUCC) {
+		C3D_RenderTargetDelete(screen1);
+		C3D_RenderTargetDelete(screen2);
+		C2D_Fini();
+		C3D_Fini();
+		cpymo_engine_free(&engine);
+		gfxExit();
+		return -1;
+	}
 
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
 
@@ -130,6 +159,9 @@ int main(void) {
 	}
 
 	EXIT:
+	cpymo_backend_text_sys_free();
+	C3D_RenderTargetDelete(screen2);
+	C3D_RenderTargetDelete(screen1);
 	cpymo_engine_free(&engine);
 	
 	C2D_Fini();
