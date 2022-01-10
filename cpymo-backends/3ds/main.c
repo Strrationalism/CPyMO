@@ -14,6 +14,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <cpymo_backend_text.h>
+
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2;
 float render_3d_offset;
@@ -100,6 +102,16 @@ int main(void) {
 		return -1;
 	}
 
+	// TEXT TEST
+	cpymo_color col;
+	col.r = 255;
+	col.g = 255;
+	col.b = 255;
+	
+	cpymo_backend_text text;
+	cpymo_backend_text_create(&text, "CPyMO for 3DS", 32.0f);
+	//
+
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
 
 	float prevSlider = NAN;
@@ -143,11 +155,15 @@ int main(void) {
 			cpymo_engine_draw(&engine);
 			cpymo_backend_image_fill_screen_edges();
 
+			cpymo_backend_text_draw(text, 0, 32, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
+
 			if(slider > 0){
 				C2D_SceneBegin(screen2);
 				render_3d_offset = -slider;
 				cpymo_engine_draw(&engine);
 				cpymo_backend_image_fill_screen_edges();
+
+				cpymo_backend_text_draw(text, 0, 32, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
 			}
 
 			C3D_FrameEnd(0);

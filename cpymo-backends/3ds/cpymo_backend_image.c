@@ -9,17 +9,17 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize.h>
 
-static float offset_3d(enum cpymo_backend_image_draw_type type)
+const extern float render_3d_offset;
+float offset_3d(enum cpymo_backend_image_draw_type type)
 {
     switch(type) {
-        case cpymo_backend_image_draw_type_bg: return -10.0f;
-        case cpymo_backend_image_draw_type_chara: return -5.0f;
-        case cpymo_backend_image_draw_type_sel_img: return 5.0f;
+        case cpymo_backend_image_draw_type_bg: return -10.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_chara: return -5.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_sel_img: return 2.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_text_ui: return 5.0f * render_3d_offset;
         default: return 0.0f;
     }
 }
-
-const extern float render_3d_offset;
 
 static float game_width, game_height;
 static float viewport_width, viewport_height;
@@ -48,7 +48,7 @@ void cpymo_backend_image_init(float game_w, float game_h)
     offset_y = 240 / 2 - viewport_height / 2;
 }
 
-static void trans_size(float *w, float *h) {
+void trans_size(float *w, float *h) {
     if(fill_screen) {
         *w = *w / game_width * (400 + 20);
         *h = *h / game_height * 240;
@@ -59,7 +59,7 @@ static void trans_size(float *w, float *h) {
     }
 }
 
-static void trans_pos(float *x, float *y) {
+void trans_pos(float *x, float *y) {
     if(fill_screen) {
         *x = *x / game_width * (400 + 20) - 10;
         *y = *y / game_height * 240;
@@ -101,7 +101,7 @@ void cpymo_backend_image_fill_rects(
         trans_pos(&x, &y);
         trans_size(&w, &h);
 
-        x += offset_3d(draw_type) * render_3d_offset;
+        x += offset_3d(draw_type);
         C2D_DrawRectSolid(x, y, 0.0, w, h, C2D_Color32(color.r, color.g, color.b, (u8)(255 * alpha)));
     }
 }
@@ -247,7 +247,7 @@ void cpymo_backend_image_draw(
     trans_pos(&dstx, &dsty);
     trans_size(&dstw, &dsth);
 
-    dstx += offset_3d(draw_type) * render_3d_offset;
+    dstx += offset_3d(draw_type);
     
     C2D_DrawParams p;
     p.angle = 0;
