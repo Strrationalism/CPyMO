@@ -38,6 +38,8 @@ Unpack a pymo package:
 
 ## 编译到任天堂3DS平台
 
-首先你需要确保已经安装了devkitPro及其中的3DS开发套件，在其控制台中，于`./makefiles/3ds/`目录下执行`make`即可生成3DSX程序。
+首先你需要确保已经安装了devkitPro及其中的3DS开发套件，在其控制台中，于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。
 
+### 产生cia文件
 
+你需要确保已经安装了`makerom`命令，之后在`./cpymo-backends/3ds/`下使用`make cia`来创建cia文件。
