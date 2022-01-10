@@ -8,7 +8,8 @@ pymo原版参见：https://github.com/pymo/pymo
 pymo官网：https://www.pymogames.com/    
 原作者：chen_xin_ming    
 
-感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。
+感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。    
+感谢守望、heiyu04为cpymo的开发提供协助。
 
 主要目标：
 
@@ -38,3 +39,5 @@ Unpack a pymo package:
 ## 编译到任天堂3DS平台
 
 首先你需要确保已经安装了devkitPro及其中的3DS开发套件，在其控制台中，于`./makefiles/3ds/`目录下执行`make`即可生成3DSX程序。
+
+
