@@ -2,7 +2,8 @@
 #include <3ds.h>
 #include <citro2d.h>
 
-C2D_Font font;
+static C2D_Font font;
+static C2D_TextBuf textBuf;
 
 error_t cpymo_backend_text_sys_init()
 {
@@ -24,6 +25,14 @@ error_t cpymo_backend_text_sys_init()
         return CPYMO_ERR_UNKNOWN;
     }
 
+    textBuf = C2D_TextBufNew(4096);
+    if(textBuf == NULL) {
+        C2D_FontFree(font);
+        cfguExit();
+        romfsExit();
+        return CPYMO_ERR_UNKNOWN;
+    }
+
     printf("[Info] Font Loaded!!\n");
 
     return CPYMO_ERR_SUCC;
@@ -31,6 +40,7 @@ error_t cpymo_backend_text_sys_init()
 
 void cpymo_backend_text_sys_free()
 {
+    C2D_TextBufDelete(textBuf);
     C2D_FontFree(font);
     cfguExit();
     romfsExit();
