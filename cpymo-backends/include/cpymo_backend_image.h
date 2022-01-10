@@ -3,8 +3,8 @@
 
 #include "../../cpymo/cpymo_error.h"
 #include "../../cpymo/cpymo_color.h"
-#include <utf8.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef void *cpymo_backend_image;
 

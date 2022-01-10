@@ -2,6 +2,7 @@
 #include "cpymo_engine.h"
 #include <memory.h>
 #include <assert.h>
+#include <stdlib.h>
 
 void cpymo_select_img_reset(cpymo_select_img *img)
 {
