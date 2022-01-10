@@ -4,9 +4,6 @@
 [submodule "cpymo-backends/sdl2/SDL"]
 	path = cpymo-backends/sdl2/SDL
 	url = https://github.com/libsdl-org/SDL.git
-[submodule "utf8.h"]
-	path = utf8.h
-	url = https://github.com/sheredom/utf8.h
 [submodule "stb"]
 	path = stb
 	url = https://github.com/nothings/stb.git

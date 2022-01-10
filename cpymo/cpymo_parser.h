@@ -41,4 +41,6 @@ cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span);
 bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const char *str);
 bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_stream_span b);
 
+cpymo_parser_stream_span cpymo_parser_stream_span_utf8_try_head(cpymo_parser_stream_span *tail);
+
 #endif

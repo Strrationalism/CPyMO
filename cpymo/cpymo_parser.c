@@ -224,3 +224,56 @@ bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_st
 	}
 	else return false;
 }
+
+cpymo_parser_stream_span cpymo_parser_stream_span_utf8_try_head(cpymo_parser_stream_span *tail)
+{
+	if (tail->len == 0) return cpymo_parser_stream_span_pure("");
+	else {
+		unsigned head_ones = 0;
+		unsigned char c = (unsigned char)tail->begin[0];
+		while (c & 0x80) {
+			head_ones++;
+			c = c << 1;
+		}
+
+		if (head_ones == 0 || (head_ones >= 2 && head_ones <= 6)) {
+			if (head_ones == 0) {
+				tail->begin++;
+				tail->len--;
+
+				cpymo_parser_stream_span span;
+				span.begin = tail->begin - 1;
+				span.len = 1;
+				return span;
+			}
+			else {
+				unsigned bytes = head_ones;
+				unsigned following_bytes = bytes - 1;
+
+				if (tail->len < bytes)
+					goto BAD_UTF8;
+				
+				for (unsigned i = 0; i < following_bytes; ++i) {
+					unsigned following_byte = tail->begin[1 + i];
+
+					if ((following_byte & 0xC0) != 0x80)
+						goto BAD_UTF8;
+				}
+
+				cpymo_parser_stream_span span;
+				span.begin = tail->begin;
+				span.len = bytes;
+
+				tail->begin += bytes;
+				tail->len -= bytes;
+				return span;
+			}
+		}
+		else goto BAD_UTF8;
+	}
+
+BAD_UTF8:
+	tail->begin++;
+	tail->len--;
+	return cpymo_parser_stream_span_pure("?");
+}
