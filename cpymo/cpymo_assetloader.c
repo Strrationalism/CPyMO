@@ -176,7 +176,7 @@ error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int 
 	if (pixels == NULL)
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 
-	err = cpymo_backend_image_load_immutable(
+	err = cpymo_backend_image_load(
 		img,
 		pixels,
 		*w,
@@ -256,14 +256,14 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, i
 
 		if (mask_px == NULL) {
 			fprintf(stderr, "[Warning] Can not load mask in chara %s.\n", chname);
-			return cpymo_backend_image_load_immutable(img, px, iw, ih, cpymo_backend_image_format_rgba);
+			return cpymo_backend_image_load(img, px, iw, ih, cpymo_backend_image_format_rgba);
 		} 
 		else {
-			return cpymo_backend_image_load_immutable_with_mask(img, px, mask_px, iw, ih);
+			return cpymo_backend_image_load_with_mask(img, px, mask_px, iw, ih);
 		}
 	}
 	else {
-		return cpymo_backend_image_load_immutable(img, px, iw, ih, cpymo_backend_image_format_rgba);
+		return cpymo_backend_image_load(img, px, iw, ih, cpymo_backend_image_format_rgba);
 	}
 }
 
@@ -355,7 +355,7 @@ error_t cpymo_assetloader_load_system_image(
 				goto LOAD_WITHOUT_MASK;
 			}
 			else {
-				err = cpymo_backend_image_load_immutable_with_mask(
+				err = cpymo_backend_image_load_with_mask(
 					&img, px, mask_px, w, h);
 			}
 		}
@@ -365,7 +365,7 @@ error_t cpymo_assetloader_load_system_image(
 	}
 	else {
 	LOAD_WITHOUT_MASK:
-		err = cpymo_backend_image_load_immutable(&img, px, w, h, cpymo_backend_image_format_rgba);
+		err = cpymo_backend_image_load(&img, px, w, h, cpymo_backend_image_format_rgba);
 	}
 
 	if (err != CPYMO_ERR_SUCC) {

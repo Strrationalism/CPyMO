@@ -124,7 +124,7 @@ typedef struct {
     float scale;
 } cpymo_backend_image_3ds;
 
-error_t cpymo_backend_image_load_immutable(
+error_t cpymo_backend_image_load(
     cpymo_backend_image *out_image, 
     void *pixels_moveintoimage, 
     int width,
@@ -264,7 +264,7 @@ void cpymo_backend_image_draw(
     C2D_DrawImage(cimg, &p, &tint);
 }
 
-error_t cpymo_backend_image_load_immutable_with_mask(
+error_t cpymo_backend_image_load_with_mask(
 	cpymo_backend_image *out_image, 
     void *px_rgbx32_moveinto, 
     void *mask_a8_moveinto, 
@@ -273,5 +273,5 @@ error_t cpymo_backend_image_load_immutable_with_mask(
 {
 	cpymo_utils_attach_mask_to_rgba(px_rgbx32_moveinto, mask_a8_moveinto, w, h);
 	free(mask_a8_moveinto);
-	return cpymo_backend_image_load_immutable(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
+	return cpymo_backend_image_load(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
 }

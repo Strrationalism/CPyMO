@@ -14,20 +14,11 @@ enum cpymo_backend_image_format {
 	cpymo_backend_image_format_rgba,
 };
 
-error_t cpymo_backend_image_load_immutable(
+error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, enum cpymo_backend_image_format);
 
-error_t cpymo_backend_image_load_immutable_with_mask(
+error_t cpymo_backend_image_load_with_mask(
 	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h);
-
-/*error_t cpymo_backend_image_font(
-	cpymo_backend_image *out_image, const char *utf8str, float size, cpymo_color color, bool aa);
-
-error_t cpymo_backend_image_create_mutable(
-	cpymo_backend_image *out_image, int width, int height);
-
-error_t cpymo_backend_image_update_mutable(
-	cpymo_backend_image image, void *pixels_moveintoimage);*/
 
 
 void cpymo_backend_image_free(cpymo_backend_image image);
