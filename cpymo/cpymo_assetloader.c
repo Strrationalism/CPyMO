@@ -67,7 +67,7 @@ error_t cpymo_assetloader_init(cpymo_assetloader * out, const cpymo_gameconfig *
 
 	chbuf[gamedir_strlen] = '\0';
 	
-	out->gamedir = realloc((void *)out->gamedir, gamedir_strlen + 1);
+	out->gamedir = (char*)realloc((void *)out->gamedir, gamedir_strlen + 1);
 	
 	return CPYMO_ERR_SUCC;
 }
