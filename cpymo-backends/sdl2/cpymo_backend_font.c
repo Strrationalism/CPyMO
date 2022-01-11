@@ -5,7 +5,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
-static stbtt_fontinfo font;
+stbtt_fontinfo font;
 static unsigned char *ttf_buffer = NULL;
 
 

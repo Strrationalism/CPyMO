@@ -1,10 +1,11 @@
-#include <stdlib.h>
+﻿#include <stdlib.h>
 #include <stdio.h>
 #include <cpymo_error.h>
 #include <SDL.h>
 #include <cpymo_engine.h>
 #include <cpymo_interpreter.h>
 #include <string.h>
+#include <cpymo_backend_text.h>
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -117,6 +118,9 @@ int main(int argc, char **argv)
 		SDL_Quit();
 		return -1;
 	}
+
+	cpymo_backend_text text;
+	cpymo_backend_text_create(&text, "CPyMO for 3DS", 32.0f);
 	
 	Uint64 prev_ticks = SDL_GetTicks64();
 	SDL_Event event;
@@ -153,11 +157,17 @@ int main(int argc, char **argv)
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 			SDL_RenderClear(renderer);
 			cpymo_engine_draw(&engine);
+			cpymo_color col;
+			col.r = 255;
+			col.g = 255;
+			col.b = 255;
+			cpymo_backend_text_draw(text, 0, 32, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
 			SDL_RenderPresent(renderer);
 		} else SDL_Delay(50);
 	}
 
 	EXIT:
+	cpymo_backend_text_free(text);
 
 	cpymo_backend_font_free();
 

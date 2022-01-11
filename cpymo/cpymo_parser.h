@@ -42,5 +42,6 @@ bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const ch
 bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_stream_span b);
 
 cpymo_parser_stream_span cpymo_parser_stream_span_utf8_try_head(cpymo_parser_stream_span *tail);
+uint32_t cpymo_parser_stream_span_utf8_try_head_to_utf32(cpymo_parser_stream_span *tail);
 
 #endif

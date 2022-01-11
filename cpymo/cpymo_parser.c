@@ -277,3 +277,24 @@ BAD_UTF8:
 	tail->len--;
 	return cpymo_parser_stream_span_pure("?");
 }
+
+uint32_t cpymo_parser_stream_span_utf8_try_head_to_utf32(cpymo_parser_stream_span *tail)
+{
+	cpymo_parser_stream_span ch = cpymo_parser_stream_span_utf8_try_head(tail);
+	uint32_t result = 0;
+
+	for (size_t i = 0; i < ch.len; ++i) {
+		result <<= 6;
+		unsigned char byte = (unsigned char)ch.begin[i];
+		unsigned char mask = 0x80;
+
+		while ((byte & mask) > 0) {
+			byte &= ~mask;
+			mask >>= 1;
+		}
+
+		result |= byte;
+	}
+
+	return result;
+}
