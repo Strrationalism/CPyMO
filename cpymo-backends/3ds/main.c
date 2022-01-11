@@ -109,7 +109,7 @@ int main(void) {
 	col.b = 255;
 	
 	cpymo_backend_text text;
-	cpymo_backend_text_create(&text, "CPyMO for 3DS", 32.0f);
+	cpymo_backend_text_create(&text, "CPyMO for 3DS Test Test\n换行换行λΛlambda12345 ワタシわたし\n换行换行λΛlambda12345 ワタシわたし", 24.0f);
 	//
 
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
@@ -155,7 +155,7 @@ int main(void) {
 			cpymo_engine_draw(&engine);
 			cpymo_backend_image_fill_screen_edges();
 
-			cpymo_backend_text_draw(text, 0, 32, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
+			cpymo_backend_text_draw(text, 0, 24, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
 
 			if(slider > 0){
 				C2D_SceneBegin(screen2);
@@ -163,7 +163,7 @@ int main(void) {
 				cpymo_engine_draw(&engine);
 				cpymo_backend_image_fill_screen_edges();
 
-				cpymo_backend_text_draw(text, 0, 32, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
+				cpymo_backend_text_draw(text, 0, 24, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
 			}
 
 			C3D_FrameEnd(0);

@@ -16,7 +16,7 @@ void cpymo_backend_text_free(cpymo_backend_text);
 
 void cpymo_backend_text_draw(
     cpymo_backend_text,
-    float x, float y_baseline, 
+    float x, float y_baseline,
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type);
 

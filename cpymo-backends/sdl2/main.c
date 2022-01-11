@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 	}
 
 	cpymo_backend_text text;
-	cpymo_backend_text_create(&text, "CPyMO for 3DS", 32.0f);
+	cpymo_backend_text_create(&text, "CPyMO for 3DS Test Test\n换行换行λΛlambda12345 ワタシわたし换行换行λΛlambda12345 ワタシわたし", 24.0f);
 	
 	Uint64 prev_ticks = SDL_GetTicks64();
 	SDL_Event event;
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 			col.r = 255;
 			col.g = 255;
 			col.b = 255;
-			cpymo_backend_text_draw(text, 0, 32, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
+			cpymo_backend_text_draw(text, 0, 24, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
 			SDL_RenderPresent(renderer);
 		} else SDL_Delay(50);
 	}

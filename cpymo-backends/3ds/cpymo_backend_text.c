@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <3ds.h>
 #include <citro2d.h>
+#include <cpymo_parser.h>
 
 static C2D_Font font;
 
@@ -43,6 +44,11 @@ struct cpymo_backend_text {
     C2D_Text text;
 };
 
+
+void trans_size(float *w, float *h);
+void trans_pos(float *x, float *y);
+float offset_3d(enum cpymo_backend_image_draw_type type);
+
 error_t cpymo_backend_text_create(cpymo_backend_text *out, const char *utf8_string, float single_character_size_in_logical_screen)
 {
     struct cpymo_backend_text *t = (struct cpymo_backend_text *)malloc(sizeof(struct cpymo_backend_text));
@@ -75,10 +81,6 @@ void cpymo_backend_text_free(cpymo_backend_text t)
     free(t);
 }
 
-void trans_size(float *w, float *h);
-void trans_pos(float *x, float *y);
-float offset_3d(enum cpymo_backend_image_draw_type type);
-
 void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color col, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
     trans_pos(&x, &y);
@@ -90,10 +92,10 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
     float x_scale = tt->single_character_size_in_logical_screen, 
           y_scale = tt->single_character_size_in_logical_screen;
 
+    x_scale /= 28.0f;
+    y_scale /= 28.0f;
+    
     trans_size(&x_scale, &y_scale);
-
-    x_scale /= 24.0f;
-    y_scale /= 24.0f;
 
     float offset_3d_v = offset_3d(draw_type);
 

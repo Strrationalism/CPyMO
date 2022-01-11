@@ -7,59 +7,97 @@
 #include <math.h>
 #include <cpymo_utils.h>
 #include <SDL_render.h>
+#include <assert.h>
 
 extern stbtt_fontinfo font;
 
-struct cpymo_backend_text {
+typedef struct {
     float scale;
     int ascent;
     float baseline;
     int width, height;
     cpymo_backend_image img;
-};
+} cpymo_backend_text_internal;
+
+
+static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline) {
+    float xpos = 0;
+
+    int width = 0, height = 0, y_base = 0;
+    while (text.len > 0) {
+        uint32_t codepoint = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
+        int x0, y0, x1, y1;
+
+        int advance_width, lsb;
+        float x_shift = xpos - (float)floor(xpos);
+        stbtt_GetCodepointHMetrics(&font, (int)codepoint, &advance_width, &lsb);
+
+        if (codepoint == '\n') {
+            xpos = 0;
+            y_base += baseline;
+
+            continue;
+        }
+
+        stbtt_GetCodepointBitmapBoxSubpixel(&font, (int)codepoint, scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
+        if(out_or_null)
+            stbtt_MakeCodepointBitmapSubpixel(
+                &font, 
+                (unsigned char *)out_or_null + (int)xpos + x0 + (int)(baseline + y0 + y_base) * *w, 
+                x1 - x0, y1 - y0, *w, scale, scale, x_shift, 0, (int)codepoint);
+
+        xpos += (advance_width * scale);
+
+        cpymo_parser_stream_span text2 = text;
+        uint32_t next_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text2);
+        if (next_char) {
+            xpos += scale * stbtt_GetCodepointKernAdvance(&font, codepoint, next_char);
+        }
+
+        int new_width = (int)ceil(xpos);
+        if (new_width > width) width = new_width;
+
+        int new_height = (y1 - y0) + baseline + y_base;
+        if (new_height > height) height = new_height;
+    }
+
+    *w = width;
+    *h = height;
+}
+
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out,
     const char *utf8_string,
     float single_character_size_in_logical_screen)
 {
-    struct cpymo_backend_text *t = (struct cpymo_backend_text *)malloc(sizeof(struct cpymo_backend_text));
+    cpymo_parser_stream_span text = cpymo_parser_stream_span_pure(utf8_string);
+    if (text.len == 0) return CPYMO_ERR_INVALID_ARG;
+
+    cpymo_backend_text_internal *t = 
+        (cpymo_backend_text_internal *)malloc(sizeof(cpymo_backend_text_internal));
     if (t == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
     t->scale = stbtt_ScaleForPixelHeight(&font, single_character_size_in_logical_screen);
     stbtt_GetFontVMetrics(&font, &t->ascent, NULL, NULL);
     t->baseline = t->scale * t->ascent;
 
-    float xpos = 0;
-    t->height = 0;
-    cpymo_parser_stream_span span_org = cpymo_parser_stream_span_pure(utf8_string);
-    cpymo_parser_stream_span span = span_org;
-    while (span.len > 0) {
-        uint32_t codepoint = cpymo_parser_stream_span_utf8_try_head_to_utf32(&span);
-        int x0, y0, x1, y1;
-
-        int advance_width, lsb;
-        float x_shift = xpos - (float)floor(xpos);
-        stbtt_GetCodepointHMetrics(&font, (int)codepoint, &advance_width, &lsb);
-        stbtt_GetCodepointBitmapBoxSubpixel(&font, (int)codepoint, t->scale, t->scale, x_shift, 0, &x0, &y0, &x1, &y1);
-        xpos += (advance_width * t->scale);
-
-        cpymo_parser_stream_span span2 = span;
-        uint32_t next_char;
-        if (next_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&span2)) {
-            xpos += t->scale * stbtt_GetCodepointKernAdvance(&font, codepoint, next_char);
-        }
-
-        t->height = max(t->height, (y1 - y0) + t->baseline);
-    }
-
-    t->width = (int)ceilf(xpos);
+    cpymo_backend_text_render(NULL, &t->width, &t->height, text, t->scale, t->baseline);
+    
+    assert(t->width > 0 && t->height > 0);
     
     void *screen = malloc(t->width * t->height);
     if (screen == NULL) {
         free(t);
         return CPYMO_ERR_OUT_OF_MEM;
     }
+
+    memset(screen, 0, t->width * t->height);
+
+    int w = t->width, h = t->height;
+    cpymo_backend_text_render(screen, &w, &h, text, t->scale, t->baseline);
+
+    assert(w == t->width && h == t->height);
 
     void *screen2 = malloc(t->width * t->height * 4);
     if (screen2 == NULL) {
@@ -68,34 +106,14 @@ error_t cpymo_backend_text_create(
         return CPYMO_ERR_OUT_OF_MEM;
     }
 
-    memset(screen, 0, t->width * t->height);
     memset(screen2, 255, t->width * t->height * 4);
-
-    xpos = 0;
-    span = span_org;
-    while (span.len > 0) {
-        uint32_t codepoint = cpymo_parser_stream_span_utf8_try_head_to_utf32(&span);
-        int x0, y0, x1, y1;
-
-        int advance_width, lsb;
-        float x_shift = xpos - (float)floor(xpos);
-        stbtt_GetCodepointHMetrics(&font, (int)codepoint, &advance_width, &lsb);
-        stbtt_GetCodepointBitmapBoxSubpixel(&font, (int)codepoint, t->scale, t->scale, x_shift, 0, &x0, &y0, &x1, &y1);
-        stbtt_MakeCodepointBitmapSubpixel(&font, (char *)screen + (int)xpos + x0 + (int)(t->baseline + y0) * t->width, x1 - x0, y1 - y0, t->width, t->scale, t->scale, x_shift, 0, (int)codepoint);
-        xpos += (advance_width * t->scale);
-
-        cpymo_parser_stream_span span2 = span;
-        uint32_t next_char;
-        if (next_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&span2)) {
-            xpos += t->scale * stbtt_GetCodepointKernAdvance(&font, codepoint, next_char);
-        }
-    }
 
     cpymo_utils_attach_mask_to_rgba(screen2, screen, t->width, t->height);
     free(screen);
 
     error_t err = cpymo_backend_image_load(&t->img, screen2, t->width, t->height, cpymo_backend_image_format_rgba);
     if (err != CPYMO_ERR_SUCC) {
+        free(screen2);
         free(t);
         return CPYMO_ERR_UNKNOWN;
     }
@@ -107,7 +125,7 @@ error_t cpymo_backend_text_create(
 
 void cpymo_backend_text_free(cpymo_backend_text t)
 {
-    struct cpymo_backend_text *tt = (struct cpymo_backend_text *)t;
+    cpymo_backend_text_internal *tt = (cpymo_backend_text_internal *)t;
     cpymo_backend_image_free(tt->img);
     free(t);
 }
@@ -118,7 +136,7 @@ void cpymo_backend_text_draw(
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type)
 {
-    struct cpymo_backend_text *t = (struct cpymo_backend_text *)text;
+    cpymo_backend_text_internal *t = (cpymo_backend_text_internal *)text;
 
     SDL_SetTextureColorMod((SDL_Texture *)t->img, 0, 0, 0);
     cpymo_backend_image_draw(
