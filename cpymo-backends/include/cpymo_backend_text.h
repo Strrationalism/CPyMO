@@ -21,4 +21,7 @@ void cpymo_backend_text_draw(
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type);
 
+float cpymo_backend_text_width(
+    cpymo_backend_text);
+
 #endif

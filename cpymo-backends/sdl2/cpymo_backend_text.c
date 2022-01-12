@@ -167,3 +167,8 @@ void cpymo_backend_text_draw(
         alpha,
         draw_type);
 }
+
+float cpymo_backend_text_width(cpymo_backend_text tt)
+{
+    return (float)((cpymo_backend_text_internal *)tt)->width;
+}

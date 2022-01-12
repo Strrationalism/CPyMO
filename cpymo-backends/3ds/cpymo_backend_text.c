@@ -83,6 +83,8 @@ void cpymo_backend_text_free(cpymo_backend_text t)
     free(t);
 }
 
+const static float text_scale_divisor = 28.0f;
+
 void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color col, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
     trans_pos(&x, &y);
@@ -94,8 +96,8 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
     float x_scale = tt->single_character_size_in_logical_screen, 
           y_scale = tt->single_character_size_in_logical_screen;
 
-    x_scale /= 28.0f;
-    y_scale /= 28.0f;
+    x_scale /= text_scale_divisor;
+    y_scale /= text_scale_divisor;
     
     trans_size(&x_scale, &y_scale);
 
@@ -113,4 +115,19 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
         C2D_WithColor | C2D_AtBaseline, 
         x + offset_3d_v, y, 0.0f,
         x_scale, y_scale, color);
+}
+
+extern float game_width;
+float cpymo_backend_text_width(cpymo_backend_text tt)
+{
+    struct cpymo_backend_text *t = (struct cpymo_backend_text *)tt;
+
+    float w, h;
+    C2D_TextGetDimensions(
+        &t->text, 
+        t->single_character_size_in_logical_screen / text_scale_divisor,
+        t->single_character_size_in_logical_screen / text_scale_divisor,
+        &w, &h);
+
+    return w / 400.0f * game_width / 2.0f;
 }

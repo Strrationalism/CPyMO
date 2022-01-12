@@ -111,6 +111,8 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float progression, 
 	trans_pos(&x, &y);
 	trans_size(&w, &h);
 
+	x += offset_3d(cpymo_backend_image_draw_type_bg);
+
 	C2D_DrawParams p;
     p.angle = 0;
     p.center.x = 0;
