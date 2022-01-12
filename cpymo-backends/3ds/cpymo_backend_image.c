@@ -23,9 +23,9 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
     }
 }
 
-static float game_width, game_height;
-static float viewport_width, viewport_height;
-static float offset_x, offset_y;
+float game_width, game_height;
+float viewport_width, viewport_height;
+float offset_x, offset_y;
 
 const extern bool fill_screen;
 
@@ -177,7 +177,7 @@ error_t cpymo_backend_image_load(
     }
 
     printf("[Load Texture] C: %d, W: %d, H: %d, PW: %d, PH: %d\n",
-    channels, width, height, pad_width, pad_height);
+        channels, width, height, pad_width, pad_height);
 
     cpymo_backend_image_3ds *img = (cpymo_backend_image_3ds *)malloc(sizeof(cpymo_backend_image_3ds));
     if(img == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -188,6 +188,8 @@ error_t cpymo_backend_image_load(
     img->pad_height = (u16)pad_height;
     img->scale = scale;
 
+    // Warning: if image crash, try make pad_width equals pad_heights.
+
     if(!C3D_TexInit(&img->tex, (u16)pad_height, (u16)pad_width, tex_fmt)) {
         free(img);
         return CPYMO_ERR_UNKNOWN;
@@ -195,19 +197,17 @@ error_t cpymo_backend_image_load(
 
     C3D_TexSetFilter(&img->tex, GPU_LINEAR, GPU_LINEAR);
 
-    memset(img->tex.data, 0, img->tex.size);
+    //memset(img->tex.data, 0, img->tex.size);
     
-    for(u32 x = 0; x < width; x++) {
-        for(u32 y = 0; y < height; y++) {
-            for(int channel = 0; channel < channels; ++channel) {
-                u32 ix = pad_width - x - 1;
-                u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
-                u8 *srcPos = (u8*)pixels_moveintoimage + (y * width + x) * channels;
+    for(u32 y = 0; y < height; y++) {
+        for(u32 x = 0; x < width; x++) {
+            u32 ix = pad_width - x - 1;
+            u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
+            u8 *srcPos = (u8*)pixels_moveintoimage + (y * width + x) * channels;
 
-                memcpy(&((u8*)img->tex.data)[dstPos], srcPos, channels);
-                for(int c = 0; c < channels; c++) {
-                    ((u8 *)img->tex.data)[dstPos + c] = srcPos[channels - 1 - c];
-                }
+            //memcpy(&((u8*)img->tex.data)[dstPos], srcPos, channels);
+            for(int c = 0; c < channels; c++) {
+                ((u8 *)img->tex.data)[dstPos + c] = srcPos[channels - 1 - c];
             }
         }
     }

@@ -131,6 +131,8 @@ static void cpymo_bg_transfer_operate(cpymo_bg *bg)
 
 static void cpymo_bg_transfer(cpymo_engine *e)
 {
+	cpymo_engine_request_redraw(e);
+
 	cpymo_bg_transfer_operate(&e->bg);
 
 	// After transfer
@@ -164,6 +166,7 @@ static error_t cpymo_bg_progression_over_callback(cpymo_engine *e)
 
 static bool cpymo_bg_wait_for_progression_fade(cpymo_engine *engine, float delta_time)
 {
+	cpymo_engine_request_redraw(engine);
 	cpymo_tween *tween = &engine->bg.transform_progression;
 	if (cpymo_tween_value(tween) < 0.5f && cpymo_tween_value_after(tween, delta_time) >= 0.5f) {
 		if (engine->bg.transform_next_bg) {
@@ -234,6 +237,8 @@ error_t cpymo_bg_command(
 			&cpymo_bg_wait_for_progression_fade,
 			&cpymo_bg_progression_over_callback);
 	}
+
+	cpymo_engine_request_redraw(engine);
 
 	return CPYMO_ERR_SUCC;
 }
