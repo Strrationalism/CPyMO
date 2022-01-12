@@ -11,7 +11,6 @@ error_t cpymo_backend_image_load(
 	int channels;
 
 	switch (fmt) {
-	case cpymo_backend_image_format_r: channels = 1; break;
 	case cpymo_backend_image_format_rgb: channels = 3; break;
 	case cpymo_backend_image_format_rgba: channels = 4; break;
 	default: assert(false);

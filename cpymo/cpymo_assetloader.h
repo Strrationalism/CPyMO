@@ -4,6 +4,7 @@
 #include "cpymo_package.h"
 #include "cpymo_gameconfig.h"
 #include <cpymo_backend_image.h>
+#include <cpymo_backend_masktrans.h>
 #include "cpymo_parser.h"
 #include <stddef.h>
 
@@ -28,6 +29,7 @@ error_t cpymo_assetloader_load_bgm(char **out_buffer, size_t *buf_size, const ch
 error_t cpymo_assetloader_load_script(char **out_buffer, size_t *buf_size, const char *script_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_video(char **out_buffer, size_t *buf_size, const char *video_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system(char **out_buffer, size_t *buf_size, const char *asset_name, const char *ext, const cpymo_assetloader *loader);
+error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image *out_image, 

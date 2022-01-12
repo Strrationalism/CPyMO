@@ -9,7 +9,6 @@
 typedef void *cpymo_backend_image;
 
 enum cpymo_backend_image_format {
-	cpymo_backend_image_format_r,
 	cpymo_backend_image_format_rgb,
 	cpymo_backend_image_format_rgba,
 };

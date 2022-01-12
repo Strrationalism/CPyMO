@@ -313,6 +313,35 @@ error_t cpymo_assetloader_load_system(char ** out_buffer, size_t * buf_size, con
 		ext, loader);
 }
 
+error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{
+	char *buf = NULL;
+	size_t buf_size;
+
+	char *path = (char *)malloc(name.len + 1);
+	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	cpymo_parser_stream_span_copy(path, name.len + 1, name);
+
+	error_t err = cpymo_assetloader_load_system(&buf, &buf_size, path, "png", loader);
+	free(path);
+
+	CPYMO_THROW(err);
+
+	int w, h, c;
+	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &c, 1);
+	free(buf);
+
+	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
+
+	err = cpymo_backend_masktrans_create(out, px, w, h);
+	if (err != CPYMO_ERR_SUCC) {
+		free(px);
+		return err;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,

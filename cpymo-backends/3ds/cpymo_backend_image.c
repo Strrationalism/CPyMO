@@ -16,6 +16,8 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
         case cpymo_backend_image_draw_type_bg: return -10.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_chara: return -5.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_sel_img: return 2.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_titledate_bg: return 2.5f * render_3d_offset;
+        case cpymo_backend_image_draw_type_titledate_text: return 3.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_text_ui: return 5.0f * render_3d_offset;
         default: return 0.0f;
     }
@@ -138,7 +140,6 @@ error_t cpymo_backend_image_load(
     int channels;
     GPU_TEXCOLOR tex_fmt;
     switch(fmt) {
-    case cpymo_backend_image_format_r: tex_fmt = GPU_A8; channels = 1; break;
     case cpymo_backend_image_format_rgb: tex_fmt = GPU_RGB8; channels = 3; break;
     case cpymo_backend_image_format_rgba: tex_fmt = GPU_RGBA8; channels = 4; break;
     default: assert(false);

@@ -2,6 +2,7 @@
 #define INCLUDE_CPYMO_BACKEND_MASKTRANS
 
 #include "../../cpymo/cpymo_error.h"
+#include <stdbool.h>
 
 typedef void *cpymo_backend_masktrans;
 
@@ -10,8 +11,7 @@ error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_
 
 void cpymo_backend_masktrans_free(cpymo_backend_masktrans);
 
-void cpymo_backend_mask_trans_draw_fullscreen_fadeout(cpymo_backend_masktrans, float t);
-void cpymo_backend_mask_trans_draw_fullscreen_fadein(cpymo_backend_masktrans, float t);
+void cpymo_backend_masktrans_draw(cpymo_backend_masktrans, float t, bool is_fade_in);
 
 
 #endif
