@@ -14,6 +14,7 @@ typedef struct {
 
 	cpymo_color color;
 
+	float fontsize;
 	float x, y;
 	float time;
 } cpymo_floating_hint;
@@ -27,6 +28,7 @@ static inline void cpymo_floating_hint_init(cpymo_floating_hint *h)
 	h->time = 0;
 	h->background_w = 0;
 	h->background_h = 0;
+	h->fontsize = 0;
 }
 
 void cpymo_floating_hint_free(cpymo_floating_hint *);

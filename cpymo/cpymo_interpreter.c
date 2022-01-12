@@ -203,7 +203,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span_pure(engine->title),
 			cpymo_parser_stream_span_pure(""),
 			4 * engine->gameconfig.fontsize, 
-			4 * engine->gameconfig.fontsize,
+			2 * engine->gameconfig.fontsize,
 			cpymo_color_white,
 			2.0f);
 	}
@@ -933,6 +933,32 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CPYMO_THROW(err);
 
 		CONT_NEXTLINE;
+	}
+
+	/*** IV. System ***/
+	D("date") {
+		int fmonth = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FMONTH"));
+		int fdate = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FDATE"));
+		char str[16];
+		sprintf(str, "%d月%d日",
+			cpymo_utils_clamp(fmonth, 1, 12),
+			cpymo_utils_clamp(fdate, 1, 31));
+
+		POP_ARG(date_bg); ENSURE(date_bg);
+		POP_ARG(x_str); ENSURE(x_str);
+		POP_ARG(y_str); ENSURE(y_str);
+		POP_ARG(col_str);
+
+		POS(x, y, x_str, y_str);
+
+		cpymo_color col =
+			cpymo_parser_stream_span_as_color(col_str);
+
+		return cpymo_floating_hint_start(
+			engine,
+			cpymo_parser_stream_span_pure(str),
+			date_bg,
+			x, y, col, 3);
 	}
 	
 	else {

@@ -34,7 +34,7 @@ void cpymo_floating_hint_draw(const cpymo_floating_hint *h)
 		cpymo_backend_text_draw(
 			h->text,
 			h->x,
-			h->y,
+			h->y + h->fontsize,
 			h->color,
 			alpha,
 			cpymo_backend_image_draw_type_titledate_text);
@@ -82,6 +82,7 @@ error_t cpymo_floating_hint_start(
 	hint->y = y;
 	hint->color = col;
 	hint->time = 0;
+	hint->fontsize = engine->gameconfig.fontsize * fontscale;
 
 	if (background.len > 0) {
 		error_t err = cpymo_assetloader_load_system_image(
@@ -104,7 +105,7 @@ error_t cpymo_floating_hint_start(
 		error_t err = cpymo_backend_text_create(
 			&hint->text,
 			text,
-			engine->gameconfig.fontsize * fontscale);
+			hint->fontsize);
 
 		if (err != CPYMO_ERR_SUCC) {
 			hint->text = NULL;
