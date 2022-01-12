@@ -202,8 +202,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			engine,
 			cpymo_parser_stream_span_pure(engine->title),
 			cpymo_parser_stream_span_pure(""),
-			4 * engine->gameconfig.fontsize, 
-			2 * engine->gameconfig.fontsize,
+			(float)(4 * engine->gameconfig.fontsize), 
+			(float)(2 * engine->gameconfig.fontsize),
 			cpymo_color_white,
 			2.0f);
 	}

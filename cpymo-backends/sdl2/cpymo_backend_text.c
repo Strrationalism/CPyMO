@@ -23,7 +23,8 @@ typedef struct {
 static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline) {
     float xpos = 0;
 
-    int width = 0, height = 0, y_base = 0;
+    int width = 0, height = 0;
+    float y_base = 0;
     while (text.len > 0) {
         uint32_t codepoint = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
         int x0, y0, x1, y1;
@@ -57,7 +58,7 @@ static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_p
         int new_width = (int)ceil(xpos);
         if (new_width > width) width = new_width;
 
-        int new_height = (y1 - y0) + baseline + y_base;
+        int new_height = (int)((y1 - y0) + baseline + y_base);
         if (new_height > height) height = new_height;
     }
 

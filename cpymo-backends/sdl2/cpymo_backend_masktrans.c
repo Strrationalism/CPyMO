@@ -3,6 +3,7 @@
 #include <cpymo_backend_image.h>
 #include <memory.h>
 #include <assert.h>
+#include <stdlib.h>
 
 typedef struct {
 	void *mask;

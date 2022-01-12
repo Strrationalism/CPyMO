@@ -19,8 +19,8 @@ void cpymo_floating_hint_draw(const cpymo_floating_hint *h)
 		cpymo_backend_image_draw(
 			h->x,
 			h->y,
-			h->background_w,
-			h->background_h,
+			(float)h->background_w,
+			(float)h->background_h,
 			h->background,
 			0,
 			0,
