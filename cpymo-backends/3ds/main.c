@@ -49,7 +49,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/nastu_s60v5");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
@@ -102,16 +102,6 @@ int main(void) {
 		return -1;
 	}
 
-	// TEXT TEST
-	cpymo_color col;
-	col.r = 255;
-	col.g = 255;
-	col.b = 255;
-	
-	cpymo_backend_text text;
-	cpymo_backend_text_create(&text, "CPyMO for 3DS Test Test\n换行换行λΛlambda12345 ワタシわたし\n换行换行λΛlambda12345 ワタシわたし", 24.0f);
-	//
-
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
 
 	float prevSlider = NAN;
@@ -155,15 +145,11 @@ int main(void) {
 			cpymo_engine_draw(&engine);
 			cpymo_backend_image_fill_screen_edges();
 
-			cpymo_backend_text_draw(text, 0, 24, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
-
 			if(slider > 0){
 				C2D_SceneBegin(screen2);
 				render_3d_offset = -slider;
 				cpymo_engine_draw(&engine);
 				cpymo_backend_image_fill_screen_edges();
-
-				cpymo_backend_text_draw(text, 0, 24, col, 1.0f, cpymo_backend_image_draw_type_text_ui);
 			}
 
 			C3D_FrameEnd(0);
