@@ -10,6 +10,11 @@ void cpymo_floating_hint_free(cpymo_floating_hint *h)
 
 void cpymo_floating_hint_draw(const cpymo_floating_hint *h)
 {
+	float alpha = 1.0f;
+
+	if (h->time < 1.0f) alpha = h->time;
+	if (h->time > 4.0f) alpha = 5.0f - h->time;
+
 	if (h->background) {
 		cpymo_backend_image_draw(
 			h->x,
@@ -21,7 +26,7 @@ void cpymo_floating_hint_draw(const cpymo_floating_hint *h)
 			0,
 			h->background_w,
 			h->background_h,
-			1.0f,
+			alpha,
 			cpymo_backend_image_draw_type_titledate_bg);
 	}
 
@@ -31,7 +36,7 @@ void cpymo_floating_hint_draw(const cpymo_floating_hint *h)
 			h->x,
 			h->y,
 			h->color,
-			1.0f,
+			alpha,
 			cpymo_backend_image_draw_type_titledate_text);
 	}
 }
@@ -41,16 +46,22 @@ static bool cpymo_floating_hint_wait(cpymo_engine *e, float dt)
 	cpymo_floating_hint *h = &e->floating_hint;
 	h->time += dt;
 
-	if (cpymo_input_foward_key_just_pressed(e))
-		return true;
+	if (h->time <= 1.0f || h->time >= 4.0f)
+		cpymo_engine_request_redraw(e);
 
-	return h->time > 10.0f;
+	if (cpymo_input_foward_key_just_pressed(e)) {
+		if (h->time <= 1.2f) h->time = 1.2f;
+		else if(h->time > 2.0f) return true;
+	}
+
+	return h->time > 5.0f;
 }
 
 static error_t cpymo_floating_hint_finish(cpymo_engine *e)
 {
 	cpymo_floating_hint_free(&e->floating_hint);
 	cpymo_floating_hint_init(&e->floating_hint);
+	cpymo_engine_request_redraw(e);
 	return CPYMO_ERR_SUCC;
 }
 
@@ -102,6 +113,8 @@ error_t cpymo_floating_hint_start(
 			return err;
 		}
 	}
+
+	cpymo_engine_request_redraw(engine);
 
 	cpymo_wait_register_with_callback(
 		&engine->wait,

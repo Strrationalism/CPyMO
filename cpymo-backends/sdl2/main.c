@@ -151,6 +151,9 @@ int main(int argc, char **argv)
 		prev_ticks = ticks;
 
 		if (need_to_redraw || redraw_by_event) {
+			//SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0xFF, 0xFF);
+			//SDL_RenderClear(renderer);
+			//SDL_RenderPresent(renderer);
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 			SDL_RenderClear(renderer);
 			cpymo_engine_draw(&engine);
