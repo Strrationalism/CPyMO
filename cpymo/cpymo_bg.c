@@ -87,13 +87,13 @@ static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
 	if (progression < 0.5f) alpha = progression * 2.0f;
 	else alpha = 1.0f - (progression - 0.5f) * 2.0f;
 
-	cpymo_color col;
-	col.r = 0;
-	col.g = 0;
-	col.b = 0;
-
 	float xywh[] = { 0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h};
-	cpymo_backend_image_fill_rects(xywh, 1, col, alpha, cpymo_backend_image_draw_type_bg);
+	cpymo_backend_image_fill_rects(
+		xywh, 
+		1, 
+		cpymo_color_black, 
+		alpha, 
+		cpymo_backend_image_draw_type_bg);
 }
 
 static void cpymo_bg_transfer_operate(cpymo_bg *bg)

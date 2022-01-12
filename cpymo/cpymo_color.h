@@ -9,6 +9,8 @@ typedef struct {
 	uint8_t b;
 } cpymo_color;
 
-cpymo_color cpymo_color_error();
+extern const cpymo_color cpymo_color_error;
+extern const cpymo_color cpymo_color_white;
+extern const cpymo_color cpymo_color_black;
 
 #endif

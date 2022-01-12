@@ -197,6 +197,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_NEXTLINE;
 	}
 
+	D("title_dsp") {
+		return cpymo_floating_hint_start(
+			engine,
+			cpymo_parser_stream_span_pure(engine->title),
+			cpymo_parser_stream_span_pure(""),
+			4 * engine->gameconfig.fontsize, 
+			4 * engine->gameconfig.fontsize,
+			cpymo_color_white,
+			2.0f);
+	}
+
 	/*** II. Video ***/
 	D("chara") {
 		int chara_ids[16];

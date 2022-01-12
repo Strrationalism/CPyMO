@@ -185,13 +185,13 @@ static uint8_t from_hex_char(char c)
 cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span) 
 {
 	cpymo_parser_stream_span_trim(&span);
-	if (span.len != 7) return cpymo_color_error();
+	if (span.len != 7) return cpymo_color_error;
 
-	if (span.begin[0] != '#') return cpymo_color_error();
+	if (span.begin[0] != '#') return cpymo_color_error;
 
 	for (size_t i = 0; i < 6; ++i) 
 		if (span.begin[i + 1] < 0 || !isxdigit((int)span.begin[i + 1]))
-			return cpymo_color_error();
+			return cpymo_color_error;
 	
 	cpymo_color c;
 	c.r = from_hex_char(span.begin[1]) * 16 + from_hex_char(span.begin[2]);

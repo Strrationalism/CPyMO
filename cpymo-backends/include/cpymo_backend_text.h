@@ -4,12 +4,13 @@
 #include "../../cpymo/cpymo_error.h"
 #include "../../cpymo/cpymo_color.h"
 #include "cpymo_backend_image.h"
+#include "../../cpymo/cpymo_parser.h"
 
 typedef void *cpymo_backend_text;
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
-    const char *utf8_string, 
+    cpymo_parser_stream_span utf8_string, 
     float single_character_size_in_logical_screen);
 
 void cpymo_backend_text_free(cpymo_backend_text);

@@ -1,10 +1,5 @@
 #include "cpymo_color.h"
 
-cpymo_color cpymo_color_error()
-{
-	cpymo_color col;
-	col.r = 241;
-	col.g = 75;
-	col.b = 233;
-	return col;
-}
+const cpymo_color cpymo_color_error = { 241, 75, 233 };
+const cpymo_color cpymo_color_white = { 255, 255, 255 };
+const cpymo_color cpymo_color_black = { 0, 0, 0 };

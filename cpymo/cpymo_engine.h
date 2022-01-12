@@ -15,6 +15,7 @@
 #include "cpymo_select_img.h"
 #include "cpymo_charas.h"
 #include "cpymo_scroll.h"
+#include "cpymo_floating_hint.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -30,6 +31,7 @@ struct cpymo_engine {
 	cpymo_select_img select_img;
 	cpymo_charas charas;
 	cpymo_scroll scroll;
+	cpymo_floating_hint floating_hint;
 
 	bool skipping;
 	char *title;

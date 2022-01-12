@@ -68,10 +68,10 @@ static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_p
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out,
-    const char *utf8_string,
+    cpymo_parser_stream_span utf8_string,
     float single_character_size_in_logical_screen)
 {
-    cpymo_parser_stream_span text = cpymo_parser_stream_span_pure(utf8_string);
+    cpymo_parser_stream_span text = utf8_string;
     if (text.len == 0) return CPYMO_ERR_INVALID_ARG;
 
     cpymo_backend_text_internal *t = 

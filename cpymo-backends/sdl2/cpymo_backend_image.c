@@ -108,31 +108,3 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 		SDL_Log("Warning: SDL_RenderFillRectsF failed, %s", SDL_GetError());
 }
 
-/*error_t cpymo_backend_image_create_mutable(cpymo_backend_image *out_image, int width, int height)
-{
-	SDL_Texture *tex =
-		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
-
-	if (tex == NULL) return CPYMO_ERR_UNKNOWN;
-
-	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-
-	*out_image = tex;
-	return CPYMO_ERR_SUCC;
-}
-
-error_t cpymo_backend_image_update_mutable(cpymo_backend_image image, void * pixels_moveintoimage)
-{
-	int w;
-	error_t err = cpymo_backend_image_size(image, &w, NULL);
-	if (err != CPYMO_ERR_SUCC) return err;
-
-	if (SDL_UpdateTexture((SDL_Texture *)image, NULL, pixels_moveintoimage, w * 4) != 0) {
-		SDL_Log("Warning: Can not update texture, %s", SDL_GetError());
-		return CPYMO_ERR_UNKNOWN;
-	}
-
-	free(pixels_moveintoimage);
-
-	return CPYMO_ERR_SUCC;
-}*/
