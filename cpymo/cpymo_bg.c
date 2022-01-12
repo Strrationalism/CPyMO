@@ -11,6 +11,9 @@ void cpymo_bg_free(cpymo_bg *bg)
 
 	if(bg->transform_next_bg)
 		cpymo_backend_image_free(bg->current_bg);
+
+	if (bg->trans)
+		cpymo_backend_masktrans_free(bg->trans);
 }
 
 error_t cpymo_bg_update(cpymo_bg *bg, bool *redraw)
@@ -87,13 +90,25 @@ static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
 	if (progression < 0.5f) alpha = progression * 2.0f;
 	else alpha = 1.0f - (progression - 0.5f) * 2.0f;
 
-	float xywh[] = { 0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h};
-	cpymo_backend_image_fill_rects(
-		xywh, 
-		1, 
-		cpymo_color_black, 
-		alpha, 
-		cpymo_backend_image_draw_type_bg);
+	if (e->bg.trans == NULL) {
+		float xywh[] = { 
+			0, 0, 
+			(float)e->gameconfig.imagesize_w, 
+			(float)e->gameconfig.imagesize_h };
+
+		cpymo_backend_image_fill_rects(
+			xywh,
+			1,
+			cpymo_color_black,
+			alpha,
+			cpymo_backend_image_draw_type_bg);
+	}
+	else {
+		cpymo_backend_masktrans_draw(
+			e->bg.trans, 
+			progression > 0.5f ? 1 - alpha : alpha,
+			progression > 0.5f);
+	}
 }
 
 static void cpymo_bg_transfer_operate(cpymo_bg *bg)
@@ -139,6 +154,11 @@ static error_t cpymo_bg_progression_over_callback(cpymo_engine *e)
 	cpymo_engine_request_redraw(e);
 	if (e->bg.transform_next_bg)
 		cpymo_bg_transfer(e);
+	
+	if (e->bg.trans)
+		cpymo_backend_masktrans_free(e->bg.trans);
+	e->bg.trans = NULL;
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -197,8 +217,16 @@ error_t cpymo_bg_command(
 			&cpymo_bg_wait_for_progression,
 			&cpymo_bg_progression_over_callback);
 	}
-	else {	//if (cpymo_parser_stream_span_equals_str(transition, "BG_FADE")) {	
-		// Mask transition is not supported yet.
+	else {
+		if (!cpymo_parser_stream_span_equals_str(transition, "BG_FADE")) {
+			cpymo_backend_masktrans trans;
+			if (cpymo_assetloader_load_system_masktrans(
+				&trans, 
+				transition, 
+				&engine->assetloader) == CPYMO_ERR_SUCC) 
+				bg->trans = trans;
+		}
+
 		bg->transform_progression = cpymo_tween_create(time);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_fade;
 		cpymo_wait_register_with_callback(

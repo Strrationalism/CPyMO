@@ -2,6 +2,7 @@
 #define INCLUDE_CPYMO_BG
 
 #include <cpymo_backend_image.h>
+#include <cpymo_backend_masktrans.h>
 #include "cpymo_parser.h"
 #include "cpymo_tween.h"
 
@@ -21,6 +22,8 @@ typedef struct {
 	cpymo_tween transform_progression;
 	void (*transform_draw)(const struct cpymo_engine *);
 
+	cpymo_backend_masktrans trans;
+
 	// Quake
 	bool follow_chara_quake;
 } cpymo_bg;
@@ -33,6 +36,7 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 	bg->transform_next_bg = NULL;
 	bg->transform_draw = NULL;
 	bg->follow_chara_quake = false;
+	bg->trans = NULL;
 
 	bg->redraw = false;
 }
