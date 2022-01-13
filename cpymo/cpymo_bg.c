@@ -200,7 +200,7 @@ error_t cpymo_bg_command(
 	bg->transform_next_bg_h = h;
 
 	// In pymo, when x = y = 0 and bg smaller than screen, bg will be centered.
-	if (fabs(x) < 1 && fabs(y) < 1 && w <= engine->gameconfig.imagesize_w && h <= engine->gameconfig.imagesize_h) {
+	if (fabs(x) < 1 && fabs(y) < 1 && (w <= engine->gameconfig.imagesize_w || h <= engine->gameconfig.imagesize_h)) {
 		bg->transform_next_bg_x = (float)(engine->gameconfig.imagesize_w - w) / 2.0f;
 		bg->transform_next_bg_y = (float)(engine->gameconfig.imagesize_h - h) / 2.0f;
 	} 
@@ -213,7 +213,7 @@ error_t cpymo_bg_command(
 		cpymo_bg_transfer(engine);
 	}
 	else if (cpymo_parser_stream_span_equals_str(transition, "BG_ALPHA")) {
-		bg->transform_progression = cpymo_tween_create(time);
+		bg->transform_progression = cpymo_tween_create(time * 2);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_alpha;
 		cpymo_wait_register_with_callback(
 			&engine->wait,
@@ -230,7 +230,7 @@ error_t cpymo_bg_command(
 				bg->trans = trans;
 		}
 
-		bg->transform_progression = cpymo_tween_create(time);
+		bg->transform_progression = cpymo_tween_create(time * 2);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_fade;
 		cpymo_wait_register_with_callback(
 			&engine->wait,
