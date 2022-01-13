@@ -135,6 +135,10 @@ error_t cpymo_backend_image_load(
 {
     int pad_width = pad_tex_size(width);
     int pad_height = pad_tex_size(height);
+    int max_pad = pad_width > pad_height ? pad_width : pad_height;
+    pad_width = max_pad;
+    pad_height = max_pad;
+
     float scale = 1.0f;
 
     int channels;
@@ -171,6 +175,9 @@ error_t cpymo_backend_image_load(
         height = new_height;
         pad_width = pad_tex_size(width);
         pad_height = pad_tex_size(height);
+        max_pad = pad_width > pad_height ? pad_width : pad_height;
+        pad_width = max_pad;
+        pad_height = max_pad;
 
         free(pixels_moveintoimage);
         pixels_moveintoimage = new_px;
@@ -188,14 +195,13 @@ error_t cpymo_backend_image_load(
     img->pad_height = (u16)pad_height;
     img->scale = scale;
 
-    // Warning: if image crash, try make pad_width equals pad_heights.
-
     if(!C3D_TexInit(&img->tex, (u16)pad_height, (u16)pad_width, tex_fmt)) {
         free(img);
         return CPYMO_ERR_UNKNOWN;
     }
 
     C3D_TexSetFilter(&img->tex, GPU_LINEAR, GPU_LINEAR);
+    C3D_TexSetWrap(&img->tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
 
     //memset(img->tex.data, 0, img->tex.size);
     
@@ -208,6 +214,30 @@ error_t cpymo_backend_image_load(
             //memcpy(&((u8*)img->tex.data)[dstPos], srcPos, channels);
             for(int c = 0; c < channels; c++) {
                 ((u8 *)img->tex.data)[dstPos + c] = srcPos[channels - 1 - c];
+            }
+        }
+    }
+
+    if(pad_width >= width + 1) {
+        for(u32 y = 0; y < height; ++y) {
+            u32 x = width;
+            u32 ix = pad_width - x - 1;
+            u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
+
+            for(int c = 0; c < channels; c++) {
+                ((u8 *)img->tex.data)[dstPos + c] = 0;
+            }
+        }
+    }
+
+    if(pad_height >= height + 1) {
+        for(u32 x = 0; x < width; ++x) {
+            u32 y = height;
+            u32 ix = pad_width - x - 1;
+            u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
+
+            for(int c = 0; c < channels; c++) {
+                ((u8 *)img->tex.data)[dstPos + c] = 0;
             }
         }
     }
