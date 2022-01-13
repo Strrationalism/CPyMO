@@ -4,6 +4,7 @@
 #include <citro2d.h>
 #include <cpymo_backend_image.h>
 #include <stdlib.h>
+#include "utils.h"
 
 typedef struct {
 	C3D_Tex tex;
@@ -23,7 +24,7 @@ error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_
 	pad_width = pad;
 	pad_height = pad;
 
-	if (pad_width > 1024 || pad_height > 1024 || pad_width < 0 || pad_height < 0)
+	if (pad_width > 1024 || pad_height > 1024 || pad_width <= 0 || pad_height <= 0)
 		return CPYMO_ERR_UNSUPPORTED;
 
 	cpymo_backend_masktrans_i *t = 
@@ -77,18 +78,16 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float progression, 
 
     for(u32 y = 0; y < t->h; y++) {
         for(u32 x = 0; x < t->w; x++) {
-            u32 ix = t->pw - x - 1;
-            u32 dstPos = ((((ix >> 3) * (t->ph >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3)));
-            u8 *srcPos = (u8*)t->mask + (y * t->w + x);
+            MAKE_PTR_TEX(out, t->tex, x, y, 1, t->pw, t->ph);
+            float mask = (float)*((u8*)t->mask + (y * t->w + x)) / 255.0f;
 
-			float mask = (float)*srcPos / 255.0f;
 			if(is_fade_in) mask = 1 - mask;
 
 			if (mask > t_top) mask = 1.0f;
 			else if (mask < t_bottom) mask = 0.0f;
 			else mask = (mask - t_bottom) / (2 * radius);
 
-			((u8 *)t->tex.data)[dstPos] = (u8)(mask * 255.0f);
+			*out = (u8)(mask * 255.0f);
         }
     }
 

@@ -198,6 +198,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("title_dsp") {
+		if (strlen(engine->title) <= 0)
+			CONT_NEXTLINE;
+
 		return cpymo_floating_hint_start(
 			engine,
 			cpymo_parser_stream_span_pure(engine->title),
@@ -940,7 +943,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		int fmonth = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FMONTH"));
 		int fdate = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FDATE"));
 		char str[16];
-		sprintf(str, "%d月%d日",
+		sprintf(str, "%d/%d",
 			cpymo_utils_clamp(fmonth, 1, 12),
 			cpymo_utils_clamp(fdate, 1, 31));
 

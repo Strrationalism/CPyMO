@@ -6,8 +6,13 @@
 #include <assert.h>
 #include <cpymo_utils.h>
 
+#define FASTEST_FILTER STBIR_FILTER_BOX
+#define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
+#define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize.h>
+
+#include "utils.h"
 
 const extern float render_3d_offset;
 float offset_3d(enum cpymo_backend_image_draw_type type)
@@ -155,8 +160,8 @@ error_t cpymo_backend_image_load(
         scale = 512.0f / max_edge;
         assert(scale > 0 && scale <= 1.0f);
 
-        int new_width = cpymo_utils_clamp((int)(scale * width), 8, 1024);
-        int new_height = cpymo_utils_clamp((int)(scale * height), 8, 1024);
+        int new_width = cpymo_utils_clamp((int)ceil(scale * width), 8, 512);
+        int new_height = cpymo_utils_clamp((int)ceil(scale * height), 8, 512);
 
         printf("[Load Texture] Scaling: %d, %d => %d, %d\n", width ,height ,new_width, new_height);
 
@@ -202,43 +207,37 @@ error_t cpymo_backend_image_load(
 
     C3D_TexSetFilter(&img->tex, GPU_LINEAR, GPU_LINEAR);
     C3D_TexSetWrap(&img->tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-
-    //memset(img->tex.data, 0, img->tex.size);
     
     for(u32 y = 0; y < height; y++) {
         for(u32 x = 0; x < width; x++) {
-            u32 ix = pad_width - x - 1;
-            u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
+            //u32 ix = pad_width - x - 1;
+            //u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
             u8 *srcPos = (u8*)pixels_moveintoimage + (y * width + x) * channels;
 
-            //memcpy(&((u8*)img->tex.data)[dstPos], srcPos, channels);
+            MAKE_PTR_TEX(out, img->tex, x, y, channels, pad_width, pad_height);
             for(int c = 0; c < channels; c++) {
-                ((u8 *)img->tex.data)[dstPos + c] = srcPos[channels - 1 - c];
+                out[c] = srcPos[channels - 1 - c];
             }
         }
     }
 
     if(pad_width >= width + 1) {
         for(u32 y = 0; y < height; ++y) {
-            u32 x = width;
-            u32 ix = pad_width - x - 1;
-            u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
-
-            for(int c = 0; c < channels; c++) {
-                ((u8 *)img->tex.data)[dstPos + c] = 0;
-            }
+            //u32 x = width;
+            //u32 ix = pad_width - x - 1;
+            //u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
+            MAKE_PTR_TEX(out, img->tex, width, y, channels, pad_width, pad_height);
+            for(int c = 0; c < channels; c++) out[c] = 0;
         }
     }
 
     if(pad_height >= height + 1) {
         for(u32 x = 0; x < width; ++x) {
-            u32 y = height;
-            u32 ix = pad_width - x - 1;
-            u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
-
-            for(int c = 0; c < channels; c++) {
-                ((u8 *)img->tex.data)[dstPos + c] = 0;
-            }
+            //u32 y = height;
+            //u32 ix = pad_width - x - 1;
+            //u32 dstPos = ((((ix >> 3) * (pad_height >> 3) + (y >> 3)) << 6) + ((y & 1) | ((ix & 1) << 1) | ((y & 2) << 1) | ((ix & 2) << 2) | ((y & 4) << 2) | ((ix & 4) << 3))) * channels;
+            MAKE_PTR_TEX(out, img->tex, x, height, channels, pad_width, pad_height);
+            for(int c = 0; c < channels; c++) out[c] = 0;
         }
     }
 
