@@ -178,15 +178,15 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 		}
 	}
 
+	if (all_is_disabled)
+		for (size_t i = 0; i < e->select_img.all_selections; ++i)
+			e->select_img.selections[i].enabled = true;
+
 	if (e->select_img.selections[e->select_img.current_selection].enabled == false) {
 		e->select_img.current_selection = 0;
 		while (e->select_img.selections[e->select_img.current_selection].enabled == false)
 			e->select_img.current_selection++;
 	}
-
-	if (all_is_disabled)
-		for (size_t i = 0; i < e->select_img.all_selections; ++i)
-			e->select_img.selections[i].enabled = true;
 
 	// Trim disabled images.
 	for (size_t i = 0; i < e->select_img.all_selections; ++i) {
