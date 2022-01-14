@@ -25,6 +25,7 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 
 	img->selections = NULL;
 	img->select_img_image = NULL;
+	img->show_option_background = false;
 }
 
 error_t cpymo_select_img_configuare_begin(
@@ -169,9 +170,6 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 			e->select_img.current_selection++;
 	}
 
-	
-	printf("[Selection] %d\n", e->select_img.current_selection);
-
 	if (all_is_disabled)
 		for (size_t i = 0; i < e->select_img.all_selections; ++i)
 			e->select_img.selections[i].enabled = true;
@@ -281,9 +279,20 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_select_img_draw(const cpymo_select_img *o)
+void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int logical_screen_h)
 {
 	if (o->selections) {
+
+		if (o->show_option_background && o->option_background) {
+			cpymo_backend_image_draw(
+				(float)logical_screen_w / 2.0f - (float)o->option_background_w / 2.0f,
+				(float)logical_screen_h / 4.0f - (float)o->option_background_h / 2.0f,
+				(float)o->option_background_w, (float)o->option_background_h,
+				o->option_background,
+				0, 0, o->option_background_w, o->option_background_h, 1.0f,
+				cpymo_backend_image_draw_type_sel_img);
+		}
+
 		for (int i = 0; i < (int)o->all_selections; ++i) {
 			const cpymo_select_img_selection *sel = &o->selections[i];
 			if (sel->image) {
@@ -333,7 +342,6 @@ void cpymo_select_img_draw(const cpymo_select_img *o)
 	}
 }
 
-
 error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_stream_span text, bool enabled)
 {
 	if (e->select_img.sel_highlight == NULL) {
@@ -362,7 +370,7 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 			&sel->or_text,
 			&text_width,
 			text,
-			fontsize);
+			(float)fontsize);
 	
 	CPYMO_THROW(err);
 
@@ -375,7 +383,7 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_select_img_configuare_end_select_text(cpymo_engine * e, float x1, float y1, float x2, float y2, cpymo_color col, int init_pos)
+void cpymo_select_img_configuare_end_select_text(cpymo_engine * e, float x1, float y1, float x2, float y2, cpymo_color col, int init_pos, bool show_option_background)
 {
 	float box_w = x2 - x1;
 	float y = y1;
@@ -392,5 +400,24 @@ void cpymo_select_img_configuare_end_select_text(cpymo_engine * e, float x1, flo
 	for (size_t i = 0; i < e->select_img.all_selections; ++i)
 		e->select_img.selections[i].y += y_offset;
 
+	e->select_img.show_option_background = show_option_background;
+
 	cpymo_select_img_configuare_end(e, init_pos);
+
+	// load option background if not load.
+	if (e->select_img.option_background == NULL && show_option_background) {
+		error_t err = cpymo_assetloader_load_system_image(
+			&e->select_img.option_background,
+			&e->select_img.option_background_w,
+			&e->select_img.option_background_h,
+			cpymo_parser_stream_span_pure("option"),
+			"png",
+			&e->assetloader,
+			cpymo_gameconfig_is_symbian(&e->gameconfig));
+
+		if (err != CPYMO_ERR_SUCC) {
+			e->select_img.option_background = NULL;
+			e->select_img.show_option_background = false;
+		}
+	}
 }

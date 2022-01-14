@@ -873,7 +873,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			engine->gameconfig.imagesize_w,
 			engine->gameconfig.imagesize_h / 2.0f,
 			cpymo_color_white,
-			0);
+			0,
+			true);
 		return CPYMO_ERR_SUCC;
 	}
 
@@ -901,7 +902,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		cpymo_select_img_configuare_end_select_text( 
 			engine, x1, y1, x2, y2,  
 			cpymo_parser_stream_span_as_color(col), 
-			cpymo_parser_stream_span_atoi(init_pos)); 
+			cpymo_parser_stream_span_atoi(init_pos),
+			false); 
 		
 		return CPYMO_ERR_SUCC;
 	}
@@ -934,7 +936,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		cpymo_select_img_configuare_end_select_text(
 			engine, x1, y1, x2, y2,
 			cpymo_parser_stream_span_as_color(col),
-			cpymo_parser_stream_span_atoi(init_pos));
+			cpymo_parser_stream_span_atoi(init_pos),
+			false);
 
 		return CPYMO_ERR_SUCC;
 	}

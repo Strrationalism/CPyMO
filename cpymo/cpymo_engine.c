@@ -153,7 +153,11 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_scroll_draw(&engine->scroll);
 	cpymo_charas_draw(engine);
 	cpymo_anime_draw(&engine->anime);
-	cpymo_select_img_draw(&engine->select_img);
+	cpymo_select_img_draw(
+		&engine->select_img, 
+		engine->gameconfig.imagesize_w, 
+		engine->gameconfig.imagesize_h);
+
 	cpymo_floating_hint_draw(&engine->floating_hint);
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);
