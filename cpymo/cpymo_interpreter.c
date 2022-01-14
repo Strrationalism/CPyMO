@@ -851,6 +851,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(choices_str); ENSURE(choices_str);
 		int choices = cpymo_parser_stream_span_atoi(choices_str);
 
+		POP_ARG(hint_pic);
+
 		error_t err =
 			cpymo_select_img_configuare_begin(
 				engine,
@@ -863,6 +865,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span text =
 				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
 
+			if (!(IS_EMPTY(hint_pic))) {
+				uint32_t first_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
+			}
+
 			err = cpymo_select_img_configuare_select_text(engine, text, true);
 			CPYMO_THROW(err);
 		}
@@ -873,7 +879,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			engine->gameconfig.imagesize_w,
 			engine->gameconfig.imagesize_h / 2.0f,
 			cpymo_color_white,
-			0,
+			-1,
 			true);
 		return CPYMO_ERR_SUCC;
 	}

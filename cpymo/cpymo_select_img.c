@@ -261,9 +261,13 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 			return cpymo_select_img_ok(e, o->current_selection);
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
-			if(o->selections[o->all_selections-1].image || o->selections[o->all_selections-1].or_text)
-				return cpymo_select_img_ok(e, (int)o->all_selections - 1);
+		if (CPYMO_INPUT_JUST_PRESSED(e, cancel) && !e->select_img.save_enabled) {
+			o->current_selection = o->all_selections - 1;
+			while (o->selections[o->current_selection].enabled == false 
+					|| (o->selections[o->current_selection].image == NULL
+						&& o->selections[o->current_selection].or_text == NULL))
+				o->current_selection--;
+			return cpymo_select_img_ok(e, o->current_selection);
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
