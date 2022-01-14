@@ -205,10 +205,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			engine,
 			cpymo_parser_stream_span_pure(engine->title),
 			cpymo_parser_stream_span_pure(""),
-			(float)(4 * engine->gameconfig.fontsize), 
-			(float)(2 * engine->gameconfig.fontsize),
+			2 * cpymo_gameconfig_font_size(&engine->gameconfig),
+			cpymo_gameconfig_font_size(&engine->gameconfig),
 			cpymo_color_white,
-			2.0f);
+			1.0f);
 	}
 
 	/*** II. Video ***/
@@ -1056,7 +1056,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			engine,
 			cpymo_parser_stream_span_pure(str),
 			date_bg,
-			x, y, col, 3);
+			x, y, col, 1.5f);
 	}
 	
 	else {

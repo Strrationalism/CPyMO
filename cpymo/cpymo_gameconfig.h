@@ -61,4 +61,7 @@ static inline bool cpymo_gameconfig_is_mo1(const cpymo_gameconfig *c)
 		&& c->scripttype[3] == '\0';
 }
 
+static inline float cpymo_gameconfig_font_size(const cpymo_gameconfig *c)
+{ return c->fontsize / 240.0f * c->imagesize_h * 0.8f; }
+
 #endif

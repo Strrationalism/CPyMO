@@ -82,7 +82,7 @@ error_t cpymo_floating_hint_start(
 	hint->y = y;
 	hint->color = col;
 	hint->time = 0;
-	hint->fontsize = engine->gameconfig.fontsize * fontscale;
+	hint->fontsize = cpymo_gameconfig_font_size(&engine->gameconfig) * fontscale;
 
 	if (background.len > 0) {
 		error_t err = cpymo_assetloader_load_system_image(

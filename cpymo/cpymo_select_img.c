@@ -361,7 +361,7 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 	assert(e->select_img.all_selections);
 	assert(e->select_img.select_img_image == NULL);
 
-	const int fontsize = e->gameconfig.fontsize * 2;
+	const float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 
 	cpymo_select_img_selection *sel = &e->select_img.selections[e->select_img.current_selection++];
 	float text_width;
@@ -370,7 +370,7 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 			&sel->or_text,
 			&text_width,
 			text,
-			(float)fontsize);
+			fontsize);
 	
 	CPYMO_THROW(err);
 
