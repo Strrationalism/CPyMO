@@ -143,8 +143,8 @@ void cpymo_backend_text_draw(
 
     SDL_SetTextureColorMod((SDL_Texture *)t->img, 255 - col.r, 255 - col.g, 255 - col.b);
     cpymo_backend_image_draw(
-        x + 2,
-        y_baseline - t->baseline + 2,
+        x + 1,
+        y_baseline - t->baseline + 1,
         (float)t->width,
         (float)t->height,
         t->img,

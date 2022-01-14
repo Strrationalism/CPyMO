@@ -213,7 +213,7 @@ error_t cpymo_bg_command(
 		cpymo_bg_transfer(engine);
 	}
 	else if (cpymo_parser_stream_span_equals_str(transition, "BG_ALPHA")) {
-		bg->transform_progression = cpymo_tween_create(time * 2);
+		bg->transform_progression = cpymo_tween_create(time);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_alpha;
 		cpymo_wait_register_with_callback(
 			&engine->wait,

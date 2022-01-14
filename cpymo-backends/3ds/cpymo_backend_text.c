@@ -128,7 +128,7 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
     C2D_DrawText(
         &tt->text, 
         C2D_WithColor | C2D_AtBaseline, 
-        x + 2.0f + offset_3d_v, y + 2.0f, 0.0f, 
+        x + 1.0f + offset_3d_v, y + 1.0f, 0.0f, 
         x_scale, y_scale, 
         C2D_Color32(255 - col.r, 255 - col.g, 255 - col.b, a));  // shadow
 

@@ -12,9 +12,12 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 	}
 	else if(img->selections) {
 		// select_imgs
-		for (size_t i = 0; i < img->all_selections; ++i)
+		for (size_t i = 0; i < img->all_selections; ++i) {
 			if (img->selections[i].image)
-				cpymo_backend_image_free(img->selections[i].image);
+				cpymo_backend_image_free(img->selections[i].image); 
+			if (img->selections[i].or_text)
+				cpymo_backend_text_free(img->selections[i].or_text);
+		}
 	}
 
 	if (img->selections)
@@ -64,6 +67,7 @@ void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, 
 
 	cpymo_select_img_selection *sel = &e->select_img.selections[e->select_img.current_selection++];
 	sel->image = e->select_img.select_img_image;
+	sel->or_text = NULL;
 
 	sel->x = x;
 	sel->y = y;
@@ -95,6 +99,7 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 		return err;
 	}
 
+	sel->or_text = NULL;
 	sel->x = x;
 	sel->y = y;
 	sel->w /= 2;
@@ -113,14 +118,24 @@ static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, co
 
 	if (!e->input.mouse_position_useable) return false;
 	cpymo_select_img_selection *s = &o->selections[sel];
+	
+	float x = e->input.mouse_x;
+	float y = e->input.mouse_y;
+
 	if (s->image) {
 		float left = s->x - (float)s->w / 2.0f;
 		float top = s->y - (float)s->h / 2.0f;
 		float right = s->x + (float)s->w / 2.0f;
 		float bottom = s->y + (float)s->h / 2.0f;
 
-		float x = e->input.mouse_x;
-		float y = e->input.mouse_y;
+		return x >= left && x <= right && y >= top && y <= bottom;
+	}
+
+	if (s->or_text) {
+		float left = s->x;
+		float right = s->x + s->w;
+		float top = s->y - (float)s->h;
+		float bottom = s->y;
 
 		return x >= left && x <= right && y >= top && y <= bottom;
 	}
@@ -147,6 +162,15 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 		}
 	}
 
+	if (e->select_img.selections[e->select_img.current_selection].enabled == false) {
+		e->select_img.current_selection = 0;
+		while (e->select_img.selections[e->select_img.current_selection].enabled == false)
+			e->select_img.current_selection++;
+	}
+
+	
+	printf("[Selection] %d\n", e->select_img.current_selection);
+
 	if (all_is_disabled)
 		for (size_t i = 0; i < e->select_img.all_selections; ++i)
 			e->select_img.selections[i].enabled = true;
@@ -158,6 +182,12 @@ void cpymo_select_img_configuare_end(struct cpymo_engine *e, int init_position)
 				if (e->select_img.select_img_image == NULL)
 					cpymo_backend_image_free(e->select_img.selections[i].image);
 				e->select_img.selections[i].image = NULL;
+			}
+
+			if (e->select_img.selections[i].or_text) {
+				if (e->select_img.selections[i].or_text)
+					cpymo_backend_text_free(e->select_img.selections[i].or_text);
+				e->select_img.selections[i].or_text = NULL;
 			}
 		}
 	}
@@ -182,7 +212,7 @@ static void cpymo_select_img_move(cpymo_select_img *o, int move) {
 	while (o->current_selection < 0) o->current_selection += (int)o->all_selections;
 	while (o->current_selection >= (int)o->all_selections) o->current_selection -= (int)o->all_selections;
 
-	if (o->selections[o->current_selection].image == NULL)
+	if (o->selections[o->current_selection].image == NULL && o->selections[o->current_selection].or_text == NULL)
 		cpymo_select_img_move(o, move);
 }
 
@@ -233,7 +263,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
-			if(o->selections[o->all_selections-1].image)
+			if(o->selections[o->all_selections-1].image || o->selections[o->all_selections-1].or_text)
 				return cpymo_select_img_ok(e, (int)o->all_selections - 1);
 		}
 
@@ -271,6 +301,95 @@ void cpymo_select_img_draw(const cpymo_select_img *o)
 					cpymo_backend_image_draw_type_sel_img
 				);
 			}
+
+			if (sel->or_text) {
+				const bool selected = o->current_selection == i;
+
+				if (selected && o->sel_highlight) {
+					cpymo_backend_image_draw(
+						(float)sel->w / 2.0f - (float)o->sel_highlight_w / 2.0f + sel->x,
+						(float)sel->h / 2.0f - (float)o->sel_highlight_h / 2.0f + sel->y - sel->h,
+						(float)o->sel_highlight_w,
+						(float)o->sel_highlight_h,
+						o->sel_highlight,
+						0, 0, o->sel_highlight_w, o->sel_highlight_h,
+						1.0f,
+						cpymo_backend_image_draw_type_sel_img);
+				}
+
+				cpymo_backend_text_draw(
+					sel->or_text,
+					sel->x,
+					sel->y,
+					(selected && o->sel_highlight == NULL) ? 
+						cpymo_color_inv(sel->text_color) : sel->text_color,
+					1.0f,
+					cpymo_backend_image_draw_type_sel_img
+				);
+
+			}
 		}
 	}
+}
+
+
+error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_stream_span text, bool enabled)
+{
+	if (e->select_img.sel_highlight == NULL) {
+		error_t err = cpymo_assetloader_load_system_image(
+			&e->select_img.sel_highlight,
+			&e->select_img.sel_highlight_w,
+			&e->select_img.sel_highlight_h,
+			cpymo_parser_stream_span_pure("sel_highlight"),
+			"png",
+			&e->assetloader,
+			cpymo_gameconfig_is_symbian(&e->gameconfig));
+
+		if (err != CPYMO_ERR_SUCC) e->select_img.sel_highlight = NULL;
+	}
+
+	assert(e->select_img.selections);
+	assert(e->select_img.all_selections);
+	assert(e->select_img.select_img_image == NULL);
+
+	const int fontsize = e->gameconfig.fontsize * 2;
+
+	cpymo_select_img_selection *sel = &e->select_img.selections[e->select_img.current_selection++];
+	float text_width;
+	error_t err =
+		cpymo_backend_text_create(
+			&sel->or_text,
+			&text_width,
+			text,
+			fontsize);
+	
+	CPYMO_THROW(err);
+
+
+	sel->image = NULL;
+	sel->enabled = enabled;
+	sel->h = fontsize;
+	sel->w = (int)text_width + 1;
+
+	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_select_img_configuare_end_select_text(cpymo_engine * e, float x1, float y1, float x2, float y2, cpymo_color col, int init_pos)
+{
+	float box_w = x2 - x1;
+	float y = y1;
+	for (size_t i = 0; i < e->select_img.all_selections; ++i) {
+		cpymo_select_img_selection *sel = &e->select_img.selections[i];
+		sel->text_color = col;
+		sel->x = (box_w - sel->w) / 2 + x1;
+		sel->y = y + sel->h;	// y is baseline.
+		if(sel->enabled) y += sel->h;
+	}
+
+	float y_offset = (y2 - y) / 2;
+
+	for (size_t i = 0; i < e->select_img.all_selections; ++i)
+		e->select_img.selections[i].y += y_offset;
+
+	cpymo_select_img_configuare_end(e, init_pos);
 }

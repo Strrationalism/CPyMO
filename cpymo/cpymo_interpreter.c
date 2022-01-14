@@ -847,6 +847,68 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return cpymo_interpreter_execute_step(caller, engine);
 	}
 
+	D("select_text") { 
+		POP_ARG(choices_str); ENSURE(choices_str); 
+		const int choices = cpymo_parser_stream_span_atoi(choices_str); 
+		error_t err = cpymo_select_img_configuare_begin(engine, (size_t)choices, cpymo_parser_stream_span_pure("")); 
+		CPYMO_THROW(err); 
+		
+		for (int i = 0; i < choices; ++i) { 
+			POP_ARG(text); ENSURE(text); 
+			err = cpymo_select_img_configuare_select_text(engine, text, true);
+			CPYMO_THROW(err); 
+		} 
+		
+		POP_ARG(x1_str); ENSURE(x1_str); 
+		POP_ARG(y1_str); ENSURE(y1_str); 
+		POP_ARG(x2_str); ENSURE(x2_str); 
+		POP_ARG(y2_str); ENSURE(y2_str); 
+		POS(x1, y1, x1_str, y1_str); 
+		POS(x2, y2, x2_str, y2_str); 
+		POP_ARG(col); ENSURE(col); 
+		POP_ARG(init_pos); ENSURE(init_pos); 
+		
+		cpymo_select_img_configuare_end_select_text( 
+			engine, x1, y1, x2, y2,  
+			cpymo_parser_stream_span_as_color(col), 
+			cpymo_parser_stream_span_atoi(init_pos)); 
+		
+		return CPYMO_ERR_SUCC;
+	}
+
+	D("select_var") {
+		POP_ARG(choices_str); ENSURE(choices_str);
+		const int choices = cpymo_parser_stream_span_atoi(choices_str);
+		error_t err = cpymo_select_img_configuare_begin(engine, (size_t)choices, cpymo_parser_stream_span_pure(""));
+		CPYMO_THROW(err);
+
+		for (int i = 0; i < choices; ++i) {
+			POP_ARG(text); ENSURE(text);
+			POP_ARG(expr); ENSURE(expr);
+			err = cpymo_select_img_configuare_select_text(
+				engine, 
+				text, 
+				cpymo_vars_eval(&engine->vars, expr) != 0);
+			CPYMO_THROW(err);
+		}
+
+		POP_ARG(x1_str); ENSURE(x1_str);
+		POP_ARG(y1_str); ENSURE(y1_str);
+		POP_ARG(x2_str); ENSURE(x2_str);
+		POP_ARG(y2_str); ENSURE(y2_str);
+		POS(x1, y1, x1_str, y1_str);
+		POS(x2, y2, x2_str, y2_str);
+		POP_ARG(col); ENSURE(col);
+		POP_ARG(init_pos); ENSURE(init_pos);
+
+		cpymo_select_img_configuare_end_select_text(
+			engine, x1, y1, x2, y2,
+			cpymo_parser_stream_span_as_color(col),
+			cpymo_parser_stream_span_atoi(init_pos));
+
+		return CPYMO_ERR_SUCC;
+	}
+
 	D("select_img") {
 		POP_ARG(choices_str); ENSURE(choices_str);
 		POP_ARG(filename); ENSURE(filename);
