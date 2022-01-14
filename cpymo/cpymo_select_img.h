@@ -10,13 +10,21 @@
 
 struct cpymo_engine;
 
+enum cpymo_select_img_selection_hint_state {
+	cpymo_select_img_selection_nohint = 0,
+	cpymo_select_img_selection_hint01,
+	cpymo_select_img_selection_hint23
+};
+
 typedef struct {
 	cpymo_backend_image image;
 	cpymo_backend_text or_text;
 	cpymo_color text_color;
 	float x, y;
 	int w, h;
-	bool enabled;
+	bool enabled : 1;
+
+	enum cpymo_select_img_selection_hint_state hint_state : 3;
 } cpymo_select_img_selection;
 
 typedef struct {
@@ -35,6 +43,11 @@ typedef struct {
 	bool show_option_background;
 	cpymo_backend_image option_background;
 	int option_background_w, option_background_h;
+
+	cpymo_backend_image hint[4];
+	int hint_w[4], hint_h[4];
+	float hint_timer;
+	bool hint_tiktok;
 } cpymo_select_img;
 
 void cpymo_select_img_reset(cpymo_select_img *img);
@@ -61,6 +74,8 @@ static inline void cpymo_select_img_init(cpymo_select_img *select_img)
 	select_img->sel_highlight = NULL;
 	select_img->option_background = NULL;
 	select_img->show_option_background = false;
+
+	for (size_t i = 0; i < 4; ++i) select_img->hint[i] = NULL;
 }
 
 static inline void cpymo_select_img_free(cpymo_select_img *img)
@@ -71,7 +86,11 @@ static inline void cpymo_select_img_free(cpymo_select_img *img)
 }
 
 error_t cpymo_select_img_configuare_select_text(
-	struct cpymo_engine *engine, cpymo_parser_stream_span text, bool enabled);
+	struct cpymo_engine *engine, cpymo_parser_stream_span text, bool enabled, 
+	enum cpymo_select_img_selection_hint_state hint_mode);
+
+void cpymo_select_img_configuare_select_text_hint_pic(
+	struct cpymo_engine *engine, cpymo_parser_stream_span hint);
 
 void cpymo_select_img_configuare_end_select_text(
 	struct cpymo_engine *engine, 

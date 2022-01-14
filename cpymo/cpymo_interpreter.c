@@ -859,17 +859,24 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				(size_t)choices,
 				cpymo_parser_stream_span_pure(""));
 		CPYMO_THROW(err);
+
+		if (!(IS_EMPTY(hint_pic))) 
+			cpymo_select_img_configuare_select_text_hint_pic(engine, hint_pic);
 		
 		for (int i = 0; i < choices; ++i) {
 			cpymo_parser_next_line(&interpreter->script_parser);
 			cpymo_parser_stream_span text =
 				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
 
+			int hint_mode = cpymo_select_img_selection_nohint;
 			if (!(IS_EMPTY(hint_pic))) {
 				uint32_t first_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
+
+				if (first_char == L'○') hint_mode = cpymo_select_img_selection_hint01;
+				else if (first_char == L'×') hint_mode = cpymo_select_img_selection_hint23;
 			}
 
-			err = cpymo_select_img_configuare_select_text(engine, text, true);
+			err = cpymo_select_img_configuare_select_text(engine, text, true, hint_mode);
 			CPYMO_THROW(err);
 		}
 
@@ -892,7 +899,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		
 		for (int i = 0; i < choices; ++i) { 
 			POP_ARG(text); ENSURE(text); 
-			err = cpymo_select_img_configuare_select_text(engine, text, true);
+			err = cpymo_select_img_configuare_select_text(engine, text, true, cpymo_select_img_selection_nohint);
 			CPYMO_THROW(err); 
 		} 
 		
@@ -926,7 +933,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			err = cpymo_select_img_configuare_select_text(
 				engine, 
 				text, 
-				cpymo_vars_eval(&engine->vars, expr) != 0);
+				cpymo_vars_eval(&engine->vars, expr) != 0,
+				cpymo_select_img_selection_nohint);
 			CPYMO_THROW(err);
 		}
 

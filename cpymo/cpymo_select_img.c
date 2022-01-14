@@ -23,6 +23,11 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 	if (img->selections)
 		free(img->selections);
 
+	for (size_t i = 0; i < 4; ++i) {
+		if (img->hint[i]) cpymo_backend_image_free(img->hint[i]);
+		img->hint[i] = NULL;
+	}
+
 	img->selections = NULL;
 	img->select_img_image = NULL;
 	img->show_option_background = false;
@@ -111,6 +116,15 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 
 static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 {
+	if (e->select_img.hint[0] != NULL) {
+		e->select_img.hint_timer += dt;
+		if (e->select_img.hint_timer >= 1.0f) {
+			e->select_img.hint_timer -= 1.0f;
+			e->select_img.hint_tiktok = !e->select_img.hint_tiktok;
+			cpymo_engine_request_redraw(e);
+		}
+	}
+
 	return e->select_img.selections == NULL;
 }
 
@@ -343,10 +357,37 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 
 			}
 		}
+
+		if (o->hint[0] != NULL) {
+			int hint_state = o->selections[o->current_selection].hint_state;
+
+			if (hint_state != cpymo_select_img_selection_nohint) {
+				int cur_img = 0;
+				if (hint_state == cpymo_select_img_selection_hint23) cur_img = 2;
+				if (o->hint_tiktok) cur_img++;
+
+				float hint_y = 0.0f;
+				if(o->show_option_background && o->option_background)
+					hint_y = (float)logical_screen_h / 4.0f - (float)o->option_background_h / 2.0f;
+
+				cpymo_backend_image_draw(
+					0,
+					hint_y,
+					o->hint_w[cur_img],
+					o->hint_h[cur_img],
+					o->hint[cur_img],
+					0,
+					0,
+					o->hint_w[cur_img],
+					o->hint_h[cur_img],
+					1.0f,
+					cpymo_backend_image_draw_type_sel_img);
+			}
+		}
 	}
 }
 
-error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_stream_span text, bool enabled)
+error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode)
 {
 	if (e->select_img.sel_highlight == NULL) {
 		error_t err = cpymo_assetloader_load_system_image(
@@ -383,8 +424,58 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 	sel->enabled = enabled;
 	sel->h = fontsize;
 	sel->w = (int)text_width + 1;
+	sel->hint_state = hint_mode;
 
 	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpymo_parser_stream_span hint)
+{
+	assert(engine->select_img.hint[0] == NULL);
+	assert(engine->select_img.hint[1] == NULL);
+	assert(engine->select_img.hint[2] == NULL);
+	assert(engine->select_img.hint[3] == NULL);
+
+	engine->select_img.hint_timer = 0;
+	engine->select_img.hint_tiktok = false;
+
+	char *hint_pic_name = (char *)malloc(hint.len + 2);
+	if (hint_pic_name == NULL) return;
+
+	bool is_all_succ = true;
+	for (size_t i = 0; i < 4; ++i) {
+		cpymo_parser_stream_span_copy(hint_pic_name, hint.len + 2, hint);
+		hint_pic_name[hint.len] = '0' + i;
+		hint_pic_name[hint.len + 1] = '\0';
+
+		error_t err = cpymo_assetloader_load_system_image(
+			&engine->select_img.hint[i],
+			&engine->select_img.hint_w[i],
+			&engine->select_img.hint_h[i],
+			cpymo_parser_stream_span_pure(hint_pic_name),
+			"png",
+			&engine->assetloader,
+			cpymo_gameconfig_is_symbian(&engine->gameconfig)
+		);
+		
+		if (err != CPYMO_ERR_SUCC) {
+			is_all_succ = false;
+			engine->select_img.hint[i] = NULL;
+			break;
+		}
+	}
+
+	free(hint_pic_name);
+
+	if (is_all_succ) return;
+	else {
+		for (size_t i = 0; i < 4; ++i) {
+			if (engine->select_img.hint[i] != NULL) {
+				cpymo_backend_image_free(engine->select_img.hint[i]);
+				engine->select_img.hint[i] = NULL;
+			}
+		}
+	}
 }
 
 void cpymo_select_img_configuare_end_select_text(cpymo_engine * e, float x1, float y1, float x2, float y2, cpymo_color col, int init_pos, bool show_option_background)
