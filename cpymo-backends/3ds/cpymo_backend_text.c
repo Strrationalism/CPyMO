@@ -59,7 +59,11 @@ void trans_size(float *w, float *h);
 void trans_pos(float *x, float *y);
 float offset_3d(enum cpymo_backend_image_draw_type type);
 
-error_t cpymo_backend_text_create(cpymo_backend_text *out, cpymo_parser_stream_span utf8_string, float single_character_size_in_logical_screen)
+extern float game_width;
+
+const static float text_scale_divisor = 28.0f;
+
+error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_parser_stream_span utf8_string, float single_character_size_in_logical_screen)
 {
     struct cpymo_backend_text *t = (struct cpymo_backend_text *)malloc(sizeof(struct cpymo_backend_text));
     if(t == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -83,6 +87,16 @@ error_t cpymo_backend_text_create(cpymo_backend_text *out, cpymo_parser_stream_s
     C2D_TextOptimize(&t->text);
 
     *out = t;
+
+    float w, h;
+    C2D_TextGetDimensions(
+        &t->text, 
+        single_character_size_in_logical_screen / text_scale_divisor,
+        single_character_size_in_logical_screen / text_scale_divisor,
+        &w, &h);
+
+    *out_w = w / 400.0f * game_width / 2.0f;
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -92,8 +106,6 @@ void cpymo_backend_text_free(cpymo_backend_text t)
     C2D_TextBufDelete(tt->text_buf);
     free(t);
 }
-
-const static float text_scale_divisor = 28.0f;
 
 void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color col, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
@@ -127,7 +139,6 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
         x_scale, y_scale, color);
 }
 
-extern float game_width;
 float cpymo_backend_text_width(cpymo_parser_stream_span text, float logic_size)
 {
     char *str = alloca(text.len + 1);

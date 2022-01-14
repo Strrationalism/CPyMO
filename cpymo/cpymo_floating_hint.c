@@ -102,8 +102,10 @@ error_t cpymo_floating_hint_start(
 	}
 
 	if (text.len > 0) {
+		float dummy;
 		error_t err = cpymo_backend_text_create(
 			&hint->text,
+			&dummy,
 			text,
 			hint->fontsize);
 

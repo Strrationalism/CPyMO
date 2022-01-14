@@ -69,6 +69,7 @@ static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_p
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out,
+    float *out_width,
     cpymo_parser_stream_span utf8_string,
     float single_character_size_in_logical_screen)
 {
@@ -120,6 +121,7 @@ error_t cpymo_backend_text_create(
     }
 
     *out = t;
+    *out_width = (float)w;
 
     return CPYMO_ERR_SUCC;
 }
@@ -132,7 +134,7 @@ void cpymo_backend_text_free(cpymo_backend_text t)
 }
 
 void cpymo_backend_text_draw(
-    cpymo_backend_text text,
+    cpymo_backend_text text,   
     float x, float y_baseline,
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type)
@@ -178,5 +180,5 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
     int w, h;
     cpymo_backend_text_render(NULL, &w, &h, t, scale, baseline);
 
-    return w;
+    return (float)w;
 }

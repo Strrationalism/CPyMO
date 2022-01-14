@@ -10,6 +10,7 @@ typedef void *cpymo_backend_text;
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
+    float *out_width,
     cpymo_parser_stream_span utf8_string, 
     float single_character_size_in_logical_screen);
 
