@@ -168,7 +168,15 @@ void cpymo_backend_text_draw(
         draw_type);
 }
 
-float cpymo_backend_text_width(cpymo_backend_text tt)
+float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_character_size_in_logical_screen)
 {
-    return (float)((cpymo_backend_text_internal *)tt)->width;
+    float scale = stbtt_ScaleForPixelHeight(&font, single_character_size_in_logical_screen);
+    int ascent;
+    stbtt_GetFontVMetrics(&font, &ascent, NULL, NULL);
+    float baseline = scale * ascent;
+
+    int w, h;
+    cpymo_backend_text_render(NULL, &w, &h, t, scale, baseline);
+
+    return w;
 }

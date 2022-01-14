@@ -22,6 +22,7 @@ void cpymo_backend_text_draw(
     enum cpymo_backend_image_draw_type draw_type);
 
 float cpymo_backend_text_width(
-    cpymo_backend_text);
+    cpymo_parser_stream_span,
+    float single_character_size_in_logical_screen);
 
 #endif

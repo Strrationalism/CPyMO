@@ -5,6 +5,7 @@
 #include <cpymo_parser.h>
 
 static C2D_Font font;
+static C2D_TextBuf for_measure;
 
 error_t cpymo_backend_text_sys_init()
 {
@@ -26,6 +27,14 @@ error_t cpymo_backend_text_sys_init()
         return CPYMO_ERR_UNKNOWN;
     }
 
+    for_measure = C2D_TextBufNew(4096);
+    if(for_measure == NULL) {
+        C2D_FontFree(font);
+        cfguExit();
+        romfsExit();
+        return CPYMO_ERR_UNKNOWN;
+    }
+
     printf("[Info] Font Loaded!!\n");
 
     return CPYMO_ERR_SUCC;
@@ -33,6 +42,7 @@ error_t cpymo_backend_text_sys_init()
 
 void cpymo_backend_text_sys_free()
 {
+    C2D_TextBufDelete(for_measure);
     C2D_FontFree(font);
     cfguExit();
     romfsExit();
@@ -118,16 +128,22 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
 }
 
 extern float game_width;
-float cpymo_backend_text_width(cpymo_backend_text tt)
+float cpymo_backend_text_width(cpymo_parser_stream_span text, float logic_size)
 {
-    struct cpymo_backend_text *t = (struct cpymo_backend_text *)tt;
+    char *str = alloca(text.len + 1);
+    cpymo_parser_stream_span_copy(str, text.len + 1, text);
+
+    C2D_Text t;
+    C2D_TextParse(&t, for_measure, str);
 
     float w, h;
     C2D_TextGetDimensions(
-        &t->text, 
-        t->single_character_size_in_logical_screen / text_scale_divisor,
-        t->single_character_size_in_logical_screen / text_scale_divisor,
+        &t, 
+        logic_size / text_scale_divisor,
+        logic_size / text_scale_divisor,
         &w, &h);
+
+    C2D_TextBufClear(for_measure);
 
     return w / 400.0f * game_width / 2.0f;
 }

@@ -31,9 +31,6 @@ void cpymo_floating_hint_draw(const cpymo_floating_hint *h)
 	}
 
 	if (h->text) {
-		float xywh[] = { h->x, h->y, cpymo_backend_text_width(h->text),  h->fontsize };
-		cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 1.0f, cpymo_backend_image_draw_type_titledate_text);
-
 		cpymo_backend_text_draw(
 			h->text,
 			h->x,
