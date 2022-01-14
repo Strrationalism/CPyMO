@@ -276,7 +276,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, cancel) && !e->select_img.save_enabled) {
-			o->current_selection = o->all_selections - 1;
+			o->current_selection = (int)o->all_selections - 1;
 			while (o->selections[o->current_selection].enabled == false 
 					|| (o->selections[o->current_selection].image == NULL
 						&& o->selections[o->current_selection].or_text == NULL))
@@ -373,8 +373,8 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 				cpymo_backend_image_draw(
 					0,
 					hint_y,
-					o->hint_w[cur_img],
-					o->hint_h[cur_img],
+					(float)o->hint_w[cur_img],
+					(float)o->hint_h[cur_img],
 					o->hint[cur_img],
 					0,
 					0,
@@ -422,7 +422,7 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 
 	sel->image = NULL;
 	sel->enabled = enabled;
-	sel->h = fontsize;
+	sel->h = (int)fontsize + 1;
 	sel->w = (int)text_width + 1;
 	sel->hint_state = hint_mode;
 
@@ -445,7 +445,7 @@ void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpy
 	bool is_all_succ = true;
 	for (size_t i = 0; i < 4; ++i) {
 		cpymo_parser_stream_span_copy(hint_pic_name, hint.len + 2, hint);
-		hint_pic_name[hint.len] = '0' + i;
+		hint_pic_name[hint.len] = (char)('0' + i);
 		hint_pic_name[hint.len + 1] = '\0';
 
 		error_t err = cpymo_assetloader_load_system_image(

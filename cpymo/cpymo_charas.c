@@ -166,6 +166,14 @@ error_t cpymo_charas_new_chara(
 	err = cpymo_assetloader_load_chara_image(&ch->img, &ch->img_w, &ch->img_h, filename, &e->assetloader);
 	if (err != CPYMO_ERR_SUCC) {
 		free(ch);
+
+		if (err == CPYMO_ERR_NOT_FOUND || err == CPYMO_ERR_CAN_NOT_OPEN_FILE) {
+			char name[32];
+			cpymo_parser_stream_span_copy(name, sizeof(name), filename);
+			fprintf(stderr, "[Error] Can not load chara \"%s\".", name);
+			return CPYMO_ERR_SUCC;
+		}
+
 		return err;
 	}
 
