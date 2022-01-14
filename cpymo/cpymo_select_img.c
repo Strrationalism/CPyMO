@@ -132,8 +132,9 @@ static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, co
 	}
 
 	if (s->or_text) {
-		float left = s->x;
-		float right = s->x + s->w;
+		float left = (float)s->w / 2.0f - (float)o->sel_highlight_w / 2.0f + s->x;
+		float w = (float)o->sel_highlight_w;
+		float right = left + w;
 		float top = s->y - (float)s->h;
 		float bottom = s->y;
 

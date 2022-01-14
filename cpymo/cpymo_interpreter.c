@@ -847,6 +847,36 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return cpymo_interpreter_execute_step(caller, engine);
 	}
 
+	D("sel") {
+		POP_ARG(choices_str); ENSURE(choices_str);
+		int choices = cpymo_parser_stream_span_atoi(choices_str);
+
+		error_t err =
+			cpymo_select_img_configuare_begin(
+				engine,
+				(size_t)choices,
+				cpymo_parser_stream_span_pure(""));
+		CPYMO_THROW(err);
+		
+		for (int i = 0; i < choices; ++i) {
+			cpymo_parser_next_line(&interpreter->script_parser);
+			cpymo_parser_stream_span text =
+				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
+
+			err = cpymo_select_img_configuare_select_text(engine, text, true);
+			CPYMO_THROW(err);
+		}
+
+		cpymo_select_img_configuare_end_select_text(
+			engine,
+			0, 0,
+			engine->gameconfig.imagesize_w,
+			engine->gameconfig.imagesize_h / 2.0f,
+			cpymo_color_white,
+			0);
+		return CPYMO_ERR_SUCC;
+	}
+
 	D("select_text") { 
 		POP_ARG(choices_str); ENSURE(choices_str); 
 		const int choices = cpymo_parser_stream_span_atoi(choices_str); 
