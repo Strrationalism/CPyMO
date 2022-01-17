@@ -50,9 +50,13 @@ error_t cpymo_backend_image_load(
 }
 
 error_t cpymo_backend_image_load_with_mask(
-	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h)
+	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h, int mask_w, int mask_h)
 {
-	cpymo_utils_attach_mask_to_rgba(px_rgbx32_moveinto, mask_a8_moveinto, w, h);
+	if (mask_w != w || mask_h != h)
+		cpymo_utils_attach_mask_to_rgba_slow(px_rgbx32_moveinto, w, h, mask_a8_moveinto, mask_w, mask_h);
+	else 
+		cpymo_utils_attach_mask_to_rgba(px_rgbx32_moveinto, mask_a8_moveinto, w, h);
+
 	free(mask_a8_moveinto);
 	return cpymo_backend_image_load(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
 }

@@ -17,7 +17,7 @@ error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, enum cpymo_backend_image_format);
 
 error_t cpymo_backend_image_load_with_mask(
-	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h);
+	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h, int mask_w, int mask_h);
 
 
 void cpymo_backend_image_free(cpymo_backend_image image);

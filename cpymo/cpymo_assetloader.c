@@ -247,19 +247,12 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, i
 			buf = NULL;
 		}
 
-		if (mask_px) {
-			if (mw != iw || mh != ih) {
-				free(mask_px);
-				mask_px = NULL;
-			}
-		}
-
 		if (mask_px == NULL) {
 			fprintf(stderr, "[Warning] Can not load mask in chara %s.\n", chname);
 			return cpymo_backend_image_load(img, px, iw, ih, cpymo_backend_image_format_rgba);
 		} 
 		else {
-			return cpymo_backend_image_load_with_mask(img, px, mask_px, iw, ih);
+			return cpymo_backend_image_load_with_mask(img, px, mask_px, iw, ih, mw, mh);
 		}
 	}
 	else {
@@ -379,14 +372,8 @@ error_t cpymo_assetloader_load_system_image(
 		if (mask_buf) free(mask_buf);
 
 		if (mask_px) {
-			if (mw != w || mh != h) {
-				free(mask_px);
-				goto LOAD_WITHOUT_MASK;
-			}
-			else {
-				err = cpymo_backend_image_load_with_mask(
-					&img, px, mask_px, w, h);
-			}
+			err = cpymo_backend_image_load_with_mask(
+				&img, px, mask_px, w, h, mw, mh);
 		}
 		else {
 			goto LOAD_WITHOUT_MASK;

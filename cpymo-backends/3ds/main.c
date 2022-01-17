@@ -49,7 +49,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/Playground");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/omocha_s60v5");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
@@ -120,7 +120,13 @@ int main(void) {
 		case CPYMO_ERR_SUCC: break;
 		default: {
 			printf("[Error] %s.\n", cpymo_error_message(err));
-			while(1) gspWaitForVBlank();
+			while(aptMainLoop()) {
+				hidScanInput();
+				gspWaitForVBlank();
+
+				u32 keys = hidKeysHeld();
+				if((keys & KEY_ZL)) aptExit();
+			}
 		}
 		}
 

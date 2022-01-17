@@ -856,7 +856,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		assert(engine->interpreter == interpreter);
 
-		cpymo_interpreter *caller = interpreter->caller;
+		// cpymo_interpreter *caller = interpreter->caller;
 
 		engine->interpreter = interpreter->caller;
 		free(interpreter->script_content);

@@ -30,4 +30,6 @@ bool cpymo_utils_string_equals_ignore_case(const char *str1, const char *str2);
 
 void cpymo_utils_attach_mask_to_rgba(void *rgba, void *mask, int w, int h);
 
+void cpymo_utils_attach_mask_to_rgba_slow(void *rgba, int w, int h, void *mask, int mask_w, int mask_h);
+
 #endif
