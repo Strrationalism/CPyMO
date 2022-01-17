@@ -14,8 +14,7 @@
 这是一个使用C实现的pymo引擎的复刻，以方便在各种平台上运行pymo游戏。
 
 pymo原版参见：https://github.com/pymo/pymo    
-pymo官网：https://www.pymogames.com/        
-pymo官网镜像：https://seng-jik.github.io/cpymo.github.io/    
+pymo官网：https://www.pymogames.com/           
 原作者：chen_xin_ming    
 
 感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。    
@@ -58,4 +57,9 @@ Unpack a pymo package:
 
 3DS兼容所有版本的PyMO游戏数据包，但s60v5版本体验最好，如果没有s60v5版本，也可以使用s60v3版本。    
 3DS上使用安卓版本的PyMO数据包可能会导致游戏运行卡顿，或游戏画面产生锯齿等问题。    
+
+### 关于字体
+
+3DS版本的CPyMO不会加载游戏中自带的字体或者其他TTF字体，而是使用[思源黑体](https://github.com/adobe-fonts/source-han-sans)。    
+思源黑体已经被转换为可以被3DS直接识别的bcfnt格式，CPyMO for 3DS中的思源黑体将会按照其原本的[SIL协议](https://github.com/adobe-fonts/source-han-sans/blob/master/LICENSE.txt)随CPyMO for 3DS一起分发。    
 
