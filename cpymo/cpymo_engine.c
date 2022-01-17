@@ -6,6 +6,21 @@
 #include <stdlib.h>
 #include <cpymo_backend_input.h>
 
+static void cpymo_logo() {
+	puts("   __________        __  _______");
+	puts("  / ____/ __ \\__  __/  |/  / __ \\");
+	puts(" / /   / /_/ / / / / /|_/ / / / /");
+	puts("/ /___/ ____/ /_/ / /  / / /_/ /");
+	puts("\\____/_/    \\__, /_/  /_/\\____/");
+	puts("           /____/");
+	puts("");
+	puts("");
+	printf("CPyMO %s %s\n", __DATE__, __TIME__);
+	puts("https://github.com/Seng-Jik/cpymo");
+	puts("");
+	puts("");
+}
+
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 {
 	// load game config
@@ -91,6 +106,8 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	{
 		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.scripttype);
 	}
+
+	cpymo_logo();
 
 	return CPYMO_ERR_SUCC;
 }

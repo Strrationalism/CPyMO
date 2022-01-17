@@ -39,7 +39,6 @@ int main(void) {
 	gfxSetDoubleBuffering(GFX_BOTTOM, false);
 
 	if(is_new_3ds) {
-		printf("[Info] New3DS\n");
 		osSetSpeedupEnable(true);
 	}
 
@@ -49,7 +48,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/omocha_s60v5");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/FrFr_android");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
