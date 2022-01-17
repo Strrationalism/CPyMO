@@ -73,6 +73,13 @@ char cpymo_parser_curline_readchar(cpymo_parser * parser)
 	}
 }
 
+char cpymo_parser_curline_peek(cpymo_parser * parser)
+{
+	char ch = cpymo_parser_curline_readchar(parser);
+	parser->cur_pos--;
+	return ch;
+}
+
 cpymo_parser_stream_span cpymo_parser_curline_readuntil(cpymo_parser * parser, char until)
 {
 	return cpymo_parser_curline_readuntil_or(parser, until, '\0');
@@ -102,6 +109,7 @@ cpymo_parser_stream_span cpymo_parser_curline_pop_commacell(cpymo_parser * parse
 {
 	cpymo_parser_stream_span span = cpymo_parser_curline_readuntil(parser, ',');
 	cpymo_parser_stream_span_trim(&span);
+
 	return span;
 }
 

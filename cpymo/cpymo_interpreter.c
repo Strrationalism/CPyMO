@@ -784,6 +784,14 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		else goto BAD_EXPRESSION;
 
 		if (run_sub_command) {
+			while (!interpreter->script_parser.is_line_end) {
+				// Skip blanks
+				char ch = cpymo_parser_curline_peek(&interpreter->script_parser);
+				if (ch == ' ' || ch == '\t')
+					cpymo_parser_curline_readchar(&interpreter->script_parser);
+				else break;
+			}
+
 			cpymo_parser_stream_span sub_command =
 				cpymo_parser_curline_readuntil_or(&interpreter->script_parser, ' ', '\t');
 
