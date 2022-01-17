@@ -119,10 +119,19 @@ cpymo_interpreter_snapshot cpymo_interpreter_get_snapshot_current_callstack(cons
 
 static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont);
 
+#define CPYMO_EXEC_CONTVAL_OK 1
+#define CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED 2
+
 error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_engine *engine)
 {
 	jmp_buf cont;
-	setjmp(cont);
+
+	switch (setjmp(cont)) {
+	case 0: break;
+	case CPYMO_EXEC_CONTVAL_OK: break;
+	case CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED: interpreter = engine->interpreter; break;
+	default: return CPYMO_ERR_INVALID_ARG;
+	}
 
 	cpymo_parser_stream_span command =
 		cpymo_parser_curline_pop_command(&interpreter->script_parser);
@@ -163,11 +172,11 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	float OUT_X = cpymo_parser_stream_span_atoi(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
 	float OUT_Y = cpymo_parser_stream_span_atoi(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
 
-#define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, 1); return CPYMO_ERR_UNKNOWN; }
+#define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }
 
 #define CONT_NEXTLINE { \
 	if (cpymo_parser_next_line(&interpreter->script_parser))	\
-		{ longjmp(cont, 1); return CPYMO_ERR_UNKNOWN; }	\
+		{ longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }	\
 	else return CPYMO_ERR_NO_MORE_CONTENT; }
 
 static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
@@ -838,7 +847,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		engine->interpreter = callee;
 		callee->caller = interpreter;
 
-		return cpymo_interpreter_execute_step(callee, engine);
+		longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
+		return CPYMO_ERR_UNKNOWN;
 	}
 
 	D("ret") {
@@ -852,7 +862,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		free(interpreter->script_content);
 		free(interpreter);
 
-		return cpymo_interpreter_execute_step(caller, engine);
+		longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
+		return CPYMO_ERR_UNKNOWN;
 	}
 
 	D("sel") {
