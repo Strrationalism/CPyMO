@@ -35,8 +35,6 @@ error_t cpymo_backend_text_sys_init()
         return CPYMO_ERR_UNKNOWN;
     }
 
-    printf("[Info] Font Loaded!!\n");
-
     return CPYMO_ERR_SUCC;
 }
 
