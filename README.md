@@ -7,7 +7,8 @@
 这是一个使用C实现的pymo引擎的复刻，以方便在各种平台上运行pymo游戏。
 
 pymo原版参见：https://github.com/pymo/pymo    
-pymo官网：https://www.pymogames.com/    
+pymo官网：https://www.pymogames.com/
+pymo官网镜像：https://seng-jik.github.io/cpymo.github.io/    
 原作者：chen_xin_ming    
 
 感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。    
