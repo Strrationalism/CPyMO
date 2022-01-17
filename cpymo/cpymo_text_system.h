@@ -23,7 +23,15 @@ error_t cpymo_text_system_new(
 	float x, float y,
 	float width, float height,
 	float character_size,
-	cpymo_color col);
+	cpymo_color col,
+	cpymo_parser_stream_span text);
+
+error_t cpymo_text_system_new_static(
+	float x, float y,
+	float width, float height,
+	float character_size,
+	cpymo_color col,
+	cpymo_parser_stream_span text);
 
 void cpymo_text_system_clear(cpymo_text_system *);
 
