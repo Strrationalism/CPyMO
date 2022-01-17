@@ -169,8 +169,8 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	{ if (IS_EMPTY(X)) return CPYMO_ERR_INVALID_ARG; }
 
 #define POS(OUT_X, OUT_Y, IN_X, IN_Y) \
-	float OUT_X = cpymo_parser_stream_span_atoi(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
-	float OUT_Y = cpymo_parser_stream_span_atoi(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
+	float OUT_X = cpymo_parser_stream_span_atof(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
+	float OUT_Y = cpymo_parser_stream_span_atof(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
 
 #define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }
 

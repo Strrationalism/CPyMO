@@ -37,6 +37,7 @@ void cpymo_parser_stream_span_trim_end(cpymo_parser_stream_span *span);
 void cpymo_parser_stream_span_trim(cpymo_parser_stream_span *span);
 void cpymo_parser_stream_span_copy(char *dst, size_t buffer_size, cpymo_parser_stream_span span);
 int cpymo_parser_stream_span_atoi(cpymo_parser_stream_span span);
+float cpymo_parser_stream_span_atof(cpymo_parser_stream_span span);
 cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span);
 
 bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const char *str);
