@@ -16,6 +16,7 @@
 #include "cpymo_charas.h"
 #include "cpymo_scroll.h"
 #include "cpymo_floating_hint.h"
+#include "cpymo_text_system.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
