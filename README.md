@@ -11,7 +11,7 @@
 
 此项目仅用于您运行**合法持有**的游戏软件副本，持有盗版副本可能会让您面临法律问题。
 
-这是一个使用C实现的pymo引擎的复刻，以方便在各种平台上运行pymo游戏。
+这是一个使用C实现的pymo引擎的复刻，以方便在各种平台上制作并运行pymo游戏。
 
 pymo原版参见：https://github.com/pymo/pymo    
 pymo官网：https://www.pymogames.com/           
