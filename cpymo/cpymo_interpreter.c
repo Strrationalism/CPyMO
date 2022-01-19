@@ -197,7 +197,35 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			name_or_text.len = 0;
 		}
 
+		cpymo_text_clear(&engine->text);
+
 		return cpymo_say_start(engine, name_or_text, text);
+	}
+
+	D("text") {
+		POP_ARG(content); ENSURE(content);
+		POP_ARG(x1_str); ENSURE(x1_str);
+		POP_ARG(y1_str); ENSURE(y1_str);
+		POS(x1, y1, x1_str, y1_str);
+		POP_ARG(x2_str); ENSURE(x2_str);
+		POP_ARG(y2_str); ENSURE(y2_str);
+		POS(x2, y2, x2_str, y2_str);
+		POP_ARG(col_str); ENSURE(col_str);
+		cpymo_color col = cpymo_parser_stream_span_as_color(col_str);
+		POP_ARG(fontsize_str); ENSURE(fontsize_str);
+		float fontsize = 
+			cpymo_parser_stream_span_atof(fontsize_str) * 
+			engine->gameconfig.imagesize_h / 240.0f * 1.2f;
+		POP_ARG(show_immediately_str);
+		bool show_immediately = cpymo_parser_stream_span_atoi(show_immediately_str) != 0;
+
+		return cpymo_text_new(engine, x1, y1, x2, y2, col, fontsize, content, show_immediately);
+	}
+
+	D("text_off") {
+		cpymo_engine_request_redraw(engine);
+		cpymo_text_clear(&engine->text);
+		return CPYMO_ERR_SUCC;
 	}
 
 	D("waitkey") {

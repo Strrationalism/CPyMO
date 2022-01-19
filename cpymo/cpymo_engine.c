@@ -97,6 +97,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init say
 	cpymo_say_init(&out->say);
 
+	// init text
+	cpymo_text_init(&out->text);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -117,6 +120,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
+	cpymo_text_free(&engine->text);
 	cpymo_say_free(&engine->say);
 	cpymo_floating_hint_free(&engine->floating_hint);
 	cpymo_scroll_free(&engine->scroll);
@@ -187,5 +191,6 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_fade_draw(engine);
 	cpymo_bg_draw_transform_effect(engine);
 
+	cpymo_text_draw(engine);
 	cpymo_say_draw(engine);
 }
