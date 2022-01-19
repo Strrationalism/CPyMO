@@ -399,6 +399,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(msg); ENSURE(msg);
 		POP_ARG(name); ENSURE(name);
 
+		cpymo_engine_request_redraw(engine);
+
 		error_t err = cpymo_say_load_msgbox_image(&engine->say, msg, &engine->assetloader);
 		CPYMO_THROW(err);
 
