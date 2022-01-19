@@ -72,7 +72,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 				1.0f, cpymo_backend_image_draw_type_textbox);
 		}
 
-		if (e->say.textbox_usable) {
+		if (e->say.textbox_usable) {	// draw say message
 			cpymo_textbox_draw(&e->say.textbox, cpymo_backend_image_draw_type_text_say);
 		}
 	}

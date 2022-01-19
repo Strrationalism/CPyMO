@@ -22,7 +22,7 @@ pymo官网：https://www.pymogames.com/
 
 主要目标：
 
-* 兼容原版pymo的游戏、存档的情况下运行游戏
+* 兼容原版pymo的游戏
 * 提供与原版pymo兼容的pymo开发工具
 * 在带有硬件加速的情况下跨平台
     - Windows
