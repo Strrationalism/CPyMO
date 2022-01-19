@@ -314,3 +314,14 @@ uint32_t cpymo_parser_stream_span_utf8_try_head_to_utf32(cpymo_parser_stream_spa
 
 	return result;
 }
+
+size_t cpymo_parser_stream_span_utf8_len(cpymo_parser_stream_span span)
+{
+	size_t len = 0;
+	while (span.len) {
+		cpymo_parser_stream_span_utf8_try_head(&span);
+		len++;
+	}
+
+	return len;
+}
