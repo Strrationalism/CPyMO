@@ -42,7 +42,7 @@ ROMFS		:=	romfs
 #GFXBUILD	:=	$(ROMFS)/gfx
 APP_TITLE   := cpymo
 APP_AUTHOR  := Seng-Jik
-APP_DESCRIPTION := Open source pymo galgame player.
+APP_DESCRIPTION := PyMO Engine implements in C.
 
 #---------------------------------------------------------------------------------
 # options for code generation

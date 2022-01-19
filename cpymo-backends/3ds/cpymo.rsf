@@ -1,14 +1,14 @@
 BasicInfo:
-  Title                   : "cpymo"
+  Title                   : "CPyMO"
   ProductCode             : "CTR-HB-PYMO"
   Logo                    : Nintendo
 
 RomFs:
-  #RootPath                : romfs
+  RootPath                : romfs
 
 TitleInfo:
   Category                : Application
-  UniqueId                : 0x44444
+  UniqueId                : 0xCF100
 
 Option:
   UseOnSD                 : true # true if App is to be installed to SD
@@ -67,7 +67,7 @@ AccessControlInfo:
 
   # Process Settings
   MemoryType                    : Application # Application/System/Base
-  SystemMode                    : 64MB # 64MB(Default)/96MB/80MB/72MB/32MB
+  SystemMode                    : 96MB # 64MB(Default)/96MB/80MB/72MB/32MB
   IdealProcessor                : 0
   AffinityMask                  : 1
   Priority                      : 16
