@@ -610,6 +610,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				&engine->charas,
 				&c,
 				chara_id);
+			if (err == CPYMO_ERR_NOT_FOUND) {
+				fprintf(stderr, "[Error] Character %d not found.\n", chara_id);
+				return CPYMO_ERR_SUCC;
+			}
+			else { CPYMO_THROW(err); }
 
 			err = cpymo_chara_convert_to_mode0_pos(engine, c, coord_mode, &endx, &endy);
 			CPYMO_THROW(err);
