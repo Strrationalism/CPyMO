@@ -94,6 +94,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init floating hint
 	cpymo_floating_hint_init(&out->floating_hint);
 
+	// init say
+	cpymo_say_init(&out->say, &out->assetloader);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -112,8 +115,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_engine_free(cpymo_engine * engine)
+void cpymo_engine_free(cpymo_engine *engine)
 {
+	cpymo_say_free(&engine->say);
 	cpymo_floating_hint_free(&engine->floating_hint);
 	cpymo_scroll_free(&engine->scroll);
 	cpymo_charas_free(&engine->charas);
@@ -179,4 +183,6 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_flash_draw(engine);
 	cpymo_fade_draw(engine);
 	cpymo_bg_draw_transform_effect(engine);
+
+	cpymo_say_draw(&engine->say);
 }

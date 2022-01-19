@@ -16,7 +16,7 @@
 #include "cpymo_charas.h"
 #include "cpymo_scroll.h"
 #include "cpymo_floating_hint.h"
-#include "cpymo_text_system.h"
+#include "cpymo_say.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -33,6 +33,7 @@ struct cpymo_engine {
 	cpymo_charas charas;
 	cpymo_scroll scroll;
 	cpymo_floating_hint floating_hint;
+	cpymo_say say;
 
 	bool skipping;
 	char *title;

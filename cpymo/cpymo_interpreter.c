@@ -395,6 +395,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return CPYMO_ERR_SUCC;
 	}
 
+	D("textbox") {
+		POP_ARG(msg); ENSURE(msg);
+		POP_ARG(name); ENSURE(name);
+
+		error_t err = cpymo_say_load_msgbox_image(&engine->say, msg, &engine->assetloader);
+		CPYMO_THROW(err);
+
+		err = cpymo_say_load_namebox_image(&engine->say, name, &engine->assetloader);
+		return err;
+	}
+
 	#define CHARA_QUAKE(NAME, ...) \
 		D(NAME) { \
 			static float offsets[] = { __VA_ARGS__}; \
