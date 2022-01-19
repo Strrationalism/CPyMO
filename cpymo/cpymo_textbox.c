@@ -177,14 +177,24 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb
         return true;
     }
 
-    while (tb->timer >= 0.05f) {
+    float speed = 0.05f;
+    switch (e->gameconfig.textspeed) {
+    case 0: speed = 0.1f; break;
+    case 1: speed = 0.075f; break;
+    case 2: speed = 0.05f; break;
+    case 3: speed = 0.025f; break;
+    case 4: speed = 0.0125f; break;
+    default: speed = 0.0f; break;
+    };
+
+    while (tb->timer >= speed) {
         if (cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb)) {
             tb->msg_cursor_visible = true;
-            tb->timer = 0;
+            tb->timer = speed;
             return true;
         }
 
-        tb->timer -= 0.05f;
+        tb->timer -= speed;
         cpymo_engine_request_redraw(e);
         cpymo_textbox_show_next_char(tb);
         cpymo_textbox_refresh_curline(tb);
