@@ -1,4 +1,5 @@
 #include "cpymo_textbox.h"
+#include "cpymo_engine.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -23,6 +24,8 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->color = col;
     o->active_line_current_width = 0;
     o->text_curline_size = 0;
+
+    o->timer = 0;
 
     return CPYMO_ERR_SUCC;
 }
@@ -54,7 +57,12 @@ static bool cpymo_textbox_line_full(cpymo_textbox * tb)
     cpymo_parser_stream_span span;
     span.begin = tb->text_curline_and_remaining.begin;
     span.len = tb->text_curline_size;
-    return cpymo_backend_text_width(span, tb->character_size) + tb->character_size > tb->width;
+    float cur_w = cpymo_backend_text_width(span, tb->character_size) + tb->character_size;
+
+    if (tb->active_line == tb->max_lines - 1)
+        cur_w += tb->character_size * 0.9f;
+
+    return cur_w > tb->width;
 }
 
 void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
@@ -86,7 +94,6 @@ void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
 
 static void cpymo_textbox_show_next_line(cpymo_textbox *tb)
 {
-    assert(!cpymo_textbox_page_full(tb));
     assert(tb->text_curline_size <= tb->text_curline_and_remaining.len);
 
     cpymo_textbox_refresh_curline(tb);
@@ -125,6 +132,7 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
 
 void cpymo_textbox_clear_page(cpymo_textbox *tb)
 {
+    tb->timer = 0;
     tb->active_line = 0;
     tb->active_line_current_width = 0;
     for (size_t i = 0; i < tb->max_lines; i++) {
@@ -141,5 +149,39 @@ void cpymo_textbox_finalize(cpymo_textbox *tb)
     }
 
     cpymo_textbox_refresh_curline(tb);
+}
+
+bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb)
+{
+    tb->timer += dt;
+
+    if (cpymo_input_foward_key_just_pressed(e)) {
+        cpymo_engine_request_redraw(e);
+        cpymo_textbox_finalize(tb);
+        return true;
+    }
+
+    while (tb->timer >= 0.05f) {
+        if (cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb))
+            return true;
+
+        tb->timer -= 0.05f;
+        cpymo_engine_request_redraw(e);
+        cpymo_textbox_show_next_char(tb);
+        cpymo_textbox_refresh_curline(tb);
+    }
+
+    return cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb);
+}
+
+bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox * tb)
+{
+    bool go =
+        CPYMO_INPUT_JUST_PRESSED(e, ok) 
+        || e->input.skip 
+        || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)
+        || CPYMO_INPUT_JUST_PRESSED(e, down);
+
+    return go;
 }
 

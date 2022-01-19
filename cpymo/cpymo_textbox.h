@@ -3,6 +3,8 @@
 
 #include <cpymo_backend_text.h>
 
+struct cpymo_engine;
+
 typedef struct {
 	float x, y;
 	float width;
@@ -14,6 +16,8 @@ typedef struct {
 	cpymo_parser_stream_span text_curline_and_remaining;
 	size_t text_curline_size;
 	cpymo_color color;
+
+	float timer;
 } cpymo_textbox;
 
 error_t cpymo_textbox_init(
@@ -43,5 +47,8 @@ static inline bool cpymo_textbox_all_finished(cpymo_textbox *tb)
 { return tb->text_curline_and_remaining.len == tb->text_curline_size; }
 
 void cpymo_textbox_finalize(cpymo_textbox *);
+
+bool cpymo_textbox_wait_text_fadein(struct cpymo_engine *, float, cpymo_textbox *which_textbox);
+bool cpymo_textbox_wait_text_reading(struct cpymo_engine *, float, cpymo_textbox *which_textbox);
 
 #endif

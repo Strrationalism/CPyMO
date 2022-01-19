@@ -141,6 +141,9 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
 
+	if (engine->input.hide_window != engine->prev_input.hide_window)
+		*redraw = true;
+
 	err = cpymo_bg_update(&engine->bg, redraw);
 	CPYMO_THROW(err);
 

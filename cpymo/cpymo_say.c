@@ -1,5 +1,6 @@
 #include "cpymo_say.h"
 #include "cpymo_engine.h"
+#include <assert.h>
 
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
@@ -60,13 +61,13 @@ void cpymo_say_free(cpymo_say *say)
 
 void cpymo_say_draw(const struct cpymo_engine *e)
 {
-	if (e->say.active) {
+	if (e->say.active && !e->input.hide_window) {
 		if (e->say.msgbox) {	// draw message box image
-			float x = (float)e->gameconfig.imagesize_w / 2 - (float)e->say.msgbox_w / 2;
-			float y = (float)e->gameconfig.imagesize_h - (float)e->say.msgbox_h;
+			float msg_h = (float)e->say.msgbox_h * e->gameconfig.imagesize_h / 360.0f;
+			float y = (float)e->gameconfig.imagesize_h - msg_h;
 
 			cpymo_backend_image_draw(
-				x, y, (float)e->say.msgbox_w, (float)e->say.msgbox_h,
+				0, y, (float)e->gameconfig.imagesize_w, msg_h,
 				e->say.msgbox, 0, 0, (float)e->say.msgbox_w, (float)e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_textbox);
 		}
@@ -119,6 +120,64 @@ error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_stream_span na
 	return err;
 }
 
+/** Mermaid Flow Chart 
+
+graph TB
+	A(START) --> cpymo_say_wait_text_fadein
+	cpymo_say_wait_text_fadein --> cpymo_say_wait_text_fadein_callback
+	cpymo_say_wait_text_fadein_callback --> cpymo_say_wait_text_reading
+	cpymo_say_wait_text_reading --> cpymo_say_wait_text_read
+	cpymo_say_wait_text_read --> cpymo_say_wait_text_read_callback
+	cpymo_say_wait_text_read_callback --> cpymo_say_wait_text_fadein
+	cpymo_say_wait_text_read_callback --> E(END)
+
+ **/
+
+static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e);
+
+static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
+{
+	assert(e->say.textbox_usable);
+	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox);
+}
+
+static bool cpymo_say_wait_text_fadein(cpymo_engine *e, float dt)
+{
+	assert(e->say.textbox_usable);
+	return cpymo_textbox_wait_text_fadein(e, dt, &e->say.textbox);
+}
+
+static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
+{
+	cpymo_say *say = &e->say;
+
+	assert(say->textbox_usable);
+
+	if (!cpymo_textbox_all_finished(&say->textbox)) {
+		cpymo_textbox_clear_page(&say->textbox);
+		cpymo_wait_register_with_callback(
+			&e->wait,
+			&cpymo_say_wait_text_fadein,
+			&cpymo_say_wait_text_fadein_callback);
+		cpymo_engine_request_redraw(e);
+	}
+	else {
+		DISABLE_TEXTBOX(say);
+		say->active = false;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
+{
+	cpymo_wait_register_with_callback(
+		&e->wait, 
+		&cpymo_say_wait_text_reading,
+		&cpymo_say_wait_text_read_callback);
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, cpymo_parser_stream_span text)
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
@@ -128,16 +187,12 @@ error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, c
 	float msgtb_t = (float)e->gameconfig.msgtb_t * e->gameconfig.imagesize_h / 360.0f;
 	float msgtb_b = (float)e->gameconfig.msgtb_b * e->gameconfig.imagesize_h / 360.0f;
 
-	float msgbox_img_x =
-		(float)e->gameconfig.imagesize_w / 2 - (float)e->say.msgbox_w / 2;
+	float msg_h = (float)e->say.msgbox_h * e->gameconfig.imagesize_h / 360.0f;
 
-	float x = msgbox_img_x + msglr_l;
-	float w = (float)e->say.msgbox_w - msglr_l - msglr_r;
-	float y = 
-		(float)e->gameconfig.imagesize_h 
-		- (float)e->say.msgbox_h 
-		+ msgtb_t;
-	float h = (float)e->say.msgbox_h - msgtb_t - msgtb_b;
+	float x = msglr_l;
+	float w = (float)e->gameconfig.imagesize_w - msglr_l - msglr_r;
+	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
+	float h = msg_h - msgtb_t - msgtb_b;
 
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 
@@ -146,11 +201,14 @@ error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, c
 	error_t err;
 	ENABLE_TEXTBOX(say, x, y, w, h, fontsize, e->gameconfig.textcolor, text, err);
 
-	cpymo_textbox_finalize(&say->textbox);
-
 	cpymo_engine_request_redraw(e);
 
 	e->say.active = true;
+
+	cpymo_wait_register_with_callback(
+		&e->wait, 
+		&cpymo_say_wait_text_fadein, 
+		&cpymo_say_wait_text_fadein_callback);
 
 	return err;
 }
