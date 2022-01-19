@@ -62,10 +62,10 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 		return;
 	}
 
-	D("fontaa") {
+	/*D("fontaa") {
 		o->fontaa = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
 		return;
-	}
+	}*/
 
 	D("hint") {
 		o->hint = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
@@ -175,6 +175,23 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream, size_t len)
 {
 	memset(out_config, 0, sizeof(cpymo_gameconfig));
+
+	/*** Default Config ***/
+
+	out_config->hint = 1;
+	out_config->textspeed = 3;
+	out_config->textcolor = cpymo_color_white;
+	out_config->msgtb_t = 6;
+	out_config->msgtb_b = 0;
+	out_config->msglr_l = 10;
+	out_config->msglr_r = 7;
+	strcpy(out_config->platform, "pygame");
+	out_config->bgmvolume = 0;
+	out_config->vovolume = 0;
+	strcpy(out_config->cgprefix, "EV_");
+	out_config->grayselected = 1;
+
+	/*** Default Config End ***/
 
 	cpymo_parser parser;
 	cpymo_parser_init(&parser, stream, len);

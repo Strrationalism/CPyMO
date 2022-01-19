@@ -27,6 +27,8 @@ extern void cpymo_backend_image_fill_screen_edges();
 extern error_t cpymo_backend_text_sys_init();
 extern void cpymo_backend_text_sys_free();
 
+extern const bool cpymo_input_fast_kill_pressed;
+
 int main(void) {
 	bool is_new_3ds = false;
 	APT_CheckNew3DS(&is_new_3ds);
@@ -106,7 +108,7 @@ int main(void) {
 	float prevSlider = NAN;
 	TickCounter tickCounter;
 	osTickCounterStart(&tickCounter);
-	while (aptMainLoop()) {
+	while (aptMainLoop() && !cpymo_input_fast_kill_pressed) {
 		hidScanInput();
 
 		bool redraw = false;

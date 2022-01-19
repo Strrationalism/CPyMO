@@ -26,7 +26,7 @@ typedef struct {
 	uint16_t imagesize_w, imagesize_h;
 	cpymo_color textcolor;
 
-	unsigned fontaa : 1;
+	//unsigned fontaa : 1;
 	unsigned hint : 1;
 	unsigned grayselected : 1;
 	unsigned playvideo : 1;

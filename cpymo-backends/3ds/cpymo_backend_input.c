@@ -2,13 +2,15 @@
 #include <3ds.h>
 #include <stdlib.h>
 
+bool cpymo_input_fast_kill_pressed = false;
+
 cpymo_input cpymo_input_snapshot()
 {
     cpymo_input out;
     u32 keys = hidKeysHeld();
 
-    if((keys & KEY_ZL)) aptExit();
-
+    if((keys & KEY_ZL)) cpymo_input_fast_kill_pressed = true;
+    
     out.ok = (keys & KEY_A) > 0;
     out.skip = (keys & KEY_R) > 0;
     out.cancel = (keys & KEY_B) > 0;

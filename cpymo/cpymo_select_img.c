@@ -431,6 +431,8 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 
 void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpymo_parser_stream_span hint)
 {
+	if (engine->gameconfig.hint == 0) return;
+
 	assert(engine->select_img.hint[0] == NULL);
 	assert(engine->select_img.hint[1] == NULL);
 	assert(engine->select_img.hint[2] == NULL);
