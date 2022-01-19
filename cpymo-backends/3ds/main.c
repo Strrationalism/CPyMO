@@ -48,7 +48,7 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v5");
+	error_t err = cpymo_engine_init(&engine, "/pymogames/DAICHYAN_s60v3");
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
@@ -159,8 +159,6 @@ int main(void) {
 
 			C3D_FrameEnd(0);
 		} else {
-			gspWaitForVBlank();
-			gspWaitForVBlank();
 			gspWaitForVBlank();
 		}
 	}
