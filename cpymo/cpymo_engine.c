@@ -95,7 +95,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	cpymo_floating_hint_init(&out->floating_hint);
 
 	// init say
-	cpymo_say_init(&out->say, &out->assetloader);
+	cpymo_say_init(&out->say);
 
 	// states
 	out->skipping = false;
@@ -184,5 +184,5 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_fade_draw(engine);
 	cpymo_bg_draw_transform_effect(engine);
 
-	cpymo_say_draw(&engine->say);
+	cpymo_say_draw(engine);
 }

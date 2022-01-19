@@ -28,7 +28,7 @@ void cpymo_textbox_free(
 	cpymo_textbox *);
 
 void cpymo_textbox_draw(
-	cpymo_textbox *, enum cpymo_backend_image_draw_type drawtype);
+	const cpymo_textbox *, enum cpymo_backend_image_draw_type drawtype);
 
 static inline bool cpymo_textbox_page_full(cpymo_textbox *tb)
 { return tb->active_line >= tb->max_lines; }

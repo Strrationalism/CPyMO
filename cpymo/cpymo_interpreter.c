@@ -188,6 +188,18 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	/*** I. Text ***/
+	D("say") {
+		POP_ARG(name_or_text); ENSURE(name_or_text);
+		POP_ARG(text);
+
+		if (IS_EMPTY(text)) {
+			text = name_or_text;
+			name_or_text.len = 0;
+		}
+
+		return cpymo_say_start(engine, name_or_text, text);
+	}
+
 	D("waitkey") {
 		cpymo_wait_for_seconds(engine, 5.0f);
 		return CPYMO_ERR_SUCC;

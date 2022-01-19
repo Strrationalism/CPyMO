@@ -33,7 +33,7 @@ void cpymo_textbox_free(cpymo_textbox *tb)
     free(tb->lines);
 }
 
-void cpymo_textbox_draw(cpymo_textbox *tb, enum cpymo_backend_image_draw_type drawtype)
+void cpymo_textbox_draw(const cpymo_textbox *tb, enum cpymo_backend_image_draw_type drawtype)
 {
     for (size_t i = 0; i < tb->max_lines; ++i) {
         cpymo_backend_text line = tb->lines[i];
