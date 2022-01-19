@@ -21,6 +21,8 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
         case cpymo_backend_image_draw_type_bg: return -10.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_chara: return -5.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_sel_img: return 2.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_textbox: return 1.5f * render_3d_offset;
+        case cpymo_backend_image_draw_type_text_say: return 2.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_bg: return 2.5f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_text: return 3.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_text_ui: return 5.0f * render_3d_offset;
@@ -79,7 +81,7 @@ void trans_pos(float *x, float *y) {
 
 void cpymo_backend_image_fill_screen_edges()
 {
-    if(!fill_screen) {
+    /*if(!fill_screen) {
         const u32 col = C2D_Color32(0, 0, 0, 255);
 
         if(offset_x > 0.5f) {
@@ -91,7 +93,7 @@ void cpymo_backend_image_fill_screen_edges()
             C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
             C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
         }
-    }
+    }*/
 }
 
 void cpymo_backend_image_fill_rects(
