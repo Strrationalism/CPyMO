@@ -26,6 +26,7 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->text_curline_size = 0;
 
     o->timer = 0;
+    o->msg_cursor_visible = false;
 
     return CPYMO_ERR_SUCC;
 }
@@ -36,7 +37,10 @@ void cpymo_textbox_free(cpymo_textbox *tb)
     free(tb->lines);
 }
 
-void cpymo_textbox_draw(const cpymo_textbox *tb, enum cpymo_backend_image_draw_type drawtype)
+void cpymo_textbox_draw(
+    const struct cpymo_engine *e,
+    const cpymo_textbox *tb, 
+    enum cpymo_backend_image_draw_type drawtype)
 {
     for (size_t i = 0; i < tb->max_lines; ++i) {
         cpymo_backend_text line = tb->lines[i];
@@ -49,6 +53,15 @@ void cpymo_textbox_draw(const cpymo_textbox *tb, enum cpymo_backend_image_draw_t
                 1.0f,
                 drawtype);
         }
+    }
+
+    if (tb->msg_cursor_visible) {
+        cpymo_backend_image_draw(
+            tb->x + tb->width - (float)e->say.msg_cursor_w,
+            tb->y + (tb->max_lines) * tb->character_size - (float)e->say.msg_cursor_h,
+            (float)e->say.msg_cursor_w, (float)e->say.msg_cursor_h,
+            e->say.msg_cursor, 0, 0, e->say.msg_cursor_w, e->say.msg_cursor_h,
+            1.0f, drawtype);
     }
 }
 
@@ -132,6 +145,7 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
 
 void cpymo_textbox_clear_page(cpymo_textbox *tb)
 {
+    tb->msg_cursor_visible = false;
     tb->timer = 0;
     tb->active_line = 0;
     tb->active_line_current_width = 0;
@@ -158,12 +172,17 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb
     if (cpymo_input_foward_key_just_pressed(e)) {
         cpymo_engine_request_redraw(e);
         cpymo_textbox_finalize(tb);
+        tb->msg_cursor_visible = true;
+        tb->timer = 0;
         return true;
     }
 
     while (tb->timer >= 0.05f) {
-        if (cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb))
+        if (cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb)) {
+            tb->msg_cursor_visible = true;
+            tb->timer = 0;
             return true;
+        }
 
         tb->timer -= 0.05f;
         cpymo_engine_request_redraw(e);
@@ -171,16 +190,29 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb
         cpymo_textbox_refresh_curline(tb);
     }
 
-    return cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb);
+    if (cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb)) {
+        tb->msg_cursor_visible = true;
+        tb->timer = 0;
+        return true;
+    }
+    else return false;
 }
 
-bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox * tb)
+bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *tb)
 {
+    tb->timer += dt;
+
     bool go =
         CPYMO_INPUT_JUST_PRESSED(e, ok) 
         || e->input.skip 
         || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)
         || CPYMO_INPUT_JUST_PRESSED(e, down);
+
+    if (tb->timer >= 0.5f) {
+        tb->timer -= 0.5f;
+        tb->msg_cursor_visible = !tb->msg_cursor_visible;
+        cpymo_engine_request_redraw(e);
+    }
 
     return go;
 }

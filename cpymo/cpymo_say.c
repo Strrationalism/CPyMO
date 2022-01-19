@@ -63,7 +63,8 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 {
 	if (e->say.active && !e->input.hide_window) {
 		if (e->say.msgbox) {	// draw message box image
-			float msg_h = (float)e->say.msgbox_h * e->gameconfig.imagesize_h / 360.0f;
+			float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
+			float msg_h = (float)e->say.msgbox_h * ratio;
 			float y = (float)e->gameconfig.imagesize_h - msg_h;
 
 			cpymo_backend_image_draw(
@@ -73,7 +74,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 		}
 
 		if (e->say.textbox_usable) {	// draw say message
-			cpymo_textbox_draw(&e->say.textbox, cpymo_backend_image_draw_type_text_say);
+			cpymo_textbox_draw(e, &e->say.textbox, cpymo_backend_image_draw_type_text_say);
 		}
 	}
 }
@@ -187,7 +188,8 @@ error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, c
 	float msgtb_t = (float)e->gameconfig.msgtb_t * e->gameconfig.imagesize_h / 360.0f;
 	float msgtb_b = (float)e->gameconfig.msgtb_b * e->gameconfig.imagesize_h / 360.0f;
 
-	float msg_h = (float)e->say.msgbox_h * e->gameconfig.imagesize_h / 360.0f;
+	float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
+	float msg_h = (float)e->say.msgbox_h * ratio;
 
 	float x = msglr_l;
 	float w = (float)e->gameconfig.imagesize_w - msglr_l - msglr_r;
