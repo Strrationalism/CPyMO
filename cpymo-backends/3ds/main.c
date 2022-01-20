@@ -29,6 +29,26 @@ extern void cpymo_backend_text_sys_free();
 
 extern const bool cpymo_input_fast_kill_pressed;
 
+static void ensure_save_dir(const char *gamedir)
+{
+	if (R_FAILED(fsInit())) return;
+
+	char *path = (char *)alloca(strlen(gamedir) + 8);
+	strcpy(path, gamedir);
+	strcat(path, "/save");
+
+	FS_Archive archive;
+	Result error = FSUSER_OpenArchive(&archive, ARCHIVE_SDMC_WRITE_ONLY, fsMakePath(PATH_EMPTY, ""));
+	if (R_FAILED(error)) {
+		fsExit();
+		return;
+	}
+
+	FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, path), FS_ATTRIBUTE_DIRECTORY);
+	FSUSER_CloseArchive(archive);
+	fsExit();
+}
+
 int main(void) {
 	bool is_new_3ds = false;
 	APT_CheckNew3DS(&is_new_3ds);
@@ -50,7 +70,10 @@ int main(void) {
 		return 0;
 	}*/
 
-	error_t err = cpymo_engine_init(&engine, "/pymogames/startup");
+	const char *gamedir = "/pymogames/startup";
+	ensure_save_dir(gamedir);
+
+	error_t err = cpymo_engine_init(&engine, gamedir);
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
 		gfxExit();
