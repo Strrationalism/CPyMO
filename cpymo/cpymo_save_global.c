@@ -23,8 +23,8 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 
 	#define ENSURE_BUF(SIZE) \
 		if (buf_size < SIZE) { \
-			if (buf != NULL) free(buf); \
-			buf = (char *)malloc(SIZE); \
+			if (buf != NULL) buf = (char *)realloc(buf, SIZE); \
+			else buf = (char *)malloc(SIZE); \
 			if(buf == NULL) { \
 				fclose(file); \
 				return CPYMO_ERR_OUT_OF_MEM; \
