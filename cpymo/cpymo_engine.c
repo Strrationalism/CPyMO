@@ -100,6 +100,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init text
 	cpymo_text_init(&out->text);
 
+	// init hash flags
+	cpymo_hash_flags_init(&out->flags);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -116,7 +119,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// load global save data
 	err = cpymo_save_global_load(out);
 	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_CAN_NOT_OPEN_FILE) {
-		fprintf(stderr, "[Error] Global save data broken!\n");
+		fprintf(stderr, "[Error] Global save data broken! %s\n", cpymo_error_message(err));
 	}
 
 	cpymo_logo();
@@ -126,9 +129,11 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
-	if (cpymo_save_global_save(engine) != CPYMO_ERR_SUCC) 
-		fprintf(stderr, "[Error] Can not save global savedata.\n");
+	error_t err = cpymo_save_global_save(engine);
+	if (err != CPYMO_ERR_SUCC) 
+		fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
 	
+	cpymo_hash_flags_free(&engine->flags);
 	cpymo_text_free(&engine->text);
 	cpymo_say_free(&engine->say);
 	cpymo_floating_hint_free(&engine->floating_hint);

@@ -18,6 +18,7 @@
 #include "cpymo_floating_hint.h"
 #include "cpymo_say.h"
 #include "cpymo_text.h"
+#include "cpymo_hash_flags.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -36,6 +37,7 @@ struct cpymo_engine {
 	cpymo_floating_hint floating_hint;
 	cpymo_say say;
 	cpymo_text text;
+	cpymo_hash_flags flags;
 
 	bool skipping;
 	char *title;
