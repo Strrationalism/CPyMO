@@ -5,6 +5,8 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
+#include "posix_win32.h"
+
 stbtt_fontinfo font;
 static unsigned char *ttf_buffer = NULL;
 
@@ -33,23 +35,22 @@ void cpymo_backend_font_free()
 
 error_t cpymo_backend_font_init(const char *gamedir)
 {
-	char *path = (char *)malloc(strlen(gamedir) + 24);
+	char *path = (char *)alloca(strlen(gamedir) + 24);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	sprintf(path, "%s/system/default.ttf", gamedir);
 	error_t err = cpymo_backend_font_try_load_font(path);
-	free(path);
+	//free(path);
 	if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
 
 #ifdef WIN32
 	const char *windir = getenv("windir");
-	path = (char *)malloc(strlen(windir) + 16);
+	path = (char *)alloca(strlen(windir) + 16);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	#define TRY_LOAD(NAME) \
 		sprintf(path, "%s/fonts/%s", windir, NAME); \
 		err = cpymo_backend_font_try_load_font(path); \
 		if (err == CPYMO_ERR_SUCC) { \
-			free(path); \
 			return CPYMO_ERR_SUCC; \
 		}
 
@@ -72,7 +73,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	TRY_LOAD("simfang.ttf");
 	TRY_LOAD("SIMLI.ttf");
 
-	free(path);
+	//free(path);
 #endif
 
 

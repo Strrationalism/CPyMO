@@ -19,6 +19,8 @@
 #include <crtdbg.h>
 #endif
 
+#include "posix_win32.h"
+
 SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
@@ -29,13 +31,13 @@ extern void cpymo_backend_font_free();
 static void set_window_icon(const char *gamedir) 
 {
 	int w, h, channel;
-	char *icon_path = (char *)malloc(strlen(gamedir) + 10);
+	char *icon_path = (char *)alloca(strlen(gamedir) + 10);
 	if (icon_path == NULL) return;
 
 	sprintf(icon_path, "%s/icon.png", gamedir);
 
 	stbi_uc *icon = stbi_load(icon_path, &w, &h, &channel, 4);
-	free(icon_path);
+	//free(icon_path);
 	if (icon == NULL) return;
 
 	SDL_Surface *surface =
@@ -51,6 +53,13 @@ static void set_window_icon(const char *gamedir)
 	stbi_image_free(icon);
 }
 
+static void ensure_save_dir(const char *gamedir)
+{
+	char *save_dir = (char *)alloca(strlen(gamedir) + 8);
+	sprintf(save_dir, "%s/save", gamedir);
+	mkdir(save_dir, 0777);
+}
+
 int main(int argc, char **argv) 
 {
 	const char *gamedir = "./";
@@ -58,6 +67,8 @@ int main(int argc, char **argv)
 	if (argc == 2) {
 		gamedir = argv[1];
 	}
+
+	ensure_save_dir(gamedir);
 
 	error_t err = cpymo_engine_init(&engine, gamedir);
 
