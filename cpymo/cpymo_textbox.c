@@ -87,7 +87,8 @@ void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
     span.len = tb->text_curline_size;
 
     if (span.len >= 2) {
-        if (span.begin[span.len - 2] == '\\' && span.begin[span.len - 1] == 'n')
+        if (span.begin[span.len - 2] == '\\' 
+            && (span.begin[span.len - 1] == 'n' || span.begin[span.len - 1] == 'r'))
             span.len -= 2;
     }
 
@@ -136,7 +137,8 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
 
     else if (cpymo_parser_stream_span_equals_str(next_char, "\\")) {
         next_char = cpymo_parser_stream_span_utf8_try_head(&span);
-        if (cpymo_parser_stream_span_equals_str(next_char, "n")) {
+        if (cpymo_parser_stream_span_equals_str(next_char, "n") 
+            || cpymo_parser_stream_span_equals_str(next_char, "r")) {
             tb->text_curline_size += next_char.len;
             cpymo_textbox_show_next_line(tb);
         }

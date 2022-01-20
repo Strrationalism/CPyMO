@@ -190,6 +190,7 @@ error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream,
 	out_config->vovolume = 0;
 	strcpy(out_config->cgprefix, "EV_");
 	out_config->grayselected = 1;
+	out_config->namealign = 1;
 
 	/*** Default Config End ***/
 

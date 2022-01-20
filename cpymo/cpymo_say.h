@@ -16,6 +16,9 @@ typedef struct {
 
 	bool active;
 	bool lazy_init;
+
+	cpymo_backend_text name;
+	float name_width;
 } cpymo_say;
 
 void cpymo_say_init(cpymo_say *);

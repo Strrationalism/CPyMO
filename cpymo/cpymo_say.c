@@ -16,6 +16,9 @@
 		if (ERR == CPYMO_ERR_SUCC) SAY->textbox_usable = true; \
 	}
 
+#define RESET_NAME(SAY) \
+	if (SAY->name) { cpymo_backend_text_free(SAY->name); SAY->name = NULL; }
+
 static void cpymo_say_lazy_init(cpymo_say *out, cpymo_assetloader *loader)
 {
 	if (out->lazy_init == false) {
@@ -49,11 +52,13 @@ void cpymo_say_init(cpymo_say *out)
 	out->active = false;
 	out->lazy_init = false;
 	out->textbox_usable = false;
+	out->name = NULL;
 }
 
 void cpymo_say_free(cpymo_say *say)
 {
 	DISABLE_TEXTBOX(say);
+	RESET_NAME(say);
 	if (say->msgbox) cpymo_backend_image_free(say->msgbox);
 	if (say->namebox) cpymo_backend_image_free(say->namebox);
 	if (say->msg_cursor) cpymo_backend_image_free(say->msg_cursor);
@@ -62,18 +67,58 @@ void cpymo_say_free(cpymo_say *say)
 void cpymo_say_draw(const struct cpymo_engine *e)
 {
 	if (e->say.active && !e->input.hide_window) {
-		if (e->say.msgbox) {	// draw message box image
-			float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
-			float msg_h = (float)e->say.msgbox_h * ratio;
-			float y = (float)e->gameconfig.imagesize_h - msg_h;
+		float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
+		float msg_h = (float)e->say.msgbox_h * ratio;
+		float y = (float)e->gameconfig.imagesize_h - msg_h;
+		float offx = (float)e->gameconfig.nameboxorg_x / 540.0f * (float)e->gameconfig.imagesize_w;
+		float offy = (float)e->gameconfig.nameboxorg_y / 360.0f * (float)e->gameconfig.imagesize_h;
 
+		float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
+		float namebox_h = fontsize * 1.4f;
+		float namebox_w = (float)e->say.namebox_w / ((float)e->say.namebox_h / namebox_h);
+
+		float namebox_x;
+		switch (e->gameconfig.namealign) {
+		case 0:
+			namebox_x = (float)(e->gameconfig.imagesize_w - namebox_w) / 2;
+			break;
+		case 2:
+			namebox_x = (float)(e->gameconfig.imagesize_w - namebox_w);
+			break;
+		default:
+			namebox_x = 0;
+			break;
+		};
+
+		float namebox_y = y - namebox_h;
+
+		namebox_x += offx;
+		namebox_y -= offy;
+
+		if (e->say.name && e->say.namebox)
+			cpymo_backend_image_draw(
+				namebox_x, namebox_y, namebox_w, namebox_h,
+				e->say.namebox, 0, 0, e->say.namebox_w, e->say.namebox_h, 1.0f,
+				cpymo_backend_image_draw_type_textbox);
+
+		if (e->say.msgbox) {
 			cpymo_backend_image_draw(
 				0, y, (float)e->gameconfig.imagesize_w, msg_h,
 				e->say.msgbox, 0, 0, (float)e->say.msgbox_w, (float)e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_textbox);
 		}
 
-		if (e->say.textbox_usable) {	// draw say message
+		if (e->say.name) {
+			float name_x =
+				namebox_w / 2 - (float)e->say.name_width / 2 + namebox_x;
+
+			cpymo_backend_text_draw(
+				e->say.name,
+				name_x, namebox_y + cpymo_gameconfig_font_size(&e->gameconfig),
+				e->gameconfig.textcolor, 1.0f, cpymo_backend_image_draw_type_text_say);
+		}
+
+		if (e->say.textbox_usable) {
 			cpymo_textbox_draw(e, &e->say.textbox, cpymo_backend_image_draw_type_text_say);
 		}
 	}
@@ -183,6 +228,19 @@ error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, c
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
 
+	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
+
+	// Create name box
+	cpymo_say *say = &e->say;
+	RESET_NAME(say);
+
+	cpymo_parser_stream_span_trim(&name);
+	if (name.len > 0) {
+		error_t err = cpymo_backend_text_create(&say->name, &say->name_width, name, fontsize);
+		if (err != CPYMO_ERR_SUCC) say->name = NULL;
+	}
+
+	// Create say message text
 	float msglr_l = (float)e->gameconfig.msglr_l * e->gameconfig.imagesize_w / 540.0f;
 	float msglr_r = (float)e->gameconfig.msglr_r * e->gameconfig.imagesize_w / 540.0f;
 	float msgtb_t = (float)e->gameconfig.msgtb_t * e->gameconfig.imagesize_h / 360.0f;
@@ -195,10 +253,6 @@ error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, c
 	float w = (float)e->gameconfig.imagesize_w - msglr_l - msglr_r;
 	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
 	float h = msg_h - msgtb_t - msgtb_b;
-
-	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
-
-	cpymo_say *say = &e->say;
 
 	error_t err;
 	ENABLE_TEXTBOX(say, x, y, w, h, fontsize, e->gameconfig.textcolor, text, err);

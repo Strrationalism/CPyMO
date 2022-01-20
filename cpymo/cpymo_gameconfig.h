@@ -20,7 +20,7 @@ typedef struct {
 	char platform[8];
 	char scripttype[4];
 	uint16_t fontsize;
-	uint16_t nameboxorg_x, nameboxorg_y;
+	int16_t nameboxorg_x, nameboxorg_y;
 	uint16_t msgtb_t, msgtb_b;
 	uint16_t msglr_l, msglr_r;
 	uint16_t imagesize_w, imagesize_h;
