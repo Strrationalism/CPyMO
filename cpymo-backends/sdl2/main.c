@@ -19,6 +19,10 @@
 #include <crtdbg.h>
 #endif
 
+#ifdef __APPLE__
+#include <dirent.h>
+#endif
+
 #include "posix_win32.h"
 
 SDL_Window *window;
