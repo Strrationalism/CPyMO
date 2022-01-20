@@ -47,4 +47,6 @@ cpymo_parser_stream_span cpymo_parser_stream_span_utf8_try_head(cpymo_parser_str
 uint32_t cpymo_parser_stream_span_utf8_try_head_to_utf32(cpymo_parser_stream_span *tail);
 size_t cpymo_parser_stream_span_utf8_len(cpymo_parser_stream_span span);
 
+uint64_t cpymo_parser_stream_span_hash(cpymo_parser_stream_span span);
+
 #endif

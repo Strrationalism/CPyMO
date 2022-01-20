@@ -325,3 +325,14 @@ size_t cpymo_parser_stream_span_utf8_len(cpymo_parser_stream_span span)
 
 	return len;
 }
+
+uint64_t cpymo_parser_stream_span_hash(cpymo_parser_stream_span span)
+{
+	uint64_t seed = 131313;
+	uint64_t hash = 0;
+
+	for (size_t i = 0; i < span.len; ++i) 
+		hash = (hash * seed) + span.begin[i];
+	
+	return hash;
+}
