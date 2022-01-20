@@ -1,10 +1,10 @@
 #include "cpymo_engine.h"
-
 #include <cpymo_backend_image.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <cpymo_backend_input.h>
+#include "cpymo_save_global.h"
 
 static void cpymo_logo() {
 	puts("   __________        __  _______");
@@ -113,6 +113,12 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.scripttype);
 	}
 
+	// load global save data
+	err = cpymo_save_global_load(out);
+	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_CAN_NOT_OPEN_FILE) {
+		fprintf(stderr, "[Error] Global save data broken!\n");
+	}
+
 	cpymo_logo();
 
 	return CPYMO_ERR_SUCC;
@@ -120,6 +126,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
+	if (cpymo_save_global_save(engine) != CPYMO_ERR_SUCC) 
+		fprintf(stderr, "[Error] Can not save global savedata.\n");
+	
 	cpymo_text_free(&engine->text);
 	cpymo_say_free(&engine->say);
 	cpymo_floating_hint_free(&engine->floating_hint);

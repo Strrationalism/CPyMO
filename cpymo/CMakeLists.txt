@@ -22,5 +22,5 @@ add_library (cpymolib STATIC
 	"cpymo_scroll.h" "cpymo_scroll.c" 
 	"cpymo_floating_hint.h" "cpymo_floating_hint.c" 
 	"cpymo_textbox.h" "cpymo_textbox.c"
-	  "cpymo_say.h" "cpymo_say.c" "cpymo_text.h" "cpymo_text.c")
+	  "cpymo_say.h" "cpymo_say.c" "cpymo_text.h" "cpymo_text.c" "cpymo_save_global.h" "cpymo_save_global.c")
 
