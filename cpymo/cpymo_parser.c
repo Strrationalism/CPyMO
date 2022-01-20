@@ -181,7 +181,7 @@ float cpymo_parser_stream_span_atof(cpymo_parser_stream_span span)
 	char buf[32];
 	cpymo_parser_stream_span_trim(&span);
 	cpymo_parser_stream_span_copy(buf, sizeof(buf), span);
-	return atof(buf);
+	return (float)atof(buf);
 }
 
 void cpymo_parser_stream_span_trim(cpymo_parser_stream_span *span) 

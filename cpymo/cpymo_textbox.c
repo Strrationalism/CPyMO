@@ -9,7 +9,7 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->y = y;
     o->width = width;
     o->character_size = character_size;
-    o->max_lines = height / o->character_size;
+    o->max_lines = (size_t)(height / o->character_size);
     if (o->max_lines < 1) o->max_lines = 1;
     
     o->lines = (cpymo_backend_text *)malloc(o->max_lines * sizeof(cpymo_backend_text));

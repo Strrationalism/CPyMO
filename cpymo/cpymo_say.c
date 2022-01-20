@@ -104,7 +104,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 		if (e->say.msgbox) {
 			cpymo_backend_image_draw(
 				0, y, (float)e->gameconfig.imagesize_w, msg_h,
-				e->say.msgbox, 0, 0, (float)e->say.msgbox_w, (float)e->say.msgbox_h,
+				e->say.msgbox, 0, 0, e->say.msgbox_w, e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_textbox);
 		}
 
