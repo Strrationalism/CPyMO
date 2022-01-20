@@ -114,7 +114,7 @@ error_t cpymo_save_global_save(const cpymo_engine *e)
 
 	// Global Variables
 	for (struct cpymo_var *var = e->vars.globals; var != NULL; var = var->next) {
-		uint16_t var_name_len = strlen(var->name);
+		uint16_t var_name_len = (uint16_t)strlen(var->name);
 		uint16_t var_name_len_le16 = end_htole16(var_name_len);
 
 		char negative = var->val >= 0 ? 1 : 2;

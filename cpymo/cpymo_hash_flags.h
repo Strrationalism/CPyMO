@@ -1,6 +1,7 @@
 #ifndef INCLUDE_CPYMO_HASH_FLAGS
 #define INCLUDE_CPYMO_HASH_FLAGS
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "cpymo_error.h"
