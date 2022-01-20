@@ -20,7 +20,8 @@
 #endif
 
 #ifdef __APPLE__
-#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #endif
 
 #include "posix_win32.h"
