@@ -132,6 +132,8 @@ int main(void) {
 	TickCounter tickCounter;
 	osTickCounterStart(&tickCounter);
 	while (aptMainLoop() && !cpymo_input_fast_kill_pressed) {
+		if(aptShouldClose()) break;
+
 		hidScanInput();
 
 		bool redraw = false;

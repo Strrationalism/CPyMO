@@ -946,8 +946,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span text =
 				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
 
-			char hash_str[64];
-			sprintf_s(hash_str, sizeof(hash_str), "SEL: %s/%u/%d/", 
+			char hash_str[128];
+			sprintf(hash_str, "SEL: %s/%u/%d/", 
 				interpreter->script_name, 
 				(unsigned)interpreter->script_parser.cur_line, 
 				i);
@@ -988,8 +988,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		
 		for (int i = 0; i < choices; ++i) { 
 			POP_ARG(text); ENSURE(text); 
-			char hash_str[64];
-			sprintf_s(hash_str, sizeof(hash_str), "SELECT_TEXT: %s/%u/%d/",
+			char hash_str[128];
+			sprintf(hash_str, "SELECT_TEXT: %s/%u/%d/",
 				interpreter->script_name,
 				(unsigned)interpreter->script_parser.cur_line,
 				i);
@@ -1031,8 +1031,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			POP_ARG(text); ENSURE(text);
 			POP_ARG(expr); ENSURE(expr);
 
-			char hash_str[64];
-			sprintf_s(hash_str, sizeof(hash_str), "SELECT_VAR: %s/%u/%d/",
+			char hash_str[128];
+			sprintf(hash_str, "SELECT_VAR: %s/%u/%d/",
 				interpreter->script_name,
 				(unsigned)interpreter->script_parser.cur_line,
 				i);
@@ -1084,8 +1084,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				const bool enabled = cpymo_vars_eval(&engine->vars, v_str) != 0;
 				POS(x, y, x_str, y_str);
 
-				char hash_str[64];
-				sprintf_s(hash_str, sizeof(hash_str), "SELECT_IMG: %s/%u/%d/",
+				char hash_str[128];
+				sprintf(hash_str, "SELECT_IMG: %s/%u/%d/",
 					interpreter->script_name,
 					(unsigned)interpreter->script_parser.cur_line,
 					i);
@@ -1122,8 +1122,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				const bool enabled = cpymo_vars_eval(&engine->vars, v_str);
 				POS(x, y, x_str, y_str);
 
-				char hash_str[64];
-				sprintf_s(hash_str, sizeof(hash_str), "SELECT_IMGS: %s/%u/%d/",
+				char hash_str[128];
+				sprintf(hash_str, "SELECT_IMGS: %s/%u/%d/",
 					interpreter->script_name,
 					(unsigned)interpreter->script_parser.cur_line,
 					i);
