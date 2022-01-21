@@ -24,6 +24,9 @@ typedef struct {
 	int w, h;
 	bool enabled : 1;
 
+	uint64_t hash;
+	bool has_selected;
+
 	enum cpymo_select_img_selection_hint_state hint_state : 3;
 } cpymo_select_img_selection;
 
@@ -57,15 +60,15 @@ error_t cpymo_select_img_configuare_begin(
 	cpymo_parser_stream_span image_name_or_empty_when_select_imgs);
 
 void cpymo_select_img_configuare_select_img_selection(
-	struct cpymo_engine *engine, float x, float y, bool enabled);
+	struct cpymo_engine *engine, float x, float y, bool enabled, uint64_t hash);
 
 error_t cpymo_select_img_configuare_select_imgs_selection(
-	struct cpymo_engine *engine, cpymo_parser_stream_span image_name, float x, float y, bool enabled);
+	struct cpymo_engine *engine, cpymo_parser_stream_span image_name, float x, float y, bool enabled, uint64_t hash);
 
 void cpymo_select_img_configuare_end(struct cpymo_engine *engine, int init_position);
 
 error_t cpymo_select_img_update(struct cpymo_engine *engine);
-void cpymo_select_img_draw(const cpymo_select_img *, int logical_screen_w, int logical_screen_h);
+void cpymo_select_img_draw(const cpymo_select_img *, int logical_screen_w, int logical_screen_h, bool gray_selected);
 
 static inline void cpymo_select_img_init(cpymo_select_img *select_img)
 {
@@ -87,7 +90,8 @@ static inline void cpymo_select_img_free(cpymo_select_img *img)
 
 error_t cpymo_select_img_configuare_select_text(
 	struct cpymo_engine *engine, cpymo_parser_stream_span text, bool enabled, 
-	enum cpymo_select_img_selection_hint_state hint_mode);
+	enum cpymo_select_img_selection_hint_state hint_mode,
+	uint64_t hash);
 
 void cpymo_select_img_configuare_select_text_hint_pic(
 	struct cpymo_engine *engine, cpymo_parser_stream_span hint);

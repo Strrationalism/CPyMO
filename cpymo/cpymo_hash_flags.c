@@ -18,6 +18,7 @@ error_t cpymo_hash_flags_reserve(cpymo_hash_flags *f, size_t size)
 {
 	if (size == 0) return CPYMO_ERR_SUCC;
 	else if (f->flags == NULL) {
+		size *= 2;
 		assert(f->flag_count == 0 && f->flag_buf_size == 0);
 		f->flags = (cpymo_hash_flag *)malloc(sizeof(cpymo_hash_flag) * size);
 		if (f->flags == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -38,6 +39,8 @@ error_t cpymo_hash_flags_reserve(cpymo_hash_flags *f, size_t size)
 
 error_t cpymo_hash_flags_add(cpymo_hash_flags *flags, cpymo_hash_flag f)
 {
+	if (cpymo_hash_flags_check(flags, f) == true) return CPYMO_ERR_SUCC;
+
 	error_t err = cpymo_hash_flags_reserve(flags, flags->flag_count + 1);
 	CPYMO_THROW(err);
 

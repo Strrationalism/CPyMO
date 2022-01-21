@@ -65,7 +65,7 @@ error_t cpymo_select_img_configuare_begin(
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, float y, bool enabled)
+void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, float y, bool enabled, uint64_t hash)
 {
 	assert(e->select_img.selections);
 	assert(e->select_img.all_selections);
@@ -81,9 +81,12 @@ void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, 
 	sel->h = e->select_img.select_img_image_h / (int)e->select_img.all_selections;
 
 	sel->enabled = enabled;
+
+	sel->hash = hash;
+	sel->has_selected = cpymo_hash_flags_check(&e->flags, hash);
 }
 
-error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo_parser_stream_span image_name, float x, float y, bool enabled)
+error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo_parser_stream_span image_name, float x, float y, bool enabled, uint64_t hash)
 {
 	assert(e->select_img.selections);
 	assert(e->select_img.all_selections);
@@ -110,6 +113,9 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 	sel->y = y;
 	sel->w /= 2;
 	sel->enabled = enabled;
+
+	sel->hash = hash;
+	sel->has_selected = cpymo_hash_flags_check(&e->flags, hash);
 
 	return CPYMO_ERR_SUCC;
 }
@@ -229,9 +235,12 @@ static void cpymo_select_img_move(cpymo_select_img *o, int move) {
 		cpymo_select_img_move(o, move);
 }
 
-static error_t cpymo_select_img_ok(cpymo_engine *e, int sel)
+static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash)
 {
 	const char *out_var = cpymo_gameconfig_is_mo1(&e->gameconfig) ? "F91" : "FSEL";
+
+	if(e->select_img.save_enabled)
+		cpymo_hash_flags_add(&e->flags, hash);
 
 	error_t err = cpymo_vars_set(
 		&e->vars,
@@ -272,7 +281,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
-			return cpymo_select_img_ok(e, o->current_selection);
+			return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash);
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, cancel) && !e->select_img.save_enabled) {
@@ -281,14 +290,14 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 					|| (o->selections[o->current_selection].image == NULL
 						&& o->selections[o->current_selection].or_text == NULL))
 				o->current_selection--;
-			return cpymo_select_img_ok(e, o->current_selection);
+			return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash);
 		}
 
 		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
 			for (int i = 0; i < (int)o->all_selections; ++i) {
 				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
 					o->current_selection = i;
-					return cpymo_select_img_ok(e, i);
+					return cpymo_select_img_ok(e, i, o->selections[o->current_selection].hash);
 				}
 			}
 		}
@@ -297,7 +306,7 @@ error_t cpymo_select_img_update(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int logical_screen_h)
+void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int logical_screen_h, bool gray_seleted)
 {
 	if (o->selections) {
 
@@ -313,6 +322,9 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 
 		for (int i = 0; i < (int)o->all_selections; ++i) {
 			const cpymo_select_img_selection *sel = &o->selections[i];
+			bool gray = sel->has_selected;
+			if (!o->save_enabled || !gray_seleted) gray = false;
+			
 			if (sel->image) {
 				const bool selected = o->current_selection == i;
 				cpymo_backend_image_draw(
@@ -325,7 +337,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 					o->select_img_image ? i * sel->h : 0,
 					sel->w,
 					sel->h,
-					1.0f,
+					gray ? 0.75f : 1.0f,
 					cpymo_backend_image_draw_type_sel_img
 				);
 			}
@@ -351,7 +363,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 					sel->y,
 					(selected && o->sel_highlight == NULL) ? 
 						cpymo_color_inv(sel->text_color) : sel->text_color,
-					1.0f,
+					gray ? 0.75f : 1.0f,
 					cpymo_backend_image_draw_type_sel_img
 				);
 
@@ -387,7 +399,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 	}
 }
 
-error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode)
+error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode, uint64_t hash)
 {
 	if (e->select_img.sel_highlight == NULL) {
 		error_t err = cpymo_assetloader_load_system_image(
@@ -425,6 +437,8 @@ error_t cpymo_select_img_configuare_select_text(cpymo_engine *e, cpymo_parser_st
 	sel->h = (int)fontsize + 1;
 	sel->w = (int)text_width + 1;
 	sel->hint_state = hint_mode;
+	sel->hash = hash;
+	sel->has_selected = cpymo_hash_flags_check(&e->flags, hash);
 
 	return CPYMO_ERR_SUCC;
 }

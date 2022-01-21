@@ -198,7 +198,8 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_select_img_draw(
 		&engine->select_img, 
 		engine->gameconfig.imagesize_w, 
-		engine->gameconfig.imagesize_h);
+		engine->gameconfig.imagesize_h,
+		engine->gameconfig.grayselected);
 
 	cpymo_floating_hint_draw(&engine->floating_hint);
 	cpymo_flash_draw(engine);

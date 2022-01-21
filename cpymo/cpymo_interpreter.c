@@ -946,6 +946,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span text =
 				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
 
+			char hash_str[64];
+			sprintf_s(hash_str, sizeof(hash_str), "SEL: %s/%u/%d/", 
+				interpreter->script_name, 
+				(unsigned)interpreter->script_parser.cur_line, 
+				i);
+
+			size_t len = strlen(hash_str);
+			cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, text);
+
+			uint64_t sel_hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+
 			int hint_mode = cpymo_select_img_selection_nohint;
 			if (!(IS_EMPTY(hint_pic))) {
 				uint32_t first_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
@@ -954,7 +965,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				else if (first_char == L'×') hint_mode = cpymo_select_img_selection_hint23;
 			}
 
-			err = cpymo_select_img_configuare_select_text(engine, text, true, hint_mode);
+			err = cpymo_select_img_configuare_select_text(engine, text, true, hint_mode, sel_hash);
 			CPYMO_THROW(err);
 		}
 
@@ -977,7 +988,18 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		
 		for (int i = 0; i < choices; ++i) { 
 			POP_ARG(text); ENSURE(text); 
-			err = cpymo_select_img_configuare_select_text(engine, text, true, cpymo_select_img_selection_nohint);
+			char hash_str[64];
+			sprintf_s(hash_str, sizeof(hash_str), "SELECT_TEXT: %s/%u/%d/",
+				interpreter->script_name,
+				(unsigned)interpreter->script_parser.cur_line,
+				i);
+
+			size_t len = strlen(hash_str);
+			cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, text);
+
+			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+
+			err = cpymo_select_img_configuare_select_text(engine, text, true, cpymo_select_img_selection_nohint, hash);
 			CPYMO_THROW(err); 
 		} 
 		
@@ -1008,11 +1030,23 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		for (int i = 0; i < choices; ++i) {
 			POP_ARG(text); ENSURE(text);
 			POP_ARG(expr); ENSURE(expr);
+
+			char hash_str[64];
+			sprintf_s(hash_str, sizeof(hash_str), "SELECT_VAR: %s/%u/%d/",
+				interpreter->script_name,
+				(unsigned)interpreter->script_parser.cur_line,
+				i);
+			size_t len = strlen(hash_str);
+			cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, text);
+
+			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+
 			err = cpymo_select_img_configuare_select_text(
 				engine, 
 				text, 
 				cpymo_vars_eval(&engine->vars, expr) != 0,
-				cpymo_select_img_selection_nohint);
+				cpymo_select_img_selection_nohint,
+				hash);
 			CPYMO_THROW(err);
 		}
 
@@ -1050,7 +1084,16 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				const bool enabled = cpymo_vars_eval(&engine->vars, v_str) != 0;
 				POS(x, y, x_str, y_str);
 
-				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled);
+				char hash_str[64];
+				sprintf_s(hash_str, sizeof(hash_str), "SELECT_IMG: %s/%u/%d/",
+					interpreter->script_name,
+					(unsigned)interpreter->script_parser.cur_line,
+					i);
+				size_t len = strlen(hash_str);
+				cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, filename);
+				uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+
+				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled, hash);
 			}
 
 			POP_ARG(init_position);
@@ -1079,7 +1122,18 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				const bool enabled = cpymo_vars_eval(&engine->vars, v_str);
 				POS(x, y, x_str, y_str);
 
-				cpymo_select_img_configuare_select_imgs_selection(engine, filename, x, y, enabled);
+				char hash_str[64];
+				sprintf_s(hash_str, sizeof(hash_str), "SELECT_IMGS: %s/%u/%d/",
+					interpreter->script_name,
+					(unsigned)interpreter->script_parser.cur_line,
+					i);
+
+				size_t len = strlen(hash_str);
+				cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, filename);
+
+				uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+
+				cpymo_select_img_configuare_select_imgs_selection(engine, filename, x, y, enabled, hash);
 			}
 
 			POP_ARG(init_position);
