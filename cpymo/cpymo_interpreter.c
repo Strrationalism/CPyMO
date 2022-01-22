@@ -1088,7 +1088,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				sprintf(hash_str, "SELECT_IMG: %s/%u/%d/",
 					interpreter->script_name,
 					(unsigned)interpreter->script_parser.cur_line,
-					i);
+					(int)i);
 				size_t len = strlen(hash_str);
 				cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, filename);
 				uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
@@ -1126,7 +1126,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				sprintf(hash_str, "SELECT_IMGS: %s/%u/%d/",
 					interpreter->script_name,
 					(unsigned)interpreter->script_parser.cur_line,
-					i);
+					(int)i);
 
 				size_t len = strlen(hash_str);
 				cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, filename);
