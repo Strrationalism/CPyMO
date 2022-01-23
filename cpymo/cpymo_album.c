@@ -9,7 +9,8 @@
 
 error_t cpymo_album_generate_album_ui_image(
 	cpymo_backend_image *out_image, 
-	cpymo_parser_stream_span album_list, 
+	cpymo_parser_stream_span album_list_text, 
+	cpymo_parser_stream_span album_list_name,
 	size_t page, 
 	cpymo_assetloader* loader,
 	size_t w, size_t h)
@@ -39,7 +40,7 @@ error_t cpymo_album_generate_album_ui_image(
 	}
 
 	cpymo_parser album_list_parser;
-	cpymo_parser_init(&album_list_parser, album_list.begin, album_list.len);
+	cpymo_parser_init(&album_list_parser, album_list_text.begin, album_list_text.len);
 
 	size_t next_id = 0;
 
