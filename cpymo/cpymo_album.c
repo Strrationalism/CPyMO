@@ -99,11 +99,19 @@ error_t cpymo_album_generate_album_ui_image(
 
 		if (thumb_pixels == NULL) continue;
 
-		// resize and write to album here
-
+		stbir_resize_uint8(
+			thumb_pixels, cg_w, cg_h, cg_w * 3, 
+			pixels + 3 * thumb_left_top_y * w + 3 * thumb_left_top_x, 
+			(int)thumb_width, (int)thumb_height, (int)w * 3, 3);
+		free(thumb_pixels);
 	} while (cpymo_parser_next_line(&album_list_parser));
 
-	// *out_image = ...
+	error_t err = cpymo_backend_image_load(out_image, pixels, (int)w, (int)h, cpymo_backend_image_format_rgb);
+	if (err != CPYMO_ERR_SUCC) {
+		free(pixels);
+		return err;
+	}
+
 	// write to game data package.
 
 	free(pixels);
