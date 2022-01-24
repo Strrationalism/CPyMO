@@ -67,6 +67,7 @@ static void ensure_save_dir(const char *gamedir)
 
 int main(int argc, char **argv) 
 {
+	int ret = 0;
 	const char *gamedir = "./";
 
 	if (argc == 2) {
@@ -160,6 +161,7 @@ int main(int argc, char **argv)
 		case CPYMO_ERR_NO_MORE_CONTENT: goto EXIT;
 		default: {
 			SDL_Log("[Error] %s.", cpymo_error_message(err));
+			ret = -1;
 			goto EXIT;
 		}
 		}
@@ -188,5 +190,5 @@ int main(int argc, char **argv)
 	_CrtDumpMemoryLeaks();
 	#endif
 
-	return 0;
+	return ret;
 }
