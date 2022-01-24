@@ -172,8 +172,8 @@ static error_t cpymo_album_load_ui_image(
 
 		if (px == NULL) goto GENERATE;
 		else {
-			*ref_w = (int)w;
-			*ref_h = (int)h;
+			*ref_w = (size_t)w;
+			*ref_h = (size_t)h;
 			return cpymo_backend_image_load(out_image, px, w, h, cpymo_backend_image_format_rgb);
 		}
 	}
