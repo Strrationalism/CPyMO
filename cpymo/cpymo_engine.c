@@ -103,6 +103,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init hash flags
 	cpymo_hash_flags_init(&out->flags);
 
+	// init ui
+	out->ui = NULL;
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -133,6 +136,7 @@ void cpymo_engine_free(cpymo_engine *engine)
 	if (err != CPYMO_ERR_SUCC) 
 		fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
 	
+	if (engine->ui) cpymo_ui_exit(engine);
 	cpymo_hash_flags_free(&engine->flags);
 	cpymo_text_free(&engine->text);
 	cpymo_say_free(&engine->say);
@@ -161,6 +165,12 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 	if (engine->input.hide_window != engine->prev_input.hide_window)
 		*redraw = true;
+
+	if (cpymo_ui_enabled(engine)) {
+		error_t err = cpymo_ui_update(engine, delta_time_sec);
+		*redraw |= engine->redraw;
+		return err;
+	}
 
 	err = cpymo_bg_update(&engine->bg, redraw);
 	CPYMO_THROW(err);
@@ -191,6 +201,11 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 void cpymo_engine_draw(const cpymo_engine *engine)
 {
+	if (cpymo_ui_enabled(engine)) {
+		cpymo_ui_draw(engine);
+		return;
+	}
+
 	cpymo_bg_draw(engine);
 	cpymo_scroll_draw(&engine->scroll);
 	cpymo_charas_draw(engine);

@@ -19,6 +19,7 @@
 #include "cpymo_say.h"
 #include "cpymo_text.h"
 #include "cpymo_hash_flags.h"
+#include "cpymo_ui.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -38,6 +39,7 @@ struct cpymo_engine {
 	cpymo_say say;
 	cpymo_text text;
 	cpymo_hash_flags flags;
+	cpymo_ui *ui;
 
 	bool skipping;
 	char *title;
