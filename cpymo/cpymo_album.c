@@ -2,12 +2,13 @@
 #include <stb_image_write.h>
 #include <stb_image.h>
 #include <memory.h>
+#include <string.h>
 #include "cpymo_error.h"
 #include "cpymo_parser.h"
 #include <cpymo_backend_image.h>
 #include "cpymo_assetloader.h"
 
-error_t cpymo_album_generate_album_ui_image(
+static error_t cpymo_album_generate_album_ui_image(		// No test.
 	cpymo_backend_image *out_image, 
 	cpymo_parser_stream_span album_list_text, 
 	cpymo_parser_stream_span album_list_name,
@@ -17,7 +18,7 @@ error_t cpymo_album_generate_album_ui_image(
 {
 	stbi_uc *pixels = NULL;
 
-	{	// Load album bg
+	{
 		char *image_buf = NULL;
 		size_t image_buf_size = 0;
 		error_t err = cpymo_assetloader_load_system(&image_buf, &image_buf_size, "albumbg", "png", loader);
@@ -107,14 +108,27 @@ error_t cpymo_album_generate_album_ui_image(
 		free(thumb_pixels);
 	} while (cpymo_parser_next_line(&album_list_parser));
 
+	if (cpymo_backend_image_album_ui_writable()) {
+		char *path = (char *)malloc(strlen(loader->gamedir) + album_list_name.len + 32);
+		if (path != NULL) {
+			strcpy(path, loader->gamedir);
+			strcat(path, "/system/");
+			strncat(path, album_list_name.begin, album_list_name.len);
+			strcat(path, "_");
+			char page_str[4];
+			itoa((int)page, page_str, 10);
+			strcat(path, page_str);
+			strcat(path, ".png");
+			stbi_write_png(path, w, h, 3, pixels, w * 3);
+			free(path);
+		}
+	}
+
 	error_t err = cpymo_backend_image_load(out_image, pixels, (int)w, (int)h, cpymo_backend_image_format_rgb);
 	if (err != CPYMO_ERR_SUCC) {
 		free(pixels);
 		return err;
 	}
 
-	// write to game data package.
-
-	free(pixels);
 	return CPYMO_ERR_SUCC;
 }

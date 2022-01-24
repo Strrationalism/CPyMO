@@ -56,4 +56,6 @@ void cpymo_backend_image_fill_rects(
 	cpymo_color color, float alpha,
 	enum cpymo_backend_image_draw_type draw_type);
 
+bool cpymo_backend_image_album_ui_writable();
+
 #endif

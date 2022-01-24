@@ -111,3 +111,4 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 		SDL_Log("Warning: SDL_RenderFillRectsF failed, %s", SDL_GetError());
 }
 
+bool cpymo_backend_image_album_ui_writable() { return true; }

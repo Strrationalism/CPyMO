@@ -306,3 +306,5 @@ error_t cpymo_backend_image_load_with_mask(
 	free(mask_a8_moveinto);
 	return cpymo_backend_image_load(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
 }
+
+bool cpymo_backend_image_album_ui_writable() { return true; }
