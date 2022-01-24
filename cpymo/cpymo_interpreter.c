@@ -230,7 +230,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	D("waitkey") {
 		cpymo_engine_request_redraw(engine);
-		cpymo_wait_for_seconds(engine, 5.0f);
+		cpymo_wait_for_seconds(&engine->wait, 5.0f);
 		return CPYMO_ERR_SUCC;
 	}
 
@@ -1152,7 +1152,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		cpymo_engine_request_redraw(engine);
 		float wait_sec = (float)cpymo_parser_stream_span_atoi(wait_ms_str) / 1000.0f;
-		cpymo_wait_for_seconds(engine, wait_sec);
+		cpymo_wait_for_seconds(&engine->wait, wait_sec);
 		return CPYMO_ERR_SUCC;
 	}
 

@@ -37,7 +37,7 @@ static inline void cpymo_wait_register(cpymo_wait *wait, cpymo_wait_for wait_for
 
 error_t cpymo_wait_update(cpymo_wait *wait, struct cpymo_engine *engine, float delta_time);
 
-void cpymo_wait_for_seconds(struct cpymo_engine *engine, float seconds);
-void cpymo_wait_callback_after_seconds(struct cpymo_engine *engine, float seconds, cpymo_wait_over_callback);
+void cpymo_wait_for_seconds(cpymo_wait *, float seconds);
+void cpymo_wait_callback_after_seconds(cpymo_wait *, float seconds, cpymo_wait_over_callback);
 
 #endif

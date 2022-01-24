@@ -35,14 +35,14 @@ static bool cpymo_wait_second_waiter(struct cpymo_engine *e, float delta_time)
 	return e->wait.wait_for_seconds <= 0;
 }
 
-void cpymo_wait_for_seconds(cpymo_engine * engine, float seconds)
+void cpymo_wait_for_seconds(cpymo_wait *wait, float seconds)
 {
-	engine->wait.wait_for_seconds = seconds;
-	cpymo_wait_register(&engine->wait, &cpymo_wait_second_waiter);
+	wait->wait_for_seconds = seconds;
+	cpymo_wait_register(wait, &cpymo_wait_second_waiter);
 }
 
-void cpymo_wait_callback_after_seconds(cpymo_engine * engine, float seconds, cpymo_wait_over_callback cb)
+void cpymo_wait_callback_after_seconds(cpymo_wait *wait, float seconds, cpymo_wait_over_callback cb)
 {
-	engine->wait.wait_for_seconds = seconds;
-	cpymo_wait_register_with_callback(&engine->wait, &cpymo_wait_second_waiter, cb);
+	wait->wait_for_seconds = seconds;
+	cpymo_wait_register_with_callback(wait, &cpymo_wait_second_waiter, cb);
 }

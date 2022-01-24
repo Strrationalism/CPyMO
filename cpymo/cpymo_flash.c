@@ -15,7 +15,7 @@ void cpymo_flash_start(cpymo_engine * engine, cpymo_color col, float time)
 	engine->flash.color = col;
 	engine->flash.enable = true;
 
-	cpymo_wait_callback_after_seconds(engine, time, &cpymo_flash_callback);
+	cpymo_wait_callback_after_seconds(&engine->wait, time, &cpymo_flash_callback);
 }
 
 void cpymo_flash_draw(const cpymo_engine *engine)
