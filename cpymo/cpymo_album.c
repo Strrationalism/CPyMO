@@ -141,15 +141,15 @@ static error_t cpymo_album_generate_album_ui_image(
 static error_t cpymo_album_load_ui_image(
 	cpymo_backend_image *out_image,
 	cpymo_parser_stream_span album_list_text,
-	cpymo_parser_stream_span output_cache_ui_file_name,
+	cpymo_parser_stream_span ui_file_name,
 	size_t page,
 	cpymo_assetloader *loader,
 	size_t *ref_w, size_t *ref_h) 
 {
-	char *assetname = (char *)malloc(output_cache_ui_file_name.len + 16);
+	char *assetname = (char *)malloc(ui_file_name.len + 16);
 	if (assetname == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	cpymo_parser_stream_span_copy(assetname, output_cache_ui_file_name.len + 16, output_cache_ui_file_name);
+	cpymo_parser_stream_span_copy(assetname, ui_file_name.len + 16, ui_file_name);
 	char page_str[4];
 	_itoa((int)page, page_str, 10);
 	strcat(assetname, "_");
@@ -163,7 +163,7 @@ static error_t cpymo_album_load_ui_image(
 	if (err != CPYMO_ERR_SUCC) {
 		GENERATE:
 		return cpymo_album_generate_album_ui_image(
-			out_image, album_list_text, output_cache_ui_file_name, page, loader, ref_w, ref_h);
+			out_image, album_list_text, ui_file_name, page, loader, ref_w, ref_h);
 	}
 	else {
 		int w, h, c;
