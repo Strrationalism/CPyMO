@@ -102,7 +102,7 @@ error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_pars
 			if (!cpymo_parser_next_line(&interpreter->script_parser)) {
 				char label_name[32];
 				cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
-				fprintf(stderr, "[Error] Can not find label %s in script %s.", label_name, interpreter->script_name);
+				fprintf(stderr, "[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
 				return CPYMO_ERR_NOT_FOUND;
 			}
 		}
