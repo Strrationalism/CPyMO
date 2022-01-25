@@ -25,5 +25,5 @@ add_library (cpymolib STATIC
 	"cpymo_say.h" "cpymo_say.c" 
 	"cpymo_text.h" "cpymo_text.c" 
 	"cpymo_save_global.h" "cpymo_save_global.c" 
-	"cpymo_hash_flags.h" "cpymo_hash_flags.c" "cpymo_album.c" "cpymo_ui.h" "cpymo_ui.c")
+	"cpymo_hash_flags.h" "cpymo_hash_flags.c" "cpymo_album.c" "cpymo_ui.h" "cpymo_ui.c" "cpymo_album.h")
 

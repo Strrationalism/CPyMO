@@ -15,6 +15,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#define FASTEST_FILTER STBIR_FILTER_BOX
+#define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
+#define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include <stb_image_resize.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 #if _WIN32 && !NDEBUG
 #include <crtdbg.h>
 #endif

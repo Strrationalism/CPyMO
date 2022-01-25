@@ -9,11 +9,14 @@ struct cpymo_engine;
 
 typedef error_t(*cpymo_ui_updater)(struct cpymo_engine *, void *ui_data, float);
 
-typedef void(*cpymo_ui_drawer)(const struct cpymo_engine *, void *ui_data);
+typedef void(*cpymo_ui_drawer)(const struct cpymo_engine *, const void *ui_data);
+
+typedef void(*cpymo_ui_deleter)(struct cpymo_engine *, void *ui_data);
 
 typedef struct {
 	cpymo_ui_updater update;
 	cpymo_ui_drawer draw;
+	cpymo_ui_deleter deleter;
 } cpymo_ui;
 
 error_t cpymo_ui_enter(
@@ -21,9 +24,12 @@ error_t cpymo_ui_enter(
 	struct cpymo_engine *,
 	size_t ui_data_size,
 	cpymo_ui_updater,
-	cpymo_ui_drawer);
+	cpymo_ui_drawer,
+	cpymo_ui_deleter);
 
 void cpymo_ui_exit(struct cpymo_engine *);
+
+void *cpymo_ui_data(struct cpymo_engine *);
 
 error_t cpymo_ui_update(struct cpymo_engine *, float dt);
 void cpymo_ui_draw(const struct cpymo_engine *);

@@ -49,7 +49,7 @@ APP_DESCRIPTION := PyMO Engine implements in C.
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -Wno-unknown-pragmas -O2 -mword-relocations \
+CFLAGS	:=	-g -Wall -Wno-unknown-pragmas -Ofast -mword-relocations \
 			-ffunction-sections \
 			$(ARCH)
 

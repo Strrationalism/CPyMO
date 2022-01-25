@@ -8,6 +8,7 @@
 #include "cpymo_parser.h"
 #include <cpymo_backend_image.h>
 #include "cpymo_assetloader.h"
+#include "cpymo_engine.h"
 
 #ifdef __3DS__
 #define _itoa itoa
@@ -179,3 +180,105 @@ static error_t cpymo_album_load_ui_image(
 	}
 
 }
+
+typedef struct {
+	cpymo_backend_image current_ui;
+	size_t current_ui_w, current_ui_h;
+
+	size_t current_page;
+	cpymo_parser_stream_span album_list_name, album_ui_name;
+
+	char *album_list_text;
+	size_t album_list_text_size;
+} cpymo_album;
+
+static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
+{
+	if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
+		cpymo_ui_exit(e);
+		return CPYMO_ERR_SUCC;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
+{
+	const cpymo_album *a = (const cpymo_album *)_a;
+	
+	if (a->current_ui) {
+		cpymo_backend_image_draw(
+			0, 0, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h,
+			a->current_ui, 0, 0, (int)a->current_ui_w, (int)a->current_ui_h,
+			1.0f, cpymo_backend_image_draw_type_bg);
+	}
+}
+
+static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
+{
+	if (a->current_ui != NULL) {
+		cpymo_backend_image_free(a->current_ui);
+		a->current_ui = NULL;
+	}
+
+	a->current_ui_w = e->gameconfig.imagesize_w;
+	a->current_ui_h = e->gameconfig.imagesize_h;
+
+	cpymo_parser_stream_span span;
+	span.begin = a->album_list_text;
+	span.len = a->album_list_text_size;
+
+	error_t err = cpymo_album_load_ui_image(
+		&a->current_ui, 
+		span,
+		a->album_ui_name, 
+		a->current_page, 
+		&e->assetloader, 
+		&a->current_ui_w, 
+		&a->current_ui_h);
+
+	return err;
+}
+
+static void cpymo_album_deleter(cpymo_engine *e, void *a)
+{
+	cpymo_album *album = (cpymo_album *)a;
+	if (album->album_list_text) free(album->album_list_text);
+	if (album->current_ui) cpymo_backend_image_free(album->current_ui);
+}
+
+error_t cpymo_album_enter(
+	cpymo_engine *e, 
+	cpymo_parser_stream_span album_list_name, 
+	cpymo_parser_stream_span album_ui_name,
+	size_t page)
+{
+	cpymo_album *album = NULL;
+	error_t err = cpymo_ui_enter(
+		(void **)&album, 
+		e, 
+		sizeof(cpymo_album),
+		&cpymo_album_update,
+		&cpymo_album_draw, 
+		&cpymo_album_deleter);
+	CPYMO_THROW(err);
+
+	album->album_list_name = album_list_name;
+	album->album_ui_name = album_ui_name;
+	album->current_ui = NULL;
+	album->current_page = page;
+
+	char script_name[128];
+	cpymo_parser_stream_span_copy(script_name, sizeof(script_name), album_list_name);
+
+	album->album_list_text = NULL;
+	err = cpymo_assetloader_load_script(
+		&album->album_list_text,
+		&album->album_list_text_size, 
+		script_name, &e->assetloader);
+
+	CPYMO_THROW(err);
+
+	return cpymo_album_load_page(e, album);
+}
+

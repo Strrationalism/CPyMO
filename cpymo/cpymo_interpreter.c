@@ -1,5 +1,6 @@
 #include "cpymo_interpreter.h"
 #include "cpymo_engine.h"
+#include "cpymo_album.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -1181,6 +1182,22 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	/*** IV. System ***/
+	D("album") {
+		POP_ARG(list_name);
+
+		cpymo_parser_stream_span ui_name;
+
+		if (IS_EMPTY(list_name)) {
+			list_name = cpymo_parser_stream_span_pure("album_list");
+			ui_name = cpymo_parser_stream_span_pure("albumbg");
+		} 
+		else {
+			ui_name = list_name;
+		}
+
+		return cpymo_album_enter(engine, list_name, ui_name, 0);
+	}
+
 	D("date") {
 		int fmonth = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FMONTH"));
 		int fdate = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FDATE"));
