@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #include "cpymo_error.h"
 #include "cpymo_parser.h"
 #include <cpymo_backend_image.h>
