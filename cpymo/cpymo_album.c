@@ -4,16 +4,12 @@
 #include <memory.h>
 #include <string.h>
 #include <math.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include "cpymo_error.h"
 #include "cpymo_parser.h"
 #include <cpymo_backend_image.h>
 #include "cpymo_assetloader.h"
 #include "cpymo_engine.h"
-
-#ifndef WIN32
-#define _itoa itoa
-#endif
 
 static error_t cpymo_album_generate_album_ui_image(
 	cpymo_backend_image *out_image, 
@@ -123,7 +119,7 @@ static error_t cpymo_album_generate_album_ui_image(
 			strncat(path, output_cache_ui_file_name.begin, output_cache_ui_file_name.len);
 			strcat(path, "_");
 			char page_str[4];
-			_itoa((int)page, page_str, 10);
+			snprintf(page_str, sizeof(page_str), "%d", (int)page);
 			strcat(path, page_str);
 			strcat(path, ".png");
 			stbi_write_png(path, (int)*ref_w, (int)*ref_h, 3, pixels, (int)*ref_w * 3);
@@ -153,7 +149,7 @@ static error_t cpymo_album_load_ui_image(
 
 	cpymo_parser_stream_span_copy(assetname, ui_file_name.len + 16, ui_file_name);
 	char page_str[4];
-	_itoa((int)page, page_str, 10);
+	snprintf(page_str, sizeof(page_str), "%d", (int)page);
 	strcat(assetname, "_");
 	strcat(assetname, page_str);
 
