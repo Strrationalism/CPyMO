@@ -10,7 +10,7 @@
 #include "cpymo_assetloader.h"
 #include "cpymo_engine.h"
 
-#ifdef __3DS__
+#ifndef WIN32
 #define _itoa itoa
 #endif
 
