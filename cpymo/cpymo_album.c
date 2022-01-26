@@ -259,6 +259,7 @@ static error_t cpymo_album_next_page(cpymo_engine *e, cpymo_album *a)
 		return cpymo_album_load_page(e, a);
 	else {
 		a->current_cg_selection = 0;
+		cpymo_engine_request_redraw(e);
 		return CPYMO_ERR_SUCC;
 	}
 }
