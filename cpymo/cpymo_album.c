@@ -271,7 +271,11 @@ static error_t cpymo_album_prev_page(cpymo_engine *e, cpymo_album *a)
 	else a->current_page--;
 
 	if (prev_page != a->current_page) return cpymo_album_load_page(e, a);
-	else return CPYMO_ERR_SUCC;
+	else {
+		a->current_cg_selection = 0;
+		cpymo_engine_request_redraw(e);
+		return CPYMO_ERR_SUCC;
+	}
 }
 
 static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)

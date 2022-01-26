@@ -190,8 +190,8 @@ error_t cpymo_backend_image_load(
         pixels_moveintoimage = new_px;
     }
 
-    printf("[Load Texture] C: %d, W: %d, H: %d, PW: %d, PH: %d\n",
-        channels, width, height, pad_width, pad_height);
+    /*printf("[Load Texture] C: %d, W: %d, H: %d, PW: %d, PH: %d\n",
+        channels, width, height, pad_width, pad_height);*/
 
     cpymo_backend_image_3ds *img = (cpymo_backend_image_3ds *)malloc(sizeof(cpymo_backend_image_3ds));
     if(img == NULL) return CPYMO_ERR_OUT_OF_MEM;
