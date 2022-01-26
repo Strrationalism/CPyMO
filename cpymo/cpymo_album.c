@@ -207,6 +207,8 @@ typedef struct {
 	size_t album_list_text_size;
 
 	float mouse_wheel_sum;
+	float mouse_x_sum;
+	size_t ignore_mouse_button_release;
 } cpymo_album;
 
 uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
@@ -362,6 +364,26 @@ static error_t cpymo_album_prev_page(cpymo_engine *e, cpymo_album *a)
 	}
 }
 
+static bool cpymo_album_check_mouse_in_box(cpymo_engine *e, size_t i) {
+	int row = i / 5;
+	int col = i % 5;
+	float
+		x = (float)e->gameconfig.imagesize_w * (0.03f + 0.19f * col),
+		y = (float)e->gameconfig.imagesize_h * (0.02f + 0.19f * row),
+		w = (float)e->gameconfig.imagesize_w * 0.17f,
+		h = (float)e->gameconfig.imagesize_h * 0.17f,
+		mx = e->input.mouse_x,
+		my = e->input.mouse_y;
+
+	float x2 = x + w, y2 = y + h;
+	return mx >= x && mx <= x2 && my >= y && my <= y2;
+}
+
+static error_t cpymo_album_select_ok(cpymo_engine *e, cpymo_album *a)
+{
+	return CPYMO_ERR_SUCC;
+}
+
 static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 {
 	if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
@@ -371,6 +393,37 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 
 	cpymo_album *album = (cpymo_album *)a;
 
+	if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
+		float percent = album->mouse_x_sum / (float)e->gameconfig.imagesize_w;
+		if (percent >= 0.25f) {
+			album->mouse_x_sum = 0;
+			return cpymo_album_prev_page(e, album);
+		}
+		else if (percent <= -0.25f) {
+			album->mouse_x_sum = 0;
+			return cpymo_album_next_page(e, album);
+		}
+		else if (album->ignore_mouse_button_release)
+			album->ignore_mouse_button_release--;
+		else {
+			for (size_t i = 0; i < album->cg_count; ++i) {
+				if (cpymo_album_check_mouse_in_box(e, i)) {
+					album->current_cg_selection = i;
+					return cpymo_album_select_ok(e, album);
+				}
+			}
+		}
+	}
+
+	if (e->input.mouse_button && e->prev_input.mouse_button) {
+		if (e->input.mouse_position_useable && e->input.mouse_position_useable) {
+			album->mouse_x_sum += e->input.mouse_x - e->prev_input.mouse_x;
+		}
+	}
+	else
+		album->mouse_x_sum = 0;
+
+	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) return cpymo_album_select_ok(e, album);
 	if (CPYMO_INPUT_JUST_PRESSED(e, left)) return cpymo_album_prev_page(e, album);
 	if (CPYMO_INPUT_JUST_PRESSED(e, right)) return cpymo_album_next_page(e, album);
 
@@ -409,19 +462,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 	if (e->prev_input.mouse_position_useable && e->input.mouse_position_useable) {
 		if (e->prev_input.mouse_x != e->input.mouse_x || e->prev_input.mouse_y != e->input.mouse_y) {
 			for (size_t i = 0; i < album->cg_count; ++i) {
-				int row = i / 5;
-				int col = i % 5;
-				float 
-					x = (float)e->gameconfig.imagesize_w * (0.03f + 0.19f * col),
-					y = (float)e->gameconfig.imagesize_h * (0.02f + 0.19f * row),
-					w = (float)e->gameconfig.imagesize_w * 0.17f,
-					h = (float)e->gameconfig.imagesize_h * 0.17f,
-					mx = e->input.mouse_x,
-					my = e->input.mouse_y;
-
-				float x2 = x + w, y2 = y + h;
-
-				if (mx >= x && mx <= x2 && my >= y && my <= y2) {
+				if (cpymo_album_check_mouse_in_box(e, i)) {
 					cpymo_engine_request_redraw(e);
 					album->current_cg_selection = (int)i;
 					break;
@@ -508,6 +549,8 @@ error_t cpymo_album_enter(
 	album->page_count = 0;
 	album->mouse_wheel_sum = 0;
 	album->cv_thumb_cover = NULL;
+	album->mouse_x_sum = 0;
+	album->ignore_mouse_button_release = 1;
 
 	char *buf = NULL;
 	size_t buf_size;

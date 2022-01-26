@@ -63,6 +63,9 @@ static inline void cpymo_engine_request_redraw(cpymo_engine *engine)
 #define CPYMO_INPUT_JUST_PRESSED(PENGINE, KEY) \
 	(!PENGINE->prev_input.KEY && PENGINE->input.KEY)
 
+#define CPYMO_INPUT_JUST_RELEASED(PENGINE, KEY) \
+	(PENGINE->prev_input.KEY && !PENGINE->input.KEY)
+
 static inline bool cpymo_input_mouse_moved(cpymo_engine *engine)
 {
 	if (engine->input.mouse_position_useable && engine->prev_input.mouse_position_useable) {
