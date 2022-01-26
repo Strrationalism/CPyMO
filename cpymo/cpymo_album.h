@@ -6,6 +6,8 @@
 
 struct cpymo_engine;
 
+uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename);
+
 error_t cpymo_album_enter(
 	struct cpymo_engine *e, 
 	cpymo_parser_stream_span album_list_name, 
