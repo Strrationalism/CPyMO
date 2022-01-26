@@ -6,6 +6,8 @@ extern SDL_Renderer *renderer;
 extern SDL_Window *window;
 extern cpymo_engine engine;
 
+float mouse_wheel;
+
 cpymo_input cpymo_input_snapshot()
 {
 	cpymo_input out;
@@ -14,6 +16,8 @@ cpymo_input cpymo_input_snapshot()
 
 	out.up = keyboard[SDL_SCANCODE_UP];
 	out.down = keyboard[SDL_SCANCODE_DOWN];
+	out.left = keyboard[SDL_SCANCODE_LEFT];
+	out.right = keyboard[SDL_SCANCODE_RIGHT];
 	out.ok = keyboard[SDL_SCANCODE_KP_ENTER] || keyboard[SDL_SCANCODE_RETURN] || keyboard[SDL_SCANCODE_SPACE];
 	out.cancel = keyboard[SDL_SCANCODE_ESCAPE] || keyboard[SDL_SCANCODE_CANCEL];
 	out.skip = keyboard[SDL_SCANCODE_LCTRL] || keyboard[SDL_SCANCODE_RCTRL];
@@ -35,6 +39,7 @@ cpymo_input cpymo_input_snapshot()
 
 	out.mouse_x = ((float)mx / scale_x - viewport.x) / (float)viewport.w;
 	out.mouse_y = ((float)my / scale_y - viewport.y) / (float)viewport.h;
+	out.mouse_wheel_delta = mouse_wheel;
 
 	if (
 		out.mouse_x >= 1.0f 

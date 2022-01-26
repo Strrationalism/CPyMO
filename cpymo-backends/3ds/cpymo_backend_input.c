@@ -18,8 +18,11 @@ cpymo_input cpymo_input_snapshot()
     out.auto_mode = (keys & KEY_Y) > 0;
     out.down = (keys & KEY_DOWN) > 0;
     out.up = (keys & KEY_UP) > 0;
+    out.left = (keys & KEY_LEFT) > 0;
+    out.right = (keys & KEY_RIGHT) > 0;
     out.mouse_button = false;
     out.mouse_position_useable = false;
+    out.mouse_wheel_delta = 0;
 
     circlePosition pos;
     hidCircleRead(&pos);

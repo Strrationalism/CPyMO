@@ -150,11 +150,19 @@ int main(int argc, char **argv)
 	while (1) {
 		bool redraw_by_event = false;
 
+		extern float mouse_wheel;
+		mouse_wheel = 0;
+
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT)
 				goto EXIT;
 			else if (event.type == SDL_WINDOWEVENT)
 				redraw_by_event = true;
+			else if (event.type == SDL_MOUSEWHEEL) {
+				mouse_wheel = event.wheel.preciseY;
+				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
+					mouse_wheel *= -1;
+			}
 		}
 
 		bool need_to_redraw = false;

@@ -10,8 +10,12 @@ typedef struct {
 	bool mouse_position_useable : 1;
 	bool mouse_button : 1;
 
+	float mouse_wheel_delta;
+
 	bool up : 1;
 	bool down : 1;
+	bool left : 1;
+	bool right : 1;
 	bool ok : 1;
 	bool cancel : 1;
 	bool skip : 1;
