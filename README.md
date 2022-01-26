@@ -45,6 +45,13 @@ Unpack a pymo package:
     cpymo-tool unpack <pak-file> <extension_without "."> <output-dir>
 ```
 
+## 编译为SDL2项目
+
+### 额外依赖
+
+你需要先使用类似vcpkg之类的包管理器安装ffmpeg。    
+本仓库内已经添加了SDL2的子模块，不需要手动添加SDL2依赖。    
+
 ## 编译到任天堂3DS平台
 
 ### 额外依赖
