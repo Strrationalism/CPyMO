@@ -47,11 +47,65 @@ Unpack a pymo package:
 
 ## 编译到任天堂3DS平台
 
-首先你需要确保已经安装了devkitPro及其中的3DS开发套件，在其控制台中，于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。
+### 额外依赖
+
+* DevkitPro
+  - libctru
+  - citro2d
+  - citro3d
+* ffmpeg
+
+#### 编译ffmpeg到3DS平台
+
+将以下内容复制到ffmpeg源码文件夹下，命名为`ffmpeg-configure3ds`：
+
+```sh
+#!/bin/sh
+
+export PATH=$DEVKITARM/bin:$PATH
+export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
+
+./configure --prefix=$DEVKITPRO/portlibs/3ds/ \
+--enable-cross-compile \
+--cross-prefix=$DEVKITARM/bin/arm-none-eabi- \
+--disable-shared \
+--disable-runtime-cpudetect \
+--disable-armv5te \
+--disable-programs \
+--disable-doc \
+--disable-everything \
+--enable-decoder=mpeg4,h264,aac,ac3,mp3 \
+--enable-demuxer=mov,h264 \
+--enable-filter=rotate,transpose \
+--enable-protocol=file \
+--enable-static \
+--enable-small \
+--arch=armv6k \
+--cpu=mpcore \
+--disable-armv6t2 \
+--disable-neon \
+--target-os=none \
+--extra-cflags=" -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math $ARCH" \
+--extra-cxxflags=" -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math -fno-rtti -fno-exceptions -std=gnu++11 $ARCH" \
+--extra-ldflags=" -specs=3dsx.specs $ARCH -L$DEVKITARM/lib  -L$DEVKITPRO/libctru/lib  -L$DEVKITPRO/portlibs/3ds/lib -lctru " \
+--disable-bzlib \
+--disable-iconv \
+--disable-lzma \
+--disable-securetransport \
+--disable-xlib \
+--disable-zlib
+#--enable-lto
+```
+
+如果你使用Windows，则需要在msys2中执行该脚本，之后执行make install。    
+如果你使用其他Unix-like操作系统，则在sh中执行该脚本，之后执行make install。    
+之后ffmpeg的3ds版本即可安装到devkitPro的portlibs文件夹下。    
 
 ### 产生cia文件
+于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。    
+你需要确保已经安装了`makerom`命令，之后在`./cpymo-backends/3ds/`下使用`make cia`来创建cia文件。    
 
-你需要确保已经安装了`makerom`命令，之后在`./cpymo-backends/3ds/`下使用`make cia`来创建cia文件。
+你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
 ### 游戏兼容性提示
 
