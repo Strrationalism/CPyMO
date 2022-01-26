@@ -392,7 +392,6 @@ static void cpymo_album_exit_showing_cg(cpymo_album *a) {
 	}
 
 	a->showing_cg = NULL;
-	a->ignore_mouse_button_release++;
 }
 
 static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
@@ -405,6 +404,7 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 
 	size_t cg_id = a->showing_cg_next_cg_id++;
 	if (cg_id >= a->cg_count) {
+		a->ignore_mouse_button_release++;
 		cpymo_album_exit_showing_cg(a);
 	}
 	else {
@@ -444,11 +444,16 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 	cpymo_album *album = (cpymo_album *)a;
 
 	if (album->showing_cg) {
-		if (CPYMO_INPUT_JUST_PRESSED(e, ok) || CPYMO_INPUT_JUST_PRESSED(e, mouse_button))
+		if (CPYMO_INPUT_JUST_PRESSED(e, ok) || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
 			cpymo_album_showing_cg_next(e, album);
+			return CPYMO_ERR_SUCC;
+		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, cancel))
+		if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
+			cpymo_engine_request_redraw(e);
 			cpymo_album_exit_showing_cg(album);
+			return CPYMO_ERR_SUCC;
+		}
 
 		return CPYMO_ERR_SUCC;
 	}
