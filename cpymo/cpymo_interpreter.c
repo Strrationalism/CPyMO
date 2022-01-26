@@ -366,6 +366,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		float x, y, time;
 
+		cpymo_album_cg_unlock(engine, bg_name);
+
 		if (cpymo_parser_stream_span_equals_str(time_str, "BG_VERYFAST")) time = 0.1f;
 		if (cpymo_parser_stream_span_equals_str(time_str, "BG_FAST")) time = 0.175f;
 		else if (cpymo_parser_stream_span_equals_str(time_str, "BG_NORMAL")) time = 0.25f;
@@ -530,6 +532,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(ex_str); ENSURE(ex_str);
 		POP_ARG(ey_str); ENSURE(ey_str);
 		POP_ARG(time_str); ENSURE(time_str);
+
+		cpymo_album_cg_unlock(engine, filename);
 
 		float sx = (float)cpymo_parser_stream_span_atoi(sx_str);
 		float sy = (float)cpymo_parser_stream_span_atoi(sy_str);

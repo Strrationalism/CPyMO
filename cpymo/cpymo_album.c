@@ -12,6 +12,7 @@
 #include "cpymo_engine.h"
 #include <assert.h>
 #include <ctype.h>
+#include "cpymo_album.h"
 
 #define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
 
@@ -220,6 +221,14 @@ uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
 	span.len = (size_t)cpymo_utils_clamp((int)cg_filename.len + 3, 0, 64);
 
 	return cpymo_parser_stream_span_hash(span);
+}
+
+error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_parser_stream_span cg_filename)
+{
+	if (!cpymo_parser_stream_span_starts_with_str(cg_filename, e->gameconfig.cgprefix))
+		return CPYMO_ERR_SUCC;
+
+	return cpymo_hash_flags_add(&e->flags, cpymo_album_cg_name_hash(cg_filename));
 }
 
 static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)

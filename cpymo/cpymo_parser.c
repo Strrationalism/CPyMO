@@ -1,6 +1,7 @@
 #include "cpymo_parser.h"
 #include <ctype.h>
 #include <math.h>
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -237,6 +238,19 @@ bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_st
 		a.begin++; a.len--;
 		b.begin++; b.len--;
 		return cpymo_parser_stream_span_equals(a, b);
+	}
+	else return false;
+}
+
+bool cpymo_parser_stream_span_starts_with_str(cpymo_parser_stream_span span, const char * prefix)
+{
+	if (*prefix == '\0') return true;
+	else if (span.len == 0 && *prefix != '\0') return false;
+	else if (span.begin[0] == *prefix) {
+		span.len--;
+		span.begin++;
+		prefix++;
+		return cpymo_parser_stream_span_starts_with_str(span, prefix);
 	}
 	else return false;
 }
