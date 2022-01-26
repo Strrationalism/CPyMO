@@ -10,6 +10,9 @@
 #include <cpymo_backend_image.h>
 #include "cpymo_assetloader.h"
 #include "cpymo_engine.h"
+#include <assert.h>
+
+#define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
 
 static error_t cpymo_album_generate_album_ui_image(
 	cpymo_backend_image *out_image, 
@@ -175,8 +178,17 @@ static error_t cpymo_album_load_ui_image(
 			return cpymo_backend_image_load(out_image, px, w, h, cpymo_backend_image_format_rgb);
 		}
 	}
-
 }
+
+typedef struct {
+	cpymo_backend_text title;
+	float title_width;
+
+	size_t cg_count;
+	cpymo_parser cg_name_parser;
+	bool force_unlock_all;
+	bool preview_unlocked;
+} cpymo_album_cg_info;
 
 typedef struct {
 	cpymo_backend_image current_ui;
@@ -192,7 +204,6 @@ typedef struct {
 
 	float mouse_wheel_sum;
 } cpymo_album;
-
 
 static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 {
@@ -212,6 +223,8 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 	cpymo_parser album_list;
 	cpymo_parser_init(&album_list, a->album_list_text, a->album_list_text_size);
 	do {
+		if (a->cg_count >= CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE) break;
+
 		cpymo_parser_stream_span page_str = cpymo_parser_curline_pop_commacell(&album_list);
 		cpymo_parser_stream_span_trim(&page_str);
 
@@ -234,6 +247,8 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 
 
 	} while (cpymo_parser_next_line(&album_list));
+
+	assert(a->cg_count <= CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE);
 
 	cpymo_parser_stream_span span;
 	span.begin = a->album_list_text;
