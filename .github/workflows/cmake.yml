@@ -33,6 +33,9 @@ jobs:
       with:
         submodules: 'recursive'
         
+    - uses: ilammy/msvc-dev-cmd@v1
+      if: ${{ runner.os == 'Windows' }}
+        
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
       if: ${{ runner.os != 'Windows' }}
