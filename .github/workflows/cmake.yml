@@ -23,23 +23,24 @@ jobs:
         include:
           - os: windows-latest
             triplet: x64-windows-static
-            script-postfix: bat
           - os: ubuntu-latest
             triplet: x64-linux-static
-            script-postfix: sh
           - os: macos-latest
             triplet: x64-osx-static
-            script-postfix: sh
             
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
         
-    - name: Install vcpkg
+    - name: Donwload vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg --depth 1
-        ./vcpkg/bootstrap-vcpkg.${{ script-postfix }}
+        if [ "$RUNNER_OS" == "Windows" ]; then
+            ./vcpkg/bootstrap-vcpkg.bat
+        else
+            ./vcpkg/bootstrap-vcpkg.sh
+        fi
         ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
         ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}
 
