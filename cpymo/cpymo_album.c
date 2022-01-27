@@ -304,7 +304,7 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 		cg_info->cg_name_parser = album_list;
 		cg_info->preview_unlocked = false;
 
-		for (size_t i = 0; i < thumb_count; ++i) {
+		for (int i = 0; i < thumb_count; ++i) {
 			cpymo_parser_stream_span cg_filename = 
 				cpymo_parser_curline_pop_commacell(&album_list);
 			cpymo_parser_stream_span_trim(&cg_filename);

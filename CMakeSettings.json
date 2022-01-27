@@ -37,6 +37,24 @@
       ]
     },
     {
+      "name": "x64-Debug-MSVC",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64" ],
+      "variables": [
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x64-windows-static",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
       "name": "x64-Release-MSVC",
       "generator": "Ninja",
       "configurationType": "MinSizeRel",
@@ -55,7 +73,7 @@
       ]
     },
     {
-      "name": "x64-Debug-MSVC",
+      "name": "x86-Debug",
       "generator": "Ninja",
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
@@ -63,11 +81,65 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64" ],
+      "inheritEnvironments": [ "clang_cl_x86" ],
       "variables": [
         {
           "name": "VCPKG_TARGET_TRIPLET",
-          "value": "x64-windows-static",
+          "value": "x86-windows-static",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "x86-Release",
+      "generator": "Ninja",
+      "configurationType": "MinSizeRel",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x86" ],
+      "variables": [
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x86-windows-static",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "x86-Debug-MSVC",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x86-windows-static",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "x86-Release-MSVC",
+      "generator": "Ninja",
+      "configurationType": "MinSizeRel",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x86-windows-static",
           "type": "STRING"
         }
       ]
