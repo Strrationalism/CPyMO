@@ -1,9 +1,6 @@
 [submodule "endianness.h"]
 	path = endianness.h
 	url = https://github.com/rofl0r/endianness.h.git
-[submodule "cpymo-backends/sdl2/SDL"]
-	path = cpymo-backends/sdl2/SDL
-	url = https://github.com/libsdl-org/SDL.git
 [submodule "stb"]
 	path = stb
 	url = https://github.com/nothings/stb.git

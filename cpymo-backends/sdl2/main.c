@@ -145,7 +145,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	Uint64 prev_ticks = SDL_GetTicks64();
+	Uint32 prev_ticks = SDL_GetTicks();
 	SDL_Event event;
 	while (1) {
 		bool redraw_by_event = false;
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
 			else if (event.type == SDL_WINDOWEVENT)
 				redraw_by_event = true;
 			else if (event.type == SDL_MOUSEWHEEL) {
-				mouse_wheel = event.wheel.preciseY;
+				mouse_wheel = event.wheel.y;
 				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
 					mouse_wheel *= -1;
 			}
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 
 		bool need_to_redraw = false;
 
-		Uint64 ticks = SDL_GetTicks64();
+		Uint32 ticks = SDL_GetTicks();
 		err = cpymo_engine_update(
 			&engine, 
 			(float)(ticks - prev_ticks) * 0.001f, 
@@ -194,6 +194,7 @@ int main(int argc, char **argv)
 	}
 
 	EXIT:
+	cpymo_engine_free(&engine);
 	cpymo_backend_font_free();
 
 	SDL_DestroyRenderer(renderer);
@@ -201,7 +202,6 @@ int main(int argc, char **argv)
 
 	SDL_Quit();
 
-	cpymo_engine_free(&engine);
 
 	#if _WIN32 && !NDEBUG
 	_CrtDumpMemoryLeaks();

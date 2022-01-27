@@ -10,7 +10,7 @@ void cpymo_bg_free(cpymo_bg *bg)
 		cpymo_backend_image_free(bg->current_bg);
 
 	if(bg->transform_next_bg)
-		cpymo_backend_image_free(bg->current_bg);
+		cpymo_backend_image_free(bg->transform_next_bg);
 
 	if (bg->trans)
 		cpymo_backend_masktrans_free(bg->trans);

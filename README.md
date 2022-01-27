@@ -49,8 +49,12 @@ Unpack a pymo package:
 
 ### 额外依赖
 
-你需要先使用类似vcpkg之类的包管理器安装ffmpeg。    
-本仓库内已经添加了SDL2的子模块，不需要手动添加SDL2依赖。    
+你需要使用类似vcpkg的包安装以下依赖：
+
+* SDL2
+* ffmpeg
+
+如果你使用Microsoft Visual Studio，默认的CMakeSettings.json中指示的依赖版本为x64-windows-static。
 
 ## 编译到任天堂3DS平台
 
