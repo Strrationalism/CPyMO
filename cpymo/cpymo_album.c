@@ -233,7 +233,7 @@ uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
 
 error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_parser_stream_span cg_filename)
 {
-	if (!cpymo_parser_stream_span_starts_with_str(cg_filename, e->gameconfig.cgprefix))
+	if (!cpymo_parser_stream_span_starts_with_str_ignore_case(cg_filename, e->gameconfig.cgprefix))
 		return CPYMO_ERR_SUCC;
 
 	return cpymo_hash_flags_add(&e->flags, cpymo_album_cg_name_hash(cg_filename));
