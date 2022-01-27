@@ -371,8 +371,8 @@ static error_t cpymo_album_prev_page(cpymo_engine *e, cpymo_album *a)
 }
 
 static bool cpymo_album_check_mouse_in_box(cpymo_engine *e, size_t i) {
-	int row = i / 5;
-	int col = i % 5;
+	size_t row = i / 5;
+	size_t col = i % 5;
 	float
 		x = (float)e->gameconfig.imagesize_w * (0.03f + 0.19f * col),
 		y = (float)e->gameconfig.imagesize_h * (0.02f + 0.19f * row),
@@ -478,7 +478,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		else {
 			for (size_t i = 0; i < album->cg_count; ++i) {
 				if (cpymo_album_check_mouse_in_box(e, i)) {
-					album->current_cg_selection = i;
+					album->current_cg_selection = (int)i;
 					return cpymo_album_select_ok(e, album);
 				}
 			}
@@ -584,7 +584,7 @@ static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
 			else {
 				cpymo_backend_image_draw(
 					xywh[0], xywh[1], xywh[2], xywh[3],
-					a->cv_thumb_cover, 0, 0, a->cv_thumb_cover_w, a->cv_thumb_cover_h,
+					a->cv_thumb_cover, 0, 0, (int)a->cv_thumb_cover_w, (int)a->cv_thumb_cover_h,
 					1.0f, cpymo_backend_image_draw_type_bg);
 			}
 		}

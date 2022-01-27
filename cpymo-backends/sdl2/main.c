@@ -92,6 +92,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
+	// SDL2 has memory leak in alloc id 113 and 114(or 112)!!!
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
 		SDL_INIT_AUDIO |
@@ -159,7 +160,7 @@ int main(int argc, char **argv)
 			else if (event.type == SDL_WINDOWEVENT)
 				redraw_by_event = true;
 			else if (event.type == SDL_MOUSEWHEEL) {
-				mouse_wheel = event.wheel.y;
+				mouse_wheel = (float)event.wheel.y;
 				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
 					mouse_wheel *= -1;
 			}
