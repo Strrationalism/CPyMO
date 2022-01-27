@@ -20,4 +20,8 @@ target_link_libraries(cpymo PRIVATE
 	SDL2::SDL2main 
 	SDL2::SDL2-static 
 	cpymolib)
+	
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    target_link_libraries(cpymo PRIVATE X11)
+endif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
