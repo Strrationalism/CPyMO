@@ -19,7 +19,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ windows-latest, macos-latest, ubuntu-latest ]
+        os: [ windows-latest ]
         include:
           - os: windows-latest
             triplet: x64-windows-static
