@@ -56,6 +56,10 @@ jobs:
 
     - name: Install FFMPEG
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
+      
+    - name: Install X11 for Linux
+      run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }}
+      if: ${{ runner.os == 'Linux' }}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
