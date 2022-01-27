@@ -24,9 +24,9 @@ jobs:
           - os: windows-latest
             triplet: x64-windows-static
           - os: ubuntu-latest
-            triplet: x64-linux-static
+            triplet: x64-linux
           - os: macos-latest
-            triplet: x64-osx-static
+            triplet: x64-osx
             
     steps:
     - uses: actions/checkout@v2
