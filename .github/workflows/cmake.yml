@@ -33,6 +33,10 @@ jobs:
       with:
         submodules: 'recursive'
         
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
+      if: ${{ runner.os == 'Linux' }}
+        
     - name: Donwload vcpkg
       run: git clone https://github.com/microsoft/vcpkg --depth 1
 
