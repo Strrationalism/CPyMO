@@ -13,7 +13,7 @@ add_executable(cpymo
 	"cpymo_backend_masktrans.c" 
 	"cpymo_backend_text.c" 
 	"posix_win32.h" 
-	"cpymo_backend_save.c")
+	"cpymo_backend_save.c" "cpymo_backend_audio.c")
 
 target_link_libraries(cpymo PRIVATE 
 	SDL2::SDL2 

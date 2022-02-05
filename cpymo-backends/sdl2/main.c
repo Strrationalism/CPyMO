@@ -42,6 +42,9 @@ cpymo_engine engine;
 extern error_t cpymo_backend_font_init(const char *gamedir);
 extern void cpymo_backend_font_free();
 
+extern void cpymo_backend_audio_init();
+extern void cpymo_backend_audio_free();
+
 static void set_window_icon(const char *gamedir) 
 {
 	int w, h, channel;
@@ -92,7 +95,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	// SDL2 has memory leak in alloc id 113 and 114(or 112)!!!
+	// SDL2 has 2 memory leaks!
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
 		SDL_INIT_AUDIO |
@@ -148,6 +151,12 @@ int main(int argc, char **argv)
 
 	Uint32 prev_ticks = SDL_GetTicks();
 	SDL_Event event;
+
+	unsigned fps_counter = 0;
+	Uint32 fps_timer = 0;
+
+	cpymo_backend_audio_init();
+
 	while (1) {
 		bool redraw_by_event = false;
 
@@ -184,6 +193,12 @@ int main(int argc, char **argv)
 		}
 		}
 
+		fps_timer += (ticks - prev_ticks);
+		if (fps_timer >= 1000) {
+			//printf("[FPS] %u\n", fps_counter);
+			fps_timer -= 1000;
+			fps_counter = 0;
+		}
 		prev_ticks = ticks;
 
 		if (need_to_redraw || redraw_by_event) {
@@ -191,12 +206,14 @@ int main(int argc, char **argv)
 			SDL_RenderClear(renderer);
 			cpymo_engine_draw(&engine);
 			SDL_RenderPresent(renderer);
+			fps_counter++;
 		} else SDL_Delay(16);
 	}
 
 	EXIT:
 	cpymo_engine_free(&engine);
 	cpymo_backend_font_free();
+	cpymo_backend_audio_free();
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
