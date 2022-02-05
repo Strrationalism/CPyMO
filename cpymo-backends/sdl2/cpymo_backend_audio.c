@@ -20,7 +20,7 @@ void cpymo_backend_audio_init()
 	SDL_memset(&want, 0, sizeof(want));
 	want.callback = &cpymo_backend_audio_sdl_callback;
 	want.channels = 2;
-	want.format = AUDIO_S8;
+	want.format = AUDIO_S16;
 	want.freq = 44100;
 	want.samples = 32768;
 	

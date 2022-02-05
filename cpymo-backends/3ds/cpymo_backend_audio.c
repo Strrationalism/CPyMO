@@ -7,10 +7,10 @@ static bool audio_enabled = false;
 
 #define SAMPLERATE 44100
 #define SAMPLESPERBUF (SAMPLERATE / 60)
-#define BYTEPERSAMPLE 2
+#define BYTEPERSAMPLE 4
 #define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
 
-static u8 *audio_buf;
+static s16 *audio_buf;
 
 static ndspWaveBuf waveBuf[2];
 
@@ -32,7 +32,7 @@ static bool cpymo_backend_audio_need_dump_dsp()
 static void cpymo_backend_audio_callback(void *_) 
 {
     static unsigned double_buffering = 0;
-    s8 *dest = waveBuf[double_buffering].data_pcm8;
+    s16 *dest = waveBuf[double_buffering].data_pcm16;
 
 	for (int i = 0; i < waveBuf[double_buffering].nsamples; i++) {
 		dest[i * 2 + 1] = rand();
@@ -56,7 +56,7 @@ void cpymo_backend_audio_init()
 
     size_t buf_size = SAMPLESPERBUF * BYTEPERSAMPLE * 2;
 
-    audio_buf = (u8*)linearAlloc(buf_size);
+    audio_buf = (s16 *)linearAlloc(buf_size);
     if(audio_buf == NULL) {
         ndspExit();
         printf("[Error] Failed to alloc audio buf.\n");
@@ -68,7 +68,7 @@ void cpymo_backend_audio_init()
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
     ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
     ndspChnSetRate(0, 44100);
-    ndspChnSetFormat(0, NDSP_FORMAT_STEREO_PCM8);
+    ndspChnSetFormat(0, NDSP_FORMAT_STEREO_PCM16);
     
     float mix[12];
     memset(mix, 0, sizeof(mix));
@@ -79,7 +79,7 @@ void cpymo_backend_audio_init()
     memset(waveBuf, 0, sizeof(waveBuf));
     waveBuf[0].data_vaddr = audio_buf;
     waveBuf[0].nsamples = SAMPLESPERBUF;
-    waveBuf[1].data_vaddr = audio_buf + SAMPLESPERBUF * BYTEPERSAMPLE;
+    waveBuf[1].data_vaddr = audio_buf + SAMPLESPERBUF * 2;
     waveBuf[1].nsamples = SAMPLESPERBUF;
 
     ndspChnWaveBufAdd(0, &waveBuf[0]);
