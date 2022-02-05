@@ -9,7 +9,8 @@ static void cpymo_backend_audio_sdl_callback(void *userdata, Uint8 * stream, int
 	SDL_memset(stream, 0, len);
 }
 
-bool cpymo_audio_enabled() {
+bool cpymo_backend_audio_enabled()
+{
 	return audio_enabled;
 }
 
