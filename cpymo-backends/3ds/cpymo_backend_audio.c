@@ -35,8 +35,8 @@ static void cpymo_backend_audio_callback(void *_)
     s16 *dest = waveBuf[double_buffering].data_pcm16;
 
 	for (int i = 0; i < waveBuf[double_buffering].nsamples; i++) {
-		dest[i * 2 + 1] = rand();
-        dest[i * 2] = rand();
+		dest[i * 2 + 1] = 0;
+        dest[i * 2] = 0;
 	}
 
 	DSP_FlushDataCache(dest, waveBuf[double_buffering].nsamples * BYTEPERSAMPLE);
