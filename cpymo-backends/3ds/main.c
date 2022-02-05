@@ -85,6 +85,9 @@ int main(void) {
 
 	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 
+	extern void cpymo_backend_audio_init();
+	cpymo_backend_audio_init();
+
 	if (!C3D_Init(C3D_DEFAULT_CMDBUF_SIZE)) {
 		cpymo_engine_free(&engine);
 		gfxExit();
@@ -194,10 +197,14 @@ int main(void) {
 	}
 
 	EXIT:
+
 	cpymo_backend_text_sys_free();
 	C3D_RenderTargetDelete(screen2);
 	C3D_RenderTargetDelete(screen1);
 	cpymo_engine_free(&engine);
+
+	extern void cpymo_backend_audio_free();
+	cpymo_backend_audio_free();
 	
 	C2D_Fini();
 	C3D_Fini();
