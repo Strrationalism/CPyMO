@@ -19,19 +19,22 @@ jobs:
     
     strategy:
       matrix:
-        os: [ windows-latest ]
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
         include:
           - os: windows-latest
             triplet: x64-windows-static
-          # - os: ubuntu-latest
-            # triplet: x64-linux
-          # - os: macos-latest
-            # triplet: x64-osx
+          - os: ubuntu-latest
+            triplet: x64-linux
+          - os: macos-latest
+            triplet: x64-osx
             
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+        
+    - uses: ilammy/msvc-dev-cmd@v1
+      if: ${{ runner.os == 'Windows' }}
         
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
@@ -50,6 +53,10 @@ jobs:
 
     - name: Install SDL2
       run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
+      
+    - name: Install X11 for Linux
+      run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
+      if: ${{ runner.os == 'Linux' }}
 
     - name: Install FFMPEG
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
