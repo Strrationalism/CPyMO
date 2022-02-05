@@ -1,16 +1,33 @@
 #include <3ds.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-volatile static bool audio_enabled = false;
+static bool audio_enabled = false;
 
 #define SAMPLERATE 44100
 #define SAMPLESPERBUF (SAMPLERATE / 60)
 #define BYTEPERSAMPLE 2
+#define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
 
 static u8 *audio_buf;
 
 static ndspWaveBuf waveBuf[2];
+
+bool cpymo_backend_audio_enabled() 
+{
+    return audio_enabled;
+}
+
+static bool cpymo_backend_audio_need_dump_dsp() 
+{
+    FILE *f = fopen(DSP_FIRM, "rb");
+    if(f != NULL) {
+        fclose(f);
+        return false;
+    }
+    return true;
+}
 
 static void cpymo_backend_audio_callback(void *_) 
 {
@@ -18,8 +35,8 @@ static void cpymo_backend_audio_callback(void *_)
     s8 *dest = waveBuf[double_buffering].data_pcm8;
 
 	for (int i = 0; i < waveBuf[double_buffering].nsamples; i++) {
-		dest[i * 2 + 1] = 0;
-        dest[i * 2] = 0;
+		dest[i * 2 + 1] = rand();
+        dest[i * 2] = rand();
 	}
 
 	DSP_FlushDataCache(dest, waveBuf[double_buffering].nsamples * BYTEPERSAMPLE);
@@ -29,6 +46,9 @@ static void cpymo_backend_audio_callback(void *_)
 
 void cpymo_backend_audio_init() 
 {
+    if(cpymo_backend_audio_need_dump_dsp())
+        printf("[Error] DSP Firmware not found, you can dump it using DSP1 (https://github.com/zoogie/DSP1).\n");
+
     if(R_FAILED(ndspInit())) {
         printf("[Error] Failed to initialize audio.\n");
         return;
@@ -72,8 +92,6 @@ void cpymo_backend_audio_init()
 
 void cpymo_backend_audio_free() {
     if(audio_enabled) {
-        audio_enabled = false;
-
         ndspExit();
         linearFree(audio_buf);
     }
