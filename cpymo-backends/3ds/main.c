@@ -137,7 +137,7 @@ int main(void) {
 	float prevSlider = NAN;
 	TickCounter tickCounter;
 	osTickCounterStart(&tickCounter);
-	while (aptMainLoop() && !cpymo_input_fast_kill_pressed) {
+	while (aptMainLoop()) {
 		if(aptShouldClose()) break;
 
 		hidScanInput();
@@ -157,7 +157,7 @@ int main(void) {
 				gspWaitForVBlank();
 
 				u32 keys = hidKeysHeld();
-				if((keys & KEY_ZL)) aptExit();
+				if((keys & KEY_ZL)) goto EXIT;
 			}
 		}
 		}
@@ -194,6 +194,8 @@ int main(void) {
 		} else {
 			gspWaitForVBlank();
 		}
+
+		if(cpymo_input_fast_kill_pressed) break;
 	}
 
 	EXIT:
