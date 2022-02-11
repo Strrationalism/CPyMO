@@ -938,9 +938,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		error_t err =
 			cpymo_select_img_configuare_begin(
-				engine,
+				&engine->select_img,
 				(size_t)choices,
-				cpymo_parser_stream_span_pure(""));
+				cpymo_parser_stream_span_pure(""),
+				&engine->assetloader,
+				&engine->gameconfig);
 		CPYMO_THROW(err);
 
 		if (!(IS_EMPTY(hint_pic))) 
@@ -988,7 +990,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("select_text") { 
 		POP_ARG(choices_str); ENSURE(choices_str); 
 		const int choices = cpymo_parser_stream_span_atoi(choices_str); 
-		error_t err = cpymo_select_img_configuare_begin(engine, (size_t)choices, cpymo_parser_stream_span_pure("")); 
+		error_t err = cpymo_select_img_configuare_begin(
+			&engine->select_img, (size_t)choices, cpymo_parser_stream_span_pure(""),
+			&engine->assetloader, &engine->gameconfig); 
 		CPYMO_THROW(err); 
 		
 		for (int i = 0; i < choices; ++i) { 
@@ -1029,7 +1033,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("select_var") {
 		POP_ARG(choices_str); ENSURE(choices_str);
 		const int choices = cpymo_parser_stream_span_atoi(choices_str);
-		error_t err = cpymo_select_img_configuare_begin(engine, (size_t)choices, cpymo_parser_stream_span_pure(""));
+		error_t err = cpymo_select_img_configuare_begin(
+			&engine->select_img, (size_t)choices, cpymo_parser_stream_span_pure(""),
+			&engine->assetloader, &engine->gameconfig);
 		CPYMO_THROW(err);
 
 		for (int i = 0; i < choices; ++i) {
@@ -1079,7 +1085,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		size_t choices = (size_t)cpymo_parser_stream_span_atoi(choices_str);
 		if (choices) {
-			error_t err = cpymo_select_img_configuare_begin(engine, choices, filename);
+			error_t err = cpymo_select_img_configuare_begin(
+				&engine->select_img, choices, filename, 
+				&engine->assetloader, &engine->gameconfig);
 			if (err != CPYMO_ERR_SUCC) return err;
 
 			for (size_t i = 0; i < choices; ++i) {
@@ -1116,7 +1124,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		size_t choices = (size_t)cpymo_parser_stream_span_atoi(choices_str);
 		if (choices) {
-			error_t err = cpymo_select_img_configuare_begin(engine, choices, cpymo_parser_stream_span_pure(""));
+			error_t err = cpymo_select_img_configuare_begin(
+				&engine->select_img, choices, cpymo_parser_stream_span_pure(""),
+				&engine->assetloader, &engine->gameconfig);
 			if (err != CPYMO_ERR_SUCC) return err;
 
 			for (size_t i = 0; i < choices; ++i) {

@@ -34,33 +34,34 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 }
 
 error_t cpymo_select_img_configuare_begin(
-	struct cpymo_engine *engine, size_t selections,
-	cpymo_parser_stream_span image_name_or_empty_when_select_imgs)
+	cpymo_select_img *sel, size_t selections,
+	cpymo_parser_stream_span image_name_or_empty_when_select_imgs,
+	cpymo_assetloader *loader, cpymo_gameconfig *gameconfig)
 {
-	engine->select_img.selections = 
+	sel->selections =
 		(cpymo_select_img_selection *)malloc(sizeof(cpymo_select_img_selection) * selections);
-	if (engine->select_img.selections == NULL) return CPYMO_ERR_SUCC;
+	if (sel->selections == NULL) return CPYMO_ERR_SUCC;
 
-	memset(engine->select_img.selections, 0, sizeof(cpymo_select_img_selection) * selections);
+	memset(sel->selections, 0, sizeof(cpymo_select_img_selection) * selections);
 
 	if (image_name_or_empty_when_select_imgs.len > 0) {
 		error_t err = cpymo_assetloader_load_system_image(
-			&engine->select_img.select_img_image,
-			&engine->select_img.select_img_image_w, &engine->select_img.select_img_image_h,
+			&sel->select_img_image,
+			&sel->select_img_image_w, &sel->select_img_image_h,
 			image_name_or_empty_when_select_imgs,
 			"png",
-			&engine->assetloader,
-			cpymo_gameconfig_is_symbian(&engine->gameconfig));
+			loader,
+			cpymo_gameconfig_is_symbian(gameconfig));
 
 		if (err != CPYMO_ERR_SUCC) {
-			free(engine->select_img.selections);
-			engine->select_img.selections = NULL;
+			free(sel->selections);
+			sel->selections = NULL;
 			return err;
 		}
 	}
 
-	engine->select_img.current_selection = 0;
-	engine->select_img.all_selections = selections;
+	sel->current_selection = 0;
+	sel->all_selections = selections;
 
 	return CPYMO_ERR_SUCC;
 }

@@ -56,8 +56,9 @@ typedef struct {
 void cpymo_select_img_reset(cpymo_select_img *img);
 
 error_t cpymo_select_img_configuare_begin(
-	struct cpymo_engine *engine, size_t selections,
-	cpymo_parser_stream_span image_name_or_empty_when_select_imgs);
+	cpymo_select_img *sel, size_t selections,
+	cpymo_parser_stream_span image_name_or_empty_when_select_imgs,
+	cpymo_assetloader *loader, cpymo_gameconfig *gameconfig);
 
 void cpymo_select_img_configuare_select_img_selection(
 	struct cpymo_engine *engine, float x, float y, bool enabled, uint64_t hash);
