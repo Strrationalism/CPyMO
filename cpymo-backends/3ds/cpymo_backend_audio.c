@@ -2,17 +2,29 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cpymo_backend_audio.h>
 
 static bool audio_enabled = false;
 
 #define SAMPLERATE 44100
-#define SAMPLESPERBUF (SAMPLERATE / 60)
+#define SAMPLESPERBUF (SAMPLERATE / 15)
 #define BYTEPERSAMPLE 4
 #define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
 
 static s16 *audio_buf;
 
 static ndspWaveBuf waveBuf[2];
+
+const static cpymo_backend_audio_info audio_info = {
+    44100,
+    cpymo_backend_audio_s16le,
+    2
+};
+
+const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)
+{
+    return audio_enabled ? &audio_info : NULL;
+}
 
 bool cpymo_backend_audio_enabled() 
 {

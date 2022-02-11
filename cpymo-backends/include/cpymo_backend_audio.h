@@ -3,6 +3,17 @@
 
 #include <stdbool.h>
 
-bool cpymo_backend_audio_enabled();
+typedef enum {
+	cpymo_backend_audio_s16le
+} cpymo_backend_audio_format;
+
+typedef struct {
+	size_t freq;
+	cpymo_backend_audio_format format;
+	size_t channels;
+} cpymo_backend_audio_info;
+
+// Returns NULL to disable audio.
+const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void);
 
 #endif
