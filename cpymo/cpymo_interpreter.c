@@ -972,11 +972,15 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				else if (first_char == L'×') hint_mode = cpymo_select_img_selection_hint23;
 			}
 
-			err = cpymo_select_img_configuare_select_text(engine, text, true, hint_mode, sel_hash);
+			err = cpymo_select_img_configuare_select_text(
+				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags, 
+				text, true, hint_mode, sel_hash);
+
 			CPYMO_THROW(err);
 		}
 
 		cpymo_select_img_configuare_end_select_text(
+			&engine->select_img,
 			engine,
 			0, 0,
 			engine->gameconfig.imagesize_w,
@@ -1008,7 +1012,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
 
-			err = cpymo_select_img_configuare_select_text(engine, text, true, cpymo_select_img_selection_nohint, hash);
+			err = cpymo_select_img_configuare_select_text(
+				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
+				text, true, cpymo_select_img_selection_nohint, hash);
+
 			CPYMO_THROW(err); 
 		} 
 		
@@ -1022,7 +1029,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(init_pos); ENSURE(init_pos); 
 		
 		cpymo_select_img_configuare_end_select_text( 
-			engine, x1, y1, x2, y2,  
+			&engine->select_img, engine, x1, y1, x2, y2,  
 			cpymo_parser_stream_span_as_color(col), 
 			cpymo_parser_stream_span_atoi(init_pos),
 			false); 
@@ -1053,11 +1060,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
 
 			err = cpymo_select_img_configuare_select_text(
-				engine, 
-				text, 
-				cpymo_vars_eval(&engine->vars, expr) != 0,
-				cpymo_select_img_selection_nohint,
-				hash);
+				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
+				text, cpymo_vars_eval(&engine->vars, expr) != 0, cpymo_select_img_selection_nohint, hash);
 			CPYMO_THROW(err);
 		}
 
@@ -1071,7 +1075,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(init_pos); ENSURE(init_pos);
 
 		cpymo_select_img_configuare_end_select_text(
-			engine, x1, y1, x2, y2,
+			&engine->select_img, engine, x1, y1, x2, y2,
 			cpymo_parser_stream_span_as_color(col),
 			cpymo_parser_stream_span_atoi(init_pos),
 			false);
@@ -1112,7 +1116,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			POP_ARG(init_position);
 			int init_position_i = cpymo_parser_stream_span_atoi(init_position);
 
-			cpymo_select_img_configuare_end(engine, init_position_i);
+			cpymo_select_img_configuare_end(&engine->select_img, &engine->wait, engine, init_position_i);
 		}
 		else return CPYMO_ERR_INVALID_ARG;
 
@@ -1154,7 +1158,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			POP_ARG(init_position);
 			int init_position_i = cpymo_parser_stream_span_atoi(init_position);
 
-			cpymo_select_img_configuare_end(engine, init_position_i);
+			cpymo_select_img_configuare_end(&engine->select_img, &engine->wait, engine, init_position_i);
 		}
 		else return CPYMO_ERR_INVALID_ARG;
 
