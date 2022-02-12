@@ -14,6 +14,4 @@ typedef struct {
 	size_t audio_buf_len;
 } cpymo_audio_channel;
 
-
-
 #endif

@@ -35,6 +35,9 @@
 
 #include "posix_win32.h"
 
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+
 SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
@@ -154,6 +157,9 @@ int main(int argc, char **argv)
 
 	unsigned fps_counter = 0;
 	Uint32 fps_timer = 0;
+
+	avcodec_register_all();
+	av_register_all();
 
 	cpymo_backend_audio_init();
 
