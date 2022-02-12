@@ -19,6 +19,9 @@
 
 #include <cpymo_backend_text.h>
 
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2;
 float render_3d_offset;
@@ -86,6 +89,7 @@ int main(void) {
 	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 
 	extern void cpymo_backend_audio_init();
+
 	cpymo_backend_audio_init();
 
 	if (!C3D_Init(C3D_DEFAULT_CMDBUF_SIZE)) {

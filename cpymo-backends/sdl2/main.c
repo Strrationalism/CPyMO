@@ -158,9 +158,6 @@ int main(int argc, char **argv)
 	unsigned fps_counter = 0;
 	Uint32 fps_timer = 0;
 
-	avcodec_register_all();
-	av_register_all();
-
 	cpymo_backend_audio_init();
 
 	while (1) {
