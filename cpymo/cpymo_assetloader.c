@@ -335,6 +335,27 @@ error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cp
 	return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_assetloader_get_bgm_path(char ** out_str, const char *bgm_name, const cpymo_assetloader *loader)
+{
+	assert(*out_str == NULL);
+	char *str = (char *)malloc(
+		strlen(loader->gamedir) 
+		+ 6 
+		+ strlen(bgm_name) 
+		+ strlen(loader->game_config->bgmformat) 
+		+ 4);
+
+	if (str == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	sprintf(str, "%s/bgm/%s.%s", 
+		loader->gamedir, 
+		bgm_name, 
+		loader->game_config->bgmformat);
+	*out_str = str;
+
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,
