@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include <libavcodec/codec.h>
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
 
@@ -28,12 +28,12 @@ typedef struct {
 typedef struct {
 	bool enabled;
 	cpymo_audio_channel channels[CPYMO_AUDIO_MAX_CHANNELS];
-	AVPacket packet;
 } cpymo_audio_system;
 
-static inline cpymo_audio_channel_init(cpymo_audio_channel *c)
+static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 {
 	c->enabled = false;
+	c->loop = false;
 	c->format_context = NULL;
 	c->codec_context = NULL;
 	c->swr_context = NULL;
