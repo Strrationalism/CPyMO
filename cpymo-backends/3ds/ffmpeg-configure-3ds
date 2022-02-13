@@ -16,7 +16,6 @@ export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 --disable-indevs \
 --disable-protocols \
 --disable-bsfs \
---disable-demuxers \
 --disable-muxers \
 --enable-protocol=file \
 --enable-static \
