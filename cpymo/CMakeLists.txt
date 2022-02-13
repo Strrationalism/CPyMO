@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.8)
 
+include_directories (${FFMPEG_INCLUDE_DIRS})
+
 add_library (cpymolib STATIC
 	"cpymo_error.h" "cpymo_error.c"
 	"cpymo_package.h" "cpymo_package.c"
@@ -27,5 +29,6 @@ add_library (cpymolib STATIC
 	"cpymo_save_global.h" "cpymo_save_global.c" 
 	"cpymo_hash_flags.h" "cpymo_hash_flags.c" 
 	"cpymo_ui.h" "cpymo_ui.c"
-	"cpymo_album.c" "cpymo_album.h" "cpymo_audio.h")
+	"cpymo_album.c" "cpymo_album.h" 
+	"cpymo_audio.h" "cpymo_audio.c")
 

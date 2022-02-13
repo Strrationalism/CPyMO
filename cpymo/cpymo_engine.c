@@ -23,6 +23,9 @@ static void cpymo_logo() {
 
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 {
+	// init audio system
+	cpymo_audio_init(&out->audio);
+
 	// load game config
 	const size_t gamedir_strlen = strlen(gamedir);
 	char *path = (char *)malloc(gamedir_strlen + 16);
@@ -151,6 +154,7 @@ void cpymo_engine_free(cpymo_engine *engine)
 	cpymo_vars_free(&engine->vars);
 	cpymo_assetloader_free(&engine->assetloader);
 	free(engine->title);
+	cpymo_audio_free(&engine->audio);
 }
 
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)

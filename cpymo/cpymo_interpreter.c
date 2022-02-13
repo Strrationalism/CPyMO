@@ -1199,7 +1199,38 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_NEXTLINE;
 	}
 
-	/*** IV. System ***/
+	/*** IV. Audio ***/
+	D("bgm") {
+		POP_ARG(filename); ENSURE(filename);
+		POP_ARG(isloop_s);
+
+		bool isloop = true;	// DANGER!!!
+
+		char *bgm_path = NULL;
+		error_t err = 
+			cpymo_assetloader_get_bgm_path(&bgm_path, filename, &engine->assetloader);
+		CPYMO_THROW(err);
+
+		err = cpymo_audio_channel_play_file(
+			&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
+			bgm_path,
+			1.0f,
+			isloop);
+
+		free(bgm_path);
+
+		CPYMO_THROW(err);
+
+		CONT_NEXTLINE;
+	}
+
+	D("bgm_stop") {
+		cpymo_audio_channel_reset(
+			&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM]);
+		CONT_NEXTLINE;
+	}
+
+	/*** V. System ***/
 	D("album") {
 		POP_ARG(list_name);
 
