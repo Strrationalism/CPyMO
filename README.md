@@ -68,45 +68,7 @@ Unpack a pymo package:
 
 #### 编译ffmpeg到3DS平台
 
-将以下内容复制到ffmpeg源码文件夹下，命名为`ffmpeg-configure3ds`：
-
-```sh
-#!/bin/sh
-
-export PATH=$DEVKITARM/bin:$PATH
-export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
-
-./configure --prefix=$DEVKITPRO/portlibs/3ds/ \
---enable-cross-compile \
---cross-prefix=$DEVKITARM/bin/arm-none-eabi- \
---disable-shared \
---disable-runtime-cpudetect \
---disable-armv5te \
---disable-programs \
---disable-doc \
---disable-everything \
---enable-decoder=mpeg4,h264,aac,ac3,mp3 \
---enable-demuxer=mov,h264 \
---enable-filter=rotate,transpose \
---enable-protocol=file \
---enable-static \
---enable-small \
---arch=armv6k \
---cpu=mpcore \
---disable-armv6t2 \
---disable-neon \
---target-os=none \
---extra-cflags=" -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math $ARCH" \
---extra-cxxflags=" -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math -fno-rtti -fno-exceptions -std=gnu++11 $ARCH" \
---extra-ldflags=" -specs=3dsx.specs $ARCH -L$DEVKITARM/lib  -L$DEVKITPRO/libctru/lib  -L$DEVKITPRO/portlibs/3ds/lib -lctru " \
---disable-bzlib \
---disable-iconv \
---disable-lzma \
---disable-securetransport \
---disable-xlib \
---disable-zlib
-#--enable-lto
-```
+将`cpymo-backends/3ds/ffmpeg-configure-3ds`复制到ffmpeg源码文件夹下：
 
 如果你使用Windows，则需要在msys2中执行该脚本，之后执行make install。    
 如果你使用其他Unix-like操作系统，则在sh中执行该脚本，之后执行make install。    

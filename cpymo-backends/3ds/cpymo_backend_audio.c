@@ -23,7 +23,6 @@ const static cpymo_backend_audio_info audio_info = {
 
 const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)
 {
-    return NULL;
     return audio_enabled ? &audio_info : NULL;
 }
 
