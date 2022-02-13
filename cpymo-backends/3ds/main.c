@@ -79,6 +79,9 @@ int main(void) {
 	const char *gamedir = "/pymogames/startup";
 	ensure_save_dir(gamedir);
 
+	extern void cpymo_backend_audio_init();
+	cpymo_backend_audio_init();
+
 	error_t err = cpymo_engine_init(&engine, gamedir);
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
@@ -88,9 +91,6 @@ int main(void) {
 
 	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 
-	extern void cpymo_backend_audio_init();
-
-	cpymo_backend_audio_init();
 
 	if (!C3D_Init(C3D_DEFAULT_CMDBUF_SIZE)) {
 		cpymo_engine_free(&engine);

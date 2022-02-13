@@ -2,8 +2,10 @@
 #include <stdbool.h>
 #include <cpymo_error.h>
 #include <cpymo_backend_audio.h>
+#include <cpymo_engine.h>
 
 static bool audio_enabled;
+extern cpymo_engine engine;
 
 const static cpymo_backend_audio_info audio_info = {
 	44100,
@@ -14,6 +16,7 @@ const static cpymo_backend_audio_info audio_info = {
 static void cpymo_backend_audio_sdl_callback(void *userdata, Uint8 * stream, int len)
 {
 	SDL_memset(stream, 0, len);
+	cpymo_audio_copy_samples(stream, (size_t)len, &engine.audio);
 }
 
 const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)

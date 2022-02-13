@@ -82,6 +82,7 @@ static void ensure_save_dir(const char *gamedir)
 
 int main(int argc, char **argv) 
 {
+	//_CrtSetBreakAlloc(550);
 	int ret = 0;
 	const char *gamedir = "./";
 
@@ -91,20 +92,22 @@ int main(int argc, char **argv)
 
 	ensure_save_dir(gamedir);
 
-	error_t err = cpymo_engine_init(&engine, gamedir);
-
-	if (err != CPYMO_ERR_SUCC) {
-		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));
-		return -1;
-	}
-
 	// SDL2 has 2 memory leaks!
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
 		SDL_INIT_AUDIO |
 		SDL_INIT_VIDEO) != 0) {
-		cpymo_engine_free(&engine);
 		SDL_Log("[Error] Unable to initialize SDL: %s", SDL_GetError());
+		return -1;
+	}
+
+	cpymo_backend_audio_init();
+
+	error_t err = cpymo_engine_init(&engine, gamedir);
+
+	if (err != CPYMO_ERR_SUCC) {
+		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));
+		SDL_Quit();
 		return -1;
 	}
 
@@ -157,8 +160,6 @@ int main(int argc, char **argv)
 
 	unsigned fps_counter = 0;
 	Uint32 fps_timer = 0;
-
-	cpymo_backend_audio_init();
 
 	while (1) {
 		bool redraw_by_event = false;

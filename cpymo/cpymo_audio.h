@@ -23,6 +23,13 @@ typedef struct {
 	AVFormatContext *format_context;
 	AVCodecContext *codec_context;
 	SwrContext *swr_context;
+
+	AVPacket *packet;
+	AVFrame *frame;
+	uint8_t *converted_buf;
+	size_t converted_buf_size, converted_buf_all_size;
+
+	size_t converted_frame_current_offset;
 } cpymo_audio_channel;
 
 typedef struct {
@@ -37,6 +44,7 @@ static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 	c->format_context = NULL;
 	c->codec_context = NULL;
 	c->swr_context = NULL;
+	c->converted_frame_current_offset = 0;
 	c->volume = 1.0f;
 }
 
@@ -50,5 +58,7 @@ error_t cpymo_audio_channel_play_file(
 
 void cpymo_audio_init(cpymo_audio_system *);
 void cpymo_audio_free(cpymo_audio_system *);
+
+void cpymo_audio_copy_samples(void *dst, size_t len, cpymo_audio_system *);
 
 #endif

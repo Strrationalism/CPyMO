@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cpymo_backend_audio.h>
+#include <cpymo_engine.h>
 
 static bool audio_enabled = false;
 
@@ -14,6 +15,8 @@ static bool audio_enabled = false;
 static s16 *audio_buf;
 
 static ndspWaveBuf waveBuf[2];
+
+extern cpymo_engine engine;
 
 const static cpymo_backend_audio_info audio_info = {
     44100,
@@ -46,10 +49,7 @@ static void cpymo_backend_audio_callback(void *_)
     static unsigned double_buffering = 0;
     s16 *dest = waveBuf[double_buffering].data_pcm16;
 
-	for (int i = 0; i < waveBuf[double_buffering].nsamples; i++) {
-		dest[i * 2 + 1] = 0;
-        dest[i * 2] = 0;
-	}
+    cpymo_audio_copy_samples(dest, BYTEPERSAMPLE * waveBuf[0].nsamples, &engine.audio);
 
 	DSP_FlushDataCache(dest, waveBuf[double_buffering].nsamples * BYTEPERSAMPLE);
     ndspChnWaveBufAdd(0, &waveBuf[double_buffering]);
