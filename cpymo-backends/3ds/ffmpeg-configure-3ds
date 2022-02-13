@@ -11,13 +11,18 @@ export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 --disable-armv5te \
 --disable-programs \
 --disable-doc \
---enable-parser=aac,mpegaudio,amr,ac3,flac,vorbis,opus,mpegvideo,h261,h263,h264\
---enable-decoder=mpeg4,h264,aac,ac3,mp3,amr_nb_at,amrnb,amrwb,flac,h261,h263,h263i,h263p,mpegvideo,opus,vorbis \
---enable-demuxer=mov,h264 \
---enable-filter=rotate,transpose \
+--disable-encoders \
+--disable-filters \
+--disable-indevs \
+--disable-protocols \
+--disable-bsfs \
+--disable-demuxers \
+--disable-muxers \
 --enable-protocol=file \
 --enable-static \
 --enable-small \
+--disable-decoder=gif,webp,bmp,dds,mjpeg,jpeg1s,jpeg2000,photocd,png,ppm,psd,qpeg,sga,sgi,smvjpeg,text \
+--disable-parser=bmp,gif,mjpeg,webp,png,ipu,jpeg2000,pnm \
 --arch=armv6k \
 --cpu=mpcore \
 --disable-armv6t2 \
@@ -31,5 +36,5 @@ export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 --disable-lzma \
 --disable-securetransport \
 --disable-xlib \
---disable-zlib \
+--disable-zlib
 #--enable-lto
