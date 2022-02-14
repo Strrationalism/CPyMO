@@ -36,6 +36,7 @@ void cpymo_backend_audio_init()
 	want.samples = 2940;
 	
 	if (SDL_OpenAudio(&want, NULL) == 0) {
+		SDL_LockAudio();
 		SDL_PauseAudio(0);
 		audio_enabled = true;
 	}
@@ -51,4 +52,14 @@ void cpymo_backend_audio_free()
 	if (audio_enabled) {
 		SDL_CloseAudio();
 	}
+}
+
+void cpymo_backend_audio_lock(void)
+{
+	SDL_LockAudio();
+}
+
+void cpymo_backend_audio_unlock(void)
+{
+	SDL_UnlockAudio();
 }

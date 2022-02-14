@@ -20,6 +20,7 @@
 #define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize.h>
+#include <cpymo_backend_audio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
@@ -34,9 +35,6 @@
 #endif
 
 #include "posix_win32.h"
-
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
 
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -83,6 +81,9 @@ static void ensure_save_dir(const char *gamedir)
 int main(int argc, char **argv) 
 {
 	//_CrtSetBreakAlloc(529);
+
+	engine.audio.enabled = false;
+
 	int ret = 0;
 	const char *gamedir = "./";
 
@@ -160,6 +161,10 @@ int main(int argc, char **argv)
 
 	unsigned fps_counter = 0;
 	Uint32 fps_timer = 0;
+
+	if (cpymo_backend_audio_get_info()) {
+		SDL_UnlockAudio();
+	}
 
 	while (1) {
 		bool redraw_by_event = false;

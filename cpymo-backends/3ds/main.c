@@ -76,6 +76,8 @@ int main(void) {
 	const char *gamedir = "/pymogames/startup";
 	ensure_save_dir(gamedir);
 
+	engine.audio.enabled = false;
+
 	extern void cpymo_backend_audio_init();
 	cpymo_backend_audio_init();
 
@@ -138,6 +140,10 @@ int main(void) {
 	float prevSlider = NAN;
 	TickCounter tickCounter;
 	osTickCounterStart(&tickCounter);
+
+	void cpymo_backend_audio_unlock(void);
+	cpymo_backend_audio_unlock();
+
 	while (aptMainLoop()) {
 		if(aptShouldClose()) break;
 

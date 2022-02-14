@@ -2,13 +2,20 @@
 #include <assert.h>
 #include <cpymo_backend_audio.h>
 
-void cpymo_audio_channel_reset(cpymo_audio_channel *c)
+static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 {
 	if (c->swr_context) swr_free(&c->swr_context);
 	if (c->codec_context) avcodec_free_context(&c->codec_context);
 	if (c->format_context) avformat_close_input(&c->format_context);
 
 	cpymo_audio_channel_init(c);
+}
+
+void cpymo_audio_channel_reset(cpymo_audio_channel *c)
+{
+	cpymo_backend_audio_lock();
+	cpymo_audio_channel_reset_unsafe(c);
+	cpymo_backend_audio_unlock();
 }
 
 static int cpymo_audio_fmt2ffmpeg(
@@ -28,13 +35,19 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 	if (result == AVERROR(EAGAIN)) {
 		result = av_read_frame(c->format_context, c->packet);
 		if (result < 0) {
-			cpymo_audio_channel_reset(c);
-			return false;
+			if (c->loop) {
+				av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
+				return cpymo_audio_channel_next_frame(c);
+			}
+			else {
+				cpymo_audio_channel_reset_unsafe(c);
+				return false;
+			}
 		}
 
 		result = avcodec_send_packet(c->codec_context, c->packet);
 		if (result < 0) {
-			cpymo_audio_channel_reset(c);
+			cpymo_audio_channel_reset_unsafe(c);
 			return false;
 		}
 
@@ -43,7 +56,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		return cpymo_audio_channel_next_frame(c);
 	}
 	else if (result < 0) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
 		return false;
 	}
 
@@ -60,7 +73,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		if (out_size > c->converted_buf_all_size) {
 			c->converted_buf = (uint8_t *)realloc(c->converted_buf, out_size);
 			if (c->converted_buf == NULL) {
-				cpymo_audio_channel_reset(c);
+				cpymo_audio_channel_reset_unsafe(c);
 				return false;
 			}
 			c->converted_buf_all_size = out_size;
@@ -80,7 +93,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		}
 		c->converted_buf_size = av_samples_get_buffer_size(
 			NULL,
-			info->channels,
+			(int)info->channels,
 			c->frame->nb_samples,
 			cpymo_audio_fmt2ffmpeg(info->format),
 			1);
@@ -88,6 +101,8 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		c->converted_frame_current_offset = 0;
 		return true;
 	}
+
+	return false;
 }
 
 static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
@@ -103,11 +118,12 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 
 	c->converted_frame_current_offset += write_bytes;
 
-	if (c->converted_frame_current_offset >= c->converted_buf_size) {
+	if (write_bytes < len) {
 		if (cpymo_audio_channel_next_frame(c)) {
-			if (write_bytes < len) {
-				cpymo_audio_channel_write_samples(dst + write_bytes, len - write_bytes, c);
-			}
+			cpymo_audio_channel_write_samples(dst + write_bytes, len - write_bytes, c);
+		}
+		else {
+			cpymo_audio_channel_reset_unsafe(c);
 		}
 	}
 }
@@ -119,9 +135,9 @@ error_t cpymo_audio_channel_play_file(
 		cpymo_backend_audio_get_info();
 	if (info == NULL) return CPYMO_ERR_SUCC;
 
-	printf("[Info] Play bgm %s.\n", filename);
+	cpymo_backend_audio_lock();
 
-	cpymo_audio_channel_reset(c);
+	cpymo_audio_channel_reset_unsafe(c);
 
 	assert(c->enabled == false);
 
@@ -131,21 +147,24 @@ error_t cpymo_audio_channel_play_file(
 	if (result != 0) {
 		c->format_context = NULL;
 		printf("[Error] Can not open %s with error ffmpeg error %s.\n", filename, av_err2str(result));
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 	}
 
 	result = avformat_find_stream_info(c->format_context, NULL);
 	if (result != 0) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
 		printf("[Error] Can not get stream info from %s.\n", filename);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
 	int stream_id = av_find_best_stream(
 		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
 	if (result != 0) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
 		printf("[Error] Can not find best stream from %s.\n", filename);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
@@ -156,14 +175,16 @@ error_t cpymo_audio_channel_play_file(
 	avcodec_parameters_to_context(c->codec_context, stream->codecpar);
 	c->codec_context->pkt_timebase = stream->time_base;
 	if (c->codec_context == NULL) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_UNKNOWN;
 	}
 
 	result = avcodec_open2(c->codec_context, codec, NULL);
 	if (result != 0) {
 		c->codec_context = NULL;
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_UNSUPPORTED;
 	}
 
@@ -178,20 +199,23 @@ error_t cpymo_audio_channel_play_file(
 		stream->codecpar->sample_rate,
 		0, NULL);
 	if (c->swr_context == NULL) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_UNKNOWN;
 	}
 
 	result = swr_init(c->swr_context);
 	if (result < 0) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_UNKNOWN;
 	}
 
 	if (c->packet == NULL) {
 		c->packet = av_packet_alloc();
 		if (c->packet == NULL) {
-			cpymo_audio_channel_reset(c);
+			cpymo_audio_channel_reset_unsafe(c);
+			cpymo_backend_audio_unlock();
 			return CPYMO_ERR_OUT_OF_MEM;
 		}
 	}
@@ -199,7 +223,8 @@ error_t cpymo_audio_channel_play_file(
 	if (c->frame == NULL) {
 		c->frame = av_frame_alloc();
 		if (c->frame == NULL) {
-			cpymo_audio_channel_reset(c);
+			cpymo_audio_channel_reset_unsafe(c);
+			cpymo_backend_audio_unlock();
 			return CPYMO_ERR_OUT_OF_MEM;
 		}
 	}
@@ -211,10 +236,12 @@ error_t cpymo_audio_channel_play_file(
 
 	// read first frame
 	if (!cpymo_audio_channel_next_frame(c)) {
-		cpymo_audio_channel_reset(c);
+		cpymo_audio_channel_reset_unsafe(c);
+		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_SUCC;
 	}
 
+	cpymo_backend_audio_unlock();
 	return CPYMO_ERR_SUCC;
 }
 

@@ -16,4 +16,7 @@ typedef struct {
 // Returns NULL to disable audio.
 const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void);
 
+void cpymo_backend_audio_lock(void);
+void cpymo_backend_audio_unlock(void);
+
 #endif

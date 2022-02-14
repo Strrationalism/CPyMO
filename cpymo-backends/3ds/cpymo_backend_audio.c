@@ -61,6 +61,8 @@ static void cpymo_backend_audio_callback(void *_)
     double_buffering = !double_buffering;
 }
 
+static void cpymo_backend_audio_callback_donothing(void *_) {}
+
 void cpymo_backend_audio_init() 
 {
     if(cpymo_backend_audio_need_dump_dsp())
@@ -103,14 +105,23 @@ void cpymo_backend_audio_init()
     ndspChnWaveBufAdd(0, &waveBuf[0]);
     ndspChnWaveBufAdd(0, &waveBuf[1]);
 
-    ndspSetCallback(cpymo_backend_audio_callback, NULL);
-
     audio_enabled = true;
 }
 
-void cpymo_backend_audio_free() {
+void cpymo_backend_audio_free() 
+{
     if(audio_enabled) {
         ndspExit();
         linearFree(audio_buf);
     }
+}
+
+void cpymo_backend_audio_lock() 
+{
+    ndspSetCallback(cpymo_backend_audio_callback_donothing, NULL);
+}
+
+void cpymo_backend_audio_unlock()
+{
+    ndspSetCallback(cpymo_backend_audio_callback, NULL);
 }
