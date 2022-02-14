@@ -77,57 +77,43 @@ static bool cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 
 static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c) 
 {
-	c->no_more_blocks = false;
 	int result = avcodec_receive_frame(c->codec_context, c->frame);
 
-	if (result == AVERROR(EAGAIN)) {
-		result = av_read_frame(c->format_context, c->packet);
-		if (result == AVERROR_EOF) {
-			if (c->loop) {
-				av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
-				return cpymo_audio_channel_next_frame(c);
-			}
-			else {
-				result = avcodec_send_packet(c->codec_context, NULL);
-				if (result < 0) {
-					printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
-				}
-				printf("[Info] Flush decoder!!!\n");
-				return cpymo_audio_channel_next_frame(c);
-			}
-		}
-		else {
-			result = avcodec_send_packet(c->codec_context, c->packet);
-			if (result < 0) {
-				cpymo_audio_channel_reset_unsafe(c);
-				printf("[Error] FFmpeg avcodec_send_packet: %s.\n", av_err2str(result));
-				return false;
-			}
-
-			av_packet_unref(c->packet);
-
-			return cpymo_audio_channel_next_frame(c);
-		}
-	}
-	else if (result == AVERROR_EOF) {
-		c->no_more_blocks = true;
-		if (c->frame->nb_samples) {
-			cpymo_audio_channel_convert_current_frame(c);
-			return true;
-		}
+	if (result == AVERROR_EOF) {
 		return false;
+	}
+	else if (result == AVERROR(EAGAIN)) {
+		result = av_read_frame(c->format_context, c->packet);
+		if (result < 0 && result != AVERROR_EOF) {
+			printf("[Error] av_read_frame: %s.\n", av_err2str(result));
+			return false;
+		}
+
+		int send_result = 
+			avcodec_send_packet(c->codec_context, result == AVERROR_EOF ? NULL : c->packet);
+
+		if (result == AVERROR_EOF) {
+			printf("[Info] avcodec_send_packer: Flush decoder!!.\n");
+		}
+		if (result != AVERROR_EOF) av_packet_unref(c->packet);
+
+		if (send_result < 0) {
+			printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
+			return false;
+		}
+
+		return cpymo_audio_channel_next_frame(c);
+		
 	}
 	else if (result < 0) {
-		cpymo_audio_channel_reset_unsafe(c);
-		printf("[Error] FFmpeg: %s.\n", av_err2str(result));
+		printf("[Error] avcodec_receive_frame: %s.\n", av_err2str(result));
 		return false;
 	}
-
-	if (result == 0) {
-		return cpymo_audio_channel_convert_current_frame(c);
+	else {
+		bool ret = cpymo_audio_channel_convert_current_frame(c);
+		c->converted_frame_current_offset = 0;
+		return ret;
 	}
-
-	return false;
 }
 
 static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
@@ -264,7 +250,6 @@ error_t cpymo_audio_channel_play_file(
 	c->volume = volume;
 	c->loop = loop;
 	c->converted_frame_current_offset = 0;
-	c->no_more_blocks = false;
 
 	// read first frame
 	if (!cpymo_audio_channel_next_frame(c)) {
