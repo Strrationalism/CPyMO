@@ -23,20 +23,29 @@ static int cpymo_audio_fmt2ffmpeg(
 
 static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c) 
 {
-	int result = av_read_frame(c->format_context, c->packet);
-	result = avcodec_send_packet(c->codec_context, c->packet);
-	if (result < 0) {
+	int result = avcodec_receive_frame(c->codec_context, c->frame);
+
+	if (result == AVERROR(EAGAIN)) {
+		result = av_read_frame(c->format_context, c->packet);
+		if (result < 0) {
+			cpymo_audio_channel_reset(c);
+			return false;
+		}
+
+		result = avcodec_send_packet(c->codec_context, c->packet);
+		if (result < 0) {
+			cpymo_audio_channel_reset(c);
+			return false;
+		}
+
+		av_packet_unref(c->packet);
+
+		return cpymo_audio_channel_next_frame(c);
+	}
+	else if (result < 0) {
 		cpymo_audio_channel_reset(c);
 		return false;
 	}
-
-	result = avcodec_receive_frame(c->codec_context, c->frame);
-	if (result < 0) {
-		cpymo_audio_channel_reset(c);
-		return false;
-	}
-
-	av_packet_unref(c->packet);
 
 	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
 
@@ -79,26 +88,22 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		c->converted_frame_current_offset = 0;
 		return true;
 	}
-	else {
-		
-		if (result >= 0) return cpymo_audio_channel_next_frame(c);
-		else return false;
-	}
 }
 
 static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
 {
-	const uint8_t *data = c->converted_buf;
-	const size_t data_size = c->converted_buf_size;
+	if (len <= 0) return;
+	const uint8_t *data = c->converted_buf + c->converted_frame_current_offset;
+	const size_t data_size = c->converted_buf_size - c->converted_frame_current_offset;
 
-	size_t write_bytes = data_size - c->converted_frame_current_offset;
+	size_t write_bytes = data_size;
 	if (write_bytes >= len) write_bytes = len;
 
 	memcpy(dst, data, write_bytes);
 
 	c->converted_frame_current_offset += write_bytes;
 
-	if (c->converted_frame_current_offset >= data_size) {
+	if (c->converted_frame_current_offset >= c->converted_buf_size) {
 		if (cpymo_audio_channel_next_frame(c)) {
 			if (write_bytes < len) {
 				cpymo_audio_channel_write_samples(dst + write_bytes, len - write_bytes, c);
@@ -205,12 +210,6 @@ error_t cpymo_audio_channel_play_file(
 	c->converted_frame_current_offset = 0;
 
 	// read first frame
-	result = av_read_frame(c->format_context, c->packet);
-	if (result < 0) {
-		cpymo_audio_channel_reset(c);
-		return CPYMO_ERR_SUCC;
-	}
-
 	if (!cpymo_audio_channel_next_frame(c)) {
 		cpymo_audio_channel_reset(c);
 		return CPYMO_ERR_SUCC;

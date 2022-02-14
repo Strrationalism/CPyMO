@@ -19,9 +19,6 @@
 
 #include <cpymo_backend_text.h>
 
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2;
 float render_3d_offset;

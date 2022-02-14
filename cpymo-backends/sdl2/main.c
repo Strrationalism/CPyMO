@@ -82,7 +82,7 @@ static void ensure_save_dir(const char *gamedir)
 
 int main(int argc, char **argv) 
 {
-	//_CrtSetBreakAlloc(550);
+	//_CrtSetBreakAlloc(529);
 	int ret = 0;
 	const char *gamedir = "./";
 

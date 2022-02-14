@@ -47,11 +47,16 @@ static bool cpymo_backend_audio_need_dump_dsp()
 static void cpymo_backend_audio_callback(void *_) 
 {
     static unsigned double_buffering = 0;
-    s16 *dest = waveBuf[double_buffering].data_pcm16;
+    if(waveBuf[double_buffering].status != NDSP_WBUF_DONE) return;
 
-    cpymo_audio_copy_samples(dest, BYTEPERSAMPLE * waveBuf[0].nsamples, &engine.audio);
+    void *dest = waveBuf[double_buffering].data_pcm16;
 
-	DSP_FlushDataCache(dest, waveBuf[double_buffering].nsamples * BYTEPERSAMPLE);
+    size_t size = waveBuf[double_buffering].nsamples * BYTEPERSAMPLE;
+
+    memset(dest, 0, size);
+    cpymo_audio_copy_samples(dest, size, &engine.audio);
+
+	DSP_FlushDataCache(dest, size);
     ndspChnWaveBufAdd(0, &waveBuf[double_buffering]);
     double_buffering = !double_buffering;
 }
@@ -66,9 +71,9 @@ void cpymo_backend_audio_init()
         return;
     }
 
-    size_t buf_size = SAMPLESPERBUF * BYTEPERSAMPLE * 2;
+    size_t buf_size = SAMPLESPERBUF * BYTEPERSAMPLE;
 
-    audio_buf = (s16 *)linearAlloc(buf_size);
+    audio_buf = (s16 *)linearAlloc(buf_size * 2);
     if(audio_buf == NULL) {
         ndspExit();
         printf("[Error] Failed to alloc audio buf.\n");
@@ -77,6 +82,7 @@ void cpymo_backend_audio_init()
 
     memset(audio_buf, 0, buf_size);
 
+    ndspChnReset(0);
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
     ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
     ndspChnSetRate(0, 44100);
@@ -91,7 +97,7 @@ void cpymo_backend_audio_init()
     memset(waveBuf, 0, sizeof(waveBuf));
     waveBuf[0].data_vaddr = audio_buf;
     waveBuf[0].nsamples = SAMPLESPERBUF;
-    waveBuf[1].data_vaddr = audio_buf + SAMPLESPERBUF * 2;
+    waveBuf[1].data_vaddr = ((u8 *)audio_buf) + buf_size;
     waveBuf[1].nsamples = SAMPLESPERBUF;
 
     ndspChnWaveBufAdd(0, &waveBuf[0]);
