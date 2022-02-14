@@ -8,7 +8,7 @@
 static bool audio_enabled = false;
 
 #define SAMPLERATE 44100
-#define SAMPLESPERBUF (SAMPLERATE / 15)
+#define SAMPLESPERBUF (SAMPLERATE / 60)
 #define BYTEPERSAMPLE 4
 #define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
 
@@ -80,7 +80,7 @@ void cpymo_backend_audio_init()
         return;
     }
 
-    memset(audio_buf, 0, buf_size);
+    memset(audio_buf, 0, buf_size * 2);
 
     ndspChnReset(0);
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
