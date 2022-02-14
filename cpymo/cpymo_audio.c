@@ -75,11 +75,21 @@ static bool cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 	return true;
 }
 
+static void cpymo_audio_channel_seek_to_head(cpymo_audio_channel *c)
+{
+	av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
+}
+
 static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c) 
 {
 	int result = avcodec_receive_frame(c->codec_context, c->frame);
 
 	if (result == AVERROR_EOF) {
+		if (c->frame->nb_samples) {
+			bool ret = cpymo_audio_channel_convert_current_frame(c);
+			c->converted_frame_current_offset = 0;
+			return ret;
+		}
 		return false;
 	}
 	else if (result == AVERROR(EAGAIN)) {
@@ -87,6 +97,13 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		if (result < 0 && result != AVERROR_EOF) {
 			printf("[Error] av_read_frame: %s.\n", av_err2str(result));
 			return false;
+		}
+
+		if (result == AVERROR_EOF) {
+			if (c->loop) {
+				cpymo_audio_channel_seek_to_head(c);
+				return cpymo_audio_channel_next_frame(c);
+			}
 		}
 
 		int send_result = 
