@@ -71,11 +71,13 @@ static void cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 		1);
 
 	c->converted_frame_current_offset = 0;
+	//printf("[Info] Packet %d Converted.\n", (int)c->converted_buf[0]);
 	return true;
 }
 
 static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c) 
 {
+	c->no_more_blocks = false;
 	int result = avcodec_receive_frame(c->codec_context, c->frame);
 
 	if (result == AVERROR(EAGAIN)) {
@@ -86,7 +88,11 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 				return cpymo_audio_channel_next_frame(c);
 			}
 			else {
-				avcodec_send_packet(c->codec_context, NULL);
+				result = avcodec_send_packet(c->codec_context, NULL);
+				if (result < 0) {
+					printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
+				}
+				printf("[Info] Flush decoder!!!\n");
 				return cpymo_audio_channel_next_frame(c);
 			}
 		}
@@ -94,6 +100,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 			result = avcodec_send_packet(c->codec_context, c->packet);
 			if (result < 0) {
 				cpymo_audio_channel_reset_unsafe(c);
+				printf("[Error] FFmpeg avcodec_send_packet: %s.\n", av_err2str(result));
 				return false;
 			}
 
@@ -102,13 +109,19 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 			return cpymo_audio_channel_next_frame(c);
 		}
 	}
+	else if (result == AVERROR_EOF) {
+		c->no_more_blocks = true;
+		if (c->frame->nb_samples) {
+			cpymo_audio_channel_convert_current_frame(c);
+			return true;
+		}
+		return false;
+	}
 	else if (result < 0) {
 		cpymo_audio_channel_reset_unsafe(c);
 		printf("[Error] FFmpeg: %s.\n", av_err2str(result));
 		return false;
 	}
-
-	
 
 	if (result == 0) {
 		cpymo_audio_channel_convert_current_frame(c);
@@ -121,6 +134,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
 {
 	if (len <= 0) return;
+	//printf("[Info] Packet %d Played.\n", (int)c->converted_buf[0]);
 	const uint8_t *data = c->converted_buf + c->converted_frame_current_offset;
 	const size_t data_size = c->converted_buf_size - c->converted_frame_current_offset;
 
@@ -131,12 +145,9 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 
 	c->converted_frame_current_offset += write_bytes;
 
-	if (write_bytes < len) {
+	if (write_bytes < len && !c->no_more_blocks) {
 		if (cpymo_audio_channel_next_frame(c)) {
 			cpymo_audio_channel_write_samples(dst + write_bytes, len - write_bytes, c);
-		}
-		else {
-			cpymo_audio_channel_reset_unsafe(c);
 		}
 	}
 }
@@ -246,6 +257,7 @@ error_t cpymo_audio_channel_play_file(
 	c->volume = volume;
 	c->loop = loop;
 	c->converted_frame_current_offset = 0;
+	c->no_more_blocks = false;
 
 	// read first frame
 	if (!cpymo_audio_channel_next_frame(c)) {

@@ -30,6 +30,8 @@ typedef struct {
 	size_t converted_buf_size, converted_buf_all_size;
 
 	size_t converted_frame_current_offset;
+
+	bool no_more_blocks;
 } cpymo_audio_channel;
 
 typedef struct {
