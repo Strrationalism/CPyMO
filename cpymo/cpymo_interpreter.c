@@ -1234,6 +1234,31 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		CONT_NEXTLINE;
 	}
 
+	D("vo") {
+		if (engine->audio.enabled) {
+			if (engine->assetloader.use_pkg_voice) {
+				// Play Packaged File HERE!!!
+			}
+			else {
+				POP_ARG(filename); ENSURE(filename);
+
+				char *vo_path = NULL;
+				error_t err = cpymo_assetloader_get_vo_path(&vo_path, filename, &engine->assetloader);
+				CPYMO_THROW(err);
+
+				err = cpymo_audio_channel_play_file(
+					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
+					vo_path,
+					1.0f,
+					false);
+				free(vo_path);
+
+				CPYMO_THROW(err);
+			}
+		}
+		CONT_NEXTLINE;
+	}
+
 	/*** V. System ***/
 	D("album") {
 		POP_ARG(list_name);

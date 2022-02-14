@@ -17,9 +17,30 @@ typedef struct {
 	FILE *stream;
 } cpymo_package;
 
-extern error_t cpymo_package_open(cpymo_package *out_package, const char *path);
-extern void cpymo_package_close(cpymo_package *package);
-extern error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, const char* filename);
-extern error_t cpymo_package_read_file(char *out_buffer, const cpymo_package *package, const cpymo_package_index *index);
+error_t cpymo_package_open(cpymo_package *out_package, const char *path);
+void cpymo_package_close(cpymo_package *package);
+error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, const char* filename);
+error_t cpymo_package_read_file(char *out_buffer, const cpymo_package *package, const cpymo_package_index *index);
+
+
+typedef struct {
+	size_t file_offset;
+	size_t file_length;
+	size_t current;
+	FILE *stream;
+} cpymo_package_stream_reader;
+
+cpymo_package_stream_reader cpymo_package_stream_reader_create(
+	const cpymo_package *package, 
+	const cpymo_package_index *index);
+
+error_t cpymo_package_stream_reader_seek(
+	size_t seek,
+	cpymo_package_stream_reader *r);
+
+size_t cpymo_package_stream_reader_read(
+	char *dst_buf,
+	size_t dst_buf_size,
+	cpymo_package_stream_reader *r);
 
 #endif

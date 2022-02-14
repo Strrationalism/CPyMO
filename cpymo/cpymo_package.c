@@ -78,3 +78,35 @@ error_t cpymo_package_read_file(char *out_buffer, const cpymo_package * package,
 
 	return CPYMO_ERR_SUCC;
 }
+
+error_t cpymo_package_stream_reader_seek(size_t seek, cpymo_package_stream_reader *r)
+{
+	if (seek > r->file_length) {
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	r->current = seek;
+	return CPYMO_ERR_SUCC;
+}
+
+size_t cpymo_package_stream_reader_read(char *dst_buf, size_t dst_buf_size, cpymo_package_stream_reader * r)
+{
+	size_t read_size = r->file_length - r->current;
+	if (read_size > dst_buf_size) read_size = dst_buf_size;
+
+	fseek(r->stream, r->file_offset + r->current, SEEK_SET);
+
+	return fread(dst_buf, dst_buf_size, 1, r->stream);
+}
+
+cpymo_package_stream_reader cpymo_package_create_stream_reader(
+	const cpymo_package * package,
+	const cpymo_package_index * index)
+{
+	cpymo_package_stream_reader reader;
+	reader.file_offset = index->file_offset;
+	reader.file_length = index->file_length;
+	reader.current = 0;
+	reader.stream = package->stream;
+	return reader;
+}

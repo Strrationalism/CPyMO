@@ -357,6 +357,27 @@ error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span
 	return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
+{
+	assert(*out_str == NULL);
+	char *str = (char *)malloc(
+		strlen(l->gamedir)
+		+ 8
+		+ vo_name.len
+		+ strlen(l->game_config->voiceformat)
+		+ 4);
+
+	if (str == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	strcpy(str, l->gamedir);
+	strcat(str, "/voice/");
+	strncat(str, vo_name.begin, vo_name.len);
+	strcat(str, ".");
+	strcat(str, l->game_config->voiceformat);
+	*out_str = str;
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,

@@ -28,77 +28,90 @@ static int cpymo_audio_fmt2ffmpeg(
 	return -1;
 }
 
+static void cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
+{
+	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
+
+	assert(c->frame->nb_samples != 0);
+
+	size_t out_size = av_samples_get_buffer_size(
+		NULL,
+		(int)info->channels,
+		c->frame->nb_samples,
+		cpymo_audio_fmt2ffmpeg(info->format),
+		1);
+
+	if (out_size > c->converted_buf_all_size) {
+		c->converted_buf = (uint8_t *)realloc(c->converted_buf, out_size);
+		if (c->converted_buf == NULL) {
+			cpymo_audio_channel_reset_unsafe(c);
+			return false;
+		}
+		c->converted_buf_all_size = out_size;
+	}
+
+	int samples = swr_convert(
+		c->swr_context,
+		&c->converted_buf,
+		c->frame->nb_samples,
+		(const uint8_t **)c->frame->data,
+		c->frame->nb_samples);
+
+	if (samples < 0) {
+		const char *err = av_err2str(samples);
+		printf("[Warning] swr_convert: %s.", err);
+		cpymo_audio_channel_reset_unsafe(c);
+	}
+
+	c->converted_buf_size = av_samples_get_buffer_size(
+		NULL,
+		(int)info->channels,
+		c->frame->nb_samples,
+		cpymo_audio_fmt2ffmpeg(info->format),
+		1);
+
+	c->converted_frame_current_offset = 0;
+	return true;
+}
+
 static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c) 
 {
 	int result = avcodec_receive_frame(c->codec_context, c->frame);
 
 	if (result == AVERROR(EAGAIN)) {
 		result = av_read_frame(c->format_context, c->packet);
-		if (result < 0) {
+		if (result == AVERROR_EOF) {
 			if (c->loop) {
 				av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
 				return cpymo_audio_channel_next_frame(c);
 			}
 			else {
+				avcodec_send_packet(c->codec_context, NULL);
+				return cpymo_audio_channel_next_frame(c);
+			}
+		}
+		else {
+			result = avcodec_send_packet(c->codec_context, c->packet);
+			if (result < 0) {
 				cpymo_audio_channel_reset_unsafe(c);
 				return false;
 			}
+
+			av_packet_unref(c->packet);
+
+			return cpymo_audio_channel_next_frame(c);
 		}
-
-		result = avcodec_send_packet(c->codec_context, c->packet);
-		if (result < 0) {
-			cpymo_audio_channel_reset_unsafe(c);
-			return false;
-		}
-
-		av_packet_unref(c->packet);
-
-		return cpymo_audio_channel_next_frame(c);
 	}
 	else if (result < 0) {
 		cpymo_audio_channel_reset_unsafe(c);
+		printf("[Error] FFmpeg: %s.\n", av_err2str(result));
 		return false;
 	}
 
-	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
+	
 
 	if (result == 0) {
-		size_t out_size = av_samples_get_buffer_size(
-			NULL, 
-			(int)info->channels,
-			c->frame->nb_samples,
-			cpymo_audio_fmt2ffmpeg(info->format),
-			1);
-
-		if (out_size > c->converted_buf_all_size) {
-			c->converted_buf = (uint8_t *)realloc(c->converted_buf, out_size);
-			if (c->converted_buf == NULL) {
-				cpymo_audio_channel_reset_unsafe(c);
-				return false;
-			}
-			c->converted_buf_all_size = out_size;
-		}
-
-		int samples = swr_convert(
-			c->swr_context,
-			&c->converted_buf, 
-			c->frame->nb_samples, 
-			(const uint8_t **)c->frame->data,
-			c->frame->nb_samples);
-
-		if (samples < 0) {
-			const char *err = av_err2str(result);
-			printf("[Warning] swr_convert: %s.", err);
-			return false;
-		}
-		c->converted_buf_size = av_samples_get_buffer_size(
-			NULL,
-			(int)info->channels,
-			c->frame->nb_samples,
-			cpymo_audio_fmt2ffmpeg(info->format),
-			1);
-
-		c->converted_frame_current_offset = 0;
+		cpymo_audio_channel_convert_current_frame(c);
 		return true;
 	}
 
