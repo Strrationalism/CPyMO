@@ -28,7 +28,7 @@ static int cpymo_audio_fmt2ffmpeg(
 	return -1;
 }
 
-static void cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
+static bool cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 {
 	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
 
@@ -124,8 +124,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 	}
 
 	if (result == 0) {
-		cpymo_audio_channel_convert_current_frame(c);
-		return true;
+		return cpymo_audio_channel_convert_current_frame(c);
 	}
 
 	return false;
@@ -135,19 +134,27 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 {
 	if (len <= 0) return;
 	//printf("[Info] Packet %d Played.\n", (int)c->converted_buf[0]);
-	const uint8_t *data = c->converted_buf + c->converted_frame_current_offset;
-	const size_t data_size = c->converted_buf_size - c->converted_frame_current_offset;
+	const uint8_t *src = c->converted_buf + c->converted_frame_current_offset;
+	const size_t src_size = c->converted_buf_size - c->converted_frame_current_offset;
 
-	size_t write_bytes = data_size;
-	if (write_bytes >= len) write_bytes = len;
+	size_t write_size = src_size;
+	if (write_size > len) write_size = len;
 
-	memcpy(dst, data, write_bytes);
+	memcpy(dst, src, write_size);
+	c->converted_frame_current_offset += write_size;
 
-	c->converted_frame_current_offset += write_bytes;
+	const size_t remain_size = len - write_size;
+	uint8_t *remain_dst = dst + write_size;
 
-	if (write_bytes < len && !c->no_more_blocks) {
-		if (cpymo_audio_channel_next_frame(c)) {
-			cpymo_audio_channel_write_samples(dst + write_bytes, len - write_bytes, c);
+	bool has_next_block = true;
+	if (c->converted_frame_current_offset >= c->converted_buf_size) {
+		has_next_block = cpymo_audio_channel_next_frame(c);
+	}
+
+	if (remain_size > 0) {
+		if (has_next_block) cpymo_audio_channel_write_samples(remain_dst, remain_size, c);
+		else {
+			memset(remain_dst, 0, remain_size);
 		}
 	}
 }
