@@ -81,7 +81,7 @@ void trans_pos(float *x, float *y) {
 
 void cpymo_backend_image_fill_screen_edges()
 {
-    /*if(!fill_screen) {
+    if(!fill_screen) {
         const u32 col = C2D_Color32(0, 0, 0, 255);
 
         if(offset_x > 0.5f) {
@@ -93,7 +93,7 @@ void cpymo_backend_image_fill_screen_edges()
             C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
             C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
         }
-    }*/
+    }
 }
 
 void cpymo_backend_image_fill_rects(
