@@ -19,7 +19,7 @@ static ndspWaveBuf waveBuf[2];
 extern cpymo_engine engine;
 
 const static cpymo_backend_audio_info audio_info = {
-    44100,
+    SAMPLERATE,
     cpymo_backend_audio_s16,
     2
 };
@@ -86,7 +86,7 @@ void cpymo_backend_audio_init()
     ndspChnReset(0);
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
     ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
-    ndspChnSetRate(0, 44100);
+    ndspChnSetRate(0, SAMPLERATE);
     ndspChnSetFormat(0, NDSP_FORMAT_STEREO_PCM16);
     
     float mix[12];
