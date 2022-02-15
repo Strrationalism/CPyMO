@@ -34,6 +34,8 @@ typedef struct {
 
 	AVIOContext *io_context;
 	cpymo_package_stream_reader package_reader;
+
+	int stream_id;
 } cpymo_audio_channel;
 
 typedef struct {

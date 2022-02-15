@@ -129,7 +129,7 @@ static error_t cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 
 static void cpymo_audio_channel_seek_to_head(cpymo_audio_channel *c)
 {
-	av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
+	av_seek_frame(c->format_context, c->stream_id, 0, AVSEEK_FLAG_FRAME);
 }
 
 static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
@@ -358,7 +358,7 @@ error_t cpymo_audio_channel_play_file(
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
-	int stream_id = av_find_best_stream(
+	c->stream_id = av_find_best_stream(
 		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
 	if (result != 0) {
 		cpymo_audio_channel_reset_unsafe(c);
@@ -367,7 +367,7 @@ error_t cpymo_audio_channel_play_file(
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
-	AVStream *stream = c->format_context->streams[stream_id];
+	AVStream *stream = c->format_context->streams[c->stream_id];
 	assert(c->codec_context == NULL);
 	const AVCodec *codec = avcodec_find_decoder(stream->codecpar->codec_id);
 	c->codec_context = avcodec_alloc_context3(codec);
