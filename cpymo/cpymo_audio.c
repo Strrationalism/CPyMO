@@ -100,10 +100,7 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		}
 
 		if (result == AVERROR_EOF) {
-			if (c->loop) {
-				cpymo_audio_channel_seek_to_head(c);
-				return cpymo_audio_channel_next_frame(c);
-			}
+			return false;
 		}
 
 		int send_result = 
@@ -144,8 +141,14 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 				continue;
 			}
 			else {
-				memset(dst, 0, len);
-				return;
+				if (c->loop) {
+					cpymo_audio_channel_seek_to_head(c);
+					continue;
+				}
+				else {
+					memset(dst, 0, len);
+					return;
+				}
 			}
 		}
 		else {
@@ -263,7 +266,7 @@ error_t cpymo_audio_channel_play_file(
 
 	c->enabled = true;
 	c->volume = volume;
-	c->loop = loop;
+	c->loop = true;
 	c->converted_frame_current_offset = 0;
 
 	// read first frame
