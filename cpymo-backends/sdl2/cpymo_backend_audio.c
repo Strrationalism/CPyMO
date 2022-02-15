@@ -3,11 +3,12 @@
 #include <cpymo_error.h>
 #include <cpymo_backend_audio.h>
 #include <cpymo_engine.h>
+#include <assert.h>
 
 static bool audio_enabled;
 extern cpymo_engine engine;
 
-const static cpymo_backend_audio_info audio_info = {
+static cpymo_backend_audio_info audio_info = {
 	48000,
 	cpymo_backend_audio_f32,
 	2
@@ -23,6 +24,14 @@ const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)
 	return audio_enabled ? &audio_info : NULL;
 }
 
+static bool cpymo_backend_audio_supported(const SDL_AudioSpec *spec)
+{
+	return (spec->format == AUDIO_S16SYS
+		|| spec->format == AUDIO_S32SYS
+		|| spec->format == AUDIO_F32SYS)
+		&& spec->padding == 0;
+}
+
 void cpymo_backend_audio_init()
 {
 	SDL_AudioSpec want;
@@ -33,17 +42,51 @@ void cpymo_backend_audio_init()
 	want.format = AUDIO_F32;
 	want.freq = 48000;
 	want.samples = 2940;
+
+	SDL_AudioSpec have;
 	
-	if (SDL_OpenAudio(&want, NULL) == 0) {
-		SDL_LockAudio();
-		SDL_PauseAudio(0);
-		audio_enabled = true;
+	if (SDL_OpenAudio(&want, &have) == 0) {
+		if (!cpymo_backend_audio_supported(&have)) {
+			SDL_CloseAudio();
+
+			if (SDL_OpenAudio(&want, NULL) == 0) {
+				audio_enabled = true;
+			}
+			else {
+				goto FAIL;
+			}
+		}
+		else {
+			audio_info.freq = have.freq;
+			audio_info.channels = have.channels;
+
+			switch (have.format) {
+			case AUDIO_S16SYS:
+				audio_info.format = cpymo_backend_audio_s16;
+				break;
+			case AUDIO_S32SYS:
+				audio_info.format = cpymo_backend_audio_s32;
+				break;
+			case AUDIO_F32SYS:
+				audio_info.format = cpymo_backend_audio_f32;
+				break;
+			default:
+				assert(false);
+			}
+
+			audio_enabled = true;
+		}
 	}
 	else {
+		FAIL:
 		audio_enabled = false;
 		const char *err = SDL_GetError();
 		SDL_Log("[Error] Audio device open failed: %s.", err);
+		return;
 	}
+
+	SDL_LockAudio();
+	SDL_PauseAudio(0);
 }
 
 void cpymo_backend_audio_free()
