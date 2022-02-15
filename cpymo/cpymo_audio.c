@@ -384,7 +384,9 @@ error_t cpymo_audio_channel_play_file(
 		(int)info->freq,
 		stream->codecpar->channels == 1 ?
 			AV_CH_LAYOUT_MONO :
-			stream->codecpar->channel_layout,
+			(stream->codecpar->channel_layout == 0 ?
+				av_get_default_channel_layout(stream->codecpar->channels) :
+				stream->codecpar->channel_layout),
 		stream->codecpar->format,
 		stream->codecpar->sample_rate,
 		0, NULL);
