@@ -1175,6 +1175,23 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		return CPYMO_ERR_SUCC;
 	}
 
+	D("wait_se") {
+		if (engine->audio.enabled) {
+			cpymo_audio_channel *c = &engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE];
+			if (c->loop) {
+				printf("[Error] Can not wait_se with a looping se.\n");
+				CONT_NEXTLINE;
+			}
+			else {
+				cpymo_wait_register(&engine->wait, &cpymo_audio_wait_se);
+				return CPYMO_ERR_SUCC;
+			}
+		}
+		else {
+			CONT_NEXTLINE;
+		}
+	}
+
 	D("rand") {
 		POP_ARG(var_name); ENSURE(var_name);
 		POP_ARG(min_val_str); ENSURE(min_val_str);

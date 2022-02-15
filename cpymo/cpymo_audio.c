@@ -1,7 +1,7 @@
 #include "cpymo_audio.h"
 #include <assert.h>
 #include <cpymo_backend_audio.h>
-#include "cpymo_package.h"
+#include "cpymo_engine.h"
 
 static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 {
@@ -138,7 +138,9 @@ static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 
 	if (result == 0) {
 		// One frame received
-		return cpymo_audio_channel_convert_current_frame(c);
+		error_t err = cpymo_audio_channel_convert_current_frame(c);
+		av_frame_unref(c->frame);
+		return err;
 	}
 	else if (result == AVERROR(EAGAIN)) {
 		// No frame received, send more packet to codec.
@@ -388,7 +390,9 @@ error_t cpymo_audio_channel_play_file(
 		av_get_default_channel_layout((int)info->channels),
 		cpymo_audio_fmt2ffmpeg(info->format),
 		(int)info->freq,
-		stream->codecpar->channel_layout,
+		stream->codecpar->channels == 1 ?
+			AV_CH_LAYOUT_MONO :
+			stream->codecpar->channel_layout,
 		stream->codecpar->format,
 		stream->codecpar->sample_rate,
 		0, NULL);
@@ -478,4 +482,13 @@ void cpymo_audio_copy_samples(void * dst, size_t len, cpymo_audio_system *s)
 			cpymo_audio_channel_mix_samples(dst, len, s->channels + i);
 		}
 	}
+}
+
+bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
+{
+	if (cpymo_input_foward_key_just_pressed(e)) {
+		return true;
+	}
+
+	return !e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].enabled;
 }

@@ -67,4 +67,7 @@ void cpymo_audio_free(cpymo_audio_system *);
 
 void cpymo_audio_copy_samples(void *dst, size_t len, cpymo_audio_system *);
 
+struct cpymo_engine;
+bool cpymo_audio_wait_se(struct cpymo_engine *, float);
+
 #endif
