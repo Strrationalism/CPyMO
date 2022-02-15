@@ -28,27 +28,71 @@ static int cpymo_audio_fmt2ffmpeg(
 	return -1;
 }
 
-static bool cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
+static error_t cpymo_audio_channel_grow_convert_buffer(
+	cpymo_audio_channel *c, 
+	size_t samples,
+	const cpymo_backend_audio_info *info)
+{
+	const size_t size = av_samples_get_buffer_size(
+		NULL,
+		(int)info->channels,
+		(int)samples,
+		cpymo_audio_fmt2ffmpeg(info->format),
+		1);
+
+	if (size > c->converted_buf_all_size) {
+		c->converted_buf = (uint8_t *)realloc(c->converted_buf, size);
+		if (c->converted_buf == NULL) {
+			cpymo_audio_channel_reset_unsafe(c);
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+		c->converted_buf_all_size = size;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_audio_channel_flush_converter(cpymo_audio_channel *c)
+{
+	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
+
+	const size_t flush_buffer_samples = 512;
+	error_t err = cpymo_audio_channel_grow_convert_buffer(c, flush_buffer_samples, info);
+	CPYMO_THROW(err);
+
+	int samples = swr_convert(
+		c->swr_context,
+		&c->converted_buf,
+		(int)flush_buffer_samples,
+		NULL,
+		0);
+
+	if (samples == 0) return CPYMO_ERR_NO_MORE_CONTENT;
+	if (samples < 0) {
+		printf("[Warning] swr_convert: %s.", av_err2str(samples));
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	c->converted_buf_size = av_samples_get_buffer_size(
+		NULL,
+		(int)info->channels,
+		samples,
+		cpymo_audio_fmt2ffmpeg(info->format),
+		1);
+
+	c->converted_frame_current_offset = 0;
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 {
 	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
 
 	assert(c->frame->nb_samples != 0);
-
-	size_t out_size = av_samples_get_buffer_size(
-		NULL,
-		(int)info->channels,
-		c->frame->nb_samples,
-		cpymo_audio_fmt2ffmpeg(info->format),
-		1);
-
-	if (out_size > c->converted_buf_all_size) {
-		c->converted_buf = (uint8_t *)realloc(c->converted_buf, out_size);
-		if (c->converted_buf == NULL) {
-			cpymo_audio_channel_reset_unsafe(c);
-			return false;
-		}
-		c->converted_buf_all_size = out_size;
-	}
+	
+	error_t err = cpymo_audio_channel_grow_convert_buffer(
+		c, (size_t)c->frame->nb_samples, info);
+	CPYMO_THROW(err);
 
 	int samples = swr_convert(
 		c->swr_context,
@@ -57,22 +101,23 @@ static bool cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 		(const uint8_t **)c->frame->data,
 		c->frame->nb_samples);
 
+	assert(samples == c->frame->nb_samples);
+
 	if (samples < 0) {
 		const char *err = av_err2str(samples);
 		printf("[Warning] swr_convert: %s.", err);
-		cpymo_audio_channel_reset_unsafe(c);
+		return CPYMO_ERR_UNKNOWN;
 	}
 
 	c->converted_buf_size = av_samples_get_buffer_size(
 		NULL,
 		(int)info->channels,
-		c->frame->nb_samples,
+		samples,
 		cpymo_audio_fmt2ffmpeg(info->format),
 		1);
 
 	c->converted_frame_current_offset = 0;
-	//printf("[Info] Packet %d Converted.\n", (int)c->converted_buf[0]);
-	return true;
+	return CPYMO_ERR_SUCC;
 }
 
 static void cpymo_audio_channel_seek_to_head(cpymo_audio_channel *c)
@@ -80,25 +125,23 @@ static void cpymo_audio_channel_seek_to_head(cpymo_audio_channel *c)
 	av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
 }
 
-static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
+static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 { RETRY: {
 	int result = avcodec_receive_frame(c->codec_context, c->frame);
 
 	if (result == 0) {
 		// One frame received
-		cpymo_audio_channel_convert_current_frame(c);
-		return true;
+		return cpymo_audio_channel_convert_current_frame(c);
 	}
 	else if (result == AVERROR(EAGAIN)) {
 		// No frame received, send more packet to codec.
-
 		result = av_read_frame(c->format_context, c->packet);
 		if (result == 0) {
 			result = avcodec_send_packet(c->codec_context, c->packet);
 			av_packet_unref(c->packet);
 			if (result != 0) {
 				printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
-				return false;
+				return CPYMO_ERR_UNKNOWN;
 			}
 			goto RETRY;
 		}
@@ -106,20 +149,23 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 			result = avcodec_send_packet(c->codec_context, NULL);
 			if (result != 0) {
 				printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
-				return false;
+				return CPYMO_ERR_UNKNOWN;
 			}
 			goto RETRY;
 		}
 		else {
 			printf("[Error] av_read_frame: %s.\n", av_err2str(result));
-			return false;
+			return CPYMO_ERR_UNKNOWN;
 		}
 	}
 	else if (result == AVERROR_EOF) {
-		return false;
+		// No frame received, and no more packet send to codec.
+		// Flush Swr buffer.
+		return cpymo_audio_channel_flush_converter(c);
 	}
 	else {
 		printf("[Error] av_receive_frame: %s.\n", av_err2str(result));
+		return CPYMO_ERR_UNKNOWN;
 	}
 }}
 
@@ -130,19 +176,20 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 		size_t src_size = c->converted_buf_size - c->converted_frame_current_offset;
 
 		if (src_size == 0) {
-			if (cpymo_audio_channel_next_frame(c)) {
+			error_t err = cpymo_audio_channel_next_frame(c);
+			if (err == CPYMO_ERR_SUCC) 
 				continue;
-			}
-			else {
+			else if (err == CPYMO_ERR_NO_MORE_CONTENT) {
 				if (c->loop) {
 					cpymo_audio_channel_seek_to_head(c);
 					continue;
 				}
 				else {
-					memset(dst, 0, len);
-					cpymo_audio_channel_reset_unsafe(c);
-					return;
+					goto FILL_BLANK_AND_RESET;
 				}
+			}
+			else {
+				goto FILL_BLANK_AND_RESET;
 			}
 		}
 		else {
@@ -155,6 +202,13 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 			len -= write_size;
 		}
 	}
+
+	return;
+
+FILL_BLANK_AND_RESET:
+	memset(dst, 0, len);
+	cpymo_audio_channel_reset_unsafe(c);
+	return;
 }
 
 error_t cpymo_audio_channel_play_file(
@@ -264,7 +318,7 @@ error_t cpymo_audio_channel_play_file(
 	c->converted_frame_current_offset = 0;
 
 	// read first frame
-	if (!cpymo_audio_channel_next_frame(c)) {
+	if (cpymo_audio_channel_next_frame(c) != CPYMO_ERR_SUCC) {
 		cpymo_audio_channel_reset_unsafe(c);
 		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_SUCC;
