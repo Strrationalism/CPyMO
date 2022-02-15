@@ -80,55 +80,48 @@ static void cpymo_audio_channel_seek_to_head(cpymo_audio_channel *c)
 	av_seek_frame(c->format_context, -1, 0, AVSEEK_FLAG_FRAME);
 }
 
-static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c) 
-{
+static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
+{ RETRY: {
 	int result = avcodec_receive_frame(c->codec_context, c->frame);
 
-	if (result == AVERROR_EOF) {
-		if (c->frame->nb_samples) {
-			bool ret = cpymo_audio_channel_convert_current_frame(c);
-			c->converted_frame_current_offset = 0;
-			return ret;
-		}
-		return false;
+	if (result == 0) {
+		// One frame received
+		cpymo_audio_channel_convert_current_frame(c);
+		return true;
 	}
 	else if (result == AVERROR(EAGAIN)) {
+		// No frame received, send more packet to codec.
+
 		result = av_read_frame(c->format_context, c->packet);
-		if (result < 0 && result != AVERROR_EOF) {
+		if (result == 0) {
+			result = avcodec_send_packet(c->codec_context, c->packet);
+			av_packet_unref(c->packet);
+			if (result != 0) {
+				printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
+				return false;
+			}
+			goto RETRY;
+		}
+		else if (result == AVERROR_EOF) {
+			result = avcodec_send_packet(c->codec_context, NULL);
+			if (result != 0) {
+				printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
+				return false;
+			}
+			goto RETRY;
+		}
+		else {
 			printf("[Error] av_read_frame: %s.\n", av_err2str(result));
 			return false;
 		}
-
-		if (result == AVERROR_EOF) {
-			return false;
-		}
-
-		int send_result = 
-			avcodec_send_packet(c->codec_context, result == AVERROR_EOF ? NULL : c->packet);
-
-		if (result == AVERROR_EOF) {
-			printf("[Info] avcodec_send_packer: Flush decoder!!.\n");
-		}
-		if (result != AVERROR_EOF) av_packet_unref(c->packet);
-
-		if (send_result < 0) {
-			printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
-			return false;
-		}
-
-		return cpymo_audio_channel_next_frame(c);
-		
 	}
-	else if (result < 0) {
-		printf("[Error] avcodec_receive_frame: %s.\n", av_err2str(result));
+	else if (result == AVERROR_EOF) {
 		return false;
 	}
 	else {
-		bool ret = cpymo_audio_channel_convert_current_frame(c);
-		c->converted_frame_current_offset = 0;
-		return ret;
+		printf("[Error] av_receive_frame: %s.\n", av_err2str(result));
 	}
-}
+}}
 
 static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
 {
@@ -147,6 +140,7 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 				}
 				else {
 					memset(dst, 0, len);
+					cpymo_audio_channel_reset_unsafe(c);
 					return;
 				}
 			}
