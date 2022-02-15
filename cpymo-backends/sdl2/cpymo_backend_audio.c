@@ -8,14 +8,13 @@ static bool audio_enabled;
 extern cpymo_engine engine;
 
 const static cpymo_backend_audio_info audio_info = {
-	44100,
-	cpymo_backend_audio_s16le,
+	48000,
+	cpymo_backend_audio_f32,
 	2
 };
 
 static void cpymo_backend_audio_sdl_callback(void *userdata, Uint8 * stream, int len)
 {
-	SDL_memset(stream, 0, len);
 	cpymo_audio_copy_samples(stream, (size_t)len, &engine.audio);
 }
 
@@ -31,8 +30,8 @@ void cpymo_backend_audio_init()
 	SDL_memset(&want, 0, sizeof(want));
 	want.callback = &cpymo_backend_audio_sdl_callback;
 	want.channels = 2;
-	want.format = AUDIO_S16;
-	want.freq = 44100;
+	want.format = AUDIO_F32;
+	want.freq = 48000;
 	want.samples = 2940;
 	
 	if (SDL_OpenAudio(&want, NULL) == 0) {

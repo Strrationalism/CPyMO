@@ -28,7 +28,9 @@ void cpymo_audio_channel_reset(cpymo_audio_channel *c)
 static int cpymo_audio_fmt2ffmpeg(
 	int f) {
 	switch (f) {
-	case cpymo_backend_audio_s16le: return AV_SAMPLE_FMT_S16;
+	case cpymo_backend_audio_s16: return AV_SAMPLE_FMT_S16;
+	case cpymo_backend_audio_s32: return AV_SAMPLE_FMT_S32;
+	case cpymo_backend_audio_f32: return AV_SAMPLE_FMT_FLT;
 	}
 
 	assert(false);
@@ -174,8 +176,43 @@ static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 	}
 }}
 
-static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
+static void cpymo_audio_mix_samples(
+	void *dst_, 
+	const void *src_,
+	size_t len, 
+	cpymo_backend_audio_format fmt,
+	float volume)
 {
+
+#define MIX_SIGNED(TYPE, TYPE_MAX_VAL) { \
+	TYPE *dst = (TYPE *)dst_; \
+	const TYPE *src = (TYPE *)src_; \
+	len /= sizeof(TYPE); \
+	\
+	for (size_t i = 0; i < len; ++i) { \
+		double src_sample = (double)src[i] / (double)TYPE_MAX_VAL; \
+		double dst_sample = (double)dst[i] / (double)TYPE_MAX_VAL; \
+		src_sample *= volume * 0.5f; \
+		dst_sample += src_sample; \
+		\
+		if (dst_sample > 1) dst_sample = 1; \
+		if (dst_sample < -1) dst_sample = -1; \
+		\
+		dst[i] = (TYPE)(dst_sample * TYPE_MAX_VAL); \
+	}\
+}
+
+	switch (fmt) {
+	case cpymo_backend_audio_s16: MIX_SIGNED(int16_t, INT16_MAX); break;
+	case cpymo_backend_audio_s32: MIX_SIGNED(int32_t, INT32_MAX); break;
+	case cpymo_backend_audio_f32: MIX_SIGNED(float, 1.0f); break;
+	}
+}
+
+static void cpymo_audio_channel_mix_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
+{
+	const cpymo_backend_audio_info *info = cpymo_backend_audio_get_info();
+
 	while (len > 0) {
 		uint8_t *src = c->converted_buf + c->converted_frame_current_offset;
 		size_t src_size = c->converted_buf_size - c->converted_frame_current_offset;
@@ -201,7 +238,7 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 			size_t write_size = src_size;
 			if (write_size > len) write_size = len;
 
-			memcpy(dst, src, write_size);
+			cpymo_audio_mix_samples(dst, src, write_size, info->format, c->volume);
 			c->converted_frame_current_offset += write_size;
 			dst += write_size;
 			len -= write_size;
@@ -211,7 +248,6 @@ static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_au
 	return;
 
 FILL_BLANK_AND_RESET:
-	memset(dst, 0, len);
 	cpymo_audio_channel_reset_unsafe(c);
 	return;
 }
@@ -440,9 +476,11 @@ void cpymo_audio_copy_samples(void * dst, size_t len, cpymo_audio_system *s)
 {
 	if (s->enabled == false) return;
 
+	memset(dst, 0, len);
+
 	for (size_t i = 0; i < CPYMO_AUDIO_MAX_CHANNELS; ++i) {
 		if (s->channels[i].enabled) {
-			cpymo_audio_channel_write_samples(dst, len, s->channels + i);
+			cpymo_audio_channel_mix_samples(dst, len, s->channels + i);
 		}
 	}
 }

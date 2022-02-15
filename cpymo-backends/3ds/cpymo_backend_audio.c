@@ -20,7 +20,7 @@ extern cpymo_engine engine;
 
 const static cpymo_backend_audio_info audio_info = {
     44100,
-    cpymo_backend_audio_s16le,
+    cpymo_backend_audio_s16,
     2
 };
 
@@ -53,7 +53,6 @@ static void cpymo_backend_audio_callback(void *_)
 
     size_t size = waveBuf[double_buffering].nsamples * BYTEPERSAMPLE;
 
-    memset(dest, 0, size);
     cpymo_audio_copy_samples(dest, size, &engine.audio);
 
 	DSP_FlushDataCache(dest, size);

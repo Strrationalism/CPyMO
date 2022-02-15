@@ -3,8 +3,11 @@
 
 #include <stdbool.h>
 
+// The data described by the sample format is always in native-endian order. 
 typedef enum {
-	cpymo_backend_audio_s16le
+	cpymo_backend_audio_s16,
+	cpymo_backend_audio_s32,
+	cpymo_backend_audio_f32
 } cpymo_backend_audio_format;
 
 typedef struct {
