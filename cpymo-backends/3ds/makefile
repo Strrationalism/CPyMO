@@ -50,13 +50,13 @@ APP_DESCRIPTION := PyMO Engine implements in C.
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -Wno-unknown-pragmas -Ofast -mword-relocations \
+CFLAGS	:=	-O3 -g -Wall -Wno-unknown-pragmas -Ofast -mword-relocations \
 			-ffunction-sections \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS	:= $(CFLAGS) -O3 -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
