@@ -1215,6 +1215,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			err = cpymo_audio_channel_play_file(
 				&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
 				bgm_path,
+				NULL,
 				1.0f,
 				isloop);
 
@@ -1236,12 +1237,22 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	D("vo") {
 		if (engine->audio.enabled) {
+			POP_ARG(filename); ENSURE(filename);
 			if (engine->assetloader.use_pkg_voice) {
-				// Play Packaged File HERE!!!
+				cpymo_package_stream_reader r;
+				error_t err = cpymo_package_stream_reader_find_create(
+					&r, &engine->assetloader.pkg_voice, filename);
+				CPYMO_THROW(err);
+				
+				err = cpymo_audio_channel_play_file(
+					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
+					NULL,
+					&r,
+					1.0f,
+					false);
+				CPYMO_THROW(err);
 			}
 			else {
-				POP_ARG(filename); ENSURE(filename);
-
 				char *vo_path = NULL;
 				error_t err = cpymo_assetloader_get_vo_path(&vo_path, filename, &engine->assetloader);
 				CPYMO_THROW(err);
@@ -1249,6 +1260,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				err = cpymo_audio_channel_play_file(
 					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
 					vo_path,
+					NULL,
 					1.0f,
 					false);
 				free(vo_path);

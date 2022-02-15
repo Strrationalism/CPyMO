@@ -1,12 +1,19 @@
 #include "cpymo_audio.h"
 #include <assert.h>
 #include <cpymo_backend_audio.h>
+#include "cpymo_package.h"
 
 static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 {
 	if (c->swr_context) swr_free(&c->swr_context);
 	if (c->codec_context) avcodec_free_context(&c->codec_context);
 	if (c->format_context) avformat_close_input(&c->format_context);
+	if (c->io_context) {
+		void *buf = c->io_context->buffer;
+		avio_context_free(&c->io_context);
+		if (buf) av_free(buf);
+	}
+	//if (c->io_buffer) av_free(c->io_buffer);
 
 	cpymo_audio_channel_init(c);
 }
@@ -211,25 +218,100 @@ FILL_BLANK_AND_RESET:
 	return;
 }
 
+static int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+	cpymo_package_stream_reader *r = (cpymo_package_stream_reader *)opaque;
+	size_t size = cpymo_package_stream_reader_read((char *)buf, buf_size, r);
+	if (size == 0) return AVERROR_EOF;
+	else return (int)size;
+}
+
+static int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offset, int whence)
+{
+	cpymo_package_stream_reader *r = (cpymo_package_stream_reader *)opaque;
+
+	switch (whence) {
+	case AVSEEK_SIZE:
+		return (int64_t)r->file_length;
+	case SEEK_SET:
+		if (cpymo_package_stream_reader_seek((size_t)offset, r) == CPYMO_ERR_SUCC)
+			return 0;
+		else return AVERROR_EOF;
+	default:
+		assert(false);
+		return -1;
+	};
+}
+
 error_t cpymo_audio_channel_play_file(
-	cpymo_audio_channel *c, const char * filename, float volume, bool loop)
+	cpymo_audio_channel *c, 
+	const char * filename, const cpymo_package_stream_reader *package_reader, 
+	float volume, bool loop)
 {
 	const cpymo_backend_audio_info *info = 
 		cpymo_backend_audio_get_info();
 	if (info == NULL) return CPYMO_ERR_SUCC;
+
+	if (filename) { assert(package_reader == NULL); }
+	if (package_reader) { assert(filename == NULL); }
+	assert(!(filename == NULL && package_reader == NULL));
 
 	cpymo_backend_audio_lock();
 
 	cpymo_audio_channel_reset_unsafe(c);
 
 	assert(c->enabled == false);
+	
+	assert(c->io_context == NULL);
 
 	assert(c->format_context == NULL);
+
+	if (package_reader) {
+		c->package_reader = *package_reader;
+
+		const size_t avio_buf_size = 4096 * 4;
+		void *io_buffer = av_malloc(avio_buf_size);
+		if (io_buffer == NULL) {
+			cpymo_audio_channel_reset_unsafe(c);
+			cpymo_backend_audio_unlock();
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+
+		c->io_context = avio_alloc_context(
+			io_buffer, (int)avio_buf_size, 0, &c->package_reader,
+			&cpymo_audio_packaged_audio_ffmpeg_read_packet,
+			NULL,
+			&cpymo_audio_packaged_audio_ffmpeg_seek);
+
+		if (c->io_context == NULL) {
+			cpymo_audio_channel_reset_unsafe(c);
+			printf("[Error] avio_alloc_context failed.\n");
+			cpymo_backend_audio_unlock();
+			return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+		}
+
+		c->format_context = avformat_alloc_context();
+		if (c->format_context == NULL) {
+			cpymo_audio_channel_reset_unsafe(c);
+			cpymo_backend_audio_unlock();
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+
+		c->format_context->pb = c->io_context;
+		c->format_context->flags |= AVFMT_FLAG_CUSTOM_IO;
+	}
+
 	int result = 
-		avformat_open_input(&c->format_context, filename, NULL, NULL);
+		avformat_open_input(&c->format_context, filename == NULL ? "" : filename, NULL, NULL);
+
+	if (filename == NULL) filename = "package stream reader";
+
 	if (result != 0) {
-		c->format_context = NULL;
-		printf("[Error] Can not open %s with error ffmpeg error %s.\n", filename, av_err2str(result));
+		printf("[Error] Can not open %s with error ffmpeg error %s.\n",
+			filename,
+			av_err2str(result));
+
+		cpymo_audio_channel_reset_unsafe(c);
 		cpymo_backend_audio_unlock();
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 	}

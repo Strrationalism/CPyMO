@@ -8,6 +8,7 @@
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
 
+#include "cpymo_package.h"
 #include "cpymo_error.h"
 
 #define CPYMO_AUDIO_MAX_CHANNELS 3
@@ -30,6 +31,9 @@ typedef struct {
 	size_t converted_buf_size, converted_buf_all_size;
 
 	size_t converted_frame_current_offset;
+
+	AVIOContext *io_context;
+	cpymo_package_stream_reader package_reader;
 } cpymo_audio_channel;
 
 typedef struct {
@@ -46,6 +50,7 @@ static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 	c->swr_context = NULL;
 	c->converted_frame_current_offset = 0;
 	c->volume = 1.0f;
+	c->io_context = NULL;
 }
 
 void cpymo_audio_channel_reset(cpymo_audio_channel *);
@@ -53,6 +58,7 @@ void cpymo_audio_channel_reset(cpymo_audio_channel *);
 error_t cpymo_audio_channel_play_file(
 	cpymo_audio_channel *channel, 
 	const char *filename,
+	const cpymo_package_stream_reader *package_reader,
 	float volume,
 	bool loop);
 

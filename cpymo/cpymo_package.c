@@ -79,6 +79,21 @@ error_t cpymo_package_read_file(char *out_buffer, const cpymo_package * package,
 	return CPYMO_ERR_SUCC;
 }
 
+
+error_t cpymo_package_stream_reader_find_create(cpymo_package_stream_reader * r, const cpymo_package * package, cpymo_parser_stream_span filename)
+{
+	cpymo_package_index index;
+	char name[32];
+	cpymo_parser_stream_span_copy(name, sizeof(name), filename);
+	
+	error_t err = cpymo_package_find(&index, package, name);
+	CPYMO_THROW(err);
+
+	*r = cpymo_package_stream_reader_create(package, &index);
+
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_package_stream_reader_seek(size_t seek, cpymo_package_stream_reader *r)
 {
 	if (seek > r->file_length) {
@@ -94,12 +109,15 @@ size_t cpymo_package_stream_reader_read(char *dst_buf, size_t dst_buf_size, cpym
 	size_t read_size = r->file_length - r->current;
 	if (read_size > dst_buf_size) read_size = dst_buf_size;
 
-	fseek(r->stream, r->file_offset + r->current, SEEK_SET);
+	if (read_size <= 0) return 0;
 
-	return fread(dst_buf, dst_buf_size, 1, r->stream);
+	fseek(r->stream, (long)(r->file_offset + r->current), SEEK_SET);
+	r->current += read_size;
+
+	return fread(dst_buf, read_size, 1, r->stream) * read_size;
 }
 
-cpymo_package_stream_reader cpymo_package_create_stream_reader(
+cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	const cpymo_package * package,
 	const cpymo_package_index * index)
 {

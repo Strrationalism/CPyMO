@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "cpymo_parser.h"
 #include "cpymo_error.h"
 
 typedef struct {
@@ -33,6 +34,11 @@ typedef struct {
 cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	const cpymo_package *package, 
 	const cpymo_package_index *index);
+
+error_t cpymo_package_stream_reader_find_create(
+	cpymo_package_stream_reader *r,
+	const cpymo_package *package,
+	cpymo_parser_stream_span name);
 
 error_t cpymo_package_stream_reader_seek(
 	size_t seek,
