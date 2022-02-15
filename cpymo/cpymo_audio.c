@@ -129,7 +129,7 @@ static error_t cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 
 static void cpymo_audio_channel_seek_to_head(cpymo_audio_channel *c)
 {
-	av_seek_frame(c->format_context, c->stream_id, 0, AVSEEK_FLAG_FRAME);
+	av_seek_frame(c->format_context, c->stream_id, 0, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_ANY);
 }
 
 static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
@@ -153,10 +153,15 @@ static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 			goto RETRY;
 		}
 		else if (result == AVERROR_EOF) {
-			result = avcodec_send_packet(c->codec_context, NULL);
-			if (result != 0) {
-				printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
-				return CPYMO_ERR_UNKNOWN;
+			if (c->loop) {
+				cpymo_audio_channel_seek_to_head(c);
+			}
+			else {
+				result = avcodec_send_packet(c->codec_context, NULL);
+				if (result != 0) {
+					printf("[Error] avcodec_send_packet: %s.\n", av_err2str(result));
+					return CPYMO_ERR_UNKNOWN;
+				}
 			}
 			goto RETRY;
 		}
@@ -221,18 +226,8 @@ static void cpymo_audio_channel_mix_samples(uint8_t *dst, size_t len, cpymo_audi
 			error_t err = cpymo_audio_channel_next_frame(c);
 			if (err == CPYMO_ERR_SUCC) 
 				continue;
-			else if (err == CPYMO_ERR_NO_MORE_CONTENT) {
-				if (c->loop) {
-					cpymo_audio_channel_seek_to_head(c);
-					continue;
-				}
-				else {
-					goto FILL_BLANK_AND_RESET;
-				}
-			}
-			else {
+			else
 				goto FILL_BLANK_AND_RESET;
-			}
 		}
 		else {
 			size_t write_size = src_size;
