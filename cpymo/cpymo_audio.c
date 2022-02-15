@@ -266,7 +266,7 @@ error_t cpymo_audio_channel_play_file(
 
 	c->enabled = true;
 	c->volume = volume;
-	c->loop = true;
+	c->loop = loop;
 	c->converted_frame_current_offset = 0;
 
 	// read first frame
