@@ -135,29 +135,27 @@ static bool cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 
 static void cpymo_audio_channel_write_samples(uint8_t *dst, size_t len, cpymo_audio_channel *c)
 {
-	if (len <= 0) return;
-	//printf("[Info] Packet %d Played.\n", (int)c->converted_buf[0]);
-	const uint8_t *src = c->converted_buf + c->converted_frame_current_offset;
-	const size_t src_size = c->converted_buf_size - c->converted_frame_current_offset;
+	while (len > 0) {
+		uint8_t *src = c->converted_buf + c->converted_frame_current_offset;
+		size_t src_size = c->converted_buf_size - c->converted_frame_current_offset;
 
-	size_t write_size = src_size;
-	if (write_size > len) write_size = len;
-
-	memcpy(dst, src, write_size);
-	c->converted_frame_current_offset += write_size;
-
-	const size_t remain_size = len - write_size;
-	uint8_t *remain_dst = dst + write_size;
-
-	bool has_next_block = true;
-	if (c->converted_frame_current_offset >= c->converted_buf_size) {
-		has_next_block = cpymo_audio_channel_next_frame(c);
-	}
-
-	if (remain_size > 0) {
-		if (has_next_block) cpymo_audio_channel_write_samples(remain_dst, remain_size, c);
+		if (src_size == 0) {
+			if (cpymo_audio_channel_next_frame(c)) {
+				continue;
+			}
+			else {
+				memset(dst, 0, len);
+				return;
+			}
+		}
 		else {
-			memset(remain_dst, 0, remain_size);
+			size_t write_size = src_size;
+			if (write_size > len) write_size = len;
+
+			memcpy(dst, src, write_size);
+			c->converted_frame_current_offset += write_size;
+			dst += write_size;
+			len -= write_size;
 		}
 	}
 }
