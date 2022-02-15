@@ -1205,7 +1205,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			POP_ARG(filename); ENSURE(filename);
 			POP_ARG(isloop_s);
 
-			bool isloop = true;	// DANGER!!!
+			bool isloop = !cpymo_parser_stream_span_equals_str(isloop_s, "0");
 
 			char *bgm_path = NULL;
 			error_t err =
@@ -1231,6 +1231,57 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		if (engine->audio.enabled) {
 			cpymo_audio_channel_reset(
 				&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM]);
+		}
+		CONT_NEXTLINE;
+	}
+
+	D("se") {
+		if (engine->audio.enabled) {
+			POP_ARG(filename); ENSURE(filename);
+			POP_ARG(isloop_s);
+
+			bool isloop = false;
+			if (cpymo_parser_stream_span_equals_str(isloop_s, "1"))
+				isloop = true;
+
+			if (engine->assetloader.use_pkg_se) {
+				cpymo_package_stream_reader r;
+				error_t err = cpymo_package_stream_reader_find_create(
+					&r, &engine->assetloader.pkg_se, filename);
+				CPYMO_THROW(err);
+
+				err = cpymo_audio_channel_play_file(
+					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE],
+					NULL,
+					&r,
+					1.0f,
+					isloop);
+				CPYMO_THROW(err);
+			}
+			else {
+				char *se_path = NULL;
+				error_t err = cpymo_assetloader_get_se_path(&se_path, filename, &engine->assetloader);
+				CPYMO_THROW(err);
+
+				err = cpymo_audio_channel_play_file(
+					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE],
+					se_path,
+					NULL,
+					1.0f,
+					false);
+				free(se_path);
+
+				CPYMO_THROW(err);
+			}
+		}
+
+		CONT_NEXTLINE;
+	}
+
+	D("se_stop") {
+		if (engine->audio.enabled) {
+			cpymo_audio_channel_reset(
+				&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE]);
 		}
 		CONT_NEXTLINE;
 	}

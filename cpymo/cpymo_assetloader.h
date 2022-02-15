@@ -32,6 +32,7 @@ error_t cpymo_assetloader_load_system(char **out_buffer, size_t *buf_size, const
 error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 
 error_t cpymo_assetloader_get_bgm_path(char **out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader);
+error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l);
 error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l);
 
 error_t cpymo_assetloader_load_system_image(

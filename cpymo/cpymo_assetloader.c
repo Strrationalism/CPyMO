@@ -335,47 +335,50 @@ error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cp
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader)
-{
-	assert(*out_str == NULL);
-	char *str = (char *)malloc(
-		strlen(loader->gamedir) 
-		+ 6 
-		+ bgm_name.len
-		+ strlen(loader->game_config->bgmformat) 
-		+ 4);
-
-	if (str == NULL) return CPYMO_ERR_OUT_OF_MEM;
-
-	strcpy(str, loader->gamedir);
-	strcat(str, "/bgm/");
-	strncat(str, bgm_name.begin, bgm_name.len);
-	strcat(str, ".");
-	strcat(str, loader->game_config->bgmformat);
-	*out_str = str;
-
-	return CPYMO_ERR_SUCC;
-}
-
-error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
+static error_t cpymo_assetloader_get_fs_path(
+	char **out_str, 
+	cpymo_parser_stream_span asset_name, 
+	const char *asset_type, 
+	const char *asset_ext,
+	const cpymo_assetloader *l)
 {
 	assert(*out_str == NULL);
 	char *str = (char *)malloc(
 		strlen(l->gamedir)
-		+ 8
-		+ vo_name.len
-		+ strlen(l->game_config->voiceformat)
+		+ strlen(asset_type)
+		+ 2
+		+ asset_name.len
+		+ strlen(asset_ext)
 		+ 4);
 
 	if (str == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	strcpy(str, l->gamedir);
-	strcat(str, "/voice/");
-	strncat(str, vo_name.begin, vo_name.len);
+	strcat(str, "/");
+	strcat(str, asset_type);
+	strcat(str, "/");
+	strncat(str, asset_name.begin, asset_name.len);
 	strcat(str, ".");
-	strcat(str, l->game_config->voiceformat);
+	strcat(str, asset_ext);
+	
 	*out_str = str;
 	return CPYMO_ERR_SUCC;
+}
+
+
+error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader)
+{
+	return cpymo_assetloader_get_fs_path(out_str, bgm_name, "bgm", loader->game_config->bgmformat, loader);
+}
+
+error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
+{
+	return cpymo_assetloader_get_fs_path(out_str, vo_name, "voice", l->game_config->voiceformat, l);
+}
+
+error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
+{
+	return cpymo_assetloader_get_fs_path(out_str, vo_name, "se", l->game_config->seformat, l);
 }
 
 error_t cpymo_assetloader_load_system_image(

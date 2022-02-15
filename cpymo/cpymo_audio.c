@@ -108,9 +108,7 @@ static error_t cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 		(const uint8_t **)c->frame->data,
 		c->frame->nb_samples);
 
-	assert(samples == c->frame->nb_samples);
-
-	if (samples < 0) {
+	if (samples <= 0) {
 		const char *err = av_err2str(samples);
 		printf("[Warning] swr_convert: %s.", err);
 		return CPYMO_ERR_UNKNOWN;
