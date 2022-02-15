@@ -51,7 +51,6 @@ static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 	c->codec_context = NULL;
 	c->swr_context = NULL;
 	c->converted_frame_current_offset = 0;
-	c->volume = 1.0f;
 	c->io_context = NULL;
 }
 
@@ -61,7 +60,6 @@ error_t cpymo_audio_channel_play_file(
 	cpymo_audio_channel *channel, 
 	const char *filename,
 	const cpymo_package_stream_reader *package_reader,
-	float volume,
 	bool loop);
 
 void cpymo_audio_init(cpymo_audio_system *);

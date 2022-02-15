@@ -37,6 +37,15 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	free(path);
 	if (err != CPYMO_ERR_SUCC) return err;
 
+	// set default volume for audio system
+	{
+		float v = cpymo_utils_clamp(out->gameconfig.bgmvolume, 0, 5) * 0.2f;
+		out->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = v;
+		out->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume = v;
+		v = cpymo_utils_clamp(out->gameconfig.vovolume, 0, 5) * 0.2f;
+		out->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = v;
+	}
+
 	// create asset loader
 	err = cpymo_assetloader_init(&out->assetloader, &out->gameconfig, gamedir);
 	if (err != CPYMO_ERR_SUCC) return err;

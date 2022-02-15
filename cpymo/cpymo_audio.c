@@ -275,7 +275,7 @@ static int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offs
 error_t cpymo_audio_channel_play_file(
 	cpymo_audio_channel *c, 
 	const char * filename, const cpymo_package_stream_reader *package_reader, 
-	float volume, bool loop)
+	bool loop)
 {
 	const cpymo_backend_audio_info *info = 
 		cpymo_backend_audio_get_info();
@@ -424,7 +424,6 @@ error_t cpymo_audio_channel_play_file(
 	}
 
 	c->enabled = true;
-	c->volume = volume;
 	c->loop = loop;
 	c->converted_frame_current_offset = 0;
 
@@ -449,6 +448,7 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		s->channels[i].frame = NULL;
 		s->channels[i].converted_buf = NULL;
 		s->channels[i].converted_buf_all_size = 0;
+		s->channels[i].volume = 0;
 	}
 }
 

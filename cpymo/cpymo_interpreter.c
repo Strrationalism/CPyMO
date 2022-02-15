@@ -1216,7 +1216,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
 				bgm_path,
 				NULL,
-				1.0f,
 				isloop);
 
 			free(bgm_path);
@@ -1254,7 +1253,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE],
 					NULL,
 					&r,
-					1.0f,
 					isloop);
 				CPYMO_THROW(err);
 			}
@@ -1267,7 +1265,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE],
 					se_path,
 					NULL,
-					1.0f,
 					false);
 				free(se_path);
 
@@ -1299,7 +1296,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
 					NULL,
 					&r,
-					1.0f,
 					false);
 				CPYMO_THROW(err);
 			}
@@ -1312,7 +1308,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
 					vo_path,
 					NULL,
-					1.0f,
 					false);
 				free(vo_path);
 
