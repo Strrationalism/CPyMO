@@ -17,6 +17,10 @@ add_executable (cpymo
 	"cpymo_backend_save.c" 
 	"cpymo_backend_audio.c")
 
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	target_sources (cpymo PRIVATE "pymo-icon-windows.rc")
+endif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+
 target_link_libraries(cpymo PRIVATE 
 	SDL2::SDL2 
 	SDL2::SDL2main 

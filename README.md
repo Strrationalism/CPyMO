@@ -1,3 +1,5 @@
+![pymo_icon](https://raw.githubusercontent.com/pymo/pymo/master/images/pymo-icon.png)
+
 ```
    __________        __  _______
   / ____/ __ \__  __/  |/  / __ \
