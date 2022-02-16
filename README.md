@@ -1,4 +1,4 @@
-![pymo_icon](https://raw.githubusercontent.com/pymo/pymo/master/images/pymo-icon.png)
+<img src="https://raw.githubusercontent.com/pymo/pymo/master/images/pymo-icon.png" width=256 height=256 />
 
 ```
    __________        __  _______
