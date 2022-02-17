@@ -461,7 +461,7 @@ void cpymo_audio_free(cpymo_audio_system *s)
 	s->enabled = false;
 }
 
-bool cpymo_audio_get_samples(void **samples, size_t *len, size_t cid, cpymo_audio_system *s)
+bool cpymo_audio_channel_get_samples(void **samples, size_t *len, size_t cid, cpymo_audio_system *s)
 { RETRY: {
 	if (!s->enabled) return false;
 
@@ -488,7 +488,7 @@ bool cpymo_audio_get_samples(void **samples, size_t *len, size_t cid, cpymo_audi
 	return true;
 } }
 
-void cpymo_audio_copy_samples(void * dst, size_t len, cpymo_audio_system *s)
+void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *s)
 {
 	if (s->enabled == false) return;
 

@@ -7,7 +7,7 @@
 
 static bool audio_enabled = false;
 
-#define SAMPLERATE 44100
+#define SAMPLERATE 32000
 #define SAMPLESPERBUF (SAMPLERATE / 60)
 #define BYTEPERSAMPLE 4
 #define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
@@ -53,7 +53,7 @@ static void cpymo_backend_audio_callback(void *_)
 
     size_t size = waveBuf[double_buffering].nsamples * BYTEPERSAMPLE;
 
-    cpymo_audio_copy_samples(dest, size, &engine.audio);
+    cpymo_audio_copy_mixed_samples(dest, size, &engine.audio);
 
 	DSP_FlushDataCache(dest, size);
     ndspChnWaveBufAdd(0, &waveBuf[double_buffering]);

@@ -24,8 +24,8 @@ static void cpymo_backend_audio_sdl_callback(void *userdata, Uint8 * stream, int
 		size_t written = 0;
 		float volume = cpymo_audio_get_channel_volume(cid, &engine.audio);
 
-		while (cpymo_audio_get_samples(&samples, &szlen, cid, &engine.audio) && (size_t)len > written) {
-			SDL_MixAudio(stream + written, samples, szlen, (int)(volume * SDL_MIX_MAXVOLUME));
+		while (cpymo_audio_channel_get_samples(&samples, &szlen, cid, &engine.audio) && szlen) {
+			SDL_MixAudio(stream + written, samples, (Uint32)szlen, (int)(volume * SDL_MIX_MAXVOLUME));
 			written += szlen;
 			szlen = (size_t)len - written;
 		}
