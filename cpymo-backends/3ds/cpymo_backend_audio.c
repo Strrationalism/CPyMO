@@ -11,7 +11,7 @@ static bool audio_enabled = false;
 #define SAMPLESPERBUF (SAMPLERATE / 60)
 #define BYTEPERSAMPLE 4
 #define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
-#define BUFFERS 3
+#define BUFFERS 4
 
 static s16 *audio_buf;
 
@@ -82,26 +82,40 @@ static inline void cpymo_backend_audio_prepare_buffer(ndspWaveBuf *buf, size_t c
     }
 }
 
-
-static void cpymo_backend_audio_callback(void *_) 
+static LightEvent audio_event;
+static LightLock audio_lock;
+static void cpymo_backend_audio_thread(void *_) 
 {
     static unsigned double_buffering[CPYMO_AUDIO_MAX_CHANNELS] = {0};
-    for(size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
-        cpymo_backend_update_volume(cid);
 
-        ndspWaveBuf *wbuf = &waveBuf[BUFFERS * cid + double_buffering[cid]];
-        
-        while(wbuf->status == NDSP_WBUF_DONE) {
-            cpymo_backend_audio_prepare_buffer(wbuf, cid);
-            DSP_FlushDataCache(wbuf->data_pcm8, wbuf->nsamples * BYTEPERSAMPLE);
-            ndspChnWaveBufAdd(cid, wbuf);
-            double_buffering[cid] = (double_buffering[cid] + 1) % BUFFERS;
-            wbuf = &waveBuf[BUFFERS * cid + double_buffering[cid]];
+    while(audio_enabled) {
+        LightEvent_Wait(&audio_event);
+        LightLock_Lock(&audio_lock);
+        for(size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
+            cpymo_backend_update_volume(cid);
+
+            ndspWaveBuf *wbuf = &waveBuf[BUFFERS * cid + double_buffering[cid]];
+            
+            size_t written = 0;
+            while(wbuf->status == NDSP_WBUF_DONE) {
+                cpymo_backend_audio_prepare_buffer(wbuf, cid);
+                DSP_FlushDataCache(wbuf->data_pcm8, wbuf->nsamples * BYTEPERSAMPLE);
+                ndspChnWaveBufAdd(cid, wbuf);
+                double_buffering[cid] = (double_buffering[cid] + 1) % BUFFERS;
+                wbuf = &waveBuf[BUFFERS * cid + double_buffering[cid]];
+
+                written++;
+            }
         }
+        LightLock_Unlock(&audio_lock);
     }
 }
 
-static void cpymo_backend_audio_callback_donothing(void *_) {}
+
+static void cpymo_backend_audio_callback(void *_) 
+{
+    LightEvent_Signal(&audio_event);
+}
 
 void cpymo_backend_audio_init()
 {
@@ -143,12 +157,23 @@ void cpymo_backend_audio_init()
         }
     }
 
+    ndspSetCallback(&cpymo_backend_audio_callback, NULL);
+
+    LightLock_Init(&audio_lock);
+    LightLock_Lock(&audio_lock);
+    LightEvent_Init(&audio_event, RESET_ONESHOT);
+
     audio_enabled = true;
+
+    threadCreate(cpymo_backend_audio_thread, NULL, 0x10000, 0x18, -1, true);
 }
 
 void cpymo_backend_audio_free() 
 {
     if(audio_enabled) {
+        audio_enabled = false;
+        LightEvent_Signal(&audio_event);
+
         ndspExit();
         linearFree(audio_buf);
     }
@@ -156,10 +181,10 @@ void cpymo_backend_audio_free()
 
 void cpymo_backend_audio_lock() 
 {
-    ndspSetCallback(cpymo_backend_audio_callback_donothing, NULL);
+    LightLock_Lock(&audio_lock);
 }
 
 void cpymo_backend_audio_unlock()
 {
-    ndspSetCallback(cpymo_backend_audio_callback, NULL);
+    LightLock_Unlock(&audio_lock);
 }

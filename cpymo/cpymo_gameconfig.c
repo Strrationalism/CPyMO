@@ -193,6 +193,7 @@ error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream,
 	out_config->namealign = 1;
 	strcpy(out_config->bgmformat, "mp3");
 	strcpy(out_config->voiceformat, "mp3");
+	strcpy(out_config->seformat, "mp3");
 
 	/*** Default Config End ***/
 
