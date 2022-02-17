@@ -61,7 +61,7 @@ static inline void cpymo_backend_update_volume(size_t cid)
     }
 }
 
-static void cpymo_backend_audio_send_to_chn(size_t cid)
+static inline void cpymo_backend_audio_send_to_chn(size_t cid)
 {
     cpymo_backend_update_volume(cid);
 
