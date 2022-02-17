@@ -44,7 +44,7 @@ static bool cpymo_backend_audio_need_dump_dsp()
     return true;
 }
 
-static void cpymo_backend_update_volume(size_t cid) 
+static inline void cpymo_backend_update_volume(size_t cid) 
 {
     static float volume[CPYMO_AUDIO_MAX_CHANNELS] = {0.0f};
 
