@@ -14,7 +14,7 @@ static bool audio_enabled = false;
 
 static s16 *audio_buf;
 
-static ndspWaveBuf waveBuf[2];
+static ndspWaveBuf waveBuf[2 * CPYMO_AUDIO_MAX_CHANNELS];
 
 extern cpymo_engine engine;
 
@@ -44,6 +44,23 @@ static bool cpymo_backend_audio_need_dump_dsp()
     return true;
 }
 
+static void cpymo_backend_update_volume(size_t cid) 
+{
+    static float volume[CPYMO_AUDIO_MAX_CHANNELS] = {0.0f};
+
+    float new_volume = cpymo_audio_get_channel_volume(cid, &engine.audio);
+    if(volume[cid] != new_volume) {
+        volume[cid] = new_volume;
+        
+        float mix[12];
+        memset(mix + 2, 0, sizeof(mix) - 2 * sizeof(float));
+        mix[0] = new_volume;
+        mix[1] = new_volume;
+
+        ndspChnSetMix(cid, mix);
+    }
+}
+
 static void cpymo_backend_audio_callback(void *_) 
 {
     static unsigned double_buffering = 0;
@@ -60,6 +77,7 @@ static void cpymo_backend_audio_callback(void *_)
     double_buffering = !double_buffering;
 }
 
+
 static void cpymo_backend_audio_callback_donothing(void *_) {}
 
 void cpymo_backend_audio_init() 
@@ -74,35 +92,34 @@ void cpymo_backend_audio_init()
 
     size_t buf_size = SAMPLESPERBUF * BYTEPERSAMPLE;
 
-    audio_buf = (s16 *)linearAlloc(buf_size * 2);
+    audio_buf = (s16 *)linearAlloc(buf_size * 2 * CPYMO_AUDIO_MAX_CHANNELS);
     if(audio_buf == NULL) {
         ndspExit();
         printf("[Error] Failed to alloc audio buf.\n");
         return;
     }
 
-    memset(audio_buf, 0, buf_size * 2);
-
-    ndspChnReset(0);
-    ndspSetOutputMode(NDSP_OUTPUT_STEREO);
-    ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
-    ndspChnSetRate(0, SAMPLERATE);
-    ndspChnSetFormat(0, NDSP_FORMAT_STEREO_PCM16);
-    
-    float mix[12];
-    memset(mix, 0, sizeof(mix));
-    mix[0] = 1.0f;
-    mix[1] = 1.0f;
-    ndspChnSetMix(0, mix);
-
+    memset(audio_buf, 0, buf_size * 2 * CPYMO_AUDIO_MAX_CHANNELS);
     memset(waveBuf, 0, sizeof(waveBuf));
-    waveBuf[0].data_vaddr = audio_buf;
-    waveBuf[0].nsamples = SAMPLESPERBUF;
-    waveBuf[1].data_vaddr = ((u8 *)audio_buf) + buf_size;
-    waveBuf[1].nsamples = SAMPLESPERBUF;
 
-    ndspChnWaveBufAdd(0, &waveBuf[0]);
-    ndspChnWaveBufAdd(0, &waveBuf[1]);
+    for(int cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
+        ndspChnReset(cid);
+        ndspSetOutputMode(NDSP_OUTPUT_STEREO);
+        ndspChnSetInterp(cid, NDSP_INTERP_LINEAR);
+        ndspChnSetRate(cid, SAMPLERATE);
+        ndspChnSetFormat(cid, NDSP_FORMAT_STEREO_PCM16);
+        cpymo_backend_update_volume(cid);
+        
+        int bufid = 2 * cid;
+        waveBuf[bufid].data_vaddr = ((u8 *)audio_buf) + bufid * buf_size;
+        waveBuf[bufid].nsamples = SAMPLESPERBUF;
+        ndspChnWaveBufAdd(cid, &waveBuf[bufid]);
+
+        bufid++;
+        waveBuf[bufid].data_vaddr = ((u8 *)audio_buf) + bufid * buf_size;
+        waveBuf[bufid].nsamples = SAMPLESPERBUF;
+        ndspChnWaveBufAdd(cid, &waveBuf[bufid]);
+    }
 
     audio_enabled = true;
 }
