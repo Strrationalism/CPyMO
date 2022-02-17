@@ -61,17 +61,12 @@ static inline void cpymo_backend_update_volume(size_t cid)
     }
 }
 
-static inline void cpymo_backend_audio_send_to_chn(size_t cid)
+static unsigned double_buffering[CPYMO_AUDIO_MAX_CHANNELS] = {0};
+
+static inline void cpymo_backend_audio_prepare_buffer(ndspWaveBuf *buf, size_t cid) 
 {
-    cpymo_backend_update_volume(cid);
-
-    static unsigned double_buffering[CPYMO_AUDIO_MAX_CHANNELS] = {0};
-    ndspWaveBuf *wbuf = &waveBuf[2 * cid + double_buffering[cid]];
-    
-    if(wbuf->status != NDSP_WBUF_DONE) return;
-
-    u8 *dst = (u8 *)wbuf->data_pcm16;
-    const size_t buf_size = wbuf->nsamples * BYTEPERSAMPLE;
+    u8 *dst = (u8 *)buf->data_pcm16;
+    const size_t buf_size = buf->nsamples * BYTEPERSAMPLE;
 
     void *samples;
     size_t io_len = buf_size;
@@ -86,16 +81,24 @@ static inline void cpymo_backend_audio_send_to_chn(size_t cid)
     if(written != buf_size) {
         memset(dst + written, 0, buf_size - written);
     }
-
-    DSP_FlushDataCache(dst, buf_size);
-    ndspChnWaveBufAdd(cid, wbuf);
-    double_buffering[cid] = !double_buffering[cid];
 }
+
 
 static void cpymo_backend_audio_callback(void *_) 
 {
-    for(size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid)
-        cpymo_backend_audio_send_to_chn(cid);
+    for(size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
+        cpymo_backend_update_volume(cid);
+
+        ndspWaveBuf *wbuf = &waveBuf[2 * cid + double_buffering[cid]];
+        
+        if(wbuf->status != NDSP_WBUF_DONE) return;
+
+        cpymo_backend_audio_prepare_buffer(wbuf, cid);
+
+        DSP_FlushDataCache(wbuf->data_pcm8, wbuf->nsamples * BYTEPERSAMPLE);
+        ndspChnWaveBufAdd(cid, wbuf);
+        double_buffering[cid] = !double_buffering[cid];
+    }
 }
 
 static void cpymo_backend_audio_callback_donothing(void *_) {}
