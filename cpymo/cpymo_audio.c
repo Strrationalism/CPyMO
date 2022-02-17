@@ -198,8 +198,8 @@ static void cpymo_audio_mix_samples(
 	len /= sizeof(TYPE); \
 	\
 	for (size_t i = 0; i < len; ++i) { \
-		double src_sample = (double)src[i] / (double)TYPE_MAX_VAL; \
-		double dst_sample = (double)dst[i] / (double)TYPE_MAX_VAL; \
+		float src_sample = (float)src[i] / (float)TYPE_MAX_VAL; \
+		float dst_sample = (float)dst[i] / (float)TYPE_MAX_VAL; \
 		src_sample *= volume * 1.0f; \
 		dst_sample += src_sample; \
 		\
