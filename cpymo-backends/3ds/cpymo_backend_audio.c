@@ -61,26 +61,46 @@ static void cpymo_backend_update_volume(size_t cid)
     }
 }
 
-static void cpymo_backend_audio_callback(void *_) 
+static void cpymo_backend_audio_send_to_chn(size_t cid)
 {
-    static unsigned double_buffering = 0;
-    if(waveBuf[double_buffering].status != NDSP_WBUF_DONE) return;
+    cpymo_backend_update_volume(cid);
 
-    void *dest = waveBuf[double_buffering].data_pcm16;
+    static unsigned double_buffering[CPYMO_AUDIO_MAX_CHANNELS] = {0};
+    ndspWaveBuf *wbuf = &waveBuf[2 * cid + double_buffering[cid]];
+    
+    if(wbuf->status != NDSP_WBUF_DONE) return;
 
-    size_t size = waveBuf[double_buffering].nsamples * BYTEPERSAMPLE;
+    u8 *dst = (u8 *)wbuf->data_pcm16;
+    const size_t buf_size = wbuf->nsamples * BYTEPERSAMPLE;
 
-    cpymo_audio_copy_mixed_samples(dest, size, &engine.audio);
+    void *samples;
+    size_t io_len = buf_size;
+    size_t written = 0;
 
-	DSP_FlushDataCache(dest, size);
-    ndspChnWaveBufAdd(0, &waveBuf[double_buffering]);
-    double_buffering = !double_buffering;
+    while(cpymo_audio_channel_get_samples(&samples, &io_len, cid, &engine.audio) && io_len) {
+        memcpy(dst + written, samples, io_len);
+        written += io_len;
+        io_len = buf_size - written;
+    }
+
+    if(written != buf_size) {
+        memset(dst + written, 0, buf_size - written);
+    }
+
+    DSP_FlushDataCache(dst, buf_size);
+    ndspChnWaveBufAdd(cid, wbuf);
+    double_buffering[cid] = !double_buffering[cid];
 }
 
+static void cpymo_backend_audio_callback(void *_) 
+{
+    for(size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid)
+        cpymo_backend_audio_send_to_chn(cid);
+}
 
 static void cpymo_backend_audio_callback_donothing(void *_) {}
 
-void cpymo_backend_audio_init() 
+void cpymo_backend_audio_init()
 {
     if(cpymo_backend_audio_need_dump_dsp())
         printf("[Error] DSP Firmware not found, you can dump it using DSP1 (https://github.com/zoogie/DSP1).\n");
