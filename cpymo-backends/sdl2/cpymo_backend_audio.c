@@ -16,7 +16,20 @@ static cpymo_backend_audio_info audio_info = {
 
 static void cpymo_backend_audio_sdl_callback(void *userdata, Uint8 * stream, int len)
 {
-	cpymo_audio_copy_samples(stream, (size_t)len, &engine.audio);
+	memset(stream, 0, (size_t)len);
+	
+	for (size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
+		void *samples;
+		size_t szlen = (size_t)len;
+		size_t written = 0;
+		float volume = cpymo_audio_get_channel_volume(cid, &engine.audio);
+
+		while (cpymo_audio_get_samples(&samples, &szlen, cid, &engine.audio) && (size_t)len > written) {
+			SDL_MixAudio(stream + written, samples, szlen, (int)(volume * SDL_MIX_MAXVOLUME));
+			written += szlen;
+			szlen = (size_t)len - written;
+		}
+	}
 }
 
 const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)

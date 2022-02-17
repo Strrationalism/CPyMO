@@ -65,7 +65,15 @@ error_t cpymo_audio_channel_play_file(
 void cpymo_audio_init(cpymo_audio_system *);
 void cpymo_audio_free(cpymo_audio_system *);
 
-void cpymo_audio_copy_samples(void *dst, size_t len, cpymo_audio_system *);
+void cpymo_audio_copy_samples(void * dst, size_t len, cpymo_audio_system *s);
+bool cpymo_audio_get_samples(
+	void **samples, 
+	size_t *in_out_len, 
+	size_t channelID, 
+	cpymo_audio_system *);
+
+static inline float cpymo_audio_get_channel_volume(size_t cid, cpymo_audio_system *s)
+{ return s->channels[cid].volume; }
 
 struct cpymo_engine;
 bool cpymo_audio_wait_se(struct cpymo_engine *, float);

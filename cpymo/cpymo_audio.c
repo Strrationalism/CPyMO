@@ -461,6 +461,33 @@ void cpymo_audio_free(cpymo_audio_system *s)
 	s->enabled = false;
 }
 
+bool cpymo_audio_get_samples(void **samples, size_t *len, size_t cid, cpymo_audio_system *s)
+{ RETRY: {
+	if (!s->enabled) return false;
+
+	cpymo_audio_channel *c = &s->channels[cid];
+	if (!c->enabled) return false;
+
+	size_t writeable_size = c->converted_buf_size - c->converted_frame_current_offset;
+
+	if (writeable_size == 0) {
+		error_t err = cpymo_audio_channel_next_frame(c);
+		if (err == CPYMO_ERR_SUCC) goto RETRY;
+		else {
+			cpymo_audio_channel_reset_unsafe(c);
+			return false;
+		}
+	}
+
+	*samples = c->converted_buf + c->converted_frame_current_offset;
+
+	if (writeable_size > *len) writeable_size = *len;
+	*len = writeable_size;
+	c->converted_frame_current_offset += writeable_size;
+
+	return true;
+} }
+
 void cpymo_audio_copy_samples(void * dst, size_t len, cpymo_audio_system *s)
 {
 	if (s->enabled == false) return;
