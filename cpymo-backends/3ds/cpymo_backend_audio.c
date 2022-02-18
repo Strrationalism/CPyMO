@@ -11,7 +11,8 @@ static bool audio_enabled = false;
 #define SAMPLESPERBUF (SAMPLERATE / 60)
 #define BYTEPERSAMPLE 4
 #define DSP_FIRM "sdmc:/3ds/dspfirm.cdc"
-#define BUFFERS 4
+#define BUF_SIZE (SAMPLESPERBUF * BYTEPERSAMPLE)
+#define BUFFERS 6
 
 static s16 *audio_buf;
 
@@ -127,16 +128,14 @@ void cpymo_backend_audio_init()
         return;
     }
 
-    size_t buf_size = SAMPLESPERBUF * BYTEPERSAMPLE;
-
-    audio_buf = (s16 *)linearAlloc(buf_size * BUFFERS * CPYMO_AUDIO_MAX_CHANNELS);
+    audio_buf = (s16 *)linearAlloc(BUF_SIZE * BUFFERS * CPYMO_AUDIO_MAX_CHANNELS);
     if(audio_buf == NULL) {
         ndspExit();
         printf("[Error] Failed to alloc audio buf.\n");
         return;
     }
 
-    memset(audio_buf, 0, buf_size * BUFFERS * CPYMO_AUDIO_MAX_CHANNELS);
+    memset(audio_buf, 0, BUF_SIZE * BUFFERS * CPYMO_AUDIO_MAX_CHANNELS);
     memset(waveBuf, 0, sizeof(waveBuf));
 
     for(int cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
@@ -150,7 +149,7 @@ void cpymo_backend_audio_init()
         for(size_t bufid = 0; bufid < BUFFERS; ++bufid) {
             ndspWaveBuf *buf = &waveBuf[BUFFERS * cid + bufid];
 
-            buf->data_vaddr = ((u8 *)audio_buf) + (cid * BUFFERS + bufid) * buf_size;
+            buf->data_vaddr = ((u8 *)audio_buf) + (cid * BUFFERS + bufid) * BUF_SIZE;
             buf->nsamples = SAMPLESPERBUF;            
 
             ndspChnWaveBufAdd(cid, buf);
