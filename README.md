@@ -16,7 +16,6 @@
 这是一个使用C实现的pymo引擎的复刻，以方便在各种平台上制作并运行pymo游戏。
 
 pymo原版参见：https://github.com/pymo/pymo    
-pymo官网：https://www.pymogames.com/           
 原作者：chen_xin_ming    
 
 感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。    
@@ -24,14 +23,12 @@ pymo官网：https://www.pymogames.com/
 
 主要目标：
 
-* 兼容原版pymo的游戏
 * 提供与原版pymo兼容的pymo开发工具
 * 在带有硬件加速的情况下跨平台
     - Windows
     - Linux
-    - Android
+    - macOS
     - Nintendo 3DS
-* libcpymo库可将cpymo或cpymo中的组件嵌入到其他应用程序中
 
 # cpymo-tool
 
@@ -82,10 +79,8 @@ Unpack a pymo package:
 
 你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
-### 游戏兼容性提示
-
-3DS兼容所有版本的PyMO游戏数据包，但s60v5版本体验最好，如果没有s60v5版本，也可以使用s60v3版本。    
-3DS上使用安卓版本的PyMO数据包可能会导致游戏运行卡顿，或游戏画面产生锯齿等问题。    
+### 启动
+你需要将你的游戏放置于`SDMC:/pymogames/startup`下，之后CPyMO for 3DS会自动启动该目录下的游戏。
 
 ### 关于字体
 
