@@ -75,17 +75,20 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_parser_stream_span nam
 	}
 }
 
-int cpymo_vars_eval(cpymo_vars * vars, cpymo_parser_stream_span expr)
+bool cpymo_vars_is_constant(cpymo_parser_stream_span expr)
 {
-	bool is_constant = true;
 	for (size_t i = 0; i < expr.len; ++i) {
 		if (!isdigit((int)expr.begin[i])) {
-			is_constant = false;
-			break;
+			return false;
 		}
 	}
 
-	if (is_constant) return cpymo_parser_stream_span_atoi(expr);
+	return true;
+}
+
+int cpymo_vars_eval(cpymo_vars * vars, cpymo_parser_stream_span expr)
+{
+	if (cpymo_vars_is_constant(expr)) return cpymo_parser_stream_span_atoi(expr);
 	else return cpymo_vars_get(vars, expr);
 }
 

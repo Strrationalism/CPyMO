@@ -839,7 +839,18 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			goto BAD_EXPRESSION;
 
 		const int lv = cpymo_vars_eval(&engine->vars, left);
-		const int rv = cpymo_vars_eval(&engine->vars, right);
+
+		int rv;
+		if (cpymo_vars_is_constant(right)) {
+			rv = cpymo_parser_stream_span_atoi(right);
+		}
+		else {
+			const int *var = cpymo_vars_access(&engine->vars, right);
+			if (var == NULL) { CONT_NEXTLINE; }
+			else {
+				rv = *var;
+			}
+		}
 
 		bool run_sub_command;
 		if (cpymo_parser_stream_span_equals_str(op, "="))
