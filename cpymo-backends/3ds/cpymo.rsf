@@ -1,14 +1,15 @@
 BasicInfo:
   Title                   : "CPyMO"
   ProductCode             : "CTR-HB-PYMO"
-  Logo                    : Nintendo
+  ContentType             : Application
+  Logo                    : iQueForSystem
 
 RomFs:
   RootPath                : romfs
 
 TitleInfo:
   Category                : Application
-  UniqueId                : 0xCF100
+  UniqueId                : 0xA3098
 
 Option:
   UseOnSD                 : true # true if App is to be installed to SD
@@ -40,18 +41,18 @@ AccessControlInfo:
    #- Debug
    #- TwlCardBackup
    #- TwlNandData
-   - Boss
+   # - Boss
    - DirectSdmc
    #- Core
    #- CtrNandRo
-   - CtrNandRw
+   #- CtrNandRw
    #- CtrNandRoWrite
    #- CategorySystemSettings
    #- CardBoard
    #- ExportImportIvs
    #- DirectSdmcWrite
    #- SwitchCleanup
-   - SaveDataMove
+   #- SaveDataMove
    #- Shop
    #- Shell
    #- CategoryHomeMenu
@@ -73,7 +74,7 @@ AccessControlInfo:
   Priority                      : 16
   MaxCpu                        : 0 # Default
   HandleTableSize               : 0x200
-  DisableDebug                  : false
+  DisableDebug                  : true
   EnableForceDebug              : false
   CanWriteSharedPage            : true
   CanUsePrivilegedPriority      : false
@@ -84,10 +85,10 @@ AccessControlInfo:
   SpecialMemoryArrange          : true
 
   # New3DS Exclusive Process Settings
-  SystemModeExt                 : Legacy # Legacy(Default)/124MB/178MB  Legacy:Use Old3DS SystemMode
+  SystemModeExt                 : 124MB # Legacy(Default)/124MB/178MB  Legacy:Use Old3DS SystemMode
   CpuSpeed                      : 804MHz # 256MHz(Default)/804MHz
   EnableL2Cache                 : true # false(default)/true
-  CanAccessCore2                : true
+  CanAccessCore2                : false
 
   # Virtual Address Mappings
   IORegisterMapping:
@@ -186,7 +187,7 @@ AccessControlInfo:
 SystemControlInfo:
   SaveDataSize: 0KB # Change if the app uses savedata
   RemasterVersion: 2
-  StackSize: 0x100000
+  StackSize: 0x40000
 
   # Modules that run services listed above should be included below
   # Maximum 48 dependencies
