@@ -14,7 +14,7 @@ static void cpymo_logo() {
 	puts("\\____/_/    \\__, /_/  /_/\\____/");
 	puts("           /____/");
 	puts("");
-	puts("This software is licensed under GPLv3.");
+	puts("This software is licensed under AGPLv3.");
 	puts("You can only run copies of game that you LEGALLY own.");
 	puts("");
 	puts("https://github.com/Seng-Jik/cpymo");
