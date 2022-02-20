@@ -86,6 +86,17 @@ Unpack a pymo package:
 ### 启动
 你需要将你的游戏放置于`SDMC:/pymogames/startup`下，之后CPyMO for 3DS会自动启动该目录下的游戏。
 
+#### 如果无法启动CIA版本的话？
+
+1. 目前仅在New 3DS日版（系统版本号Ver 11.15.0-47J）上对CIA版本进行过测试。
+2. 如果你的机器在运行CIA版本的CPyMO时崩溃，请尝试切换到3dsx版。
+
+#### 如何启动3DSX版本？
+
+1. 将cpymo.3dsx放入SD卡的3ds目录下。
+2. 启动Homebrew Launcher，建议使用这里的Homebrew Launcher Dummy（https://github.com/PabloMK7/homebrew_launcher_dummy ）。
+3. 执行cpymo.3dsx。
+
 ### 关于字体
 
 3DS版本的CPyMO不会加载游戏中自带的字体或者其他TTF字体，而是使用[思源黑体](https://github.com/adobe-fonts/source-han-sans)。    
