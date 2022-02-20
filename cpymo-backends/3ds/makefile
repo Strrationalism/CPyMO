@@ -40,9 +40,9 @@ GRAPHICS	:=	gfx
 GFXBUILD	:=	$(BUILD)
 ROMFS		:=	romfs
 #GFXBUILD	:=	$(ROMFS)/gfx
-APP_TITLE   := cpymo
-APP_AUTHOR  := Seng-Jik
-APP_DESCRIPTION := PyMO Engine implements in C.
+APP_TITLE   := CPyMO
+APP_AUTHOR  := Strrationalism Studio
+APP_DESCRIPTION := PyMO AVG Game Engine implemention in C.
 
 
 #---------------------------------------------------------------------------------
