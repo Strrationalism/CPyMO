@@ -195,11 +195,17 @@ $(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
 	@tex3ds -i $< -H $(BUILD)/$*.h -d $(DEPSDIR)/$*.d -o $(GFXBUILD)/$*.t3x
 	
 $(TARGET)-strip.elf: $(BUILD)
+	@make -j16
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
 	
 cia: $(TARGET)-strip.elf
 	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner  banner
 	@echo Built cpymo.cia
+
+.PHONY: run
+run:
+	@make -j16
+	@citra $(OUTPUT).3DSX
 
 #---------------------------------------------------------------------------------
 else

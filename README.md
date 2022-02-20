@@ -85,7 +85,8 @@ Unpack a pymo package:
 你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
 ### 启动
-你需要将你的游戏放置于`SDMC:/pymogames/startup`下，之后CPyMO for 3DS会自动启动该目录下的游戏。
+你需要将你的游戏放置于`SDMC:/pymogames/startup`下，之后CPyMO for 3DS会自动启动该目录下的游戏。    
+如果你已经安装了Citra且citra命令可用，你可以直接使用`make run`来调用Citra模拟器来启动CPyMO。    
 
 #### 如果无法启动CIA版本的话？
 
