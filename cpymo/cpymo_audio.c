@@ -509,3 +509,32 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 
 	return !e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].enabled;
 }
+
+error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+{
+	if (e->audio.enabled) {
+		char *bgm_path = NULL;
+		error_t err =
+			cpymo_assetloader_get_bgm_path(&bgm_path, bgmname, &e->assetloader);
+		CPYMO_THROW(err);
+
+		err = cpymo_audio_channel_play_file(
+			&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
+			bgm_path,
+			NULL,
+			loop);
+
+		free(bgm_path);
+		return err;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_audio_bgm_stop(cpymo_engine * engine)
+{
+	if (engine->audio.enabled) {
+		cpymo_audio_channel_reset(
+			&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM]);
+	}
+}

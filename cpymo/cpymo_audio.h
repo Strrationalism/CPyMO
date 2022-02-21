@@ -78,4 +78,7 @@ static inline float cpymo_audio_get_channel_volume(size_t cid, cpymo_audio_syste
 struct cpymo_engine;
 bool cpymo_audio_wait_se(struct cpymo_engine *, float);
 
+error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop);
+void cpymo_audio_bgm_stop(struct cpymo_engine *e);
+
 #endif

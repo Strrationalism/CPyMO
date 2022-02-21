@@ -76,7 +76,7 @@ static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
 	}
 }
 
-static const void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
+static void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
 {
 	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
 	void *node = ui->current_node;
@@ -103,8 +103,13 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	}
 
 	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
+
+	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+		ui->mouse_key_press_time = 0;
+	}
 	
 	if (e->input.mouse_button || e->input.mouse_wheel_delta) {
+		ui->mouse_key_press_time += d;
 		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
 
 		if (fabs(e->input.mouse_wheel_delta) > fabs(delta_y)) {
@@ -187,6 +192,24 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		}
 	}
 
+	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
+		error_t err = ui->ok(e, obj);
+		CPYMO_THROW(err);
+	}
+	else if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button) && ui->mouse_key_press_time < 0.15f) {
+		int selected = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
+		if (selected != INT_MAX) {
+			if (ui->selection_relative_to_cur != selected) {
+				ui->selection_relative_to_cur = selected;
+				cpymo_engine_request_redraw(e);
+			}
+			void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
+			error_t err = ui->ok(e, obj);
+			CPYMO_THROW(err);
+		}
+	}
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -242,6 +265,7 @@ error_t cpymo_list_ui_enter(
 	void **out_ui_data,
 	size_t ui_data_size,
 	cpymo_list_ui_draw_node draw_node,
+	cpymo_list_ui_ok ok,
 	cpymo_ui_deleter ui_data_deleter,
 	void *current,
 	cpymo_list_ui_get_node get_next,
@@ -266,6 +290,8 @@ error_t cpymo_list_ui_enter(
 	data->node_height = (float)e->gameconfig.imagesize_h / nodes_per_screen;
 	data->current_y = 0;
 	data->selection_relative_to_cur = 0;
+	data->ok = ok;
+	data->mouse_key_press_time = 0;
 
 	assert(*out_ui_data == NULL);
 	*out_ui_data = cpymo_list_ui_data(e);

@@ -42,6 +42,15 @@ static void cpymo_musicbox_draw_node(const cpymo_engine *e, const void *node_to_
 		cpymo_backend_image_draw_type_uielement);
 }
 
+static error_t cpymo_musicbox_ok(struct cpymo_engine *e, void *selected)
+{
+	const cpymo_music_box *box = (cpymo_music_box *)cpymo_list_ui_data_const(e);
+
+	uintptr_t node_index = DECODE_NODE(selected);
+	cpymo_audio_bgm_play(e, box->music_filename[node_index], true);
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_music_box_enter(cpymo_engine *e)
 {
 	cpymo_music_box *box = NULL;
@@ -49,6 +58,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	error_t err = cpymo_list_ui_enter(
 		e, (void **)&box, sizeof(cpymo_music_box), 
 		&cpymo_musicbox_draw_node,
+		&cpymo_musicbox_ok,
 		&cpymo_music_box_deleter, 
 		(void *)0, 
 		&cpymo_music_box_get_next, 

@@ -6,17 +6,20 @@
 
 typedef void *(*cpymo_list_ui_get_node)(const struct cpymo_engine *, const void *ui_data, const void *cur);
 typedef void (*cpymo_list_ui_draw_node)(const struct cpymo_engine *, const void *node_to_draw, float y);
+typedef error_t (*cpymo_list_ui_ok)(struct cpymo_engine *, void *selected);
 
 typedef struct {
 	cpymo_ui_deleter ui_data_deleter;
 	cpymo_list_ui_draw_node draw_node;
-
+	cpymo_list_ui_ok ok;
 	void *current_node;
 	int selection_relative_to_cur;
 	cpymo_list_ui_get_node get_next;
 	cpymo_list_ui_get_node get_prev;
 	bool from_bottom_to_top;
 	float node_height;
+
+	float mouse_key_press_time;
 
 	float current_y;
 } cpymo_list_ui;
@@ -26,6 +29,7 @@ error_t cpymo_list_ui_enter(
 	void **out_ui_data,
 	size_t ui_data_size,
 	cpymo_list_ui_draw_node draw_node,
+	cpymo_list_ui_ok ok,
 	cpymo_ui_deleter ui_data_deleter,
 	void *current,
 	cpymo_list_ui_get_node get_next,
