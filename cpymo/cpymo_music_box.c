@@ -1,9 +1,21 @@
 #include "cpymo_music_box.h"
 #include "cpymo_engine.h"
+#include "cpymo_list_ui.h"
+#include "cpymo_parser.h"
+#include <cpymo_backend_text.h>
 #include <assert.h>
 
-#define ENCODE_NODE(INDEX) ((void *)((INDEX) + 1))
-#define DECODE_NODE(PTR) (((uintptr_t)(PTR)) - 1)
+#define ENCODE_NODE(INDEX) CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX)
+#define DECODE_NODE(PTR) CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR)
+
+typedef struct {
+	char *music_list;
+
+	uintptr_t music_count;
+	cpymo_parser_stream_span *music_filename;
+	cpymo_backend_text *music_title;
+	float font_size;
+} cpymo_music_box;
 
 static void cpymo_music_box_deleter(cpymo_engine *e, void *ui_)
 {

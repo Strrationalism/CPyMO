@@ -4,6 +4,9 @@
 #include "cpymo_ui.h"
 #include <stdint.h>
 
+#define CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX) ((void *)((INDEX) + 1))
+#define CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR) (((uintptr_t)(PTR)) - 1)
+
 typedef void *(*cpymo_list_ui_get_node)(const struct cpymo_engine *, const void *ui_data, const void *cur);
 typedef void (*cpymo_list_ui_draw_node)(const struct cpymo_engine *, const void *node_to_draw, float y);
 typedef error_t (*cpymo_list_ui_ok)(struct cpymo_engine *, void *selected);

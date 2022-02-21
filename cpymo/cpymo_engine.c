@@ -118,6 +118,9 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// init ui
 	out->ui = NULL;
 
+	// init backlog
+	cpymo_backlog_init(&out->backlog);
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -148,6 +151,7 @@ void cpymo_engine_free(cpymo_engine *engine)
 	if (err != CPYMO_ERR_SUCC) 
 		fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
 	
+	cpymo_backlog_free(&engine->backlog);
 	if (engine->ui) cpymo_ui_exit(engine);
 	cpymo_hash_flags_free(&engine->flags);
 	cpymo_text_free(&engine->text);

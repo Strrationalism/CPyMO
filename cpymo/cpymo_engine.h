@@ -21,6 +21,7 @@
 #include "cpymo_hash_flags.h"
 #include "cpymo_ui.h"
 #include "cpymo_audio.h"
+#include "cpymo_backlog.h"
 
 struct cpymo_engine {
 	cpymo_gameconfig gameconfig;
@@ -42,6 +43,7 @@ struct cpymo_engine {
 	cpymo_hash_flags flags;
 	cpymo_ui *ui;
 	cpymo_audio_system audio;
+	cpymo_backlog backlog;
 
 	bool skipping;
 	char *title;

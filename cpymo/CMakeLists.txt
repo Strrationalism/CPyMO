@@ -31,5 +31,7 @@ add_library (cpymolib STATIC
 	"cpymo_ui.h" "cpymo_ui.c"
 	"cpymo_album.c" "cpymo_album.h" 
 	"cpymo_audio.h" "cpymo_audio.c"
-	"cpymo_list_ui.h" "cpymo_list_ui.c" "cpymo_music_box.h" "cpymo_music_box.c")
+	"cpymo_list_ui.h" "cpymo_list_ui.c" 
+	"cpymo_music_box.h" "cpymo_music_box.c"
+	"cpymo_backlog.h" "cpymo_backlog.c")
 
