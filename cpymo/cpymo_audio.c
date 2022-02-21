@@ -510,25 +510,50 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 	return !e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].enabled;
 }
 
-error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+static error_t cpymo_audio_high_level_play(
+	cpymo_engine *e,
+	cpymo_parser_stream_span filename,
+	error_t(*get_path)(char **, cpymo_parser_stream_span, const cpymo_assetloader *),
+	const cpymo_package *package,
+	int channel,
+	bool loop)
 {
 	if (e->audio.enabled) {
-		char *bgm_path = NULL;
-		error_t err =
-			cpymo_assetloader_get_bgm_path(&bgm_path, bgmname, &e->assetloader);
-		CPYMO_THROW(err);
+		if (package) {
+			cpymo_package_stream_reader r;
+			error_t err = cpymo_package_stream_reader_find_create(
+				&r, package, filename);
+			CPYMO_THROW(err);
 
-		err = cpymo_audio_channel_play_file(
-			&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
-			bgm_path,
-			NULL,
-			loop);
+			return cpymo_audio_channel_play_file(
+				&e->audio.channels[channel],
+				NULL,
+				&r,
+				loop);
+		}
+		else {
+			char *path = NULL;
+			error_t err = get_path(&path, filename, &e->assetloader);
+			CPYMO_THROW(err);
 
-		free(bgm_path);
-		return err;
+			err = cpymo_audio_channel_play_file(
+				&e->audio.channels[channel],
+				path,
+				NULL,
+				loop);
+			free(path);
+			return err;
+		}
 	}
 
 	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+{
+	return cpymo_audio_high_level_play(
+		e, bgmname, &cpymo_assetloader_get_bgm_path, 
+		NULL, CPYMO_AUDIO_CHANNEL_BGM, loop);
 }
 
 void cpymo_audio_bgm_stop(cpymo_engine * engine)
@@ -538,3 +563,28 @@ void cpymo_audio_bgm_stop(cpymo_engine * engine)
 			&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM]);
 	}
 }
+
+error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_parser_stream_span sename, bool loop)
+{
+	return cpymo_audio_high_level_play(
+		e, sename, &cpymo_assetloader_get_se_path,
+		e->assetloader.use_pkg_se ? &e->assetloader.pkg_se : NULL,
+		CPYMO_AUDIO_CHANNEL_SE, loop);
+}
+
+void cpymo_audio_se_stop(cpymo_engine *e)
+{
+	if (e->audio.enabled) {
+		cpymo_audio_channel_reset(
+			&e->audio.channels[CPYMO_AUDIO_CHANNEL_SE]);
+	}
+}
+
+error_t cpymo_audio_vo_play(cpymo_engine * e, cpymo_parser_stream_span voname)
+{
+	return cpymo_audio_high_level_play(
+		e, voname, &cpymo_assetloader_get_vo_path,
+		e->assetloader.use_pkg_voice ? &e->assetloader.pkg_voice : NULL,
+		CPYMO_AUDIO_CHANNEL_VO, false);
+}
+

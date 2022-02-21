@@ -81,4 +81,9 @@ bool cpymo_audio_wait_se(struct cpymo_engine *, float);
 error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop);
 void cpymo_audio_bgm_stop(struct cpymo_engine *e);
 
+error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sename, bool loop);
+void cpymo_audio_se_stop(struct cpymo_engine *e);
+
+error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname);
+
 #endif

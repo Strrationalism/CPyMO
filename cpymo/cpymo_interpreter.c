@@ -1248,85 +1248,28 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("se") {
-		if (engine->audio.enabled) {
-			POP_ARG(filename); ENSURE(filename);
-			POP_ARG(isloop_s);
+		POP_ARG(filename); ENSURE(filename);
+		POP_ARG(isloop_s);
 
-			bool isloop = false;
-			if (cpymo_parser_stream_span_equals_str(isloop_s, "1"))
-				isloop = true;
+		bool isloop = false;
+		if (cpymo_parser_stream_span_equals_str(isloop_s, "1"))
+			isloop = true;
 
-			if (engine->assetloader.use_pkg_se) {
-				cpymo_package_stream_reader r;
-				error_t err = cpymo_package_stream_reader_find_create(
-					&r, &engine->assetloader.pkg_se, filename);
-				CPYMO_THROW(err);
-
-				err = cpymo_audio_channel_play_file(
-					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE],
-					NULL,
-					&r,
-					isloop);
-				CPYMO_THROW(err);
-			}
-			else {
-				char *se_path = NULL;
-				error_t err = cpymo_assetloader_get_se_path(&se_path, filename, &engine->assetloader);
-				CPYMO_THROW(err);
-
-				err = cpymo_audio_channel_play_file(
-					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE],
-					se_path,
-					NULL,
-					false);
-				free(se_path);
-
-				CPYMO_THROW(err);
-			}
-		}
+		error_t err = cpymo_audio_se_play(engine, filename, isloop);
+		CPYMO_THROW(err);
 
 		CONT_NEXTLINE;
 	}
 
 	D("se_stop") {
-		if (engine->audio.enabled) {
-			cpymo_audio_channel_reset(
-				&engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE]);
-		}
+		cpymo_audio_se_stop(engine);
 		CONT_NEXTLINE;
 	}
 
 	D("vo") {
-		if (engine->audio.enabled) {
-			POP_ARG(filename); ENSURE(filename);
-			if (engine->assetloader.use_pkg_voice) {
-				cpymo_package_stream_reader r;
-				error_t err = cpymo_package_stream_reader_find_create(
-					&r, &engine->assetloader.pkg_voice, filename);
-				CPYMO_THROW(err);
-				
-				err = cpymo_audio_channel_play_file(
-					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
-					NULL,
-					&r,
-					false);
-				CPYMO_THROW(err);
-			}
-			else {
-				char *vo_path = NULL;
-				error_t err = cpymo_assetloader_get_vo_path(&vo_path, filename, &engine->assetloader);
-				CPYMO_THROW(err);
-
-				err = cpymo_audio_channel_play_file(
-					&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
-					vo_path,
-					NULL,
-					false);
-				free(vo_path);
-
-				CPYMO_THROW(err);
-			}
-		}
+		POP_ARG(filename); ENSURE(filename);
+		error_t err = cpymo_audio_vo_play(engine, filename);
+		CPYMO_THROW(err);
 		CONT_NEXTLINE;
 	}
 
