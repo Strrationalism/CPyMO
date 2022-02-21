@@ -50,6 +50,51 @@ static int cpymo_list_ui_get_selection_relative_to_cur_by_mouse(const cpymo_engi
 	return INT_MAX;
 }
 
+static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
+	ui->current_y = 0;
+
+	float y = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
+
+	bool a = y < 0;
+	bool b = y > e->gameconfig.imagesize_h - ui->node_height;
+
+	if (ui->from_bottom_to_top) {
+		bool t = a;
+		a = b;
+		b = t;
+	}
+
+	if (a) {
+		ui->current_node = ui->get_prev(e, ui + 1, ui->current_node);
+		ui->selection_relative_to_cur++;
+	}
+	else if (b) {
+		ui->current_node = ui->get_next(e, ui + 1, ui->current_node);
+		ui->selection_relative_to_cur--;
+	}
+}
+
+static const void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
+{
+	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
+	void *node = ui->current_node;
+
+	while (id && node) {
+		if (id > 0) {
+			id--;
+			node = ui->get_next(e, ui + 1, node);
+		}
+		else if (id < 0) {
+			id++;
+			node = ui->get_prev(e, ui + 1, node);
+		}
+	}
+
+	return node;
+}
+
 static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 {
 	if (e->input.cancel) {
@@ -117,15 +162,21 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	}
 
 	if (just_press_up) {
-		ui->selection_relative_to_cur--;
-		// scroll follow
-		cpymo_engine_request_redraw(e);
+		int r = ui->selection_relative_to_cur - 1;
+		if (cpymo_list_ui_get_relative_id_to_cur(e, r)) {
+			ui->selection_relative_to_cur = r;
+			cpymo_list_ui_fix_key_scroll(e);
+			cpymo_engine_request_redraw(e);
+		}
 	}
 
 	if (just_press_down) {
-		ui->selection_relative_to_cur++;
-		// scroll follow
-		cpymo_engine_request_redraw(e);
+		int r = ui->selection_relative_to_cur + 1;
+		if (cpymo_list_ui_get_relative_id_to_cur(e, r)) {
+			ui->selection_relative_to_cur = r;
+			cpymo_list_ui_fix_key_scroll(e);
+			cpymo_engine_request_redraw(e);
+		}
 	}
 
 	if (cpymo_input_mouse_moved(e)) {
@@ -135,8 +186,6 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			cpymo_engine_request_redraw(e);
 		}
 	}
-
-	// OK!
 
 	return CPYMO_ERR_SUCC;
 }
@@ -152,13 +201,14 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	xywh[3] = ui->node_height;
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_bg);
 
-	cpymo_color red;
+	// For Debugging!
+	/*cpymo_color red;
 	red.r = 255;
 	red.g = 0;
 	red.b = 0;
 	xywh[1] = cpymo_list_ui_get_y(e, 0);
 	xywh[3] = ui->node_height;
-	cpymo_backend_image_fill_rects(xywh, 1, red, 0.5f, cpymo_backend_image_draw_type_bg);
+	cpymo_backend_image_fill_rects(xywh, 1, red, 0.5f, cpymo_backend_image_draw_type_bg);*/
 
 	float y = ui->from_bottom_to_top ? 
 		(float)e->gameconfig.imagesize_h - ui->node_height - ui->current_y : 

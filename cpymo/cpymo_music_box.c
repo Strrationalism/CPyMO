@@ -53,7 +53,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 		(void *)0, 
 		&cpymo_music_box_get_next, 
 		&cpymo_music_box_get_prev, 
-		true,
+		false,
 		5);
 	CPYMO_THROW(err);
 
