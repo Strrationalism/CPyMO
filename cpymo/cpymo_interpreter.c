@@ -1,6 +1,7 @@
 #include "cpymo_interpreter.h"
 #include "cpymo_engine.h"
 #include "cpymo_album.h"
+#include "cpymo_music_box.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -1360,6 +1361,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		}
 
 		return cpymo_album_enter(engine, list_name, ui_name, 0);
+	}
+
+	D("music") {
+		return cpymo_music_box_enter(engine);
 	}
 
 	D("date") {

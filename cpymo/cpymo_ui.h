@@ -30,6 +30,7 @@ error_t cpymo_ui_enter(
 void cpymo_ui_exit(struct cpymo_engine *);
 
 void *cpymo_ui_data(struct cpymo_engine *);
+const void *cpymo_ui_data_const(const struct cpymo_engine *);
 
 error_t cpymo_ui_update(struct cpymo_engine *, float dt);
 void cpymo_ui_draw(const struct cpymo_engine *);

@@ -39,6 +39,11 @@ void *cpymo_ui_data(cpymo_engine *e)
 	return e->ui + 1;
 }
 
+const void * cpymo_ui_data_const(const cpymo_engine *e)
+{
+	return e->ui + 1;
+}
+
 error_t cpymo_ui_update(cpymo_engine *e, float dt)
 {
 	return e->ui->update(e, e->ui + 1, dt);
