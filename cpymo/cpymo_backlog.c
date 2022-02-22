@@ -134,6 +134,7 @@ static void *cpymo_backlog_ui_get_next(const cpymo_engine *e, const void *ui_dat
 	else index = CPYMO_BACKLOG_MAX_RECORDS - 1;
 
 	if (index == e->backlog.next_record_to_write) return NULL;
+	if (e->backlog.records[index].lines == NULL) return NULL;
 
 	return ENC(index);
 }
@@ -145,6 +146,7 @@ static void *cpymo_backlog_ui_get_prev(const cpymo_engine *e, const void *ui_dat
 	else index++;
 
 	if (index == e->backlog.next_record_to_write) return NULL;
+	if (e->backlog.records[index].lines == NULL) return NULL;
 
 	return ENC(index);
 }
