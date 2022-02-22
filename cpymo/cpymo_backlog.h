@@ -5,7 +5,7 @@
 #include "cpymo_error.h"
 #include <cpymo_backend_text.h>
 
-#define CPYMO_BACKLOG_MAX_RECORDS 4
+#define CPYMO_BACKLOG_MAX_RECORDS 256
 
 typedef struct {
 	bool owning_name;

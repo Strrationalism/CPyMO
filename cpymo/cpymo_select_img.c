@@ -149,6 +149,13 @@ static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 		}
 	}
 
+	if (e->select_img.save_enabled) {
+		if (CPYMO_INPUT_JUST_PRESSED(e, up) ||
+			e->input.mouse_wheel_delta > 0) {
+			cpymo_backlog_ui_enter(e);
+		}
+	}
+
 	return e->select_img.selections == NULL;
 }
 

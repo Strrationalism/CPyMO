@@ -168,5 +168,5 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 		&cpymo_backlog_ui_get_next,
 		&cpymo_backlog_ui_get_prev,
 		true,
-		5);
+		3);
 }
