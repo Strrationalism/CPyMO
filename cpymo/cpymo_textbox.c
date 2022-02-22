@@ -145,7 +145,7 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
     }
 }
 
-void cpymo_textbox_clear_page(cpymo_textbox *tb)
+error_t cpymo_textbox_clear_page(cpymo_textbox *tb)
 {
     tb->msg_cursor_visible = false;
     tb->timer = 0;
@@ -156,6 +156,8 @@ void cpymo_textbox_clear_page(cpymo_textbox *tb)
             cpymo_backend_text_free(tb->lines[i]);
         tb->lines[i] = NULL;
     }
+
+    return CPYMO_ERR_SUCC;
 }
 
 void cpymo_textbox_finalize(cpymo_textbox *tb)
@@ -218,7 +220,8 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
         CPYMO_INPUT_JUST_PRESSED(e, ok) 
         || e->input.skip 
         || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)
-        || CPYMO_INPUT_JUST_PRESSED(e, down);
+        || CPYMO_INPUT_JUST_PRESSED(e, down)
+        || e->input.mouse_wheel_delta < 0;
 
     if (tb->timer >= 0.5f) {
         tb->timer -= 0.5f;

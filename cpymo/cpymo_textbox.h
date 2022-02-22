@@ -44,7 +44,7 @@ void cpymo_textbox_refresh_curline(cpymo_textbox *);
 
 void cpymo_textbox_show_next_char(cpymo_textbox *);
 
-void cpymo_textbox_clear_page(cpymo_textbox *);
+error_t cpymo_textbox_clear_page(cpymo_textbox *);
 
 static inline bool cpymo_textbox_all_finished(cpymo_textbox *tb)
 { return tb->text_curline_and_remaining.len == tb->text_curline_size; }

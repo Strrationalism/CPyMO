@@ -59,7 +59,9 @@ static error_t cpymo_text_callback_read(cpymo_engine *e)
 	assert(t->active_box);
 
 	if (!cpymo_textbox_all_finished(t->active_box)) {
-		cpymo_textbox_clear_page(t->active_box);
+		error_t err = cpymo_textbox_clear_page(t->active_box);
+		CPYMO_THROW(err);
+
 		cpymo_wait_register_with_callback(
 			&e->wait,
 			&cpymo_text_wait_fadein,

@@ -16,8 +16,7 @@
 		if (ERR == CPYMO_ERR_SUCC) SAY->textbox_usable = true; \
 	}
 
-#define RESET_NAME(SAY) \
-	if (SAY->name) { cpymo_backend_text_free(SAY->name); SAY->name = NULL; }
+#define RESET_NAME(SAY) SAY->name = NULL;
 
 static void cpymo_say_lazy_init(cpymo_say *out, cpymo_assetloader *loader)
 {
@@ -172,8 +171,7 @@ graph TB
 	A(START) --> cpymo_say_wait_text_fadein
 	cpymo_say_wait_text_fadein --> cpymo_say_wait_text_fadein_callback
 	cpymo_say_wait_text_fadein_callback --> cpymo_say_wait_text_reading
-	cpymo_say_wait_text_reading --> cpymo_say_wait_text_read
-	cpymo_say_wait_text_read --> cpymo_say_wait_text_read_callback
+	cpymo_say_wait_text_reading --> cpymo_say_wait_text_read_callback
 	cpymo_say_wait_text_read_callback --> cpymo_say_wait_text_fadein
 	cpymo_say_wait_text_read_callback --> E(END)
 
@@ -184,6 +182,11 @@ static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e);
 static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
+
+	if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
+		cpymo_backlog_ui_enter(e);
+	}
+
 	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox);
 }
 
@@ -200,7 +203,9 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 	assert(say->textbox_usable);
 
 	if (!cpymo_textbox_all_finished(&say->textbox)) {
-		cpymo_textbox_clear_page(&say->textbox);
+		error_t err = cpymo_textbox_clear_page(&say->textbox);
+		CPYMO_THROW(err);
+
 		cpymo_wait_register_with_callback(
 			&e->wait,
 			&cpymo_say_wait_text_fadein,
@@ -217,6 +222,7 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 
 static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 {
+	// TODO: Move out lines from text box and write to backlog.
 	cpymo_wait_register_with_callback(
 		&e->wait, 
 		&cpymo_say_wait_text_reading,
@@ -224,7 +230,7 @@ static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, cpymo_parser_stream_span text)
+error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_parser_stream_span text)
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
 
@@ -239,6 +245,8 @@ error_t cpymo_say_start(struct cpymo_engine *e, cpymo_parser_stream_span name, c
 		error_t err = cpymo_backend_text_create(&say->name, &say->name_width, name, fontsize);
 		if (err != CPYMO_ERR_SUCC) say->name = NULL;
 	}
+
+	cpymo_backlog_record_write_name(&e->backlog, say->name);
 
 	// Create say message text
 	float msglr_l = (float)e->gameconfig.msglr_l * e->gameconfig.imagesize_w / 540.0f;

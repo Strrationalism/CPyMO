@@ -9,25 +9,51 @@ void cpymo_backlog_init(cpymo_backlog *b)
 {
 	b->next_record_to_write = 0;
 	b->pending_vo_filename[0] = '\0';
+	b->owning_name = false;
+	b->pending_name = NULL;
 	for (size_t i = 0; i < CPYMO_BACKLOG_MAX_RECORDS; i++) {
 		b->records[i].vo_filename[0] = '\0';
+		b->records[i].owning_name = false;
+		b->records[i].name = NULL;
 	}
 }
 
 void cpymo_backlog_free(cpymo_backlog *b)
 {
+	if (b->owning_name && b->pending_name) 
+		cpymo_backend_text_free(b->pending_name);
+
+	for (size_t i = 0; i < CPYMO_BACKLOG_MAX_RECORDS; i++)
+		if (b->records[i].owning_name && b->records[i].name)
+			cpymo_backend_text_free(b->records[i].name);
 }
 
-void cpymo_backlog_record_on_vo(cpymo_backlog *b, cpymo_parser_stream_span vo)
+void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_parser_stream_span vo)
 {
 	cpymo_parser_stream_span_copy(
 		b->pending_vo_filename, sizeof(b->pending_vo_filename), vo);
 }
 
-error_t cpymo_backlog_record_write(cpymo_backlog *b, cpymo_backend_text name)
+void cpymo_backlog_record_write_name(cpymo_backlog *b, cpymo_backend_text name)
+{
+	if (b->owning_name && b->pending_name)	
+		cpymo_backend_text_free(b->pending_name);
+
+	b->owning_name = name == NULL ? false : true;
+	b->pending_name = name;
+}
+
+error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text * textlines_moveinto)
 {
 	cpymo_backlog_record *rec = &b->records[b->next_record_to_write];
-	
+
+	if (rec->owning_name && rec->name)
+		cpymo_backend_text_free(rec->name);
+
+	rec->owning_name = b->owning_name;
+	rec->name = b->pending_name;
+	b->owning_name = false;
+
 	strcpy(rec->vo_filename, b->pending_vo_filename);
 	b->pending_vo_filename[0] = '\0';
 
@@ -43,6 +69,12 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 	const cpymo_backlog_record *rec = &e->backlog.records[DEC(node_to_draw)];
 
 	const float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
+	if (rec->name) {
+		// Why not draw?
+		cpymo_backend_text_draw(
+			rec->name, 0, y + font_size, cpymo_color_white,
+			1.0, cpymo_backend_image_draw_type_uielement);
+	}
 }
 
 static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)

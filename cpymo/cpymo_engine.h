@@ -89,7 +89,8 @@ static inline bool cpymo_input_foward_key_just_pressed(cpymo_engine *e)
 		CPYMO_INPUT_JUST_PRESSED(e, down) ||
 		CPYMO_INPUT_JUST_PRESSED(e, cancel) ||
 		CPYMO_INPUT_JUST_PRESSED(e, up) ||
-		cpymo_engine_skipping(e);
+		cpymo_engine_skipping(e) ||
+		e->input.mouse_wheel_delta < 0;
 }
 
 #endif
