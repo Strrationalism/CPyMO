@@ -2,6 +2,7 @@
 #define INCLUDE_CPYMO_LIST_UI
 
 #include "cpymo_ui.h"
+#include "cpymo_key_pulse.h"
 #include <stdint.h>
 
 #define CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX) ((void *)((INDEX) + 1))
@@ -23,6 +24,8 @@ typedef struct {
 	float node_height;
 
 	float mouse_key_press_time;
+
+	cpymo_key_pluse key_up, key_down;
 
 	float current_y;
 } cpymo_list_ui;

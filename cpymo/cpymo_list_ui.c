@@ -157,8 +157,11 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		cpymo_engine_request_redraw(e);
 	}
 
-	bool just_press_up = CPYMO_INPUT_JUST_PRESSED(e, up);
-	bool just_press_down = CPYMO_INPUT_JUST_PRESSED(e, down);
+	cpymo_key_pluse_update(&ui->key_up, d, e->input.up);
+	cpymo_key_pluse_update(&ui->key_down, d, e->input.down);
+
+	bool just_press_up = cpymo_key_pluse_output(&ui->key_up);
+	bool just_press_down = cpymo_key_pluse_output(&ui->key_down);
 
 	if (ui->from_bottom_to_top) {
 		bool tmp = just_press_up;
@@ -183,7 +186,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		}
 	}
 
-	if (just_press_down) {
+	else if (just_press_down) {
 		int r = ui->selection_relative_to_cur + 1;
 		if (cpymo_list_ui_get_relative_id_to_cur(e, r)) {
 			ui->selection_relative_to_cur = r;
@@ -302,6 +305,9 @@ error_t cpymo_list_ui_enter(
 	data->selection_relative_to_cur = 0;
 	data->ok = ok;
 	data->mouse_key_press_time = 0;
+
+	cpymo_key_pluse_init(&data->key_up, e->input.up);
+	cpymo_key_pluse_init(&data->key_down, e->input.down);
 
 	assert(*out_ui_data == NULL);
 	*out_ui_data = cpymo_list_ui_data(e);
