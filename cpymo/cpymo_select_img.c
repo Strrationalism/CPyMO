@@ -268,15 +268,18 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 	return err;
 }
 
-error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o)
+error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 {
 	if (o->selections) {
-		if (CPYMO_INPUT_JUST_PRESSED(e, down)) {
+		cpymo_key_pluse_update(&o->key_up, dt, e->input.up);
+		cpymo_key_pluse_update(&o->key_down, dt, e->input.down);
+
+		if (cpymo_key_pluse_output(&o->key_down)) {
 			cpymo_select_img_move(o, 1);
 			cpymo_engine_request_redraw(e);
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, up)) {
+		if (cpymo_key_pluse_output(&o->key_up)) {
 			cpymo_select_img_move(o, -1);
 			cpymo_engine_request_redraw(e);
 		}

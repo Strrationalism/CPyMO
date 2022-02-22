@@ -194,7 +194,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 	cpymo_anime_update(&engine->anime, delta_time_sec, redraw);
 
-	err = cpymo_select_img_update(engine, &engine->select_img);
+	err = cpymo_select_img_update(engine, &engine->select_img, delta_time_sec);
 	CPYMO_THROW(err);
 
 	err = cpymo_wait_update(&engine->wait, engine, delta_time_sec);

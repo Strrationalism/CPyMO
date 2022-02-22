@@ -66,7 +66,7 @@ void cpymo_backlog_record_write_name(cpymo_backlog *b, cpymo_backend_text name)
 	b->pending_name = name;
 }
 
-error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text * textlines_moveinto, size_t max_lines)
+error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text **textlines_moveinto, size_t max_lines)
 {
 	cpymo_backlog_record *rec = &b->records[b->next_record_to_write];
 
@@ -75,7 +75,8 @@ error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text * t
 	rec->name = b->pending_name;
 	rec->owning_name = b->owning_name;
 	b->owning_name = false;
-	rec->lines = textlines_moveinto;
+	rec->lines = *textlines_moveinto;
+	*textlines_moveinto = NULL;
 	rec->max_lines = max_lines;
 	
 	strcpy(rec->vo_filename, b->pending_vo_filename);

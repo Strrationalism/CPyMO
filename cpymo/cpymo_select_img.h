@@ -9,6 +9,7 @@
 #include "cpymo_assetloader.h"
 #include "cpymo_wait.h"
 #include "cpymo_hash_flags.h"
+#include "cpymo_key_pulse.h"
 
 struct cpymo_engine;
 
@@ -52,6 +53,8 @@ struct cpymo_select_img {
 	cpymo_backend_image option_background;
 	int option_background_w, option_background_h;
 
+	cpymo_key_pluse key_up, key_down;
+
 	cpymo_backend_image hint[4];
 	int hint_w[4], hint_h[4];
 	float hint_timer;
@@ -83,7 +86,7 @@ void cpymo_select_img_configuare_end(
 	cpymo_select_img *sel, cpymo_wait *wait,
 	struct cpymo_engine *engine, int init_position);
 
-error_t cpymo_select_img_update(struct cpymo_engine *engine, cpymo_select_img *o);
+error_t cpymo_select_img_update(struct cpymo_engine *engine, cpymo_select_img *o, float dt);
 void cpymo_select_img_draw(const cpymo_select_img *, int logical_screen_w, int logical_screen_h, bool gray_selected);
 
 static inline void cpymo_select_img_init(cpymo_select_img *select_img)
@@ -93,6 +96,9 @@ static inline void cpymo_select_img_init(cpymo_select_img *select_img)
 	select_img->sel_highlight = NULL;
 	select_img->option_background = NULL;
 	select_img->show_option_background = false;
+
+	cpymo_key_pluse_init(&select_img->key_up, false);
+	cpymo_key_pluse_init(&select_img->key_down, false);
 
 	for (size_t i = 0; i < 4; ++i) select_img->hint[i] = NULL;
 }

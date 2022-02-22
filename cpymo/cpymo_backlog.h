@@ -37,7 +37,7 @@ void cpymo_backlog_record_write_name(
 
 error_t cpymo_backlog_record_write_text(
 	cpymo_backlog *,
-	cpymo_backend_text *textlines_moveinto,
+	cpymo_backend_text **textlines_moveinto,
 	size_t max_lines);
 
 struct cpymo_engine;

@@ -34,7 +34,8 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
 void cpymo_textbox_free(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
 {
     if (write_to_backlog) {
-        cpymo_backlog_record_write_text(write_to_backlog, tb->lines, tb->max_lines);
+        cpymo_backlog_record_write_text(write_to_backlog, &tb->lines, tb->max_lines);
+        assert(tb->lines == NULL);
     }
     else {
         cpymo_textbox_clear_page(tb, NULL);
@@ -158,7 +159,8 @@ error_t cpymo_textbox_clear_page(cpymo_textbox *tb, cpymo_backlog *write_to_back
     tb->active_line_current_width = 0;
 
     if (write_to_backlog) {
-        cpymo_backlog_record_write_text(write_to_backlog, tb->lines, tb->max_lines);
+        cpymo_backlog_record_write_text(write_to_backlog, &tb->lines, tb->max_lines);
+        assert(tb->lines == NULL);
         tb->lines = (cpymo_backend_text *)malloc(sizeof(cpymo_backend_text) * tb->max_lines);
         for (size_t i = 0; i < tb->max_lines; ++i)
             tb->lines[i] = NULL;
