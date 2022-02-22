@@ -59,7 +59,7 @@ static error_t cpymo_text_callback_read(cpymo_engine *e)
 	assert(t->active_box);
 
 	if (!cpymo_textbox_all_finished(t->active_box)) {
-		error_t err = cpymo_textbox_clear_page(t->active_box);
+		error_t err = cpymo_textbox_clear_page(t->active_box, NULL);
 		CPYMO_THROW(err);
 
 		cpymo_wait_register_with_callback(
@@ -116,7 +116,7 @@ void cpymo_text_clear(cpymo_text *t)
 	struct cpymo_textbox_list *to_free = t->ls;
 	while (to_free) {
 		struct cpymo_textbox_list *next_to_free = to_free->next;
-		cpymo_textbox_free(&to_free->box);
+		cpymo_textbox_free(&to_free->box, NULL);
 		free(to_free);
 		to_free = next_to_free;
 	}

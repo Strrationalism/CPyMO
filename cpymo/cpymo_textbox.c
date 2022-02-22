@@ -31,10 +31,15 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     return CPYMO_ERR_SUCC;
 }
 
-void cpymo_textbox_free(cpymo_textbox *tb)
+void cpymo_textbox_free(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
 {
-    cpymo_textbox_clear_page(tb);
-    free(tb->lines);
+    if (write_to_backlog) {
+        cpymo_backlog_record_write_text(write_to_backlog, tb->lines, tb->max_lines);
+    }
+    else {
+        cpymo_textbox_clear_page(tb, NULL);
+        free(tb->lines);
+    }
 }
 
 void cpymo_textbox_draw(
@@ -145,16 +150,25 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
     }
 }
 
-error_t cpymo_textbox_clear_page(cpymo_textbox *tb)
+error_t cpymo_textbox_clear_page(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
 {
     tb->msg_cursor_visible = false;
     tb->timer = 0;
     tb->active_line = 0;
     tb->active_line_current_width = 0;
-    for (size_t i = 0; i < tb->max_lines; i++) {
-        if (tb->lines[i] != NULL) 
-            cpymo_backend_text_free(tb->lines[i]);
-        tb->lines[i] = NULL;
+
+    if (write_to_backlog) {
+        cpymo_backlog_record_write_text(write_to_backlog, tb->lines, tb->max_lines);
+        tb->lines = (cpymo_backend_text *)malloc(sizeof(cpymo_backend_text) * tb->max_lines);
+        for (size_t i = 0; i < tb->max_lines; ++i)
+            tb->lines[i] = NULL;
+    }
+    else {
+        for (size_t i = 0; i < tb->max_lines; i++) {
+            if (tb->lines[i] != NULL)
+                cpymo_backend_text_free(tb->lines[i]);
+            tb->lines[i] = NULL;
+        }
     }
 
     return CPYMO_ERR_SUCC;

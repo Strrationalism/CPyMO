@@ -4,7 +4,7 @@
 
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
-		cpymo_textbox_free(&(SAY)->textbox); \
+		cpymo_textbox_free(&(SAY)->textbox, &e->backlog); \
 		SAY->textbox_usable = false; \
 	}
 
@@ -56,7 +56,7 @@ void cpymo_say_init(cpymo_say *out)
 
 void cpymo_say_free(cpymo_say *say)
 {
-	DISABLE_TEXTBOX(say);
+	cpymo_textbox_free(&say->textbox, NULL);
 	RESET_NAME(say);
 	if (say->msgbox) cpymo_backend_image_free(say->msgbox);
 	if (say->namebox) cpymo_backend_image_free(say->namebox);
@@ -203,7 +203,7 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 	assert(say->textbox_usable);
 
 	if (!cpymo_textbox_all_finished(&say->textbox)) {
-		error_t err = cpymo_textbox_clear_page(&say->textbox);
+		error_t err = cpymo_textbox_clear_page(&say->textbox, &e->backlog);
 		CPYMO_THROW(err);
 
 		cpymo_wait_register_with_callback(

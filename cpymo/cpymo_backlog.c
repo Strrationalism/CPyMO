@@ -29,7 +29,7 @@ static void cpymo_backlog_record_clean(cpymo_backlog_record *rec)
 
 	if (rec->lines) {
 		for (size_t i = 0; i < rec->max_lines; ++i) {
-			if (rec->lines[i]) cpymo_backend_text_free(rec->lines);
+			if (rec->lines[i]) cpymo_backend_text_free(rec->lines[i]);
 		}
 
 		free(rec->lines);
