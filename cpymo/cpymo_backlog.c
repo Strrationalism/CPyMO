@@ -15,7 +15,29 @@ void cpymo_backlog_init(cpymo_backlog *b)
 		b->records[i].vo_filename[0] = '\0';
 		b->records[i].owning_name = false;
 		b->records[i].name = NULL;
+		b->records[i].lines = NULL;
 	}
+}
+
+static void cpymo_backlog_record_clean(cpymo_backlog_record *rec)
+{
+	if (rec->owning_name && rec->name)
+		cpymo_backend_text_free(rec->name);
+
+	rec->owning_name = false;
+	rec->name = NULL;
+
+	if (rec->lines) {
+		for (size_t i = 0; i < rec->max_lines; ++i) {
+			if (rec->lines[i]) cpymo_backend_text_free(rec->lines);
+		}
+
+		free(rec->lines);
+		rec->lines = NULL;
+	}
+
+	rec->max_lines = 0;
+	rec->vo_filename[0] = '\0';
 }
 
 void cpymo_backlog_free(cpymo_backlog *b)
@@ -23,9 +45,10 @@ void cpymo_backlog_free(cpymo_backlog *b)
 	if (b->owning_name && b->pending_name) 
 		cpymo_backend_text_free(b->pending_name);
 
-	for (size_t i = 0; i < CPYMO_BACKLOG_MAX_RECORDS; i++)
-		if (b->records[i].owning_name && b->records[i].name)
-			cpymo_backend_text_free(b->records[i].name);
+	for (size_t i = 0; i < CPYMO_BACKLOG_MAX_RECORDS; i++) {
+		cpymo_backlog_record *rec = &b->records[i];
+		cpymo_backlog_record_clean(rec);
+	}
 }
 
 void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_parser_stream_span vo)
@@ -43,17 +66,18 @@ void cpymo_backlog_record_write_name(cpymo_backlog *b, cpymo_backend_text name)
 	b->pending_name = name;
 }
 
-error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text * textlines_moveinto)
+error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text * textlines_moveinto, size_t max_lines)
 {
 	cpymo_backlog_record *rec = &b->records[b->next_record_to_write];
 
-	if (rec->owning_name && rec->name)
-		cpymo_backend_text_free(rec->name);
+	cpymo_backlog_record_clean(rec);
 
-	rec->owning_name = b->owning_name;
 	rec->name = b->pending_name;
+	rec->owning_name = b->owning_name;
 	b->owning_name = false;
-
+	rec->lines = textlines_moveinto;
+	rec->max_lines = max_lines;
+	
 	strcpy(rec->vo_filename, b->pending_vo_filename);
 	b->pending_vo_filename[0] = '\0';
 
@@ -69,11 +93,23 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 	const cpymo_backlog_record *rec = &e->backlog.records[DEC(node_to_draw)];
 
 	const float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
+	y += font_size;
 	if (rec->name) {
 		// Why not draw?
 		cpymo_backend_text_draw(
-			rec->name, 0, y + font_size, cpymo_color_white,
+			rec->name, 0, y, cpymo_color_white,
 			1.0, cpymo_backend_image_draw_type_uielement);
+
+		y += font_size;
+	}
+
+	for (size_t i = 0; i < rec->max_lines; ++i) {
+		if (rec->lines[i]) {
+			cpymo_backend_text_draw(
+				rec->lines[i], 0, y, cpymo_color_white,
+				1.0f, cpymo_backend_image_draw_type_uielement);
+			y += font_size;
+		}
 	}
 }
 

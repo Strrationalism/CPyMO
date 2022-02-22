@@ -5,11 +5,12 @@
 #include "cpymo_error.h"
 #include <cpymo_backend_text.h>
 
-#define CPYMO_BACKLOG_MAX_RECORDS 128
+#define CPYMO_BACKLOG_MAX_RECORDS 4
 
 typedef struct {
 	bool owning_name;
-	cpymo_backend_text name;
+	cpymo_backend_text name, *lines;
+	size_t max_lines;
 
 	char vo_filename[32];
 } cpymo_backlog_record;
@@ -36,7 +37,8 @@ void cpymo_backlog_record_write_name(
 
 error_t cpymo_backlog_record_write_text(
 	cpymo_backlog *,
-	cpymo_backend_text *textlines_moveinto);
+	cpymo_backend_text *textlines_moveinto,
+	size_t max_lines);
 
 struct cpymo_engine;
 error_t cpymo_backlog_ui_enter(struct cpymo_engine *e);
