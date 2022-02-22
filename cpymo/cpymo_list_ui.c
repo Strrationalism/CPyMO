@@ -164,6 +164,14 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		bool tmp = just_press_up;
 		just_press_up = just_press_down;
 		just_press_down = tmp;
+
+		void *selected = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
+		if (ui->get_prev(e, ui + 1, selected) == NULL) {
+			if (just_press_up) {
+				cpymo_list_ui_exit(e);
+				return CPYMO_ERR_SUCC;
+			}
+		}
 	}
 
 	if (just_press_up) {
@@ -216,6 +224,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 {
 	cpymo_bg_draw(e);
+	cpymo_scroll_draw(&e->scroll);
+
 	float xywh[] = {0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h };
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_bg);
 
