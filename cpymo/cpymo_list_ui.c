@@ -112,7 +112,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		ui->mouse_key_press_time += d;
 		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
 
-		if (fabs(e->input.mouse_wheel_delta) > fabs(delta_y)) {
+		bool control_by_wheel = fabs(e->input.mouse_wheel_delta) > fabs(delta_y);
+		if (control_by_wheel) {
 			delta_y = e->input.mouse_wheel_delta * ui->node_height * 0.5f;
 		}
 
@@ -152,6 +153,12 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 				ui->current_node = p;
 				ui->selection_relative_to_cur--;
 			}
+		}
+
+		if (control_by_wheel) {
+			int s = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
+			if (s != INT_MAX) 
+				ui->selection_relative_to_cur = s;
 		}
 
 		cpymo_engine_request_redraw(e);
