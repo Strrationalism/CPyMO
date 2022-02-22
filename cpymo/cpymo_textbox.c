@@ -39,7 +39,7 @@ void cpymo_textbox_free(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
     }
     else {
         cpymo_textbox_clear_page(tb, NULL);
-        free(tb->lines);
+        if (tb->lines) free(tb->lines);
     }
 }
 
@@ -166,10 +166,12 @@ error_t cpymo_textbox_clear_page(cpymo_textbox *tb, cpymo_backlog *write_to_back
             tb->lines[i] = NULL;
     }
     else {
-        for (size_t i = 0; i < tb->max_lines; i++) {
-            if (tb->lines[i] != NULL)
-                cpymo_backend_text_free(tb->lines[i]);
-            tb->lines[i] = NULL;
+        if (tb->lines) {
+            for (size_t i = 0; i < tb->max_lines; i++) {
+                if (tb->lines[i] != NULL)
+                    cpymo_backend_text_free(tb->lines[i]);
+                tb->lines[i] = NULL;
+            }
         }
     }
 
