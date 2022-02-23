@@ -26,8 +26,8 @@ void cpymo_say_free(cpymo_say *);
 
 void cpymo_say_draw(const struct cpymo_engine *);
 
-error_t cpymo_say_load_msgbox_image(cpymo_say *, cpymo_parser_stream_span name, cpymo_assetloader *);
-error_t cpymo_say_load_namebox_image(cpymo_say *, cpymo_parser_stream_span name, cpymo_assetloader *);
+error_t cpymo_say_load_msgbox_and_namebox_image(
+	cpymo_say *, cpymo_parser_stream_span msgbox, cpymo_parser_stream_span namebox, cpymo_assetloader *);
 
 error_t cpymo_say_start(
 	struct cpymo_engine *,

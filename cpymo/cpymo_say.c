@@ -24,12 +24,19 @@ static void cpymo_say_lazy_init(cpymo_say *out, cpymo_assetloader *loader)
 	if (out->lazy_init == false) {
 		out->lazy_init = true;
 
-		error_t err;
-		err = cpymo_say_load_msgbox_image(out, cpymo_parser_stream_span_pure("message"), loader);
-		if (err != CPYMO_ERR_SUCC) out->msgbox = NULL;
+		error_t err = cpymo_say_load_msgbox_and_namebox_image(
+			out,
+			cpymo_parser_stream_span_pure("message"),
+			cpymo_parser_stream_span_pure("name"),
+			loader);
+		
+		if (err != CPYMO_ERR_SUCC) {
+			if (out->msgbox) cpymo_backend_image_free(out->msgbox);
+			if (out->namebox) cpymo_backend_image_free(out->namebox);
 
-		err = cpymo_say_load_namebox_image(out, cpymo_parser_stream_span_pure("name"), loader);
-		if (err != CPYMO_ERR_SUCC) out->namebox = NULL;
+			out->msgbox = NULL;
+			out->namebox = NULL;
+		}
 
 		err = cpymo_assetloader_load_system_image(
 			&out->msg_cursor,
@@ -99,13 +106,13 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 			cpymo_backend_image_draw(
 				namebox_x, namebox_y, namebox_w, namebox_h,
 				e->say.namebox, 0, 0, e->say.namebox_w, e->say.namebox_h, 1.0f,
-				cpymo_backend_image_draw_type_textbox);
+				cpymo_backend_image_draw_type_text_say_textbox);
 
 		if (e->say.msgbox) {
 			cpymo_backend_image_draw(
 				0, y, (float)e->gameconfig.imagesize_w, msg_h,
 				e->say.msgbox, 0, 0, e->say.msgbox_w, e->say.msgbox_h,
-				1.0f, cpymo_backend_image_draw_type_textbox);
+				1.0f, cpymo_backend_image_draw_type_text_say_textbox);
 		}
 
 		if (e->say.name) {
@@ -124,10 +131,8 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 	}
 }
 
-error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_stream_span name, cpymo_assetloader *l)
+static inline error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_stream_span name, cpymo_assetloader *l)
 {
-	cpymo_say_lazy_init(say, l);
-
 	if (say->msgbox) cpymo_backend_image_free(say->msgbox);
 	say->msgbox = NULL;
 
@@ -145,10 +150,8 @@ error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_stream_span nam
 	return err;
 }
 
-error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_stream_span name, cpymo_assetloader *l)
+static inline error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_stream_span name, cpymo_assetloader *l)
 {
-	cpymo_say_lazy_init(say, l);
-
 	if (say->namebox) cpymo_backend_image_free(say->namebox);
 	say->namebox = NULL;
 
@@ -164,6 +167,18 @@ error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_stream_span na
 	if (err != CPYMO_ERR_SUCC) say->namebox = NULL;
 
 	return err;
+}
+
+error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_parser_stream_span msgbox, cpymo_parser_stream_span namebox, cpymo_assetloader *l)
+{
+	cpymo_say_lazy_init(say, l);
+	error_t err = cpymo_say_load_namebox_image(say, namebox, l);
+	CPYMO_THROW(err);
+
+	err = cpymo_say_load_msgbox_image(say, msgbox, l);
+	CPYMO_THROW(err);
+
+	return CPYMO_ERR_SUCC;
 }
 
 /** Mermaid Flow Chart 

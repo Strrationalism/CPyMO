@@ -6,6 +6,8 @@
 
 static C2D_Font font;
 
+bool enhanced_3ds_display_mode_select(enum cpymo_backend_image_draw_type t);
+
 error_t cpymo_backend_text_sys_init()
 {
     Result res = romfsInit();
@@ -100,6 +102,7 @@ void cpymo_backend_text_free(cpymo_backend_text t)
 
 void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color col, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
+    if(!enhanced_3ds_display_mode_select(draw_type)) return;
     trans_pos(&x, &y);
 
     u8 a = (u8)(alpha * 255.0f);

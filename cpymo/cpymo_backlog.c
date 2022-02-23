@@ -99,7 +99,7 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 		// Why not draw?
 		cpymo_backend_text_draw(
 			rec->name, 0, y, cpymo_color_white,
-			1.0, cpymo_backend_image_draw_type_uielement);
+			1.0, cpymo_backend_image_draw_type_ui_element);
 
 		y += font_size;
 	}
@@ -108,7 +108,7 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 		if (rec->lines[i]) {
 			cpymo_backend_text_draw(
 				rec->lines[i], 0, y, cpymo_color_white,
-				1.0f, cpymo_backend_image_draw_type_uielement);
+				1.0f, cpymo_backend_image_draw_type_ui_element);
 			y += font_size;
 		}
 	}

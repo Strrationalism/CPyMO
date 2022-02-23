@@ -335,7 +335,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 				(float)o->option_background_w, (float)o->option_background_h,
 				o->option_background,
 				0, 0, o->option_background_w, o->option_background_h, 1.0f,
-				cpymo_backend_image_draw_type_sel_img);
+				o->draw_type);
 		}
 
 		for (int i = 0; i < (int)o->all_selections; ++i) {
@@ -356,7 +356,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 					sel->w,
 					sel->h,
 					gray ? 0.75f : 1.0f,
-					cpymo_backend_image_draw_type_sel_img
+					o->draw_type
 				);
 			}
 
@@ -372,7 +372,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 						o->sel_highlight,
 						0, 0, o->sel_highlight_w, o->sel_highlight_h,
 						1.0f,
-						cpymo_backend_image_draw_type_sel_img);
+						o->draw_type);
 				}
 
 				cpymo_backend_text_draw(
@@ -382,7 +382,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 					(selected && o->sel_highlight == NULL) ? 
 						cpymo_color_inv(sel->text_color) : sel->text_color,
 					gray ? 0.75f : 1.0f,
-					cpymo_backend_image_draw_type_sel_img
+					o->draw_type
 				);
 
 			}
@@ -411,7 +411,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 					o->hint_w[cur_img],
 					o->hint_h[cur_img],
 					1.0f,
-					cpymo_backend_image_draw_type_sel_img);
+					o->draw_type);
 			}
 		}
 	}

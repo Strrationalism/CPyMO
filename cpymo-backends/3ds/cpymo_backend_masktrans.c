@@ -43,8 +43,8 @@ error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_
 		return CPYMO_ERR_UNKNOWN;
 	}
 
-	printf("[Load Masktrans] W: %d, H: %d, PW: %d, PH: %d", 
-		t->w, t->h, t->pw, t->ph);
+	/*printf("[Load Masktrans] W: %d, H: %d, PW: %d, PH: %d\n", 
+		t->w, t->h, t->pw, t->ph);*/
 
 	*out = t;
 

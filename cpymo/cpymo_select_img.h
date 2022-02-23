@@ -61,6 +61,8 @@ struct cpymo_select_img {
 	bool hint_tiktok;
 
 	cpymo_select_img_ok_callback ok_callback;
+
+	enum cpymo_backend_image_draw_type draw_type;
 };
 
 typedef struct cpymo_select_img cpymo_select_img;
@@ -96,6 +98,7 @@ static inline void cpymo_select_img_init(cpymo_select_img *select_img)
 	select_img->sel_highlight = NULL;
 	select_img->option_background = NULL;
 	select_img->show_option_background = false;
+	select_img->draw_type = cpymo_backend_image_draw_type_sel_img;
 
 	cpymo_key_pluse_init(&select_img->key_up, false);
 	cpymo_key_pluse_init(&select_img->key_down, false);

@@ -55,12 +55,12 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 			r->bg_w,
 			r->bg_h,
 			1.0f,
-			cpymo_backend_image_draw_type_uielement);
+			cpymo_backend_image_draw_type_ui_bg);
 	}
 	else {
 		cpymo_backend_image_fill_rects(
 			bg_xywh, 1, cpymo_color_black, 0.75f, 
-			cpymo_backend_image_draw_type_uielement);
+			cpymo_backend_image_draw_type_ui_bg);
 	}
 
 	cpymo_select_img_draw(&r->menu, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h, false);
@@ -203,6 +203,8 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		cpymo_color_white,
 		0,
 		false);
+
+	rmenu->menu.draw_type = cpymo_backend_image_draw_type_ui_element;
 
 	return CPYMO_ERR_SUCC;
 }

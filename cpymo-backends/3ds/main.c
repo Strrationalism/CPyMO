@@ -21,7 +21,7 @@
 #include <cpymo_backend_text.h>
 
 cpymo_engine engine;
-C3D_RenderTarget *screen1, *screen2;
+C3D_RenderTarget *screen1, *screen2, *screen3;
 float render_3d_offset;
 bool fill_screen;
 
@@ -32,6 +32,9 @@ extern error_t cpymo_backend_text_sys_init();
 extern void cpymo_backend_text_sys_free();
 
 extern const bool cpymo_input_fast_kill_pressed;
+
+const bool enhanced_3ds_display_mode = true;
+bool drawing_bottom_screen;
 
 static void ensure_save_dir(const char *gamedir)
 {
@@ -62,21 +65,20 @@ int main(void) {
 	fill_screen = false;
 	
 	gfxInitDefault();
+
+	const char *gamedir = "/pymogames/startup";
+
 	gfxSet3D(true);
-	consoleInit(GFX_BOTTOM, NULL);
-	gfxSetDoubleBuffering(GFX_BOTTOM, false);
+
+	if(!enhanced_3ds_display_mode) {
+		consoleInit(GFX_BOTTOM, NULL);
+		gfxSetDoubleBuffering(GFX_BOTTOM, false);
+	}
 
 	if(is_new_3ds) {
 		osSetSpeedupEnable(true);
 	}
 
-	/*const char *gamename = "DAICHYAN_s60v3";	//select_game();
-	if (gamename == NULL) {
-		gfxExit();
-		return 0;
-	}*/
-
-	const char *gamedir = "/pymogames/startup";
 	ensure_save_dir(gamedir);
 
 	engine.audio.enabled = false;
@@ -128,9 +130,23 @@ int main(void) {
 		return -1;
 	}
 
+	if(enhanced_3ds_display_mode) {
+		screen3 = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+		if(screen3 == NULL) {
+			C3D_RenderTargetDelete(screen1);
+			C3D_RenderTargetDelete(screen2);
+			C2D_Fini();
+			C3D_Fini();
+			cpymo_engine_free(&engine);
+			gfxExit();
+			return -1;
+		}
+	}
+
 	if(cpymo_backend_text_sys_init() != CPYMO_ERR_SUCC) {
 		C3D_RenderTargetDelete(screen1);
 		C3D_RenderTargetDelete(screen2);
+		C3D_RenderTargetDelete(screen3);
 		C2D_Fini();
 		C3D_Fini();
 		cpymo_engine_free(&engine);
@@ -184,9 +200,9 @@ int main(void) {
 		}
 
 		if(redraw) {
+			drawing_bottom_screen = false;
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(screen1, clr);
-			C2D_TargetClear(screen2, clr);
 
 			C2D_SceneBegin(screen1);
 			render_3d_offset = slider;
@@ -194,8 +210,18 @@ int main(void) {
 			cpymo_backend_image_fill_screen_edges();
 
 			if(slider > 0){
+				C2D_TargetClear(screen2, clr);
 				C2D_SceneBegin(screen2);
 				render_3d_offset = -slider;
+				cpymo_engine_draw(&engine);
+				cpymo_backend_image_fill_screen_edges();
+			}
+
+			if(enhanced_3ds_display_mode) {
+				drawing_bottom_screen = true;
+				C2D_TargetClear(screen3, clr);
+				C2D_SceneBegin(screen3);
+				render_3d_offset = 0;
 				cpymo_engine_draw(&engine);
 				cpymo_backend_image_fill_screen_edges();
 			}
@@ -211,6 +237,7 @@ int main(void) {
 	EXIT:
 
 	cpymo_backend_text_sys_free();
+	if(enhanced_3ds_display_mode) C3D_RenderTargetDelete(screen3);
 	C3D_RenderTargetDelete(screen2);
 	C3D_RenderTargetDelete(screen1);
 	cpymo_engine_free(&engine);

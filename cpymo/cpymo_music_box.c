@@ -51,7 +51,7 @@ static void cpymo_musicbox_draw_node(const cpymo_engine *e, const void *node_to_
 	cpymo_backend_text text = box->music_title[node_index];
 	cpymo_backend_text_draw(
 		text, 0, y + box->font_size, cpymo_color_white, 1.0f, 
-		cpymo_backend_image_draw_type_uielement);
+		cpymo_backend_image_draw_type_ui_element);
 }
 
 static error_t cpymo_musicbox_ok(struct cpymo_engine *e, void *selected)

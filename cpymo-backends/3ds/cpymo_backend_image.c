@@ -21,11 +21,12 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
         case cpymo_backend_image_draw_type_bg: return -10.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_chara: return -5.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_sel_img: return 2.0f * render_3d_offset;
-        case cpymo_backend_image_draw_type_textbox: return 1.5f * render_3d_offset;
+        case cpymo_backend_image_draw_type_text_say_textbox: return 1.5f * render_3d_offset;
         case cpymo_backend_image_draw_type_text_say: return 2.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_bg: return 2.5f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_text: return 3.0f * render_3d_offset;
-        case cpymo_backend_image_draw_type_text_ui: return 5.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_ui_element: return 2.5f * render_3d_offset;
+        case cpymo_backend_image_draw_type_ui_bg: return 3.0f * render_3d_offset;
         default: return 0.0f;
     }
 }
@@ -35,6 +36,20 @@ float viewport_width, viewport_height;
 float offset_x, offset_y;
 
 const extern bool fill_screen;
+
+const extern bool enhanced_3ds_display_mode;
+const extern bool drawing_bottom_screen;
+
+bool enhanced_3ds_display_mode_select(enum cpymo_backend_image_draw_type t)
+{
+    if(enhanced_3ds_display_mode) {
+        if(t == cpymo_backend_image_draw_type_text_say_textbox
+        || t == cpymo_backend_image_draw_type_text_say) return drawing_bottom_screen;
+
+        else return !drawing_bottom_screen;
+    }
+    else return true;
+}
 
 void cpymo_backend_image_init(float game_w, float game_h)
 {
@@ -69,29 +84,55 @@ void trans_size(float *w, float *h) {
 }
 
 void trans_pos(float *x, float *y) {
-    if(fill_screen) {
-        *x = *x / game_width * (400 + 20) - 10;
-        *y = *y / game_height * 240;
+    if(drawing_bottom_screen) {
+        // enhanced_3ds_display_mode
+        if(fill_screen) {
+            *x = *x / game_width * 320;
+            *y = *y / game_height * 240;
+        }
+        else {
+            *x = *x / game_width * viewport_width + offset_x - 40;
+            *y = *y / game_height * viewport_height + offset_y;
+        }
     }
     else {
-        *x = *x / game_width * viewport_width + offset_x;
-        *y = *y / game_height * viewport_height + offset_y;
+        if(fill_screen) {
+            *x = *x / game_width * (400 + 20) - 10;
+            *y = *y / game_height * 240;
+        }
+        else {
+            *x = *x / game_width * viewport_width + offset_x;
+            *y = *y / game_height * viewport_height + offset_y;
+        }
     }
 }
 
 void cpymo_backend_image_fill_screen_edges()
 {
-    if(!fill_screen) {
-        const u32 col = C2D_Color32(0, 0, 0, 255);
-
+    const u32 col = C2D_Color32(0, 0, 0, 255);
+    if(drawing_bottom_screen) {
+        // enhanced_3ds_display_mode
         if(offset_x > 0.5f) {
-            C2D_DrawRectSolid(-10 * render_3d_offset - 10, 0, 0, offset_x + 10, 240, col);
-            C2D_DrawRectSolid(-10 * render_3d_offset + offset_x + viewport_width, 0, 0, offset_x + 10, 240, col);
+            C2D_DrawRectSolid(- 10, 0, 0, offset_x - 30, 240, col);
+            C2D_DrawRectSolid(offset_x - 30 + viewport_width, 0, 0, offset_x - 30, 240, col);
         }
 
         if(offset_y > 0.5f) {
             C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
             C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
+        }
+    }
+    else {
+        if(!fill_screen) {
+            if(offset_x > 0.5f) {
+                C2D_DrawRectSolid(-10 * render_3d_offset - 10, 0, 0, offset_x + 10, 240, col);
+                C2D_DrawRectSolid(-10 * render_3d_offset + offset_x + viewport_width, 0, 0, offset_x + 10, 240, col);
+            }
+
+            if(offset_y > 0.5f) {
+                C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
+                C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
+            }
         }
     }
 }
@@ -262,6 +303,8 @@ void cpymo_backend_image_draw(
 	int srcx, int srcy, int srcw, int srch, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
 {
+    if(!enhanced_3ds_display_mode_select(draw_type)) return;
+
     cpymo_backend_image_3ds *img = (cpymo_backend_image_3ds *)src;
     
     Tex3DS_SubTexture sub;
