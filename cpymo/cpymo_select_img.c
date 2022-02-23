@@ -1,12 +1,13 @@
 #include "cpymo_select_img.h"
 #include "cpymo_engine.h"
+#include "cpymo_rmenu.h"
 #include <memory.h>
 #include <assert.h>
 #include <stdlib.h>
 
-static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, uint64_t hash, cpymo_select_img *o)
+static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, uint64_t hash, bool save_enabled)
 {
-	if (o->save_enabled)
+	if (save_enabled)
 		cpymo_hash_flags_add(&e->flags, hash);
 
 	const char *out_var = cpymo_gameconfig_is_mo1(&e->gameconfig) ? "F91" : "FSEL";
@@ -150,9 +151,10 @@ static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 	}
 
 	if (e->select_img.save_enabled) {
-		if (e->input.mouse_wheel_delta > 0) {
+		if (e->input.mouse_wheel_delta > 0)
 			cpymo_backlog_ui_enter(e);
-		}
+		else if (CPYMO_INPUT_JUST_RELEASED(e, cancel))
+			cpymo_rmenu_enter(e);
 	}
 
 	return e->select_img.selections == NULL;
@@ -261,8 +263,10 @@ static void cpymo_select_img_move(cpymo_select_img *o, int move) {
 
 static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpymo_select_img *o)
 {
-	error_t err = o->ok_callback(e, sel, hash, o);
+	bool save_enabled = o->save_enabled;
 	cpymo_select_img_reset(o);
+
+	error_t err = o->ok_callback(e, sel, hash, save_enabled);
 	cpymo_engine_request_redraw(e);
 	return err;
 }
@@ -294,11 +298,11 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 			}
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, ok)) {
 			return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash, o);
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, cancel) && !o->save_enabled) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, cancel) && !o->save_enabled) {
 			o->current_selection = (int)o->all_selections - 1;
 			while (o->selections[o->current_selection].enabled == false 
 					|| (o->selections[o->current_selection].image == NULL
@@ -307,7 +311,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 			return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash, o);
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
 			for (int i = 0; i < (int)o->all_selections; ++i) {
 				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
 					o->current_selection = i;

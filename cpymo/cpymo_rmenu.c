@@ -1,22 +1,33 @@
 #include "cpymo_rmenu.h"
 #include "cpymo_engine.h"
+#include <assert.h>
 
 typedef struct {
 	cpymo_backend_image bg;
 	int bg_w, bg_h;
+
+	cpymo_select_img menu;
+	cpymo_wait menu_waiter;
+
+	bool alive;
 } cpymo_rmenu;
 
-error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
+static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 {
-	if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
-		cpymo_ui_exit(e);
-		return CPYMO_ERR_SUCC;
+	cpymo_rmenu *r = (cpymo_rmenu *)ui_data;
+
+	if (r->alive) {
+		cpymo_wait_update(&r->menu_waiter, e, dt);
+
+		if (r->alive) {
+			cpymo_select_img_update(e, &r->menu, dt);
+		}
 	}
 
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
+static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 {
 	const cpymo_rmenu *r = (const cpymo_rmenu *)ui_data;
 
@@ -49,12 +60,35 @@ void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 			bg_xywh, 1, cpymo_color_black, 0.75f, 
 			cpymo_backend_image_draw_type_uielement);
 	}
+
+	cpymo_select_img_draw(&r->menu, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h, false);
 }
 
-void cpymo_rmenu_delete(cpymo_engine *e, void *ui_data)
+static void cpymo_rmenu_delete(cpymo_engine *e, void *ui_data)
 {
 	cpymo_rmenu *r = (cpymo_rmenu *)ui_data;
+	r->alive = false;
+
 	if (r->bg) cpymo_backend_image_free(r->bg);
+
+	cpymo_select_img_free(&r->menu);
+}
+
+static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
+{
+	switch (sel) {
+	case 0: cpymo_ui_exit(e); break;
+	case 1: cpymo_ui_exit(e); break;
+	case 2: cpymo_backlog_ui_enter(e); break;
+	case 3: cpymo_ui_exit(e); break;
+	case 4:	cpymo_ui_exit(e); break;
+	case 5: cpymo_ui_exit(e); break;
+	case 6: cpymo_ui_exit(e); break;
+	default:
+		assert(false);
+	}
+
+	return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_rmenu_enter(cpymo_engine *e)
@@ -68,6 +102,11 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		&cpymo_rmenu_draw,
 		&cpymo_rmenu_delete);
 	CPYMO_THROW(err);
+
+	rmenu->alive = true;
+
+	cpymo_select_img_init(&rmenu->menu);
+	cpymo_wait_reset(&rmenu->menu_waiter);
 
 	rmenu->bg = NULL;
 	err = cpymo_assetloader_load_system_image(
@@ -95,6 +134,62 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 			rmenu->bg_h = (int)((float)e->gameconfig.imagesize_h * 0.6f);
 		}
 	}
+
+	err = cpymo_select_img_configuare_begin(
+		&rmenu->menu,
+		7,
+		cpymo_parser_stream_span_pure(""),
+		&e->assetloader,
+		&e->gameconfig);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_ui_exit(e);
+		return err;
+	}
+
+	#define RMENU_ITEM(_, TEXT, ENABLED) \
+		err = cpymo_select_img_configuare_select_text( \
+			&rmenu->menu, \
+			&e->assetloader, \
+			&e->gameconfig, \
+			&e->flags, \
+			cpymo_parser_stream_span_pure(TEXT), \
+			true, \
+			cpymo_select_img_selection_nohint, \
+			0); \
+		if (err != CPYMO_ERR_SUCC) { \
+			cpymo_ui_exit(e); \
+			return err; \
+		}
+
+	cpymo_select_img_configuare_set_ok_callback(&rmenu->menu, &cpymo_rmenu_ok);
+
+	RMENU_ITEM(0, "保存存档", true);
+	RMENU_ITEM(1, "读取存档", true);
+	RMENU_ITEM(2, "对话记录", true);
+	RMENU_ITEM(3, "游戏设置", true)
+	RMENU_ITEM(4, "重启游戏", true);
+	RMENU_ITEM(5, "退出游戏", true);
+	RMENU_ITEM(6, "返回游戏", true);
+
+	float xywh[4] = {
+		((float)e->gameconfig.imagesize_w - (float)rmenu->bg_w) / 2,
+		((float)e->gameconfig.imagesize_h - (float)rmenu->bg_h) / 2,
+		(float)rmenu->bg_w,
+		(float)rmenu->bg_h,
+	};
+
+
+	cpymo_select_img_configuare_end_select_text(
+		&rmenu->menu,
+		&rmenu->menu_waiter,
+		e,
+		xywh[0],
+		xywh[1],
+		xywh[0] + xywh[2],
+		xywh[1] + xywh[3],
+		cpymo_color_white,
+		0,
+		false);
 
 	return CPYMO_ERR_SUCC;
 }

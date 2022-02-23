@@ -187,7 +187,7 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 	if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
 		cpymo_backlog_ui_enter(e);
 	}
-	else if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
+	else if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 		cpymo_rmenu_enter(e);
 	}
 

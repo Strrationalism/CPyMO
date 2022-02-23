@@ -20,7 +20,7 @@ enum cpymo_select_img_selection_hint_state {
 };
 
 struct cpymo_select_img;
-typedef error_t (*cpymo_select_img_ok_callback)(struct cpymo_engine *, int, uint64_t, struct cpymo_select_img *);
+typedef error_t (*cpymo_select_img_ok_callback)(struct cpymo_engine *, int, uint64_t, bool save_enabled);
 
 typedef struct {
 	cpymo_backend_image image;

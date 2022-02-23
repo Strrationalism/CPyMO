@@ -97,7 +97,7 @@ static void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
 
 static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 {
-	if (e->input.cancel) {
+	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 		cpymo_list_ui_exit(e); 
 		return CPYMO_ERR_SUCC;
 	}
