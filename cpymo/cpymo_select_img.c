@@ -511,7 +511,7 @@ void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpy
 }
 
 void cpymo_select_img_configuare_end_select_text(
-	cpymo_select_img *sel, cpymo_engine *e, float x1, float y1, float x2, float y2, cpymo_color col, int init_pos, bool show_option_background)
+	cpymo_select_img *sel, cpymo_wait *waiter, cpymo_engine *e, float x1, float y1, float x2, float y2, cpymo_color col, int init_pos, bool show_option_background)
 {
 	float box_w = x2 - x1;
 	float y = y1;
@@ -530,7 +530,7 @@ void cpymo_select_img_configuare_end_select_text(
 
 	sel->show_option_background = show_option_background;
 
-	cpymo_select_img_configuare_end(&e->select_img, &e->wait, e, init_pos);
+	cpymo_select_img_configuare_end(sel, waiter, e, init_pos);
 
 	// load option background if not load.
 	if (sel->option_background == NULL && show_option_background) {

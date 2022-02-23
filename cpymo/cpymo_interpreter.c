@@ -993,6 +993,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 		cpymo_select_img_configuare_end_select_text(
 			&engine->select_img,
+			&engine->wait,
 			engine,
 			0, 0,
 			engine->gameconfig.imagesize_w,
@@ -1041,7 +1042,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(init_pos); ENSURE(init_pos); 
 		
 		cpymo_select_img_configuare_end_select_text( 
-			&engine->select_img, engine, x1, y1, x2, y2,  
+			&engine->select_img, &engine->wait, engine, x1, y1, x2, y2,  
 			cpymo_parser_stream_span_as_color(col), 
 			cpymo_parser_stream_span_atoi(init_pos),
 			false); 
@@ -1087,7 +1088,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(init_pos); ENSURE(init_pos);
 
 		cpymo_select_img_configuare_end_select_text(
-			&engine->select_img, engine, x1, y1, x2, y2,
+			&engine->select_img, &engine->wait, engine, x1, y1, x2, y2,
 			cpymo_parser_stream_span_as_color(col),
 			cpymo_parser_stream_span_atoi(init_pos),
 			false);

@@ -121,6 +121,7 @@ void cpymo_select_img_configuare_select_text_hint_pic(
 
 void cpymo_select_img_configuare_end_select_text(
 	cpymo_select_img *sel,
+	cpymo_wait *waiter,
 	struct cpymo_engine *engine, 
 	float x1, float y1, 
 	float x2, float y2, 
