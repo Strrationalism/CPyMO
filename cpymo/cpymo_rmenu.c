@@ -83,7 +83,18 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	case 1: cpymo_ui_exit(e); break;
 	case 2: cpymo_backlog_ui_enter(e); break;
 	case 3: cpymo_ui_exit(e); break;
-	case 4:	cpymo_ui_exit(e); break;
+	case 4: {
+		char *gamedir = (char *)malloc(strlen(e->assetloader.gamedir) + 1);
+		if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;
+		
+		strcpy(gamedir, e->assetloader.gamedir);
+		cpymo_engine_free(e);
+		error_t err = cpymo_engine_init(e, gamedir);
+		free(gamedir);
+
+		CPYMO_THROW(err);
+		break;
+	}
 	case 5: return CPYMO_ERR_NO_MORE_CONTENT;
 	case 6: cpymo_ui_exit(e); break;
 	default:
