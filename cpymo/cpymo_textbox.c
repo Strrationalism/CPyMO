@@ -39,7 +39,10 @@ void cpymo_textbox_free(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
     }
     else {
         cpymo_textbox_clear_page(tb, NULL);
-        if (tb->lines) free(tb->lines);
+        if (tb->lines) {
+            free(tb->lines); 
+            tb->lines = NULL;
+        }
     }
 }
 

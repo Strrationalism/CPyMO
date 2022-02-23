@@ -166,7 +166,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 			&e->gameconfig, \
 			&e->flags, \
 			cpymo_parser_stream_span_pure(TEXT), \
-			true, \
+			ENABLED, \
 			cpymo_select_img_selection_nohint, \
 			0); \
 		if (err != CPYMO_ERR_SUCC) { \
@@ -176,10 +176,10 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 
 	cpymo_select_img_configuare_set_ok_callback(&rmenu->menu, &cpymo_rmenu_ok);
 
-	RMENU_ITEM(0, "保存存档", true);
-	RMENU_ITEM(1, "读取存档", true);
+	RMENU_ITEM(0, "保存存档", false);
+	RMENU_ITEM(1, "读取存档", false);
 	RMENU_ITEM(2, "对话记录", true);
-	RMENU_ITEM(3, "游戏设置", true)
+	RMENU_ITEM(3, "游戏设置", false)
 	RMENU_ITEM(4, "重启游戏", true);
 	RMENU_ITEM(5, "退出游戏", true);
 	RMENU_ITEM(6, "返回游戏", true);

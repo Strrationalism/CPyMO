@@ -151,11 +151,11 @@ void cpymo_engine_free(cpymo_engine *engine)
 	if (err != CPYMO_ERR_SUCC) 
 		fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
 	
-	cpymo_backlog_free(&engine->backlog);
 	if (engine->ui) cpymo_ui_exit(engine);
 	cpymo_hash_flags_free(&engine->flags);
 	cpymo_text_free(&engine->text);
 	cpymo_say_free(&engine->say);
+	cpymo_backlog_free(&engine->backlog);
 	cpymo_floating_hint_free(&engine->floating_hint);
 	cpymo_scroll_free(&engine->scroll);
 	cpymo_charas_free(&engine->charas);
