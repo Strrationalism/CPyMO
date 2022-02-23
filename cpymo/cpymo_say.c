@@ -23,22 +23,7 @@ static void cpymo_say_lazy_init(cpymo_say *out, cpymo_assetloader *loader)
 {
 	if (out->lazy_init == false) {
 		out->lazy_init = true;
-
-		error_t err = cpymo_say_load_msgbox_and_namebox_image(
-			out,
-			cpymo_parser_stream_span_pure("message"),
-			cpymo_parser_stream_span_pure("name"),
-			loader);
-		
-		if (err != CPYMO_ERR_SUCC) {
-			if (out->msgbox) cpymo_backend_image_free(out->msgbox);
-			if (out->namebox) cpymo_backend_image_free(out->namebox);
-
-			out->msgbox = NULL;
-			out->namebox = NULL;
-		}
-
-		err = cpymo_assetloader_load_system_image(
+		error_t err = cpymo_assetloader_load_system_image(
 			&out->msg_cursor,
 			&out->msg_cursor_w,
 			&out->msg_cursor_h,

@@ -12,6 +12,7 @@
 error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_script_name)
 {
 	const char *script_format =
+		"#textbox message,name\n"
 		"#bg logo1\n"
 		"#bg logo2\n"
 		"#change %s";

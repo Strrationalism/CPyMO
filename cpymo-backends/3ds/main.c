@@ -21,7 +21,7 @@
 #include <cpymo_backend_text.h>
 
 cpymo_engine engine;
-C3D_RenderTarget *screen1, *screen2, *screen3;
+C3D_RenderTarget *screen1, *screen2, *screen3 = NULL;
 float render_3d_offset;
 bool fill_screen;
 
@@ -33,8 +33,20 @@ extern void cpymo_backend_text_sys_free();
 
 extern const bool cpymo_input_fast_kill_pressed;
 
-const bool enhanced_3ds_display_mode = true;
+bool enhanced_3ds_display_mode = true;
 bool drawing_bottom_screen;
+
+float enhanced_3ds_bottom_yoffset()
+{
+	float ratio = (float)engine.gameconfig.imagesize_w / (float)engine.say.msgbox_w;
+	float msg_h = (float)engine.say.msgbox_h * ratio;
+	float y = (float)engine.gameconfig.imagesize_h - msg_h;
+	float fontsize = cpymo_gameconfig_font_size(&engine.gameconfig);
+	float namebox_h = fontsize * 1.4f;
+	float namebox_y = y - namebox_h;
+	
+	return -namebox_y + 16;
+}
 
 static void ensure_save_dir(const char *gamedir)
 {
@@ -194,9 +206,14 @@ int main(void) {
 			prevSlider = slider;
 		}
 
-		if (hidKeysDown() & KEY_SELECT) {
+		if(hidKeysDown() & KEY_SELECT) {
 			redraw = true;
 			fill_screen = !fill_screen;
+		}
+
+		if(hidKeysDown() & KEY_START) {
+			redraw = true;
+			enhanced_3ds_display_mode = !enhanced_3ds_display_mode;
 		}
 
 		if(redraw) {
@@ -217,13 +234,16 @@ int main(void) {
 				cpymo_backend_image_fill_screen_edges();
 			}
 
-			if(enhanced_3ds_display_mode) {
-				drawing_bottom_screen = true;
-				C2D_TargetClear(screen3, clr);
+			if(screen3) {
 				C2D_SceneBegin(screen3);
-				render_3d_offset = 0;
-				cpymo_engine_draw(&engine);
-				cpymo_backend_image_fill_screen_edges();
+				C2D_TargetClear(screen3, clr);
+
+				if(enhanced_3ds_display_mode) {
+					render_3d_offset = 0;
+					drawing_bottom_screen = true;
+					cpymo_engine_draw(&engine);
+					cpymo_backend_image_fill_screen_edges();
+				}
 			}
 
 			C3D_FrameEnd(0);

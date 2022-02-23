@@ -33,7 +33,9 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
 
 float game_width, game_height;
 float viewport_width, viewport_height;
+float viewport_width_bottom, viewport_height_bottom;
 float offset_x, offset_y;
+float offset_xb, offset_yb;
 
 const extern bool fill_screen;
 
@@ -57,6 +59,7 @@ void cpymo_backend_image_init(float game_w, float game_h)
     game_height = game_h;
 
     float ratio_w = game_w / 400;
+    float ratio_wb = game_w / 320;
     float ratio_h = game_h / 240;
 
     if(ratio_w > ratio_h) {
@@ -68,18 +71,41 @@ void cpymo_backend_image_init(float game_w, float game_h)
         viewport_height = 240;
     }
 
+    if(ratio_wb > ratio_h) {
+        viewport_width_bottom = 320;
+        viewport_height_bottom = game_h / ratio_w;
+    }
+    else {
+        viewport_width_bottom = game_w / ratio_h;
+        viewport_height_bottom = 240;
+    }
+
     offset_x = 400 / 2 - viewport_width / 2;
     offset_y = 240 / 2 - viewport_height / 2;
+    offset_xb = 320 / 2 - viewport_width_bottom / 2;
+    offset_yb = 240 / 2 - viewport_height_bottom / 2;
 }
 
 void trans_size(float *w, float *h) {
-    if(fill_screen) {
-        *w = *w / game_width * (400 + 20);
-        *h = *h / game_height * 240;
+    if(drawing_bottom_screen) {
+        if(fill_screen) {
+            *w = *w / game_width * 320;
+            *h = *h / game_height * 240;
+        }
+        else {
+            *w = *w / game_width * viewport_width_bottom;
+            *h = *h / game_height * viewport_height_bottom;
+        }
     }
     else {
-        *w = *w / game_width * viewport_width;
-        *h = *h / game_height * viewport_height;
+        if(fill_screen) {
+            *w = *w / game_width * (400 + 20);
+            *h = *h / game_height * 240;
+        }
+        else {
+            *w = *w / game_width * viewport_width;
+            *h = *h / game_height * viewport_height;
+        }
     }
 }
 
@@ -91,8 +117,8 @@ void trans_pos(float *x, float *y) {
             *y = *y / game_height * 240;
         }
         else {
-            *x = *x / game_width * viewport_width + offset_x - 40;
-            *y = *y / game_height * viewport_height + offset_y;
+            *x = *x / game_width * viewport_width_bottom + offset_xb;
+            *y = *y / game_height * viewport_height_bottom + offset_yb;
         }
     }
     else {
@@ -113,13 +139,13 @@ void cpymo_backend_image_fill_screen_edges()
     if(drawing_bottom_screen) {
         // enhanced_3ds_display_mode
         if(offset_x > 0.5f) {
-            C2D_DrawRectSolid(- 10, 0, 0, offset_x - 30, 240, col);
-            C2D_DrawRectSolid(offset_x - 30 + viewport_width, 0, 0, offset_x - 30, 240, col);
+            C2D_DrawRectSolid(0, 0, 0, offset_xb, 240, col);
+            C2D_DrawRectSolid(offset_xb + viewport_width_bottom, 0, 0, offset_xb, 240, col);
         }
 
         if(offset_y > 0.5f) {
-            C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
-            C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
+            C2D_DrawRectSolid(0, 0, 0, 320, offset_yb, col);
+            C2D_DrawRectSolid(0, offset_yb + viewport_height_bottom, 0, 320, offset_yb, col);
         }
     }
     else {
@@ -137,14 +163,19 @@ void cpymo_backend_image_fill_screen_edges()
     }
 }
 
+float enhanced_3ds_bottom_yoffset();
+
 void cpymo_backend_image_fill_rects(
 	const float *xywh, size_t count,
 	cpymo_color color, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
 {
+    if(!enhanced_3ds_display_mode_select(draw_type)) return;
+    const float off = drawing_bottom_screen ? enhanced_3ds_bottom_yoffset() : 0;
+
     for(size_t i = 0; i < count; ++i) {
         float x = xywh[i * 4];
-        float y = xywh[i * 4 + 1];
+        float y = xywh[i * 4 + 1] + off;
         float w = xywh[i * 4 + 2];
         float h = xywh[i * 4 + 3];
 
@@ -304,6 +335,9 @@ void cpymo_backend_image_draw(
 	enum cpymo_backend_image_draw_type draw_type)
 {
     if(!enhanced_3ds_display_mode_select(draw_type)) return;
+    if(drawing_bottom_screen) {
+        dsty += enhanced_3ds_bottom_yoffset();
+    }
 
     cpymo_backend_image_3ds *img = (cpymo_backend_image_3ds *)src;
     

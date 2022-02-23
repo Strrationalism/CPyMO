@@ -48,6 +48,8 @@ struct cpymo_backend_text {
 void trans_size(float *w, float *h);
 void trans_pos(float *x, float *y);
 float offset_3d(enum cpymo_backend_image_draw_type type);
+float enhanced_3ds_bottom_yoffset();
+const extern bool drawing_bottom_screen;
 
 const static float text_scale_divisor = 28.0f;
 
@@ -103,6 +105,10 @@ void cpymo_backend_text_free(cpymo_backend_text t)
 void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color col, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
     if(!enhanced_3ds_display_mode_select(draw_type)) return;
+    if(drawing_bottom_screen) {
+        y += enhanced_3ds_bottom_yoffset();
+    }
+
     trans_pos(&x, &y);
 
     u8 a = (u8)(alpha * 255.0f);
