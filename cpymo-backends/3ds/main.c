@@ -38,14 +38,19 @@ bool drawing_bottom_screen;
 
 float enhanced_3ds_bottom_yoffset()
 {
-	float ratio = (float)engine.gameconfig.imagesize_w / (float)engine.say.msgbox_w;
-	float msg_h = (float)engine.say.msgbox_h * ratio;
-	float y = (float)engine.gameconfig.imagesize_h - msg_h;
-	float fontsize = cpymo_gameconfig_font_size(&engine.gameconfig);
-	float namebox_h = fontsize * 1.4f;
-	float namebox_y = y - namebox_h;
-	
-	return -namebox_y + 16;
+	if(engine.say.msgbox && engine.say.namebox) {
+		float ratio = (float)engine.gameconfig.imagesize_w / (float)engine.say.msgbox_w;
+		float msg_h = (float)engine.say.msgbox_h * ratio;
+		float y = (float)engine.gameconfig.imagesize_h - msg_h;
+		float fontsize = cpymo_gameconfig_font_size(&engine.gameconfig);
+		float namebox_h = fontsize * 1.4f;
+		float namebox_y = y - namebox_h;
+		
+		return -namebox_y + 16;
+	}
+	else {
+		return 0;
+	}
 }
 
 static void ensure_save_dir(const char *gamedir)

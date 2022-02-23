@@ -142,14 +142,11 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	error_t err = cpymo_interpreter_dispatch(command, interpreter, engine, cont);
 	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_INVALID_ARG) {
 		cpymo_parser_next_line(&interpreter->script_parser);
-		return err;
-	}
-
-	if (err == CPYMO_ERR_INVALID_ARG) {
-		fprintf(stderr,
-			"[Error] Invalid arguments in script %s(%d).", 
-			interpreter->script_name, 
-			(int)interpreter->script_parser.cur_line);
+		
+		printf("[Error] In script \'%s\'(%d): %s\n",
+			interpreter->script_name,
+			(int)interpreter->script_parser.cur_line,
+			cpymo_error_message(err));
 	}
 
 	if (!cpymo_parser_next_line(&interpreter->script_parser))

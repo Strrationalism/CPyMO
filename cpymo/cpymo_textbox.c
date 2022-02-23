@@ -238,10 +238,10 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
     tb->timer += dt;
 
     bool go =
-        CPYMO_INPUT_JUST_PRESSED(e, ok) 
+        CPYMO_INPUT_JUST_RELEASED(e, ok) 
         || e->input.skip 
-        || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)
-        || CPYMO_INPUT_JUST_PRESSED(e, down)
+        || CPYMO_INPUT_JUST_RELEASED(e, mouse_button)
+        || CPYMO_INPUT_JUST_RELEASED(e, down)
         || e->input.mouse_wheel_delta < 0;
 
     if (tb->timer >= 0.5f) {
