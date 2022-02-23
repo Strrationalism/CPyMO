@@ -6,6 +6,7 @@
 #include <cpymo_interpreter.h>
 #include <string.h>
 #include <cpymo_backend_text.h>
+#include <libavutil/log.h>
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -81,6 +82,8 @@ static void ensure_save_dir(const char *gamedir)
 int main(int argc, char **argv) 
 {
 	//_CrtSetBreakAlloc(529);
+
+	av_log_set_level(AV_LOG_ERROR);
 
 	engine.audio.enabled = false;
 

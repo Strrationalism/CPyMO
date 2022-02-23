@@ -5,6 +5,7 @@
 #include <citro2d.h>
 #include "select_game.h"
 #include <stdbool.h>
+#include <libavutil/log.h>
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -55,6 +56,8 @@ static void ensure_save_dir(const char *gamedir)
 int main(void) {
 	bool is_new_3ds = false;
 	APT_CheckNew3DS(&is_new_3ds);
+
+	av_log_set_level(AV_LOG_ERROR);
 	
 	fill_screen = false;
 	
