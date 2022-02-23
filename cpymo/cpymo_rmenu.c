@@ -17,10 +17,12 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 	cpymo_rmenu *r = (cpymo_rmenu *)ui_data;
 
 	if (r->alive) {
-		cpymo_wait_update(&r->menu_waiter, e, dt);
+		error_t err = cpymo_wait_update(&r->menu_waiter, e, dt);
+		CPYMO_THROW(err);
 
 		if (r->alive) {
-			cpymo_select_img_update(e, &r->menu, dt);
+			err = cpymo_select_img_update(e, &r->menu, dt);
+			CPYMO_THROW(err);
 		}
 	}
 
@@ -82,7 +84,7 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	case 2: cpymo_backlog_ui_enter(e); break;
 	case 3: cpymo_ui_exit(e); break;
 	case 4:	cpymo_ui_exit(e); break;
-	case 5: cpymo_ui_exit(e); break;
+	case 5: return CPYMO_ERR_NO_MORE_CONTENT;
 	case 6: cpymo_ui_exit(e); break;
 	default:
 		assert(false);
