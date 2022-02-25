@@ -86,8 +86,8 @@ error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t li
 
 error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_parser_stream_span label)
 {
-	cpymo_parser_reset(&interpreter->script_parser);
-
+	bool retring = false;
+RETRY:
 	while (1) {
 		cpymo_parser_stream_span command = 
 			cpymo_parser_curline_pop_command(&interpreter->script_parser);
@@ -103,10 +103,16 @@ error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_pars
 		}
 		else {
 			if (!cpymo_parser_next_line(&interpreter->script_parser)) {
-				char label_name[32];
-				cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
-				fprintf(stderr, "[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
-				return CPYMO_ERR_NOT_FOUND;
+				if (retring) {
+					char label_name[32];
+					cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
+					fprintf(stderr, "[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
+					return CPYMO_ERR_NOT_FOUND;
+				}
+				else {
+					cpymo_parser_reset(&interpreter->script_parser);
+					goto RETRY;
+				}
 			}
 		}
 	}
