@@ -132,6 +132,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		|| out->gameconfig.scripttype[3] != '\0')
 	{
 		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.scripttype);
+		printf("[Warning] If you are running MO1 script or MO2 script, you can convert it using https://github.com/Seng-Jik/cpymo/blob/main/mo2pymo.ps1\n");
 	}
 
 	// load global save data

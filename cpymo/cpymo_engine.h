@@ -93,5 +93,17 @@ static inline bool cpymo_input_foward_key_just_pressed(cpymo_engine *e)
 		e->input.mouse_wheel_delta < 0;
 }
 
+static inline bool cpymo_input_foward_key_just_released(cpymo_engine *e)
+{
+	return
+		CPYMO_INPUT_JUST_RELEASED(e, ok) ||
+		CPYMO_INPUT_JUST_RELEASED(e, mouse_button) ||
+		CPYMO_INPUT_JUST_RELEASED(e, down) ||
+		CPYMO_INPUT_JUST_RELEASED(e, cancel) ||
+		CPYMO_INPUT_JUST_RELEASED(e, up) ||
+		cpymo_engine_skipping(e) ||
+		e->input.mouse_wheel_delta < 0;
+}
+
 #endif
 

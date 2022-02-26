@@ -194,7 +194,7 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb
 {
     tb->timer += dt;
 
-    if (cpymo_input_foward_key_just_pressed(e)) {
+    if (cpymo_input_foward_key_just_released(e)) {
         cpymo_engine_request_redraw(e);
         cpymo_textbox_finalize(tb);
         tb->msg_cursor_visible = true;

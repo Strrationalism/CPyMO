@@ -896,7 +896,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span_copy(condition_str, condition.len + 1, condition);
 			fprintf(
 				stderr, 
-				"[Error] Bad if expression \"%s\" in script %s(%u).", 
+				"[Error] Bad if expression \"%s\" in script %s(%u).\n", 
 				condition_str,
 				interpreter->script_name,
 				(unsigned)interpreter->script_parser.cur_line);
