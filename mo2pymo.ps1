@@ -192,7 +192,7 @@ function Compile-MO1($target, $cmd, $title_list) {
             if ($cmd.Args.Length -gt 2) {
                 $pos = Eval-CharPos $cmd.Args[2]
             }
-            $_ = $target.AppendLine("#chara $cid,$filename,$pos,0")
+            $_ = $target.AppendLine("#chara $cid,$filename,$pos,0,300")
             break
         }
         "cspw" {
@@ -202,7 +202,7 @@ function Compile-MO1($target, $cmd, $title_list) {
             $filename1 = $cmd.Args[2]
             $filename2 = $cmd.Args[3]
 
-            $_ = $target.AppendLine("#chara $cid1,$filename1,25,$cid2,$filename2,75")
+            $_ = $target.AppendLine("#chara $cid1,$filename1,25,$cid2,$filename2,75,300")
             break
         }
         "cpos" {
@@ -224,7 +224,7 @@ function Compile-MO1($target, $cmd, $title_list) {
             $filename1 = $cmd.Args[2]
             $filename2 = $cmd.Args[3]
 
-            $_ = $target.AppendLine("#chara $cid1,$filename1,25,$cid2,$filename2,75")
+            $_ = $target.AppendLine("#chara $cid1,$filename1,25,$cid2,$filename2,75,300")
             break
         }
         "csptime" {
@@ -235,7 +235,7 @@ function Compile-MO1($target, $cmd, $title_list) {
             if ($cmd.Args.Length -gt 2) {
                 $pos = Eval-CharPos $cmd.Args[2]
             }
-            $_ = $target.AppendLine("#chara $cid,$filename,$pos,0")
+            $_ = $target.AppendLine("#chara $cid,$filename,$pos,0,300")
             break
         }
         "fade_out" {
@@ -586,6 +586,8 @@ function Compile-MO2($target, $cmd) {
                 $chr_param += $cmd.Args[$chr_id * 3 + 2]
             }
 
+            $chr_param += "300"
+
             $_ = $target.AppendLine("#chara $(Args $chr_param)")
 
             break
@@ -773,7 +775,8 @@ function Compile-MO2($target, $cmd) {
                 }
             }
 
-            $_ = $target.AppendLine("#chara $cid1,$filename1,$pos1,0,$cid2,$filename2,$pos2,0")
+            $_ = $target.AppendLine("#chara a,300")
+            $_ = $target.AppendLine("#chara $cid1,$filename1,$pos1,0,$cid2,$filename2,$pos2,0,300")
             break
         }
 
@@ -869,7 +872,8 @@ function Compile-MO2($target, $cmd) {
                 $filename = $filename.Substring(0, 6)
             }
 
-            $_ = $target.AppendLine("#chara $($cmd.Args[0]),$filename,$pos,0")
+            $_ = $target.AppendLine("#chara_cls a,300")
+            $_ = $target.AppendLine("#chara $($cmd.Args[0]),$filename,$pos,0,300")
             break
         }
 
