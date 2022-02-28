@@ -1,6 +1,8 @@
 #include "cpymo_config_ui.h"
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
+#include "cpymo_save_global.h"
+#include <assert.h>
 
 typedef struct {
 	cpymo_backend_text show_name;
@@ -66,6 +68,8 @@ static void cpymo_config_ui_deleter(cpymo_engine *e, void *ui_data)
 		if (ui->items[i].show_name) cpymo_backend_text_free(ui->items[i].show_name);
 		if (ui->items[i].show_value) cpymo_backend_text_free(ui->items[i].show_value);
 	}
+
+	cpymo_save_config_save(e);
 }
 
 static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, int item_index, int val)
@@ -99,8 +103,16 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 	case ITEM_VO_VOL:
 		e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = (float)val / 10.0f;
 		break;
-	default: break;
+	case ITEM_FONT_SIZE:
+		e->gameconfig.fontsize = (uint16_t)val;
+		break;
+	case ITEM_TEXT_SPEED:
+		e->gameconfig.textspeed = (unsigned)val;
+		break;
+	default: assert(false);
 	}
+
+	cpymo_engine_request_redraw(e);
 
 	return err;
 }
@@ -109,6 +121,22 @@ static error_t cpymo_config_ui_item_inc(cpymo_engine *e, cpymo_config_ui *ui, in
 {
 	cpymo_config_ui_item *item = ui->items + item_index;
 	int new_val = (item->value + 1) % (item->max_value + 1);
+	if (new_val != item->value) {
+		error_t err = cpymo_config_ui_set_value(e, ui, item_index, new_val);
+		CPYMO_THROW(err);
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_config_ui_item_dec(cpymo_engine *e, cpymo_config_ui *ui, int item_index)
+{
+	cpymo_config_ui_item *item = ui->items + item_index;
+	int new_val = item->value - 1;
+	if (new_val < item->min_value) {
+		new_val = item->max_value;
+	}
+
 	if (new_val != item->value) {
 		error_t err = cpymo_config_ui_set_value(e, ui, item_index, new_val);
 		CPYMO_THROW(err);
