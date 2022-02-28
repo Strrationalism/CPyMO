@@ -146,4 +146,49 @@ error_t cpymo_save_global_save(const cpymo_engine *e)
 	#undef WRITE
 }
 
+error_t cpymo_save_config_save(const cpymo_engine *e)
+{
+	uint16_t config[] = {
+		(uint16_t)(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * UINT16_MAX),
+		(uint16_t)(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * UINT16_MAX),
+		(uint16_t)(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * UINT16_MAX),
+		(uint16_t)e->gameconfig.fontsize,
+		(uint16_t)e->gameconfig.textspeed
+	};
+
+	for (size_t i = 0; i < sizeof(config) / sizeof(config[0]); ++i)
+		config[i] = end_htole16(config[i]);
+	
+	FILE *config_file = cpymo_backend_write_save(e->assetloader.gamedir, "config.csav");
+	if (config_file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	const size_t written = fwrite(config, sizeof(config), 1, config_file);
+	fclose(config_file);
+	if (written != 1) return CPYMO_ERR_UNKNOWN;
+		
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_save_config_load(cpymo_engine *e)
+{
+	uint16_t config[5];
+	FILE *file = cpymo_backend_read_save(e->assetloader.gamedir, "config.csav");
+	if (file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	const size_t read = fread(config, sizeof(config), 1, file);
+	fclose(file);
+	if (read != 1) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	for (size_t i = 0; i < sizeof(config) / sizeof(config[0]); ++i)
+		config[i] = end_le16toh(config[i]);
+
+	e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = config[0] / (float)UINT16_MAX;
+	e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume = config[1] / (float)UINT16_MAX;
+	e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = config[2] / (float)UINT16_MAX;
+	e->gameconfig.fontsize = config[3];
+	e->gameconfig.textspeed = config[4];
+
+	return CPYMO_ERR_SUCC;
+}
+
 

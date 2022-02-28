@@ -135,6 +135,12 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		printf("[Warning] If you are running MO1 script or MO2 script, you can convert it using https://github.com/Seng-Jik/cpymo/blob/main/mo2pymo.ps1\n");
 	}
 
+	// load config
+	err = cpymo_save_config_load(out);
+	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_CAN_NOT_OPEN_FILE) {
+		fprintf(stderr, "[Error] Config data broken! %s\n", cpymo_error_message(err));
+	}
+
 	// load global save data
 	err = cpymo_save_global_load(out);
 	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_CAN_NOT_OPEN_FILE) {
@@ -151,6 +157,10 @@ void cpymo_engine_free(cpymo_engine *engine)
 	error_t err = cpymo_save_global_save(engine);
 	if (err != CPYMO_ERR_SUCC) 
 		fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
+
+	err = cpymo_save_config_save(engine);
+	if (err != CPYMO_ERR_SUCC)
+		fprintf(stderr, "[Error] Can not save config. %s\n", cpymo_error_message(err));
 	
 	if (engine->ui) cpymo_ui_exit(engine);
 	cpymo_hash_flags_free(&engine->flags);
