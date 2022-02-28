@@ -14,6 +14,8 @@ typedef struct {
 typedef struct {
 	cpymo_config_ui_item items[5];
 	float font_size;
+
+	cpymo_key_pluse left, right;
 } cpymo_config_ui;
 
 #define ITEM_BGM_VOL 0
@@ -41,8 +43,8 @@ static void *cpymo_config_ui_get_prev_item(const cpymo_engine *e, const void *ui
 
 static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
-	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data_const(e);
-	cpymo_config_ui_item *item = &ui->items[CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw)];
+	const cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data_const(e);
+	const cpymo_config_ui_item *item = &ui->items[CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw)];
 
 	const float height = (float)e->gameconfig.imagesize_h / 5.0f;
 	y += height / 2 + ui->font_size / 2;
@@ -120,7 +122,10 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 static error_t cpymo_config_ui_item_inc(cpymo_engine *e, cpymo_config_ui *ui, int item_index)
 {
 	cpymo_config_ui_item *item = ui->items + item_index;
-	int new_val = (item->value + 1) % (item->max_value + 1);
+	int new_val = item->value + 1;
+	if (new_val > item->max_value)
+		new_val = item->min_value;
+
 	if (new_val != item->value) {
 		error_t err = cpymo_config_ui_set_value(e, ui, item_index, new_val);
 		CPYMO_THROW(err);
@@ -133,9 +138,8 @@ static error_t cpymo_config_ui_item_dec(cpymo_engine *e, cpymo_config_ui *ui, in
 {
 	cpymo_config_ui_item *item = ui->items + item_index;
 	int new_val = item->value - 1;
-	if (new_val < item->min_value) {
+	if (new_val < item->min_value)
 		new_val = item->max_value;
-	}
 
 	if (new_val != item->value) {
 		error_t err = cpymo_config_ui_set_value(e, ui, item_index, new_val);
@@ -144,6 +148,22 @@ static error_t cpymo_config_ui_item_dec(cpymo_engine *e, cpymo_config_ui *ui, in
 
 	return CPYMO_ERR_SUCC;
 }
+
+static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
+{
+	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
+	cpymo_key_pluse_update(&ui->left, dt, e->input.left);
+	cpymo_key_pluse_update(&ui->right, dt, e->input.right);
+
+	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	if (cpymo_key_pluse_output(&ui->left))
+		cpymo_config_ui_item_dec(e, ui, i);
+	else if (cpymo_key_pluse_output(&ui->right))
+		cpymo_config_ui_item_inc(e, ui, i);
+
+	return CPYMO_ERR_SUCC;
+}
+
 
 static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
 {
@@ -171,6 +191,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	CPYMO_THROW(err);
 
 	cpymo_list_ui_set_scroll_enabled(e, false);
+	cpymo_list_ui_set_custom_update(e, &cpymo_config_ui_update);
 
 	for (size_t i = 0; i < sizeof(ui->items) / sizeof(ui->items[0]); ++i) {
 		ui->items[i].show_name = NULL;
@@ -179,6 +200,9 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 
 	const cpymo_gameconfig *c = &e->gameconfig;
 	ui->font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
+
+	cpymo_key_pluse_init(&ui->left, e->input.left);
+	cpymo_key_pluse_init(&ui->right, e->input.right);
 
 	float width;
 	#define INIT_ITEM(ITEM_ID, TEXT, MIN_VAL, MAX_VAL, CUR_VAL) \

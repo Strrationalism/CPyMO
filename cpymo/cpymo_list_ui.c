@@ -210,6 +210,12 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		}
 	}
 
+	if (ui->custom_update) {
+		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
+		error_t err = ui->custom_update(e, d, obj);
+		CPYMO_THROW(err);
+	}
+
 	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
 		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
 		error_t err = ui->ok(e, obj);
@@ -313,6 +319,7 @@ error_t cpymo_list_ui_enter(
 	data->ok = ok;
 	data->mouse_key_press_time = 0;
 	data->allow_scroll = true;
+	data->custom_update = NULL;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
