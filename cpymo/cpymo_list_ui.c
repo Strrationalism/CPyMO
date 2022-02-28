@@ -108,7 +108,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		ui->mouse_key_press_time = 0;
 	}
 	
-	if (e->input.mouse_button || e->input.mouse_wheel_delta) {
+	if ((e->input.mouse_button || e->input.mouse_wheel_delta) && ui->allow_scroll) {
 		ui->mouse_key_press_time += d;
 		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
 
@@ -312,6 +312,7 @@ error_t cpymo_list_ui_enter(
 	data->selection_relative_to_cur = 0;
 	data->ok = ok;
 	data->mouse_key_press_time = 0;
+	data->allow_scroll = true;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);

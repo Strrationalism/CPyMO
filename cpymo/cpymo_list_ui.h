@@ -27,6 +27,8 @@ typedef struct {
 
 	cpymo_key_pluse key_up, key_down;
 
+	bool allow_scroll;
+
 	float current_y;
 } cpymo_list_ui;
 
@@ -47,6 +49,12 @@ static inline void cpymo_list_ui_set_current_node(struct cpymo_engine *e, void *
 {
 	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
 	ui->current_node = cur;
+}
+
+static inline void cpymo_list_ui_set_scroll_enabled(struct cpymo_engine *e, bool allow_scroll)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
+	ui->allow_scroll = allow_scroll;
 }
 
 static inline void *cpymo_list_ui_data(struct cpymo_engine *e)

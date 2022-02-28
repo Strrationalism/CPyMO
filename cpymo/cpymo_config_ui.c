@@ -30,7 +30,7 @@ static void *cpymo_config_ui_get_next_item(const cpymo_engine *e, const void *ui
 	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC((x + 1));
 }
 
-void *cpymo_config_ui_get_prev_item(const cpymo_engine *e, const void *ui_data, const void *cur)
+static void *cpymo_config_ui_get_prev_item(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
 	uintptr_t x = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
 	if (x == 0) return NULL;
@@ -68,7 +68,7 @@ static void cpymo_config_ui_deleter(cpymo_engine *e, void *ui_data)
 	}
 }
 
-static error_t cpymo_config_ui_set_value(cpymo_config_ui *ui, int item_index, int val)
+static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, int item_index, int val)
 {
 	cpymo_config_ui_item *item = ui->items + item_index;
 
@@ -89,13 +89,40 @@ static error_t cpymo_config_ui_set_value(cpymo_config_ui *ui, int item_index, in
 	if (err != CPYMO_ERR_SUCC)
 		item->show_value = NULL;
 
+	switch (item_index) {
+	case ITEM_BGM_VOL:
+		e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = (float)val / 10.0f;
+		break;
+	case ITEM_SE_VOL:
+		e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume = (float)val / 10.0f;
+		break;
+	case ITEM_VO_VOL:
+		e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = (float)val / 10.0f;
+		break;
+	default: break;
+	}
+
 	return err;
+}
+
+static error_t cpymo_config_ui_item_inc(cpymo_engine *e, cpymo_config_ui *ui, int item_index)
+{
+	cpymo_config_ui_item *item = ui->items + item_index;
+	int new_val = (item->value + 1) % (item->max_value + 1);
+	if (new_val != item->value) {
+		error_t err = cpymo_config_ui_set_value(e, ui, item_index, new_val);
+		CPYMO_THROW(err);
+	}
+
+	return CPYMO_ERR_SUCC;
 }
 
 static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
 {
-	// TODO
-	return CPYMO_ERR_SUCC;
+	return cpymo_config_ui_item_inc(
+		e, 
+		(cpymo_config_ui *)cpymo_list_ui_data(e), 
+		(int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(selected));
 }
 
 error_t cpymo_config_ui_enter(cpymo_engine *e)
@@ -114,6 +141,8 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		false,
 		5);
 	CPYMO_THROW(err);
+
+	cpymo_list_ui_set_scroll_enabled(e, false);
 
 	for (size_t i = 0; i < sizeof(ui->items) / sizeof(ui->items[0]); ++i) {
 		ui->items[i].show_name = NULL;
@@ -136,15 +165,15 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 			cpymo_ui_exit(e); \
 			return err; \
 		} \
-		err = cpymo_config_ui_set_value(ui, ITEM_ID, CUR_VAL); \
+		err = cpymo_config_ui_set_value(e, ui, ITEM_ID, CUR_VAL); \
 		if (err != CPYMO_ERR_SUCC) { \
 			cpymo_ui_exit(e); \
 			return err; \
 		}
 		
-	INIT_ITEM(ITEM_BGM_VOL, "背景音乐音量", 0, 10, (int)(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * 10));
-	INIT_ITEM(ITEM_SE_VOL, "音效音量", 0, 10, (int)(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * 10));
-	INIT_ITEM(ITEM_VO_VOL, "语音音量", 0, 10, (int)(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * 10));
+	INIT_ITEM(ITEM_BGM_VOL, "背景音乐音量", 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * 10));
+	INIT_ITEM(ITEM_SE_VOL, "音效音量", 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * 10));
+	INIT_ITEM(ITEM_VO_VOL, "语音音量", 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * 10));
 	INIT_ITEM(ITEM_TEXT_SPEED, "文字速度", 0, 5, (int)e->gameconfig.textspeed);
 	INIT_ITEM(ITEM_FONT_SIZE, "文字大小", 12, 32, (int)e->gameconfig.fontsize);
 
