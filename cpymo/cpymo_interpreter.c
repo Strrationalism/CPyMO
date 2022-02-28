@@ -2,6 +2,7 @@
 #include "cpymo_engine.h"
 #include "cpymo_album.h"
 #include "cpymo_music_box.h"
+#include "cpymo_config_ui.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -1322,6 +1323,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span_pure(str),
 			date_bg,
 			x, y, col, 1.5f);
+	}
+
+	D("config") {
+		return cpymo_config_ui_enter(engine);
 	}
 	
 	else {

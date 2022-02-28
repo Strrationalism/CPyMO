@@ -1,5 +1,6 @@
 #include "cpymo_rmenu.h"
 #include "cpymo_engine.h"
+#include "cpymo_config_ui.h"
 #include <assert.h>
 
 typedef struct {
@@ -82,7 +83,7 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	case 0: cpymo_ui_exit(e); break;
 	case 1: cpymo_ui_exit(e); break;
 	case 2: cpymo_backlog_ui_enter(e); break;
-	case 3: cpymo_ui_exit(e); break;
+	case 3: cpymo_config_ui_enter(e); break;
 	case 4: {
 		char *gamedir = (char *)malloc(strlen(e->assetloader.gamedir) + 1);
 		if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -179,7 +180,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 	RMENU_ITEM(0, "保存存档", false);
 	RMENU_ITEM(1, "读取存档", false);
 	RMENU_ITEM(2, "对话记录", true);
-	RMENU_ITEM(3, "游戏设置", false)
+	RMENU_ITEM(3, "游戏设置", true)
 	RMENU_ITEM(4, "重启游戏", true);
 	RMENU_ITEM(5, "退出游戏", true);
 	RMENU_ITEM(6, "返回游戏", true);
