@@ -321,27 +321,12 @@ char * select_game()
 	error_t err = load_game_list(&ui);
 	if (err != CPYMO_ERR_SUCC) return NULL;
 
-	/*char *games[] = {
-		"/pymogames/120Y_s60v5",
-		"/pymogames/DAICHYAN_android",
-		"/pymogames/jingbao_android",
-		"/pymogames/LOLItime_android",
-		"/pymogames/mashiro_android",
-		"/pymogames/nastu_s60v3"
-	};
-
-	for (size_t i = 0; i < ui.game_count; i++) {
-		char *str = malloc(32);
-		strcpy(str, games[i]);
-		load_game_info(ui.games + i, &str);
-	}*/
-
 	if (ui.game_count == 0 || ui.games == NULL) {
 		float _;
-		const char *hint1_msg = "No games found.";
+		const char *hint1_msg = "未找到游戏";
 		const char *hint2_msg =
-			"Please make sure folder\"pymogames\" is in SD card root,\n"
-			"and that you have at least one game in it.\n";
+			"你需要将游戏放在SD卡中的\"pymogames\"文件夹下，\n"
+			"并确保路径中只包含英文、数字和下划线。\n";
 
 		error_t err = cpymo_backend_text_create(&ui.hint1, &_, 
 			cpymo_parser_stream_span_pure(hint1_msg), GAME_INFO_FONT_SIZE);
