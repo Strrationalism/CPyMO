@@ -83,8 +83,6 @@ int main(void) {
 	
 	gfxInitDefault();
 
-	const char *gamedir = "/pymogames/startup";
-
 	gfxSet3D(true);
 
 	if(!enhanced_3ds_display_mode) {
@@ -96,34 +94,17 @@ int main(void) {
 		osSetSpeedupEnable(true);
 	}
 
-	ensure_save_dir(gamedir);
-
 	engine.audio.enabled = false;
 
-	extern void cpymo_backend_audio_init();
-	cpymo_backend_audio_init();
-
-	error_t err = cpymo_engine_init(&engine, gamedir);
-	if (err != CPYMO_ERR_SUCC) {
-		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
-		gfxExit();
-		return -1;
-	}
-
-	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
-
-
 	if (!C3D_Init(C3D_DEFAULT_CMDBUF_SIZE)) {
-		cpymo_engine_free(&engine);
 		gfxExit();
-		return -1;
+		return 0;
 	}
 
 	if (!C2D_Init(C2D_DEFAULT_MAX_OBJECTS)) {
 		C3D_Fini();
-		cpymo_engine_free(&engine);
 		gfxExit();
-		return -1;
+		return 0;
 	}
 
 	C2D_Prepare();
@@ -132,9 +113,8 @@ int main(void) {
 	if(screen1 == NULL) {
 		C2D_Fini();
 		C3D_Fini();
-		cpymo_engine_free(&engine);
 		gfxExit();
-		return -1;
+		return 0;
 	}
 
 	screen2 = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
@@ -142,33 +122,61 @@ int main(void) {
 		C3D_RenderTargetDelete(screen1);
 		C2D_Fini();
 		C3D_Fini();
-		cpymo_engine_free(&engine);
 		gfxExit();
-		return -1;
-	}
-
-	if(enhanced_3ds_display_mode) {
-		screen3 = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-		if(screen3 == NULL) {
-			C3D_RenderTargetDelete(screen1);
-			C3D_RenderTargetDelete(screen2);
-			C2D_Fini();
-			C3D_Fini();
-			cpymo_engine_free(&engine);
-			gfxExit();
-			return -1;
-		}
+		return 0;
 	}
 
 	if(cpymo_backend_text_sys_init() != CPYMO_ERR_SUCC) {
 		C3D_RenderTargetDelete(screen1);
 		C3D_RenderTargetDelete(screen2);
-		C3D_RenderTargetDelete(screen3);
 		C2D_Fini();
 		C3D_Fini();
-		cpymo_engine_free(&engine);
 		gfxExit();
-		return -1;
+		return 0;
+	}
+
+	cpymo_backend_image_init(400, 320);
+	char *gamedir = select_game();
+	if (gamedir == NULL) {
+		cpymo_backend_text_sys_free();
+		C3D_RenderTargetDelete(screen1);
+		C3D_RenderTargetDelete(screen2);
+		C2D_Fini();
+		C3D_Fini();
+		gfxExit();
+		return 0;
+	}
+
+	extern void cpymo_backend_audio_init();
+	cpymo_backend_audio_init();
+
+	ensure_save_dir(gamedir);
+	error_t err = cpymo_engine_init(&engine, gamedir);
+	free(gamedir);
+	if (err != CPYMO_ERR_SUCC) {
+		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
+		cpymo_backend_text_sys_free();
+		C3D_RenderTargetDelete(screen1);
+		C3D_RenderTargetDelete(screen2);
+		C2D_Fini();
+		C3D_Fini();
+		gfxExit();
+		return 0;
+	}
+
+	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
+
+	if(enhanced_3ds_display_mode) {
+		screen3 = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+		if(screen3 == NULL) {
+			cpymo_engine_free(&engine);
+			C3D_RenderTargetDelete(screen1);
+			C3D_RenderTargetDelete(screen2);
+			C2D_Fini();
+			C3D_Fini();
+			gfxExit();
+			return 0;
+		}
 	}
 
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
