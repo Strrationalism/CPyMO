@@ -135,7 +135,7 @@ static void draw_select_game(const select_game_ui *ui)
 {
 	if (ui->hint1) {
 		cpymo_backend_text_draw(
-			ui->hint1, 127, 100, cpymo_color_white, 0.5f,
+			ui->hint1, 145, 100, cpymo_color_white, 0.5f,
 			cpymo_backend_image_draw_type_ui_element);
 
 		cpymo_backend_text_draw(
