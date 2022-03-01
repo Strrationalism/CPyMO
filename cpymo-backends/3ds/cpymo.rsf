@@ -2,7 +2,7 @@ BasicInfo:
   Title                   : "CPyMO"
   ProductCode             : "CTR-HB-PYMO"
   ContentType             : Application
-  Logo                    : iQueForSystem
+  Logo                    : Homebrew
 
 RomFs:
   RootPath                : romfs
