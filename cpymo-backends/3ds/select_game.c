@@ -9,11 +9,13 @@
 #include <cpymo_gameconfig.h>
 #include <stb_image.h>
 #include "cpymo_backend_input.h"
+#include <cpymo_key_pulse.h>
 
 extern C3D_RenderTarget *screen1, *screen2;
 extern float render_3d_offset;
 extern bool drawing_bottom_screen;
 extern const bool cpymo_input_fast_kill_pressed;
+extern bool enhanced_3ds_display_mode;
 
 typedef struct {
 	float name_width;
@@ -100,7 +102,11 @@ typedef struct {
 	game_info *games;
 	cpymo_input prev_input;
 
+	size_t current_screen_first_game_id;
+	size_t selected_game_rel_to_cur_first;
+
 	cpymo_backend_text hint1, hint2;
+	cpymo_key_pluse key_up, key_down;
 
 	char *ok;
 
@@ -136,8 +142,11 @@ static void draw_select_game(const select_game_ui *ui)
 			cpymo_backend_image_draw_type_ui_element);
 	}
 	else {
+		int current_selected = ui->current_screen_first_game_id + ui->selected_game_rel_to_cur_first;
 		for (size_t i = 0; i < ITEMS_PER_SCREEN; ++i)
-			draw_game_info(ui->games, i * ITEM_HEIGHT, i == 1);
+			if (ui->current_screen_first_game_id + i < ui->game_count)
+				draw_game_info(&ui->games[ui->current_screen_first_game_id + i], i * ITEM_HEIGHT, 
+					current_selected == ui->current_screen_first_game_id + i);
 	}
 }
 
@@ -153,9 +162,40 @@ static void update_select_game(select_game_ui *ui)
 
 	cpymo_input input = cpymo_input_snapshot();
 
+	size_t cursel = ui->current_screen_first_game_id + ui->selected_game_rel_to_cur_first;
+
 	if (input.ok) {
-		select_game_ok(ui, ui->games);
+		if (input.skip) 
+			enhanced_3ds_display_mode = false;
+		
+		select_game_ok(ui, ui->games + cursel);
 		return;
+	}
+
+	cpymo_key_pluse_update(&ui->key_up, 0.016f, input.up);
+	cpymo_key_pluse_update(&ui->key_down, 0.016f, input.down);
+
+	if (cpymo_key_pluse_output(&ui->key_down)) {
+		if (cursel + 1 < ui->game_count) {
+			ui->selected_game_rel_to_cur_first++;
+			if (ui->selected_game_rel_to_cur_first >= ITEMS_PER_SCREEN) {
+				ui->current_screen_first_game_id++;
+				ui->selected_game_rel_to_cur_first--;
+				ui->redraw = true;
+			}
+		}
+	}
+	else if (cpymo_key_pluse_output(&ui->key_up)) {
+		if (cursel > 0) {
+			if (ui->selected_game_rel_to_cur_first > 0) {
+				ui->selected_game_rel_to_cur_first--;
+			}
+			else {
+				ui->current_screen_first_game_id--;
+			}
+
+			ui->redraw = true;
+		}
 	}
 
 	ui->prev_input = input;
@@ -165,15 +205,31 @@ char * select_game()
 {
 	select_game_ui ui;
 	ui.redraw = true;
-	ui.games = malloc(sizeof(game_info));
-	ui.game_count = 1;
+	ui.games = malloc(sizeof(game_info) * 16);
+	ui.game_count = 6;
 	ui.ok = NULL;
 	ui.hint1 = NULL;
 	ui.hint2 = NULL;
+	ui.current_screen_first_game_id = 0;
+	ui.selected_game_rel_to_cur_first = 0;
 
-	char *str = malloc(32);
-	strcpy(str, "/pymogames/mashiro_android");
-	load_game_info(ui.games, &str);
+	cpymo_key_pluse_init(&ui.key_down, false);
+	cpymo_key_pluse_init(&ui.key_up, false);
+
+	char *games[] = {
+		"/pymogames/120Y_s60v5",
+		"/pymogames/DAICHYAN_android",
+		"/pymogames/jingbao_android",
+		"/pymogames/LOLItime_android",
+		"/pymogames/mashiro_android",
+		"/pymogames/nastu_s60v3"
+	};
+
+	for (size_t i = 0; i < ui.game_count; i++) {
+		char *str = malloc(32);
+		strcpy(str, games[i]);
+		load_game_info(ui.games + i, &str);
+	}
 
 	if (ui.game_count == 0 || ui.games == NULL) {
 		float _;
@@ -224,7 +280,7 @@ char * select_game()
 		gspWaitForVBlank();
 	}
 
-	free_all_game_info(ui.games, ui.game_count);
+	if (ui.games) free_all_game_info(ui.games, ui.game_count);
 	if (ui.hint1) cpymo_backend_text_free(ui.hint1);
 	if (ui.hint2) cpymo_backend_text_free(ui.hint2);
 

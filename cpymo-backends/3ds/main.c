@@ -85,11 +85,6 @@ int main(void) {
 
 	gfxSet3D(true);
 
-	if(!enhanced_3ds_display_mode) {
-		consoleInit(GFX_BOTTOM, NULL);
-		gfxSetDoubleBuffering(GFX_BOTTOM, false);
-	}
-
 	if(is_new_3ds) {
 		osSetSpeedupEnable(true);
 	}
@@ -145,6 +140,11 @@ int main(void) {
 		C3D_Fini();
 		gfxExit();
 		return 0;
+	}
+
+	if(!enhanced_3ds_display_mode) {
+		consoleInit(GFX_BOTTOM, NULL);
+		gfxSetDoubleBuffering(GFX_BOTTOM, false);
 	}
 
 	extern void cpymo_backend_audio_init();
@@ -224,7 +224,7 @@ int main(void) {
 			fill_screen = !fill_screen;
 		}
 
-		if(hidKeysDown() & KEY_START) {
+		if((hidKeysDown() & KEY_START) && screen3 != NULL) {
 			redraw = true;
 			enhanced_3ds_display_mode = !enhanced_3ds_display_mode;
 		}
