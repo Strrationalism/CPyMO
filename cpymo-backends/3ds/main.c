@@ -19,6 +19,7 @@
 #include <stb_image_write.h>
 
 #include <cpymo_backend_text.h>
+#include "cpymo_backend_save.h"
 
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2, *screen3 = NULL;
@@ -71,6 +72,41 @@ static void ensure_save_dir(const char *gamedir)
 	FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, path), FS_ATTRIBUTE_DIRECTORY);
 	FSUSER_CloseArchive(archive);
 	fsExit();
+}
+
+static void save_screen_mode()
+{
+	FILE *sav = cpymo_backend_write_save(engine.assetloader.gamedir, "3ds-display-mode.csav");
+
+	if (sav) {
+		uint8_t save = fill_screen;
+		save = save << 1;
+		save = save | enhanced_3ds_display_mode;
+		fwrite(&save, sizeof(save), 1, sav);
+		fclose(sav);
+	}
+}
+
+static void load_screen_mode()
+{
+	FILE *sav = cpymo_backend_read_save(engine.assetloader.gamedir, "3ds-display-mode.csav");
+
+	if (sav) {
+		uint8_t save;
+
+		if (fread(&save, sizeof(save), 1, sav) == 1) {
+			bool enhanced = save & 1;
+			save = save >> 1;
+			fill_screen = save;
+
+			if (enhanced_3ds_display_mode == true) {
+				if (enhanced == false)
+					enhanced_3ds_display_mode = false;
+			}
+		}
+
+		fclose(sav);
+	}
 }
 
 int main(void) {
@@ -163,6 +199,8 @@ int main(void) {
 		gfxExit();
 		return 0;
 	}
+
+	load_screen_mode();
 
 	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 
@@ -268,6 +306,8 @@ int main(void) {
 	}
 
 	EXIT:
+
+	save_screen_mode();
 
 	cpymo_backend_text_sys_free();
 	if(enhanced_3ds_display_mode) C3D_RenderTargetDelete(screen3);
