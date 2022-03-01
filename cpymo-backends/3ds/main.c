@@ -200,8 +200,6 @@ int main(void) {
 		return 0;
 	}
 
-	load_screen_mode();
-
 	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 
 	if(enhanced_3ds_display_mode) {
@@ -216,6 +214,8 @@ int main(void) {
 			return 0;
 		}
 	}
+	
+	load_screen_mode();
 
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
 
