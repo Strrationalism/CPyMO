@@ -10,6 +10,7 @@
 #include <stb_image.h>
 #include "cpymo_backend_input.h"
 #include <cpymo_key_pulse.h>
+#include <cpymo_utils.h>
 
 extern C3D_RenderTarget *screen1, *screen2;
 extern float render_3d_offset;
@@ -154,6 +155,12 @@ static void select_game_ok(select_game_ui *ui, game_info *info)
 {
 	ui->ok = info->path;
 	info->path = NULL;
+
+	FILE *last_game_record = fopen("/pymogames/last_game.txt", "wb");
+	if (last_game_record) {
+		fwrite(ui->ok, strlen(ui->ok), 1, last_game_record);
+		fclose(last_game_record);
+	}
 }
 
 static void update_select_game(select_game_ui *ui) 
@@ -220,6 +227,17 @@ static error_t load_game_list(select_game_ui *ui)
 		return CPYMO_ERR_UNKNOWN;
 	}
 
+	cpymo_parser_stream_span last_loaded_game;
+	last_loaded_game.begin = NULL;
+	last_loaded_game.len = 0;
+
+	error_t err2 = cpymo_utils_loadfile(
+		"/pymogames/last_game.txt", (char **)&last_loaded_game.begin, &last_loaded_game.len);
+	if (err2 != CPYMO_ERR_SUCC) {
+		last_loaded_game.begin = NULL;
+		last_loaded_game.len = 0;
+	}
+
 	size_t buf_size = 0;
 
 	u32 result = 0;
@@ -254,16 +272,29 @@ static error_t load_game_list(select_game_ui *ui)
 
 				if (games == NULL) {
 					free_game_info(&info);
+					if (last_loaded_game.begin) free((char *)last_loaded_game.begin);
 					return CPYMO_ERR_SUCC;
 				}
 
 				ui->games = games;
 			}
 
+			if (cpymo_parser_stream_span_equals_str(last_loaded_game, info.path)) {
+				ui->current_screen_first_game_id = ui->game_count;
+				ui->selected_game_rel_to_cur_first = 0;
+
+				if (ui->current_screen_first_game_id > 0) {
+					ui->current_screen_first_game_id--;
+					ui->selected_game_rel_to_cur_first++;
+				}
+			}
+
 			ui->games[ui->game_count++] = info;
 		}
 
 	} while(result);
+
+	if (last_loaded_game.begin) free((char *)last_loaded_game.begin);
 
 	FSDIR_Close(handle);
 	FSUSER_CloseArchive(archive);
