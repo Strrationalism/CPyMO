@@ -177,7 +177,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 
 		void *selected = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
 		if (ui->get_prev(e, ui + 1, selected) == NULL) {
-			if (just_press_up) {
+			if (CPYMO_INPUT_JUST_RELEASED(e, up)) {
 				cpymo_list_ui_exit(e);
 				return CPYMO_ERR_SUCC;
 			}
