@@ -83,8 +83,17 @@ Unpack a pymo package:
 你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
 ### 启动
-你需要将你的游戏放置于`SDMC:/pymogames/startup`下，之后CPyMO for 3DS会自动启动该目录下的游戏。    
+你需要将你的游戏放置于`SDMC:/pymogames/`下，保证路径中只有半角英文、数字和下划线，之后该游戏便会被CPyMO for 3DS检测到。   
 如果你已经安装了Citra且citra命令可用，你可以直接使用`make run`来调用Citra模拟器来启动CPyMO。    
+
+CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。    
+在New 3DS系列上按下ZL键可以快速退出游戏。    
+按下Start键会在切换在“上屏/下屏”显示对话文本。    
+按下Select键会切换使用“拉伸/适应”方式显示游戏画面。    
+
+### 以调试模式启动
+如果你需要查看CPyMO控制台，你需要在游戏列表中按住R键，同时按下A键选择游戏，即可激活调试模式。    
+在这种模式下，下屏会显示CPyMO控制台，Start键将不再可用，对话文本会被强制显示在上屏。    
 
 #### 如果无法启动CIA版本的话？
 
