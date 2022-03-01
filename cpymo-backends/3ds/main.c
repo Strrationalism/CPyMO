@@ -135,7 +135,7 @@ int main(void) {
 		return 0;
 	}
 
-	cpymo_backend_image_init(400, 320);
+	cpymo_backend_image_init(400, 240);
 	char *gamedir = select_game();
 	if (gamedir == NULL) {
 		cpymo_backend_text_sys_free();

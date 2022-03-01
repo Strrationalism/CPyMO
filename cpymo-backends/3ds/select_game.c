@@ -23,7 +23,10 @@ typedef struct {
 	cpymo_backend_image icon;
 } game_info;
 
-#define GAME_INFO_FONT_SIZE 24
+#define GAME_INFO_FONT_SIZE 22
+#define GAME_ICON_SIZE 64
+#define ITEM_HEIGHT 80
+#define ITEMS_PER_SCREEN 3
 
 static void free_game_info(game_info *g) 
 {
@@ -97,25 +100,45 @@ typedef struct {
 	game_info *games;
 	cpymo_input prev_input;
 
+	cpymo_backend_text hint1, hint2;
+
 	char *ok;
 
 	bool redraw;
 } select_game_ui;
 
-static void draw_game_info(const game_info *info, float y) 
+static void draw_game_info(const game_info *info, float y, bool selected) 
 {
+	if (selected) {
+		float xywh[] = { 0, y, 400, ITEM_HEIGHT };
+		cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, 
+			cpymo_backend_image_draw_type_ui_element);
+	}
+
 	if (info->icon) {
-		cpymo_backend_image_draw(0, y + 6, 72, 72, info->icon, 0, 0, 
+		cpymo_backend_image_draw(16, y + 6, GAME_ICON_SIZE, GAME_ICON_SIZE, info->icon, 0, 0, 
 			info->icon_w, info->icon_h, 1.0f, cpymo_backend_image_draw_type_ui_element);
 	}
 
-	cpymo_backend_text_draw(info->name, 76, y + GAME_INFO_FONT_SIZE, cpymo_color_white, 1.0f,
+	cpymo_backend_text_draw(info->name, 76 + 16, y + GAME_INFO_FONT_SIZE, cpymo_color_white, 1.0f,
 		cpymo_backend_image_draw_type_ui_element);
 }
 
 static void draw_select_game(const select_game_ui *ui) 
 {
-	draw_game_info(ui->games, 0);
+	if (ui->hint1) {
+		cpymo_backend_text_draw(
+			ui->hint1, 127, 100, cpymo_color_white, 0.5f,
+			cpymo_backend_image_draw_type_ui_element);
+
+		cpymo_backend_text_draw(
+			ui->hint2, 20, 130, cpymo_color_white, 0.25f,
+			cpymo_backend_image_draw_type_ui_element);
+	}
+	else {
+		for (size_t i = 0; i < ITEMS_PER_SCREEN; ++i)
+			draw_game_info(ui->games, i * ITEM_HEIGHT, i == 1);
+	}
 }
 
 static void select_game_ok(select_game_ui *ui, game_info *info)
@@ -126,6 +149,8 @@ static void select_game_ok(select_game_ui *ui, game_info *info)
 
 static void update_select_game(select_game_ui *ui) 
 {
+	if (ui->hint1) return;
+
 	cpymo_input input = cpymo_input_snapshot();
 
 	if (input.ok) {
@@ -143,11 +168,31 @@ char * select_game()
 	ui.games = malloc(sizeof(game_info));
 	ui.game_count = 1;
 	ui.ok = NULL;
-	if (ui.game_count == 0 || ui.games == NULL) return NULL;
+	ui.hint1 = NULL;
+	ui.hint2 = NULL;
 
 	char *str = malloc(32);
-	strcpy(str, "/pymogames/startup");
+	strcpy(str, "/pymogames/mashiro_android");
 	load_game_info(ui.games, &str);
+
+	if (ui.game_count == 0 || ui.games == NULL) {
+		float _;
+		const char *hint1_msg = "No games found.";
+		const char *hint2_msg =
+			"Please make sure folder\"pymogames\" is in SD card root,\n"
+			"and that you have at least one game in it.\n";
+
+		error_t err = cpymo_backend_text_create(&ui.hint1, &_, 
+			cpymo_parser_stream_span_pure(hint1_msg), GAME_INFO_FONT_SIZE);
+		if (err != CPYMO_ERR_SUCC) return NULL;
+
+		err = cpymo_backend_text_create(&ui.hint2, &_, 
+			cpymo_parser_stream_span_pure(hint2_msg), GAME_INFO_FONT_SIZE / 1.3f);
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_backend_text_free(ui.hint1);
+			return NULL;
+		}
+	}
 	
 	drawing_bottom_screen = false;
 	float prevSlider = NAN;
@@ -180,5 +225,8 @@ char * select_game()
 	}
 
 	free_all_game_info(ui.games, ui.game_count);
+	if (ui.hint1) cpymo_backend_text_free(ui.hint1);
+	if (ui.hint2) cpymo_backend_text_free(ui.hint2);
+
 	return ui.ok;
 }
