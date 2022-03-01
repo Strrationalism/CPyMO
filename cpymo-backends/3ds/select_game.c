@@ -201,12 +201,83 @@ static void update_select_game(select_game_ui *ui)
 	ui->prev_input = input;
 }
 
+static error_t load_game_list(select_game_ui *ui)
+{
+	if (R_FAILED(fsInit())) return CPYMO_ERR_UNKNOWN;
+
+	FS_Archive archive;
+	Result err = FSUSER_OpenArchive(&archive, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
+	if (R_FAILED(err)) {
+		fsExit();
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	Handle handle;
+	err = FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, "/pymogames/"));
+	if (R_FAILED(err)) {
+		FSUSER_CloseArchive(archive);
+		fsExit();
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	size_t buf_size = 0;
+
+	u32 result = 0;
+	do {
+		FS_DirectoryEntry item;
+		err = FSDIR_Read(handle, &result, 1, &item);
+		if (R_FAILED(err)) continue;
+		if (result != 1) continue;
+		if ((item.attributes & FS_ATTRIBUTE_DIRECTORY) == 0) continue;
+
+		size_t name_len = 0;
+		for (size_t i = 0; i < sizeof(item.name) / sizeof(item.name[0]); ++i) {
+			if (item.name[i] == 0) break;
+			name_len++;
+		}
+
+		char *path = (char *)malloc(name_len + 12);
+		if (path == NULL) continue;
+
+		strcpy(path, "/pymogames/");
+		for (size_t i = 0; i < name_len; ++i)
+			path[i + 11] = (char)item.name[i];
+		path[name_len + 11] = '\0';
+
+		game_info info;
+		error_t err2 = load_game_info(&info, &path);
+
+		if (err2 == CPYMO_ERR_SUCC) {
+			if (ui->game_count + 1 > buf_size) {
+				buf_size = (buf_size + 1) * 2;
+				game_info *games = (game_info *)realloc(ui->games, buf_size * sizeof(game_info));
+
+				if (games == NULL) {
+					free_game_info(&info);
+					return CPYMO_ERR_SUCC;
+				}
+
+				ui->games = games;
+			}
+
+			ui->games[ui->game_count++] = info;
+		}
+
+	} while(result);
+
+	FSDIR_Close(handle);
+	FSUSER_CloseArchive(archive);
+	fsExit();
+
+	return CPYMO_ERR_SUCC;
+}
+
 char * select_game()
 {
 	select_game_ui ui;
 	ui.redraw = true;
-	ui.games = malloc(sizeof(game_info) * 16);
-	ui.game_count = 6;
+	ui.games = NULL;
+	ui.game_count = 0;
 	ui.ok = NULL;
 	ui.hint1 = NULL;
 	ui.hint2 = NULL;
@@ -216,7 +287,10 @@ char * select_game()
 	cpymo_key_pluse_init(&ui.key_down, false);
 	cpymo_key_pluse_init(&ui.key_up, false);
 
-	char *games[] = {
+	error_t err = load_game_list(&ui);
+	if (err != CPYMO_ERR_SUCC) return NULL;
+
+	/*char *games[] = {
 		"/pymogames/120Y_s60v5",
 		"/pymogames/DAICHYAN_android",
 		"/pymogames/jingbao_android",
@@ -229,7 +303,7 @@ char * select_game()
 		char *str = malloc(32);
 		strcpy(str, games[i]);
 		load_game_info(ui.games + i, &str);
-	}
+	}*/
 
 	if (ui.game_count == 0 || ui.games == NULL) {
 		float _;
