@@ -215,6 +215,8 @@ typedef struct {
 	int showing_cg_image_w, showing_cg_image_h;
 	cpymo_parser showing_cg_filename_parser;
 	size_t showing_cg_next_cg_id;
+
+	cpymo_key_pluse key_up, key_down, key_left, key_right;
 } cpymo_album;
 
 uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
@@ -443,6 +445,11 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 {
 	cpymo_album *album = (cpymo_album *)a;
 
+	cpymo_key_pluse_update(&album->key_left, dt, e->input.left);
+	cpymo_key_pluse_update(&album->key_up, dt, e->input.up);
+	cpymo_key_pluse_update(&album->key_right, dt, e->input.right);
+	cpymo_key_pluse_update(&album->key_down, dt, e->input.down);
+
 	if (album->showing_cg) {
 		if (CPYMO_INPUT_JUST_PRESSED(e, ok) || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
 			cpymo_album_showing_cg_next(e, album);
@@ -494,10 +501,10 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		album->mouse_x_sum = 0;
 
 	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) return cpymo_album_select_ok(e, album);
-	if (CPYMO_INPUT_JUST_PRESSED(e, left)) return cpymo_album_prev_page(e, album);
-	if (CPYMO_INPUT_JUST_PRESSED(e, right)) return cpymo_album_next_page(e, album);
+	if (cpymo_key_pluse_output(&album->key_left)) return cpymo_album_prev_page(e, album);
+	if (cpymo_key_pluse_output(&album->key_right)) return cpymo_album_next_page(e, album);
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, down)) {
+	if (cpymo_key_pluse_output(&album->key_down)) {
 		album->current_cg_selection++;
 		cpymo_engine_request_redraw(e);
 
@@ -506,7 +513,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		return CPYMO_ERR_SUCC;
 	}
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, up)) {
+	if (cpymo_key_pluse_output(&album->key_up)) {
 		cpymo_engine_request_redraw(e);
 		album->current_cg_selection--;
 		if (album->current_cg_selection < 0) {
@@ -633,6 +640,11 @@ error_t cpymo_album_enter(
 	album->ignore_mouse_button_release = 1;
 	album->showing_cg = NULL;
 	album->showing_cg_image = NULL;
+
+	cpymo_key_pluse_init(&album->key_left, e->input.left);
+	cpymo_key_pluse_init(&album->key_right, e->input.right);
+	cpymo_key_pluse_init(&album->key_up, e->input.up);
+	cpymo_key_pluse_init(&album->key_down, e->input.down);
 
 	char *buf = NULL;
 	size_t buf_size;
