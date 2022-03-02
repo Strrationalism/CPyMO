@@ -39,7 +39,7 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 
 	float bg_xywh[4] = {
 		((float)e->gameconfig.imagesize_w - (float)r->bg_w) / 2,
-		((float)e->gameconfig.imagesize_h - (float)r->bg_h) / 2,
+		((float)e->gameconfig.imagesize_h - (float)r->bg_h) / 2 - 0.018f * (float)e->gameconfig.imagesize_h,
 		(float)r->bg_w,
 		(float)r->bg_h,
 	};
@@ -82,9 +82,11 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	switch (sel) {
 	case 0: cpymo_ui_exit(e); break;
 	case 1: cpymo_ui_exit(e); break;
-	case 2: cpymo_backlog_ui_enter(e); break;
-	case 3: cpymo_config_ui_enter(e); break;
-	case 4: {
+	case 2: e->skipping = true; cpymo_ui_exit(e); break;
+	case 3: cpymo_ui_exit(e); break;
+	case 4: cpymo_backlog_ui_enter(e); break;
+	case 5: cpymo_config_ui_enter(e); break;
+	case 6: {
 		char *gamedir = (char *)malloc(strlen(e->assetloader.gamedir) + 1);
 		if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;
 		
@@ -96,8 +98,7 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 		CPYMO_THROW(err);
 		break;
 	}
-	case 5: return CPYMO_ERR_NO_MORE_CONTENT;
-	case 6: cpymo_ui_exit(e); break;
+	case 7: cpymo_ui_exit(e); break;
 	default:
 		assert(false);
 	}
@@ -151,7 +152,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 
 	err = cpymo_select_img_configuare_begin(
 		&rmenu->menu,
-		7,
+		8,
 		cpymo_parser_stream_span_pure(""),
 		&e->assetloader,
 		&e->gameconfig);
@@ -159,6 +160,8 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		cpymo_ui_exit(e);
 		return err;
 	}
+
+	const float font_size = 16 / 240.0f * e->gameconfig.imagesize_h * 0.75f;
 
 	#define RMENU_ITEM(_, TEXT, ENABLED) \
 		err = cpymo_select_img_configuare_select_text( \
@@ -169,7 +172,8 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 			cpymo_parser_stream_span_pure(TEXT), \
 			ENABLED, \
 			cpymo_select_img_selection_nohint, \
-			0); \
+			0, \
+			font_size); \
 		if (err != CPYMO_ERR_SUCC) { \
 			cpymo_ui_exit(e); \
 			return err; \
@@ -177,13 +181,14 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 
 	cpymo_select_img_configuare_set_ok_callback(&rmenu->menu, &cpymo_rmenu_ok);
 
-	RMENU_ITEM(0, "保存进度", false);
-	RMENU_ITEM(1, "读取进度", false);
-	RMENU_ITEM(2, "对话历史", true);
-	RMENU_ITEM(3, "游戏设置", true)
-	RMENU_ITEM(4, "重启游戏", true);
-	RMENU_ITEM(5, "退出游戏", true);
-	RMENU_ITEM(6, "返回游戏", true);
+	RMENU_ITEM(0, "存档", false);
+	RMENU_ITEM(1, "读档", false);
+	RMENU_ITEM(2, "快进", true);
+	RMENU_ITEM(3, "隐藏对话框", false);
+	RMENU_ITEM(4, "对话历史", true);
+	RMENU_ITEM(5, "设置", true)
+	RMENU_ITEM(6, "重启游戏", true);
+	RMENU_ITEM(7, "返回游戏", true);
 
 	float xywh[4] = {
 		((float)e->gameconfig.imagesize_w - (float)rmenu->bg_w) / 2,

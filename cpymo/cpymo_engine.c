@@ -191,6 +191,22 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
 
+	if (engine->skipping) {
+		if (engine->input.ok ||
+			engine->input.cancel ||
+			engine->input.auto_mode ||
+			engine->input.down ||
+			engine->input.hide_window ||
+			engine->input.left ||
+			engine->input.mouse_button ||
+			fabs(engine->input.mouse_wheel_delta) > 0 ||
+			engine->input.ok ||
+			engine->input.right ||
+			engine->input.skip ||
+			engine->input.up)
+			engine->skipping = false;
+	}
+
 	if (engine->input.hide_window != engine->prev_input.hide_window)
 		*redraw = true;
 

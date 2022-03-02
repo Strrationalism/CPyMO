@@ -419,7 +419,8 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 
 error_t cpymo_select_img_configuare_select_text(
 	cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
-	cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode, uint64_t hash)
+	cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode, 
+	uint64_t hash, float fontsize)
 {
 	if (sel->sel_highlight == NULL) {
 		error_t err = cpymo_assetloader_load_system_image(
@@ -437,8 +438,6 @@ error_t cpymo_select_img_configuare_select_text(
 	assert(sel->selections);
 	assert(sel->all_selections);
 	assert(sel->select_img_image == NULL);
-
-	const float fontsize = cpymo_gameconfig_font_size(gc);
 
 	cpymo_select_img_selection *s = &sel->selections[sel->current_selection++];
 	float text_width;

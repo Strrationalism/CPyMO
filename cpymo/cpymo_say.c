@@ -191,7 +191,7 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 		cpymo_rmenu_enter(e);
 	}
 
-	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox);
+	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox) || e->skipping;
 }
 
 static bool cpymo_say_wait_text_fadein(cpymo_engine *e, float dt)
