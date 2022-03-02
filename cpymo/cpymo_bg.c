@@ -14,6 +14,10 @@ void cpymo_bg_free(cpymo_bg *bg)
 
 	if (bg->trans)
 		cpymo_backend_masktrans_free(bg->trans);
+
+	bg->current_bg = NULL;
+	bg->trans = NULL;
+	bg->transform_next_bg = NULL;
 }
 
 error_t cpymo_bg_update(cpymo_bg *bg, bool *redraw)

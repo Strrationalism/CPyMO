@@ -17,6 +17,8 @@ typedef struct {
 	bool active;
 	bool lazy_init;
 
+	bool hide_window;
+
 	cpymo_backend_text name;
 	float name_width;
 } cpymo_say;
@@ -33,5 +35,7 @@ error_t cpymo_say_start(
 	struct cpymo_engine *,
 	cpymo_parser_stream_span name, 
 	cpymo_parser_stream_span text);
+
+void cpymo_say_hidewindow_until_click(struct cpymo_engine *e);
 
 #endif

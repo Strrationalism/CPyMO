@@ -45,6 +45,7 @@ void cpymo_say_init(cpymo_say *out)
 	out->lazy_init = false;
 	out->textbox_usable = false;
 	out->name = NULL;
+	out->hide_window = false;
 }
 
 void cpymo_say_free(cpymo_say *say)
@@ -58,7 +59,7 @@ void cpymo_say_free(cpymo_say *say)
 
 void cpymo_say_draw(const struct cpymo_engine *e)
 {
-	if (e->say.active && !e->input.hide_window) {
+	if (e->say.active && !e->input.hide_window && !e->say.hide_window) {
 		float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
 		float msg_h = (float)e->say.msgbox_h * ratio;
 		float y = (float)e->gameconfig.imagesize_h - msg_h;
@@ -184,6 +185,14 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
 
+	if (e->say.hide_window) {
+		if (cpymo_input_foward_key_just_released(e)) {
+			e->say.hide_window = false;
+			cpymo_engine_request_redraw(e);
+		}
+		return false;
+	}
+
 	if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
 		cpymo_backlog_ui_enter(e);
 	}
@@ -197,6 +206,15 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 static bool cpymo_say_wait_text_fadein(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
+	
+	if (e->say.hide_window) {
+		if (cpymo_input_foward_key_just_released(e)) {
+			e->say.hide_window = false;
+			cpymo_engine_request_redraw(e);
+		}
+		return false;
+	}
+
 	return cpymo_textbox_wait_text_fadein(e, dt, &e->say.textbox);
 }
 
@@ -279,4 +297,10 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 		&cpymo_say_wait_text_fadein_callback);
 
 	return err;
+}
+
+void cpymo_say_hidewindow_until_click(cpymo_engine * e)
+{
+	e->say.hide_window = true;
+	cpymo_engine_request_redraw(e);
 }
