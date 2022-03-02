@@ -185,19 +185,20 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
 
+	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
+		cpymo_rmenu_enter(e);
+		return false;
+	}
+	else if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
+		cpymo_backlog_ui_enter(e);
+	}
+
 	if (e->say.hide_window) {
 		if (cpymo_input_foward_key_just_released(e)) {
 			e->say.hide_window = false;
 			cpymo_engine_request_redraw(e);
 		}
 		return false;
-	}
-
-	if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
-		cpymo_backlog_ui_enter(e);
-	}
-	else if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
-		cpymo_rmenu_enter(e);
 	}
 
 	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox) || e->skipping;
