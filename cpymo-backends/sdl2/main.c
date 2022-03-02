@@ -162,8 +162,8 @@ int main(int argc, char **argv)
 	Uint32 prev_ticks = SDL_GetTicks();
 	SDL_Event event;
 
-	unsigned fps_counter = 0;
-	Uint32 fps_timer = 0;
+	// unsigned fps_counter = 0;
+	// Uint32 fps_timer = 0;
 
 	if (cpymo_backend_audio_get_info()) {
 		SDL_UnlockAudio();
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT)
 				goto EXIT;
-			else if (event.type == SDL_WINDOWEVENT)
+			else if (event.type == SDL_WINDOWEVENT || event.type == SDL_RENDER_TARGETS_RESET)
 				redraw_by_event = true;
 			else if (event.type == SDL_MOUSEWHEEL) {
 				mouse_wheel = (float)event.wheel.y;
@@ -205,12 +205,12 @@ int main(int argc, char **argv)
 		}
 		}
 
-		fps_timer += (ticks - prev_ticks);
+		/*fps_timer += (ticks - prev_ticks);
 		if (fps_timer >= 1000) {
 			//printf("[FPS] %u\n", fps_counter);
 			fps_timer -= 1000;
 			fps_counter = 0;
-		}
+		}*/
 		prev_ticks = ticks;
 
 		if (need_to_redraw || redraw_by_event) {
@@ -218,7 +218,7 @@ int main(int argc, char **argv)
 			SDL_RenderClear(renderer);
 			cpymo_engine_draw(&engine);
 			SDL_RenderPresent(renderer);
-			fps_counter++;
+			//fps_counter++;
 		} else SDL_Delay(16);
 	}
 
