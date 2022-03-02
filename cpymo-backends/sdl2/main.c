@@ -189,6 +189,11 @@ int main(int argc, char **argv)
 				extern void cpymo_backend_audio_reset();
 				cpymo_backend_audio_reset();
 			}
+			else if (event.type == SDL_RENDER_DEVICE_RESET) {
+				SDL_Log("[Error] Render device lost!\n");
+				ret = -1;
+				goto EXIT;
+			}
 		}
 
 		bool need_to_redraw = false;
