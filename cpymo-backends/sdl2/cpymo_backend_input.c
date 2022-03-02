@@ -11,9 +11,6 @@ float mouse_wheel;
 SDL_GameController **gamecontrollers = NULL;
 size_t gamecontrollers_count = 0;
 
-static bool prev_mouse_button_down = false;
-static Uint64 prev_mouse_button_just_down_time = 0;
-
 cpymo_input cpymo_input_snapshot()
 {
 	cpymo_input out;
@@ -39,19 +36,6 @@ cpymo_input cpymo_input_snapshot()
 	out.mouse_button = (mouse_state & SDL_BUTTON_LMASK) != 0;
 	out.cancel |= (mouse_state & SDL_BUTTON_RMASK) != 0;
 	out.mouse_position_useable = true;
-
-	if (out.mouse_button && !prev_mouse_button_down) {
-		prev_mouse_button_just_down_time = SDL_GetTicks();
-	}
-	else if (out.mouse_button && prev_mouse_button_down && SDL_GetTicks() - prev_mouse_button_just_down_time > 700) {
-		out.cancel = true;
-	}
-	else if (!out.mouse_button && prev_mouse_button_down) {
-		if (SDL_GetTicks() - prev_mouse_button_just_down_time > 700) {
-			out.cancel = false;
-		}
-	}
-	
 
 	SDL_Rect viewport;
 	SDL_RenderGetViewport(renderer, &viewport);
@@ -118,8 +102,6 @@ cpymo_input cpymo_input_snapshot()
 		if (y > 16384) out.down = true;
 		else if (y < -16384) out.up = true;
 	}
-
-	prev_mouse_button_down = (mouse_state & SDL_BUTTON_LMASK) != 0;
 
 	return out;
 }
