@@ -104,13 +104,15 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 
 	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
-		ui->mouse_key_press_time = 0;
-	}
-	
+
 	if ((e->input.mouse_button || e->input.mouse_wheel_delta) && ui->allow_scroll) {
 		ui->mouse_key_press_time += d;
 		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
+
+		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+			ui->mouse_key_press_time = 0;
+			delta_y = 0;
+		}
 
 		bool control_by_wheel = fabs(e->input.mouse_wheel_delta) > fabs(delta_y);
 		if (control_by_wheel) {
