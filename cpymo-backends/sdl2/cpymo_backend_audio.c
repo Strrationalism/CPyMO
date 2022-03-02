@@ -45,6 +45,10 @@ static bool cpymo_backend_audio_supported(const SDL_AudioSpec *spec)
 		&& spec->padding == 0;
 }
 
+static SDL_AudioSpec have;
+
+static uint64_t current_audio_driver;
+
 void cpymo_backend_audio_init()
 {
 	SDL_AudioSpec want;
@@ -55,8 +59,6 @@ void cpymo_backend_audio_init()
 	want.format = AUDIO_F32;
 	want.freq = 48000;
 	want.samples = 2940;
-
-	SDL_AudioSpec have;
 	
 	if (SDL_OpenAudio(&want, &have) == 0) {
 		if (!cpymo_backend_audio_supported(&have)) {
@@ -100,6 +102,11 @@ void cpymo_backend_audio_init()
 
 	SDL_LockAudio();
 	SDL_PauseAudio(0);
+
+	current_audio_driver = 
+		cpymo_parser_stream_span_hash(
+			cpymo_parser_stream_span_pure(
+				SDL_GetCurrentAudioDriver()));
 }
 
 void cpymo_backend_audio_free()
@@ -112,6 +119,32 @@ void cpymo_backend_audio_free()
 void cpymo_backend_audio_lock(void)
 {
 	SDL_LockAudio();
+}
+
+void cpymo_backend_audio_reset()
+{
+	if (audio_enabled) {
+		uint64_t current_audio_driver_hash =
+			cpymo_parser_stream_span_hash(
+				cpymo_parser_stream_span_pure(SDL_GetCurrentAudioDriver()));
+
+		if (current_audio_driver == current_audio_driver_hash) return;
+
+		SDL_CloseAudio();
+
+		if (SDL_OpenAudio(&have, NULL) != 0) {
+			printf("[Error] Failed to reset audio.\n");
+			exit(-1);
+		}
+
+		SDL_PauseAudio(0);
+
+		current_audio_driver = current_audio_driver_hash;
+	}
+	else {
+		cpymo_backend_audio_init();
+		SDL_UnlockAudio();
+	}
 }
 
 void cpymo_backend_audio_unlock(void)

@@ -185,6 +185,10 @@ int main(int argc, char **argv)
 				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
 					mouse_wheel *= -1;
 			}
+			else if (event.type == SDL_AUDIODEVICEADDED || event.type == SDL_AUDIODEVICEREMOVED) {
+				extern void cpymo_backend_audio_reset();
+				cpymo_backend_audio_reset();
+			}
 		}
 
 		bool need_to_redraw = false;
