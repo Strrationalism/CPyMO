@@ -10,6 +10,7 @@
 #include "cpymo_wait.h"
 #include "cpymo_hash_flags.h"
 #include "cpymo_key_pulse.h"
+#include "cpymo_key_hold.h"
 
 struct cpymo_engine;
 
@@ -63,6 +64,8 @@ struct cpymo_select_img {
 	cpymo_select_img_ok_callback ok_callback;
 
 	enum cpymo_backend_image_draw_type draw_type;
+
+	cpymo_key_hold key_mouse_button;
 };
 
 typedef struct cpymo_select_img cpymo_select_img;

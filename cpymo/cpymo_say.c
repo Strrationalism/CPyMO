@@ -185,6 +185,9 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
 
+	const enum cpymo_key_hold_result mouse_button_state = 
+		cpymo_key_hold_update(&e->say.key_mouse_button, dt, e->input.mouse_button);
+
 	if (e->say.hide_window) {
 		if (cpymo_input_foward_key_just_released(e)) {
 			e->say.hide_window = false;
@@ -196,8 +199,9 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 	if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
 		cpymo_backlog_ui_enter(e);
 	}
-	else if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
+	else if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mouse_button_state == cpymo_key_hold_result_hold_released) {
 		cpymo_rmenu_enter(e);
+		return false;
 	}
 
 	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox) || e->skipping;
@@ -244,7 +248,7 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 
 static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 {
-	// TODO: Move out lines from text box and write to backlog.
+	cpymo_key_hold_init(&e->say.key_mouse_button, e->input.mouse_button);
 	cpymo_wait_register_with_callback(
 		&e->wait, 
 		&cpymo_say_wait_text_reading,

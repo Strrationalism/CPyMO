@@ -150,10 +150,13 @@ static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 		}
 	}
 
+	enum cpymo_key_hold_result mouse_button_state =
+		cpymo_key_hold_update(&e->select_img.key_mouse_button, dt, e->input.mouse_button);
+
 	if (e->select_img.save_enabled) {
 		if (e->input.mouse_wheel_delta > 0)
 			cpymo_backlog_ui_enter(e);
-		else if (CPYMO_INPUT_JUST_RELEASED(e, cancel))
+		else if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mouse_button_state == cpymo_key_hold_result_hold_released)
 			cpymo_rmenu_enter(e);
 	}
 
@@ -246,6 +249,7 @@ void cpymo_select_img_configuare_end(cpymo_select_img *sel, cpymo_wait *wait, st
 		}
 	}
 
+	cpymo_key_hold_init(&sel->key_mouse_button, e->input.mouse_button);
 	cpymo_wait_register(wait, &cpymo_select_img_wait);
 	cpymo_engine_request_redraw(e);
 }

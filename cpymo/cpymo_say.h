@@ -3,7 +3,7 @@
 
 #include "cpymo_textbox.h"
 #include "cpymo_assetloader.h"
-#include "cpymo_textbox.h"
+#include "cpymo_key_hold.h"
 
 struct cpymo_engine;
 
@@ -21,6 +21,8 @@ typedef struct {
 
 	cpymo_backend_text name;
 	float name_width;
+
+	cpymo_key_hold key_mouse_button;
 } cpymo_say;
 
 void cpymo_say_init(cpymo_say *);
