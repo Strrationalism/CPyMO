@@ -8,6 +8,9 @@ extern cpymo_engine engine;
 
 float mouse_wheel;
 
+SDL_GameController **gamecontrollers = NULL;
+size_t gamecontrollers_count = 0;
+
 cpymo_input cpymo_input_snapshot()
 {
 	cpymo_input out;
@@ -52,5 +55,83 @@ cpymo_input cpymo_input_snapshot()
 	out.mouse_x *= engine.gameconfig.imagesize_w;
 	out.mouse_y *= engine.gameconfig.imagesize_h;
 
+	#define MAP_CONTROLLER(OUT_KEY, CONTROLLER_KEY) \
+		for (size_t i = 0; i < gamecontrollers_count; ++i) \
+			if (SDL_GameControllerGetButton(gamecontrollers[i], CONTROLLER_KEY)) { \
+				out.OUT_KEY = true; \
+				break; \
+			}
+
+	MAP_CONTROLLER(up, SDL_CONTROLLER_BUTTON_DPAD_UP);
+	MAP_CONTROLLER(down, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+	MAP_CONTROLLER(left, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+	MAP_CONTROLLER(right, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+	MAP_CONTROLLER(skip, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+	MAP_CONTROLLER(skip, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+	MAP_CONTROLLER(hide_window, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+	MAP_CONTROLLER(hide_window, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+	MAP_CONTROLLER(ok, SDL_CONTROLLER_BUTTON_A);
+	MAP_CONTROLLER(ok, SDL_CONTROLLER_BUTTON_Y);
+	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_B);
+	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_X);
+	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_START);
+	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_GUIDE);
+	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_BACK);
+
+	#undef MAP_CONTROLLER
+
+	for (size_t i = 0; i < gamecontrollers_count; ++i) {
+		if (abs(SDL_GameControllerGetAxis(gamecontrollers[i], SDL_CONTROLLER_AXIS_TRIGGERLEFT)) > 16384)
+			out.hide_window = true;
+		
+		if (abs(SDL_GameControllerGetAxis(gamecontrollers[i], SDL_CONTROLLER_AXIS_TRIGGERRIGHT)) > 16384)
+			out.skip = true;
+
+		Sint16 x = SDL_GameControllerGetAxis(gamecontrollers[i], SDL_CONTROLLER_AXIS_LEFTX);
+		Sint16 y = SDL_GameControllerGetAxis(gamecontrollers[i], SDL_CONTROLLER_AXIS_LEFTY);
+
+		Sint16 x2 = SDL_GameControllerGetAxis(gamecontrollers[i], SDL_CONTROLLER_AXIS_RIGHTX);
+		Sint16 y2 = SDL_GameControllerGetAxis(gamecontrollers[i], SDL_CONTROLLER_AXIS_RIGHTY);
+
+		if (abs(x2) > abs(x)) x = x2;
+		if (abs(y2) > abs(y)) y = y2;
+
+		if (x > 16384) out.right = true;
+		else if (x < -16384) out.left = true;
+
+		if (y > 16384) out.down = true;
+		else if (y < -16384) out.up = true;
+	}
+
 	return out;
+}
+
+void cpymo_input_free_joysticks() 
+{
+	for (size_t i = 0; i < gamecontrollers_count; ++i)
+		SDL_GameControllerClose(gamecontrollers[i]);
+	if (gamecontrollers) free(gamecontrollers);
+	gamecontrollers = NULL;
+	gamecontrollers_count = 0;
+}
+
+void cpymo_input_refresh_joysticks() 
+{
+	cpymo_input_free_joysticks();
+
+	for (int i = 0; i < SDL_NumJoysticks(); ++i) 
+		if (SDL_IsGameController(i)) 
+			gamecontrollers_count++;
+
+	if (gamecontrollers_count)
+		gamecontrollers = (SDL_GameController **)malloc(sizeof(gamecontrollers[0]) * gamecontrollers_count);
+	if (gamecontrollers == NULL) gamecontrollers_count = 0;
+
+	if (gamecontrollers) {
+		memset(gamecontrollers, 0, sizeof(gamecontrollers[0]) * gamecontrollers_count);
+		size_t j = 0;
+		for (int i = 0; i < SDL_NumJoysticks(); ++i)
+			if (SDL_IsGameController(i))
+				gamecontrollers[j++] = SDL_GameControllerOpen(i);
+	}
 }

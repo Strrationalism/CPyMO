@@ -100,7 +100,9 @@ int main(int argc, char **argv)
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
 		SDL_INIT_AUDIO |
-		SDL_INIT_VIDEO) != 0) {
+		SDL_INIT_VIDEO |
+		SDL_INIT_JOYSTICK |
+		SDL_INIT_GAMECONTROLLER) != 0) {
 		SDL_Log("[Error] Unable to initialize SDL: %s", SDL_GetError());
 		return -1;
 	}
@@ -194,6 +196,12 @@ int main(int argc, char **argv)
 				ret = -1;
 				goto EXIT;
 			}
+			else if (event.type == SDL_JOYDEVICEADDED || event.type == SDL_JOYDEVICEREMOVED ||
+				event.type == SDL_CONTROLLERDEVICEADDED || event.type == SDL_CONTROLLERDEVICEREMOVED ||
+				event.type == SDL_CONTROLLERDEVICEREMAPPED) {
+				extern void cpymo_input_refresh_joysticks();
+				cpymo_input_refresh_joysticks();
+			}
 		}
 
 		bool need_to_redraw = false;
@@ -233,6 +241,10 @@ int main(int argc, char **argv)
 
 	EXIT:
 	cpymo_engine_free(&engine);
+
+	extern void cpymo_input_free_joysticks();
+	cpymo_input_free_joysticks();
+
 	cpymo_backend_font_free();
 	cpymo_backend_audio_free();
 
