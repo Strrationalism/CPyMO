@@ -133,8 +133,9 @@ void cpymo_backend_audio_reset()
 		SDL_CloseAudio();
 
 		if (SDL_OpenAudio(&have, NULL) != 0) {
-			printf("[Error] Failed to reset audio.\n");
-			exit(-1);
+			printf("[Error] Failed to reset audio: %s\n", SDL_GetError());
+			audio_enabled = false;
+			return;
 		}
 
 		SDL_PauseAudio(0);
