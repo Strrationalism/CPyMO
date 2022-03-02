@@ -172,7 +172,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 			cpymo_parser_stream_span_pure(TEXT), \
 			ENABLED, \
 			cpymo_select_img_selection_nohint, \
-			0, \
+			0xFFFFFFFFFFFFFFFF, \
 			font_size); \
 		if (err != CPYMO_ERR_SUCC) { \
 			cpymo_ui_exit(e); \

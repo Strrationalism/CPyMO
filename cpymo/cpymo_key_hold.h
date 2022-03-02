@@ -36,11 +36,11 @@ static inline enum cpymo_key_hold_result cpymo_key_hold_update(cpymo_key_hold *h
 	}
 	else if (pressed && prev_pressed) {
 		h->timer += dt;
-		if (h->timer >= 1.0f) return cpymo_key_hold_result_holding;
+		if (h->timer >= 0.6f) return cpymo_key_hold_result_holding;
 		else return cpymo_key_hold_result_pressing;
 	}
 	else {//if (!pressed && prev_pressed) {
-		if (h->timer >= 1.0f) return cpymo_key_hold_result_hold_released;
+		if (h->timer >= 0.6f) return cpymo_key_hold_result_hold_released;
 		else return cpymo_key_hold_result_just_released;
 	}
 }

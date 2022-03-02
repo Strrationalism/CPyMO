@@ -3,6 +3,7 @@
 
 #include "cpymo_ui.h"
 #include "cpymo_key_pulse.h"
+#include "cpymo_key_hold.h"
 #include <stdint.h>
 
 #define CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX) ((void *)((INDEX) + 1))
@@ -28,6 +29,8 @@ typedef struct {
 	float mouse_key_press_time;
 
 	cpymo_key_pluse key_up, key_down;
+	cpymo_key_hold key_mouse_button;
+	float scroll_delta_y_sum;
 
 	bool allow_scroll;
 

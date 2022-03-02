@@ -97,22 +97,26 @@ static void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
 
 static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 {
+	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
+
+	enum cpymo_key_hold_result mouse_button_state =
+		cpymo_key_hold_update(&ui->key_mouse_button, d, e->input.mouse_button);
+
 	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 		cpymo_list_ui_exit(e); 
 		return CPYMO_ERR_SUCC;
 	}
 
-	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
-
-
 	if ((e->input.mouse_button || e->input.mouse_wheel_delta) && ui->allow_scroll) {
 		ui->mouse_key_press_time += d;
 		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+		if (mouse_button_state == cpymo_key_hold_result_just_press) {
 			ui->mouse_key_press_time = 0;
 			delta_y = 0;
 		}
+
+		ui->scroll_delta_y_sum = ui->scroll_delta_y_sum > fabsf(delta_y) ? ui->scroll_delta_y_sum : fabsf(delta_y);
 
 		bool control_by_wheel = fabs(e->input.mouse_wheel_delta) > fabs(delta_y);
 		if (control_by_wheel) {
@@ -218,12 +222,16 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		CPYMO_THROW(err);
 	}
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+	if (mouse_button_state == cpymo_key_hold_result_hold_released && ui->scroll_delta_y_sum < 5.0f) {
+		cpymo_list_ui_exit(e);
+		return CPYMO_ERR_SUCC;
+	}
+	else if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
 		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
 		error_t err = ui->ok(e, obj);
 		CPYMO_THROW(err);
 	}
-	else if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button) && ui->mouse_key_press_time < 0.15f) {
+	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f) {
 		int selected = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 		if (selected != INT_MAX) {
 			if (ui->selection_relative_to_cur != selected) {
@@ -235,6 +243,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			CPYMO_THROW(err);
 		}
 	}
+
+	if (mouse_button_state == cpymo_key_hold_result_released)
+		ui->scroll_delta_y_sum = 0;
 
 	return CPYMO_ERR_SUCC;
 }
@@ -322,9 +333,11 @@ error_t cpymo_list_ui_enter(
 	data->mouse_key_press_time = 0;
 	data->allow_scroll = true;
 	data->custom_update = NULL;
+	data->scroll_delta_y_sum = 0;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
+	cpymo_key_hold_init(&data->key_mouse_button, e->input.mouse_button);
 
 	assert(*out_ui_data == NULL);
 	*out_ui_data = cpymo_list_ui_data(e);
