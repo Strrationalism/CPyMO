@@ -11,9 +11,9 @@ cpymo_input cpymo_input_snapshot()
 
     if((keys & KEY_ZL)) cpymo_input_fast_kill_pressed = true;
     
-    out.ok = (keys & KEY_A) > 0;
-    out.skip = (keys & KEY_R) > 0;
-    out.cancel = (keys & KEY_B) > 0;
+    out.ok = (keys & KEY_A) > 0 || (keys & KEY_Y) > 0;
+    out.skip = (keys & KEY_R) > 0 || (keys & KEY_ZR) > 0;
+    out.cancel = (keys & KEY_B) > 0 || (keys & KEY_X) > 0;
     out.hide_window = (keys & KEY_L) > 0;
     out.auto_mode = (keys & KEY_Y) > 0;
     out.down = (keys & KEY_DOWN) > 0;
@@ -27,8 +27,14 @@ cpymo_input cpymo_input_snapshot()
     circlePosition pos;
     hidCircleRead(&pos);
 
-    if(pos.dy > 170) out.up = true;
-    else if(pos.dy < -170) out.down = true;
+    circlePosition cpos;
+    hidCstickRead(&cpos);
+
+    if(pos.dy > 170 || cpos.dy > 32) out.up = true;
+    else if(pos.dy < -170 || cpos.dy < -32) out.down = true;
+
+    if(pos.dx > 170 || cpos.dx > 32) out.right = true;
+    else if(pos.dx < -170 || cpos.dx < -32) out.left = true;
 
     return out;
 }

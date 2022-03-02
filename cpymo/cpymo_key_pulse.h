@@ -36,9 +36,9 @@ static inline void cpymo_key_pluse_update(cpymo_key_pluse *p, float dt, bool pre
 			}
 		}
 		else {
-			if (p->timer >= 0.075f) {
+			if (p->timer >= 0.05f) {
 				p->output = true;
-				p->timer -= 0.075f;
+				p->timer -= 0.05f;
 			}
 		}
 	}
