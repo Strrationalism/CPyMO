@@ -65,10 +65,21 @@ void cpymo_textbox_draw(
     }
 
     if (tb->msg_cursor_visible) {
+        float ratio = 
+            tb->character_size
+            / (float)(e->say.msg_cursor_w > e->say.msg_cursor_h ? e->say.msg_cursor_w : e->say.msg_cursor_h);
+
+        if (ratio > 1) ratio = 1;
+
+        ratio *= 0.75f;
+
+        float cursor_w = ratio * (float)e->say.msg_cursor_w;
+        float cursor_h = ratio * (float)e->say.msg_cursor_h;
+
         cpymo_backend_image_draw(
-            tb->x + tb->width - (float)e->say.msg_cursor_w,
-            tb->y + (tb->max_lines) * tb->character_size - (float)e->say.msg_cursor_h,
-            (float)e->say.msg_cursor_w, (float)e->say.msg_cursor_h,
+            tb->x + tb->width - cursor_w,
+            tb->y + (tb->max_lines) * tb->character_size - cursor_h,
+            cursor_w, cursor_h,
             e->say.msg_cursor, 0, 0, e->say.msg_cursor_w, e->say.msg_cursor_h,
             1.0f, drawtype);
     }
