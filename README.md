@@ -47,11 +47,11 @@ Unpack a pymo package:
     cpymo-tool unpack <pak-file> <extension_without "."> <output-dir>
 ```
 
-## 编译为SDL2项目
+## 编译到Windows、Linux或macOS
 
 ### 额外依赖
 
-你需要使用类似vcpkg的包安装以下依赖：
+你需要使用vcpkg包管理器安装以下依赖：
 
 * SDL2
 * ffmpeg
@@ -91,7 +91,7 @@ CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。
 按下Start键会在切换在“上屏/下屏”显示对话文本。    
 按下Select键会切换使用“拉伸/适应”方式显示游戏画面。    
 
-### 以调试模式启动
+#### 以调试模式启动
 如果你需要查看CPyMO控制台，你需要在游戏列表中按住R键，同时按下A键选择游戏，即可激活调试模式。    
 在这种模式下，下屏会显示CPyMO控制台，Start键将不再可用，对话文本会被强制显示在上屏。    
 
@@ -110,4 +110,5 @@ CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。
 
 3DS版本的CPyMO不会加载游戏中自带的字体或者其他TTF字体，而是使用[思源黑体](https://github.com/adobe-fonts/source-han-sans)。    
 思源黑体已经被转换为可以被3DS直接识别的bcfnt格式，CPyMO for 3DS中的思源黑体将会按照其原本的[SIL协议](https://github.com/adobe-fonts/source-han-sans/blob/master/LICENSE.txt)随CPyMO for 3DS一起分发。    
+
 
