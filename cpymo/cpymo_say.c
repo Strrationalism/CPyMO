@@ -48,6 +48,9 @@ void cpymo_say_init(cpymo_say *out)
 	out->hide_window = false;
 	out->msgbox_name = NULL;
 	out->namebox_name = NULL;
+
+	out->current_name = NULL;
+	out->current_text = NULL;
 }
 
 void cpymo_say_free(cpymo_say *say)
@@ -59,6 +62,9 @@ void cpymo_say_free(cpymo_say *say)
 	if (say->msg_cursor) cpymo_backend_image_free(say->msg_cursor);
 	if (say->msgbox_name) free(say->msgbox_name);
 	if (say->namebox_name) free(say->namebox_name);
+
+	if (say->current_name) free(say->current_name);
+	if (say->current_text) free(say->current_text);
 }
 
 void cpymo_say_draw(const struct cpymo_engine *e)
@@ -275,6 +281,24 @@ static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_parser_stream_span text)
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
+
+	if (name.len > 0) {
+		char *current_name = (char *)realloc(e->say.current_name, name.len + 1);
+		if (current_name) {
+			cpymo_parser_stream_span_copy(current_name, name.len + 1, name);
+			e->say.current_name = current_name;
+		}
+	}
+	else {
+		free(e->say.current_name);
+		e->say.current_name = NULL;
+	}
+
+	char *current_text = (char *)realloc(e->say.current_text, text.len + 1);
+	if (current_text) {
+		cpymo_parser_stream_span_copy(current_text, text.len + 1, text);
+		e->say.current_text = current_text;
+	}
 
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 

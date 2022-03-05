@@ -25,6 +25,8 @@ typedef struct {
 	cpymo_key_hold key_mouse_button;
 
 	char *msgbox_name, *namebox_name;
+
+	char *current_name, *current_text;
 } cpymo_say;
 
 void cpymo_say_init(cpymo_say *);

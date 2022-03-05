@@ -20,6 +20,7 @@ error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_
 
 	out->script_name[0] = '\0';
 	out->caller = NULL;
+	out->checkpoint.cur_pos = 0;
 	
 	size_t script_len = strlen(script_format) + 64;
 	out->script_content = (char *)malloc(script_len);
@@ -44,6 +45,7 @@ error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * scri
 	out->caller = NULL;
 
 	out->script_content = NULL;
+	out->checkpoint.cur_pos = 0;
 	size_t script_len = 0;
 
 	error_t err =
@@ -138,6 +140,11 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	return CPYMO_ERR_SUCC;
 }
 
+void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
+{
+	interpreter->checkpoint.cur_pos = interpreter->script_parser.cur_pos;
+}
+
 #define D(CMD) \
 	else if (cpymo_parser_stream_span_equals_str(command, CMD))
 
@@ -172,6 +179,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	/*** I. Text ***/
 	D("say") {
+		cpymo_interpreter_checkpoint(interpreter);
+
 		POP_ARG(name_or_text); ENSURE(name_or_text);
 		POP_ARG(text);
 
@@ -923,6 +932,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("sel") {
+		cpymo_interpreter_checkpoint(interpreter);
+
 		POP_ARG(choices_str); ENSURE(choices_str);
 		int choices = cpymo_parser_stream_span_atoi(choices_str);
 
@@ -985,6 +996,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("select_text") { 
+		cpymo_interpreter_checkpoint(interpreter);
+
 		POP_ARG(choices_str); ENSURE(choices_str); 
 		const int choices = cpymo_parser_stream_span_atoi(choices_str); 
 		error_t err = cpymo_select_img_configuare_begin(
@@ -1031,6 +1044,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("select_var") {
+		cpymo_interpreter_checkpoint(interpreter);
+
 		POP_ARG(choices_str); ENSURE(choices_str);
 		const int choices = cpymo_parser_stream_span_atoi(choices_str);
 		error_t err = cpymo_select_img_configuare_begin(
@@ -1078,6 +1093,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("select_img") {
+		cpymo_interpreter_checkpoint(interpreter);
+
 		POP_ARG(choices_str); ENSURE(choices_str);
 		POP_ARG(filename); ENSURE(filename);
 
@@ -1118,6 +1135,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("select_imgs") {
+		cpymo_interpreter_checkpoint(interpreter);
+
 		POP_ARG(choices_str); ENSURE(choices_str);
 
 		size_t choices = (size_t)cpymo_parser_stream_span_atoi(choices_str);
