@@ -63,14 +63,14 @@ error_t cpymo_save_save(cpymo_engine * e, unsigned short save_id)
 
 	// FADEOUT
 	{
-		uint8_t col[] = {
+		uint8_t fadeout_state[] = {
 			e->fade.state != cpymo_fade_disabled,
 			e->fade.col.r,
 			e->fade.col.g,
 			e->fade.col.b
 		};
 
-		if (fwrite(col, sizeof(col), 1, save) != 1) {
+		if (fwrite(fadeout_state, sizeof(fadeout_state), 1, save) != 1) {
 			fclose(save);
 			return CPYMO_ERR_UNKNOWN;
 		}
@@ -140,6 +140,11 @@ error_t cpymo_save_save(cpymo_engine * e, unsigned short save_id)
 				PACK32(x),
 				PACK32(y)
 			};
+
+			if (fwrite(anime_params, sizeof(anime_params), 1, save) != 1) {
+				fclose(save);
+				return CPYMO_ERR_UNKNOWN;
+			}
 		}
 		else {
 			WRITE_STR(empty);
