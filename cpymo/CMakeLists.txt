@@ -37,5 +37,6 @@ add_library (cpymolib STATIC
 	"cpymo_key_pulse.h"
 	"cpymo_key_hold.h"
 	"cpymo_rmenu.h" "cpymo_rmenu.c" 
-	"cpymo_config_ui.h" "cpymo_config_ui.c")
+	"cpymo_config_ui.h" "cpymo_config_ui.c" 
+	"cpymo_save.h" "cpymo_save.c")
 
