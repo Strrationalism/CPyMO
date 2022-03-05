@@ -16,6 +16,8 @@ typedef struct {
 	bool is_loop;
 	float draw_x, draw_y;
 	int image_width;
+
+	char *anime_name;
 } cpymo_anime;
 
 void cpymo_anime_update(cpymo_anime *anime, float delta_time, bool *redraw);
@@ -33,7 +35,7 @@ error_t cpymo_anime_on(
 void cpymo_anime_off(cpymo_anime *anime);
 
 static inline void cpymo_anime_init(cpymo_anime *anime)
-{ anime->anime_image = NULL; }
+{ anime->anime_image = NULL; anime->anime_name = NULL; }
 
 static inline void cpymo_anime_free(cpymo_anime *anime)
 { cpymo_anime_off(anime); }

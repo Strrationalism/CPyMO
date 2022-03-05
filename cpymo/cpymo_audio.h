@@ -41,6 +41,8 @@ typedef struct {
 typedef struct {
 	bool enabled;
 	cpymo_audio_channel channels[CPYMO_AUDIO_MAX_CHANNELS];
+
+	char *bgm_name, *se_name;
 } cpymo_audio_system;
 
 static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)

@@ -50,6 +50,14 @@ error_t cpymo_anime_on(
 	engine->anime.draw_y = y;
 	engine->anime.image_width = w;
 
+	if (loop) {
+		char *anime_name = (char *)realloc(engine->anime.anime_name, filename_span.len + 1);
+		if (anime_name) {
+			cpymo_parser_stream_span_copy(anime_name, filename_span.len + 1, filename_span);
+			engine->anime.anime_name = anime_name;
+		}
+	}
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -72,6 +80,11 @@ void cpymo_anime_update(cpymo_anime *anime, float delta_time, bool * redraw)
 
 void cpymo_anime_off(cpymo_anime *anime)
 {
+	if (anime->anime_name) {
+		free(anime->anime_name);
+		anime->anime_name = NULL;
+	}
+
 	if (anime->anime_image) {
 		cpymo_backend_image_free(anime->anime_image);
 		anime->anime_image = NULL;

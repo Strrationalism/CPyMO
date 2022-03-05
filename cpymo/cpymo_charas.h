@@ -17,6 +17,8 @@ struct cpymo_chara {
 
 	bool play_anime;
 
+	char *chara_name;
+
 	struct cpymo_chara *next;
 };
 

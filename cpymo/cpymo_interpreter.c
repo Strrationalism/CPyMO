@@ -55,14 +55,6 @@ error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * scri
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_interpreter_init_snapshot(cpymo_interpreter * out, const cpymo_interpreter_snapshot * snapshot, const cpymo_assetloader * loader)
-{
-	error_t err = cpymo_interpreter_init_script(out, snapshot->script_name, loader);
-	if (err != CPYMO_ERR_SUCC) return err;
-
-	return cpymo_interpreter_goto_line(out, snapshot->cur_line);
-}
-
 void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 {
 	cpymo_interpreter *caller = interpreter->caller;
@@ -75,14 +67,6 @@ void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 	}
 
 	free(interpreter->script_content);
-}
-
-error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t line)
-{
-	while (line != interpreter->script_parser.cur_line)
-		if (!cpymo_parser_next_line(&interpreter->script_parser))
-			return CPYMO_ERR_BAD_FILE_FORMAT;
-	return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_parser_stream_span label)
@@ -117,14 +101,6 @@ RETRY:
 			}
 		}
 	}
-}
-
-cpymo_interpreter_snapshot cpymo_interpreter_get_snapshot_current_callstack(const cpymo_interpreter * interpreter)
-{
-	cpymo_interpreter_snapshot out;
-	strcpy(out.script_name, interpreter->script_name);
-	out.cur_line = interpreter->script_parser.cur_line;
-	return out;
 }
 
 static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont);

@@ -23,6 +23,8 @@ typedef struct {
 	float name_width;
 
 	cpymo_key_hold key_mouse_button;
+
+	char *msgbox_name, *namebox_name;
 } cpymo_say;
 
 void cpymo_say_init(cpymo_say *);

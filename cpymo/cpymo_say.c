@@ -46,6 +46,8 @@ void cpymo_say_init(cpymo_say *out)
 	out->textbox_usable = false;
 	out->name = NULL;
 	out->hide_window = false;
+	out->msgbox_name = NULL;
+	out->namebox_name = NULL;
 }
 
 void cpymo_say_free(cpymo_say *say)
@@ -55,6 +57,8 @@ void cpymo_say_free(cpymo_say *say)
 	if (say->msgbox) cpymo_backend_image_free(say->msgbox);
 	if (say->namebox) cpymo_backend_image_free(say->namebox);
 	if (say->msg_cursor) cpymo_backend_image_free(say->msg_cursor);
+	if (say->msgbox_name) free(say->msgbox_name);
+	if (say->namebox_name) free(say->namebox_name);
 }
 
 void cpymo_say_draw(const struct cpymo_engine *e)
@@ -122,6 +126,12 @@ static inline error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_s
 	if (say->msgbox) cpymo_backend_image_free(say->msgbox);
 	say->msgbox = NULL;
 
+	char *msgbox_name = (char *)realloc(say->msgbox_name, name.len + 1);
+	if (msgbox_name) {
+		cpymo_parser_stream_span_copy(msgbox_name, name.len + 1, name);
+		say->msgbox_name = msgbox_name;
+	}
+
 	error_t err = cpymo_assetloader_load_system_image(
 		&say->msgbox,
 		&say->msgbox_w,
@@ -140,6 +150,12 @@ static inline error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_
 {
 	if (say->namebox) cpymo_backend_image_free(say->namebox);
 	say->namebox = NULL;
+
+	char *namebox_name = (char *)realloc(say->namebox_name, name.len + 1);
+	if (namebox_name) {
+		cpymo_parser_stream_span_copy(namebox_name, name.len + 1, name);
+		say->namebox_name = namebox_name;
+	}
 
 	error_t err = cpymo_assetloader_load_system_image(
 		&say->namebox,

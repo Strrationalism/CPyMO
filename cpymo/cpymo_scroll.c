@@ -45,6 +45,12 @@ error_t cpymo_scroll_start(cpymo_engine *e, cpymo_parser_stream_span bgname, flo
 	cpymo_bg_reset(&e->bg);
 	cpymo_charas_fast_kill_all(&e->charas);
 
+	char *next_bg_name = (char *)realloc(e->bg.current_bg_name, bgname.len + 1);
+	if (next_bg_name) {
+		cpymo_parser_stream_span_copy(next_bg_name, bgname.len + 1, bgname);
+		e->bg.current_bg_name = next_bg_name;
+	}
+
 	cpymo_scroll *s = &e->scroll;
 	cpymo_scroll_reset(s);
 

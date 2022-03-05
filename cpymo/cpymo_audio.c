@@ -444,6 +444,9 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		s->channels[i].converted_buf_all_size = 0;
 		s->channels[i].volume = 0;
 	}
+
+	s->bgm_name = NULL;
+	s->se_name = NULL;
 }
 
 void cpymo_audio_free(cpymo_audio_system *s)
@@ -459,6 +462,9 @@ void cpymo_audio_free(cpymo_audio_system *s)
 	}
 
 	s->enabled = false;
+
+	if (s->bgm_name) free(s->bgm_name);
+	if (s->se_name) free(s->se_name);
 }
 
 bool cpymo_audio_channel_get_samples(void **samples, size_t *len, size_t cid, cpymo_audio_system *s)
@@ -551,6 +557,14 @@ static error_t cpymo_audio_high_level_play(
 
 error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
 {
+	if (loop) {
+		char *bgm_name = (char *)realloc(e->audio.bgm_name, bgmname.len + 1);
+		if (bgm_name) {
+			cpymo_parser_stream_span_copy(bgm_name, bgmname.len + 1, bgmname);
+			e->audio.bgm_name = bgm_name;
+		}
+	}
+
 	return cpymo_audio_high_level_play(
 		e, bgmname, &cpymo_assetloader_get_bgm_path, 
 		NULL, CPYMO_AUDIO_CHANNEL_BGM, loop);
@@ -558,6 +572,11 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
 
 void cpymo_audio_bgm_stop(cpymo_engine * engine)
 {
+	if (engine->audio.bgm_name) {
+		free(engine->audio.bgm_name);
+		engine->audio.bgm_name = NULL;
+	}
+
 	if (engine->audio.enabled) {
 		cpymo_audio_channel_reset(
 			&engine->audio.channels[CPYMO_AUDIO_CHANNEL_BGM]);
@@ -566,6 +585,14 @@ void cpymo_audio_bgm_stop(cpymo_engine * engine)
 
 error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_parser_stream_span sename, bool loop)
 {
+	if (loop) {
+		char *se_name = (char *)realloc(e->audio.se_name, sename.len + 1);
+		if (se_name) {
+			cpymo_parser_stream_span_copy(se_name, sename.len + 1, sename);
+			e->audio.se_name = se_name;
+		}
+	}
+
 	return cpymo_audio_high_level_play(
 		e, sename, &cpymo_assetloader_get_se_path,
 		e->assetloader.use_pkg_se ? &e->assetloader.pkg_se : NULL,
@@ -574,6 +601,11 @@ error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_parser_stream_span sename, b
 
 void cpymo_audio_se_stop(cpymo_engine *e)
 {
+	if (e->audio.se_name) {
+		free(e->audio.se_name);
+		e->audio.se_name = NULL;
+	}
+
 	if (e->audio.enabled) {
 		cpymo_audio_channel_reset(
 			&e->audio.channels[CPYMO_AUDIO_CHANNEL_SE]);

@@ -18,6 +18,9 @@ void cpymo_bg_free(cpymo_bg *bg)
 	bg->current_bg = NULL;
 	bg->trans = NULL;
 	bg->transform_next_bg = NULL;
+
+	if (bg->current_bg_name)
+		free(bg->current_bg_name);
 }
 
 error_t cpymo_bg_update(cpymo_bg *bg, bool *redraw)
@@ -195,6 +198,12 @@ error_t cpymo_bg_command(
 	cpymo_backend_image img;
 	error_t err = cpymo_assetloader_load_bg_image(&img, &w, &h, bgname, &engine->assetloader);
 	CPYMO_THROW(err);
+
+	char *next_bg_name = (char *)realloc(bg->current_bg_name, bgname.len + 1);
+	if (next_bg_name) {
+		cpymo_parser_stream_span_copy(next_bg_name, bgname.len + 1, bgname);
+		bg->current_bg_name = next_bg_name;
+	}
 
 	if (bg->transform_next_bg)
 		cpymo_backend_image_free(bg->transform_next_bg);

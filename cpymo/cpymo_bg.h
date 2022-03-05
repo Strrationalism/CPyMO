@@ -26,6 +26,9 @@ typedef struct {
 
 	// Quake
 	bool follow_chara_quake;
+
+	// Current background name
+	char *current_bg_name;
 } cpymo_bg;
 
 static inline void cpymo_bg_init(cpymo_bg *bg)
@@ -37,6 +40,7 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 	bg->transform_draw = NULL;
 	bg->follow_chara_quake = false;
 	bg->trans = NULL;
+	bg->current_bg_name = NULL;
 
 	bg->redraw = false;
 }
