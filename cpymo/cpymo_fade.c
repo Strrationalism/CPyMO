@@ -15,7 +15,7 @@ void cpymo_fade_draw(const cpymo_engine *engine)
 		if (engine->fade.state == cpymo_fade_in) alpha = 1.0f - alpha;
 		else if (engine->fade.state == cpymo_fade_keep) alpha = 1.0f;
 
-		cpymo_backend_image_fill_rects(xywh, 1, engine->flash.color, alpha, cpymo_backend_image_draw_type_bg);
+		cpymo_backend_image_fill_rects(xywh, 1, engine->fade.col, alpha, cpymo_backend_image_draw_type_bg);
 	}
 }
 
