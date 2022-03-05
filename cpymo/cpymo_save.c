@@ -9,7 +9,7 @@ static inline void cpymo_save_get_filename(char *dst, unsigned short save_id)
 	sprintf(dst, "save-%02d.csav", save_id);
 }
 
-error_t cpymo_save_save(cpymo_engine * e, unsigned short save_id)
+error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 {
 	FILE *save = NULL;
 	const char * const empty = "";
@@ -203,5 +203,65 @@ error_t cpymo_save_save(cpymo_engine * e, unsigned short save_id)
 	#undef WRITE_STR
 
 	fclose(save);
+	return CPYMO_ERR_SUCC;
+}
+
+FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id)
+{
+	char filename[16];
+	cpymo_save_get_filename(filename, save_id);
+
+	return cpymo_backend_read_save(e->assetloader.gamedir, filename);
+}
+
+static error_t cpymo_save_read_string(char **str, FILE *save) 
+{
+	uint16_t len_le;
+	if (fread(&len_le, sizeof(len_le), 1, save) != 1) {
+		return CPYMO_ERR_BAD_FILE_FORMAT;
+	}
+
+	size_t len = end_le16toh(len_le);
+
+	char *dst = (char *)realloc(*str, len + 1);
+	if (dst == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	*str = dst;
+
+	if (fread(*str, len, 1, save) != 1) {
+		free(*str);
+		*str = NULL;
+		return CPYMO_ERR_BAD_FILE_FORMAT;
+	}
+
+	*str[len] = '\0';
+
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save)
+{
+	assert(out->say_name == NULL);
+	assert(out->say_text == NULL);
+	assert(out->title == NULL);
+
+	error_t err = cpymo_save_read_string(&out->title, save);
+	CPYMO_THROW(err);
+
+	err = cpymo_save_read_string(&out->say_name, save);
+	if (err != CPYMO_ERR_SUCC) {
+		free(out->title);
+		out->title = NULL;
+		return err;
+	}
+
+	err = cpymo_save_read_string(&out->say_text, save);
+	if (err != CPYMO_ERR_SUCC) {
+		free(out->title);
+		free(out->say_name);
+		out->title = NULL;
+		out->say_name = NULL;
+	}
+
 	return CPYMO_ERR_SUCC;
 }
