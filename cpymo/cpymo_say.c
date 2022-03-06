@@ -1,6 +1,7 @@
 #include "cpymo_say.h"
 #include "cpymo_rmenu.h"
 #include "cpymo_engine.h"
+#include "cpymo_save.h"
 #include <assert.h>
 
 #define DISABLE_TEXTBOX(SAY) \
@@ -270,6 +271,7 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 
 static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 {
+	if(!cpymo_engine_skipping(e)) cpymo_save_autosave(e);
 	cpymo_key_hold_init(&e->say.key_mouse_button, e->input.mouse_button);
 	cpymo_wait_register_with_callback(
 		&e->wait, 

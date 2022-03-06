@@ -22,7 +22,7 @@ error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_
 
 	out->script_name[0] = '\0';
 	out->caller = NULL;
-	out->checkpoint.cur_pos = 0;
+	out->checkpoint.cur_line = 0;
 	
 	size_t script_len = strlen(script_format) + 64;
 	out->script_content = (char *)malloc(script_len);
@@ -39,6 +39,15 @@ error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_
 	return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t line)
+{
+	cpymo_parser_reset(&interpreter->script_parser);
+	while (line != interpreter->script_parser.cur_line)
+		if (!cpymo_parser_next_line(&interpreter->script_parser))
+			return CPYMO_ERR_BAD_FILE_FORMAT;
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * script_name, const cpymo_assetloader *loader)
 {
 	if (strlen(script_name) >= 63) return CPYMO_ERR_OUT_OF_MEM;
@@ -47,7 +56,7 @@ error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * scri
 	out->caller = NULL;
 
 	out->script_content = NULL;
-	out->checkpoint.cur_pos = 0;
+	out->checkpoint.cur_line = 0;
 	size_t script_len = 0;
 
 	error_t err =
@@ -144,7 +153,7 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 
 void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
 {
-	interpreter->checkpoint.cur_pos = interpreter->script_parser.cur_pos;
+	interpreter->checkpoint.cur_line = interpreter->script_parser.cur_line;
 }
 
 #define D(CMD) \
@@ -1279,14 +1288,27 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	/*** V. System ***/
 	D("load") {
-		POP_ARG(save_id);
+		POP_ARG(save_id_x);
 
-		if (IS_EMPTY(save_id)) {
+		if (IS_EMPTY(save_id_x)) {
 			return cpymo_save_ui_enter(engine, true);
 		}
 		else {
-			assert(false);	// TODO
-			CONT_NEXTLINE;
+			unsigned short save_id = (unsigned short)cpymo_parser_stream_span_atoi(save_id_x);
+			FILE *file = cpymo_save_open_read(engine, save_id);
+			if (file) {
+				error_t err = cpymo_save_load_savedata(engine, file);
+				if (err != CPYMO_ERR_SUCC) {
+					printf("[Error] Bad save data file: %s\n", cpymo_error_message(err));
+					return CPYMO_ERR_NO_MORE_CONTENT;
+				}
+
+				longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
+				return CPYMO_ERR_UNKNOWN;
+			}
+			else {
+				CONT_NEXTLINE;
+			}
 		}
 	}
 

@@ -15,7 +15,7 @@ struct cpymo_interpreter {
 	struct cpymo_interpreter *caller;
 
 	struct {
-		size_t cur_pos;
+		size_t cur_line;
 	} checkpoint;
 };
 
@@ -29,5 +29,7 @@ error_t cpymo_interpreter_goto_label(cpymo_interpreter *interpreter, cpymo_parse
 error_t cpymo_interpreter_execute_step(cpymo_interpreter *interpreter, struct cpymo_engine *engine);
 
 void cpymo_interpreter_checkpoint(cpymo_interpreter *interpreter);
+
+error_t cpymo_interpreter_goto_line(cpymo_interpreter *interpreter, uint64_t line);
 
 #endif

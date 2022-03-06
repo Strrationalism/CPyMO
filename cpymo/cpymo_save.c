@@ -1,4 +1,5 @@
 #include "cpymo_save.h"
+#include "cpymo_save_global.h"
 #include "cpymo_engine.h"
 #include "cpymo_msgbox_ui.h"
 #include <cpymo_backend_save.h>
@@ -134,11 +135,13 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 			WRITE_STR(e->anime.anime_name);
 
 			int32_t all_frames = (int32_t)e->anime.all_frame;
+			int32_t interval = (int32_t)(e->anime.interval * 1000.0f);
 			int32_t x = (int32_t)e->anime.draw_x;
 			int32_t y = (int32_t)e->anime.draw_y;
 
 			uint32_t anime_params[] = {
 				PACK32(all_frames),
+				PACK32(interval),
 				PACK32(x),
 				PACK32(y)
 			};
@@ -180,7 +183,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 			uint32_t cur_pos = (uint32_t)interpreter->script_parser.cur_pos;
 			uint32_t cur_line = (uint32_t)interpreter->script_parser.cur_line;
 			uint32_t line_end = (uint32_t)interpreter->script_parser.is_line_end;
-			uint32_t checkpoint_line = (uint32_t)interpreter->checkpoint.cur_pos;
+			uint32_t checkpoint_line = (uint32_t)interpreter->checkpoint.cur_line;
 			
 			uint32_t interpreter_params[] = {
 				PACK32(cur_pos),
@@ -206,6 +209,12 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 
 	fclose(save);
 	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_save_autosave(cpymo_engine *e)
+{
+	cpymo_save_write(e, 0);
+	cpymo_save_global_save(e);
 }
 
 FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id)
@@ -266,6 +275,202 @@ error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save)
 		out->title = NULL;
 		out->say_name = NULL;
 	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
+{
+	char *strbuf = NULL;
+
+	#define FAIL if (err != CPYMO_ERR_SUCC)
+	#define THROW if (strbuf) free(strbuf); return err;
+
+	// TITLE
+	error_t err = cpymo_save_read_string(&strbuf, save);
+	FAIL{ THROW; };
+
+	if (e->title) free(e->title);
+	e->title = strbuf;
+	strbuf = NULL;
+
+	// LATEST SAY
+	err = cpymo_save_read_string(&strbuf, save);
+	FAIL{ THROW; };
+	err = cpymo_save_read_string(&strbuf, save);
+	FAIL{ THROW; };
+
+	// MSGBOX IMAGES
+	{
+		char *msgbox = NULL, *namebox = NULL;
+		err = cpymo_save_read_string(&namebox, save);
+		FAIL{ THROW; }
+
+		err = cpymo_save_read_string(&msgbox, save);
+		FAIL{ free(namebox); THROW; };
+
+		cpymo_say_load_msgbox_and_namebox_image(
+			&e->say,
+			cpymo_parser_stream_span_pure(msgbox),
+			cpymo_parser_stream_span_pure(namebox),
+			&e->assetloader);
+
+		free(namebox);
+		free(msgbox);
+	}
+
+	// BGM
+	cpymo_audio_channel_reset(e->audio.channels + CPYMO_AUDIO_CHANNEL_VO);
+	cpymo_audio_bgm_stop(e);
+	err = cpymo_save_read_string(&strbuf, save);
+	FAIL{ THROW; };
+	if (*strbuf) cpymo_audio_bgm_play(e, cpymo_parser_stream_span_pure(strbuf), true);
+	
+	
+	// SE
+	cpymo_audio_se_stop(e);
+	err = cpymo_save_read_string(&strbuf, save);
+	FAIL{ THROW; };
+	if (*strbuf) cpymo_audio_se_play(e, cpymo_parser_stream_span_pure(strbuf), true);
+	
+
+	// FADEOUT
+	{
+		uint8_t fadeout_state[4];
+		if (fread(fadeout_state, sizeof(fadeout_state), 1, save) != 1) { THROW; }
+
+		if (fadeout_state[0]) {
+			cpymo_color col;
+			col.r = fadeout_state[1];
+			col.g = fadeout_state[2];
+			col.b = fadeout_state[3];
+
+			e->fade.state = cpymo_fade_keep;
+			e->fade.col = col;
+			cpymo_tween_assign(&e->fade.alpha, 1.0f);
+		}
+		else {
+			e->fade.state = cpymo_fade_disabled;
+		}
+	}
+
+	#define READ_PARAMS(NAME, SIZE) \
+		uint32_t NAME[SIZE]; \
+		if (fread(NAME, sizeof(NAME), 1, save) != 1) { \
+			THROW; \
+		} \
+		for (size_t iiiii = 0; iiiii < SIZE; ++iiiii) \
+			NAME[iiiii] = end_le32toh(NAME[iiiii]);
+
+	#define CAST(TYPE, X) (*(TYPE *)(&X))
+
+	// BG
+	{
+		err = cpymo_save_read_string(&strbuf, save);
+		FAIL{ THROW; };
+
+		READ_PARAMS(bg_params, 2);
+
+		cpymo_bg_command(
+			e,
+			&e->bg,
+			cpymo_parser_stream_span_pure(strbuf),
+			cpymo_parser_stream_span_pure("BG_NOFADE"),
+			(float)CAST(int32_t, bg_params[0]),
+			(float)CAST(int32_t, bg_params[1]),
+			0);
+	}
+
+	// CHARA
+	cpymo_charas_kill_all(e, 0);
+	while (true) {
+		err = cpymo_save_read_string(&strbuf, save);
+		FAIL{ THROW; };
+
+		if (*strbuf == '\0') break;
+
+		READ_PARAMS(chara_params, 4);
+
+		int cid = chara_params[0];
+		int layer = chara_params[1];
+		int32_t x = CAST(int32_t, chara_params[2]);
+		int32_t y = CAST(int32_t, chara_params[3]);
+
+		struct cpymo_chara *c = NULL;
+		cpymo_charas_new_chara(
+			e,
+			&c,
+			cpymo_parser_stream_span_pure(strbuf),
+			cid,
+			layer,
+			0,
+			x,
+			y,
+			1.0f,
+			0);
+	}
+
+	// ANIME
+	cpymo_anime_off(&e->anime);
+	err = cpymo_save_read_string(&strbuf, save);
+	FAIL{ THROW; };
+
+	if (*strbuf) {
+		READ_PARAMS(anime_params, 4);
+		int32_t all_frames = CAST(int32_t, anime_params[0]);
+		int32_t interval_x = CAST(int32_t, anime_params[1]);
+		float interval = 0.001f * (float)interval_x;
+		int32_t x = CAST(int32_t, anime_params[2]);
+		int32_t y = CAST(int32_t, anime_params[3]);
+
+		cpymo_anime_on(e, all_frames, cpymo_parser_stream_span_pure(strbuf), (float)x, (float)y, interval, true);
+	}
+
+	// LOCAL VARS
+	cpymo_vars_clear_locals(&e->vars);
+	while (true) {
+		err = cpymo_save_read_string(&strbuf, save);
+		FAIL{ THROW; };
+		if (*strbuf == '\0') break;
+
+		READ_PARAMS(val, 1);
+		cpymo_vars_set(
+			&e->vars,
+			cpymo_parser_stream_span_pure(strbuf),
+			(int)CAST(int32_t, val[0]));
+	}
+
+	// INTERPRETER
+	cpymo_interpreter_free(e->interpreter);
+	e->interpreter = NULL;
+	cpymo_interpreter **slot = &e->interpreter;
+	while (true) {
+		err = cpymo_save_read_string(&strbuf, save);
+		FAIL{ THROW; };
+
+		if (*strbuf == '\0') break;
+
+		*slot = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
+		if (*slot == NULL) {
+			err = CPYMO_ERR_OUT_OF_MEM;
+			THROW;
+		}
+
+		err = cpymo_interpreter_init_script(*slot, strbuf, &e->assetloader);
+		FAIL{ THROW; };
+
+		READ_PARAMS(interpreter_params, 4);
+		(*slot)->script_parser.cur_pos = interpreter_params[0];
+		(*slot)->script_parser.cur_line = interpreter_params[1];
+		(*slot)->script_parser.is_line_end = interpreter_params[2] != 0;
+		(*slot)->checkpoint.cur_line = interpreter_params[3];
+
+		slot = &(*slot)->caller;
+	}
+
+	cpymo_interpreter_goto_line(e->interpreter, (uint64_t)e->interpreter->checkpoint.cur_line);
+
+	cpymo_engine_request_redraw(e);
 
 	return CPYMO_ERR_SUCC;
 }

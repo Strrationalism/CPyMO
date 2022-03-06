@@ -209,7 +209,11 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 
 static error_t cpymo_save_ui_load_savedata_yesnobox_confirm(cpymo_engine *e, void *save_id_x)
 {
-	return CPYMO_ERR_SUCC;
+	FILE *file = cpymo_save_open_read(e, (unsigned short)(uintptr_t)save_id_x);
+	if (file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+	error_t err = cpymo_save_load_savedata(e, file);
+	fclose(file);
+	return err;
 }
 
 error_t cpymo_save_ui_load_savedata_yesnobox(cpymo_engine * e, unsigned short save_id)

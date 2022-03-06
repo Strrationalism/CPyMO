@@ -7,6 +7,7 @@
 struct cpymo_engine;
 
 error_t cpymo_save_write(struct cpymo_engine *e, unsigned short save_id);
+void cpymo_save_autosave(struct cpymo_engine *e);
 
 FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id);
 
@@ -17,6 +18,6 @@ typedef struct {
 
 error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save);
 
-
+error_t cpymo_save_load_savedata(struct cpymo_engine *e, FILE *save);
 
 #endif

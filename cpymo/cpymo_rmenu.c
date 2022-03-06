@@ -3,6 +3,7 @@
 #include "cpymo_config_ui.h"
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_save_ui.h"
+#include "cpymo_save.h"
 #include <assert.h>
 
 typedef struct {
@@ -119,6 +120,7 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 
 error_t cpymo_rmenu_enter(cpymo_engine *e)
 {
+	cpymo_save_autosave(e);
 	cpymo_rmenu *rmenu = NULL;
 	error_t err = cpymo_ui_enter(
 		(void **)&rmenu,
@@ -207,7 +209,6 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		(float)rmenu->bg_w,
 		(float)rmenu->bg_h,
 	};
-
 
 	cpymo_select_img_configuare_end_select_text(
 		&rmenu->menu,
