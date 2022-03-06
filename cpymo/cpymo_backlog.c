@@ -96,7 +96,6 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 	const float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
 	y += font_size;
 	if (rec->name) {
-		// Why not draw?
 		cpymo_backend_text_draw(
 			rec->name, 0, y, cpymo_color_white,
 			1.0, cpymo_backend_image_draw_type_ui_element);
@@ -152,18 +151,38 @@ static void *cpymo_backlog_ui_get_prev(const cpymo_engine *e, const void *ui_dat
 	return ENC(index);
 }
 
+typedef struct {
+	bool press_key_down_to_close;
+} cpymo_backlog_ui;
+
+static error_t cpymo_backlog_ui_update(cpymo_engine *e, float dt, void *selected)
+{
+	cpymo_backlog_ui *ui = (cpymo_backlog_ui * )cpymo_list_ui_data(e);
+	if (cpymo_backlog_ui_get_prev(e, cpymo_list_ui_data(e), selected) == NULL) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, down)) {
+			if (ui->press_key_down_to_close) cpymo_list_ui_exit(e);
+			else ui->press_key_down_to_close = true;
+		}
+	}
+	else {
+		ui->press_key_down_to_close = false;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 {
-	void *out_data = NULL;
+	cpymo_backlog_ui *ui = NULL;
 
 	size_t first = e->backlog.next_record_to_write;
 	if (first) first--;
 	else first = CPYMO_BACKLOG_MAX_RECORDS - 1;
 
-	return cpymo_list_ui_enter(
+	error_t err = cpymo_list_ui_enter(
 		e,
-		&out_data,
-		0,
+		(void **)&ui,
+		sizeof(cpymo_backlog_ui),
 		&cpymo_backlog_ui_draw_node,
 		&cpymo_backlog_ui_ok,
 		&cpymo_backlog_ui_deleter,
@@ -172,4 +191,11 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 		&cpymo_backlog_ui_get_prev,
 		true,
 		3);
+	CPYMO_THROW(err);
+
+	cpymo_list_ui_set_custom_update(e, &cpymo_backlog_ui_update);
+
+	ui->press_key_down_to_close = false;
+
+	return CPYMO_ERR_SUCC;
 }

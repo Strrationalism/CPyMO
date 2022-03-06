@@ -180,14 +180,6 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		bool tmp = just_press_up;
 		just_press_up = just_press_down;
 		just_press_down = tmp;
-
-		void *selected = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
-		if (ui->get_prev(e, ui + 1, selected) == NULL) {
-			if (CPYMO_INPUT_JUST_RELEASED(e, down)) {
-				cpymo_list_ui_exit(e);
-				return CPYMO_ERR_SUCC;
-			}
-		}
 	}
 
 	if (just_press_up) {
@@ -220,6 +212,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
 		error_t err = ui->custom_update(e, d, obj);
 		CPYMO_THROW(err);
+
+		if (!cpymo_ui_enabled(e))
+			return CPYMO_ERR_SUCC;
 	}
 
 	if (mouse_button_state == cpymo_key_hold_result_hold_released && ui->scroll_delta_y_sum < 5.0f) {
