@@ -404,8 +404,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 			cid,
 			layer,
 			0,
-			x,
-			y,
+			(float)x,
+			(float)y,
 			1.0f,
 			0);
 	}
