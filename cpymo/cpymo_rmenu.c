@@ -1,6 +1,7 @@
 #include "cpymo_rmenu.h"
 #include "cpymo_engine.h"
 #include "cpymo_config_ui.h"
+#include "cpymo_msgbox_ui.h"
 #include <assert.h>
 
 typedef struct {
@@ -77,6 +78,19 @@ static void cpymo_rmenu_delete(cpymo_engine *e, void *ui_data)
 	cpymo_select_img_free(&r->menu);
 }
 
+error_t cpymo_rmenu_restart_game(cpymo_engine *e, void *data)
+{
+	char *gamedir = (char *)malloc(strlen(e->assetloader.gamedir) + 1);
+	if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	strcpy(gamedir, e->assetloader.gamedir);
+	cpymo_engine_free(e);
+	error_t err = cpymo_engine_init(e, gamedir);
+	free(gamedir);
+
+	return err;
+}
+
 static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 {
 	switch (sel) {
@@ -86,18 +100,14 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	case 3: cpymo_say_hidewindow_until_click(e); cpymo_ui_exit(e); break;
 	case 4: cpymo_backlog_ui_enter(e); break;
 	case 5: cpymo_config_ui_enter(e); break;
-	case 6: {
-		char *gamedir = (char *)malloc(strlen(e->assetloader.gamedir) + 1);
-		if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;
-		
-		strcpy(gamedir, e->assetloader.gamedir);
-		cpymo_engine_free(e);
-		error_t err = cpymo_engine_init(e, gamedir);
-		free(gamedir);
-
-		CPYMO_THROW(err);
+	case 6: 
+		cpymo_msgbox_ui_enter(
+			e, 
+			cpymo_parser_stream_span_pure("确定要重新启动游戏吗？"), 
+			&cpymo_rmenu_restart_game, 
+			NULL);
 		break;
-	}
+	
 	case 7: cpymo_ui_exit(e); break;
 	default:
 		assert(false);
