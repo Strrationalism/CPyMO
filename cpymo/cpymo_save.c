@@ -1,5 +1,6 @@
 #include "cpymo_save.h"
 #include "cpymo_engine.h"
+#include "cpymo_msgbox_ui.h"
 #include <cpymo_backend_save.h>
 #include <endianness.h>
 #include <assert.h>
@@ -31,9 +32,11 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 				fclose(save); \
 				return CPYMO_ERR_UNKNOWN; \
 			} \
-			if (fwrite(STR, len, 1, save) != 1) { \
-				fclose(save); \
-				return CPYMO_ERR_UNKNOWN; \
+			if (len) { \
+				if (fwrite(STR, len, 1, save) != 1) { \
+					fclose(save); \
+					return CPYMO_ERR_UNKNOWN; \
+				} \
 			} \
 		} \
 		else { \
@@ -44,7 +47,6 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 			} \
 		}
 
-	// TITLE
 	WRITE_STR(e->title);
 
 	// LATEST SAY
@@ -228,13 +230,15 @@ static error_t cpymo_save_read_string(char **str, FILE *save)
 
 	*str = dst;
 
-	if (fread(*str, len, 1, save) != 1) {
-		free(*str);
-		*str = NULL;
-		return CPYMO_ERR_BAD_FILE_FORMAT;
+	if (len) {
+		if (fread(*str, len, 1, save) != 1) {
+			free(*str);
+			*str = NULL;
+			return CPYMO_ERR_BAD_FILE_FORMAT;
+		}
 	}
 
-	*str[len] = '\0';
+	(*str)[len] = '\0';
 
 	return CPYMO_ERR_SUCC;
 }

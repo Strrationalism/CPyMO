@@ -362,6 +362,19 @@ size_t cpymo_parser_stream_span_utf8_len(cpymo_parser_stream_span span)
 	return len;
 }
 
+cpymo_parser_stream_span cpymo_parser_stream_span_split(cpymo_parser_stream_span *tail, size_t skip)
+{
+	cpymo_parser_stream_span span;
+	span.begin = tail->begin;
+	span.len = 0;
+	for (size_t i = 0; i < skip && tail->len; ++i) {
+		cpymo_parser_stream_span ch = cpymo_parser_stream_span_utf8_try_head(tail);
+		span.len += ch.len;
+	}
+
+	return span;
+}
+
 uint64_t cpymo_parser_stream_span_hash(cpymo_parser_stream_span span)
 {
 	uint64_t seed = 131313;

@@ -47,6 +47,7 @@ bool cpymo_parser_stream_span_starts_with_str_ignore_case(cpymo_parser_stream_sp
 cpymo_parser_stream_span cpymo_parser_stream_span_utf8_try_head(cpymo_parser_stream_span *tail);
 uint32_t cpymo_parser_stream_span_utf8_try_head_to_utf32(cpymo_parser_stream_span *tail);
 size_t cpymo_parser_stream_span_utf8_len(cpymo_parser_stream_span span);
+cpymo_parser_stream_span cpymo_parser_stream_span_split(cpymo_parser_stream_span *tail, size_t skip);
 
 uint64_t cpymo_parser_stream_span_hash(cpymo_parser_stream_span span);
 

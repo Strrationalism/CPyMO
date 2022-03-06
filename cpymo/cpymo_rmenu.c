@@ -2,6 +2,7 @@
 #include "cpymo_engine.h"
 #include "cpymo_config_ui.h"
 #include "cpymo_msgbox_ui.h"
+#include "cpymo_save_ui.h"
 #include <assert.h>
 
 typedef struct {
@@ -94,8 +95,8 @@ error_t cpymo_rmenu_restart_game(cpymo_engine *e, void *data)
 static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 {
 	switch (sel) {
-	case 0: cpymo_ui_exit(e); break;
-	case 1: cpymo_ui_exit(e); break;
+	case 0: cpymo_save_ui_enter(e, false); break;
+	case 1: cpymo_save_ui_enter(e, true); break;
 	case 2: cpymo_ui_exit(e); e->skipping = true; break;
 	case 3: cpymo_say_hidewindow_until_click(e); cpymo_ui_exit(e); break;
 	case 4: cpymo_backlog_ui_enter(e); break;
@@ -191,8 +192,8 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 
 	cpymo_select_img_configuare_set_ok_callback(&rmenu->menu, &cpymo_rmenu_ok);
 
-	RMENU_ITEM(0, "存档", false);
-	RMENU_ITEM(1, "读档", false);
+	RMENU_ITEM(0, "存档", true);
+	RMENU_ITEM(1, "读档", true);
 	RMENU_ITEM(2, "快进", e->select_img.selections == NULL);
 	RMENU_ITEM(3, "隐藏对话框", e->select_img.selections == NULL);
 	RMENU_ITEM(4, "对话历史", true);
