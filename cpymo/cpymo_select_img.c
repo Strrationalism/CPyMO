@@ -10,11 +10,9 @@ static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, ui
 	if (save_enabled)
 		cpymo_hash_flags_add(&e->flags, hash);
 
-	const char *out_var = cpymo_gameconfig_is_mo1(&e->gameconfig) ? "F91" : "FSEL";
-
 	error_t err = cpymo_vars_set(
 		&e->vars,
-		cpymo_parser_stream_span_pure(out_var),
+		cpymo_parser_stream_span_pure("FSEL"),
 		sel);
 
 	if (err != CPYMO_ERR_SUCC) return err;

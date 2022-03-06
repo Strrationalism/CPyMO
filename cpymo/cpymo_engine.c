@@ -1,4 +1,5 @@
 #include "cpymo_engine.h"
+#include "cpymo_interpreter.h"
 #include <cpymo_backend_image.h>
 #include <string.h>
 #include <stdio.h>

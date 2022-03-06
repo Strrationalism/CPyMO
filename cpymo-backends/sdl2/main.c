@@ -81,7 +81,7 @@ static void ensure_save_dir(const char *gamedir)
 
 int main(int argc, char **argv) 
 {
-	//_CrtSetBreakAlloc(529);
+	//_CrtSetBreakAlloc(1371);
 
 	av_log_set_level(AV_LOG_ERROR);
 

@@ -51,11 +51,13 @@ static error_t cpymo_audio_channel_grow_convert_buffer(
 		1);
 
 	if (size > c->converted_buf_all_size) {
-		c->converted_buf = (uint8_t *)realloc(c->converted_buf, size);
-		if (c->converted_buf == NULL) {
+		uint8_t *converted_buf = (uint8_t *)realloc(c->converted_buf, size);
+		if (converted_buf == NULL) {
 			cpymo_audio_channel_reset_unsafe(c);
 			return CPYMO_ERR_OUT_OF_MEM;
 		}
+
+		c->converted_buf = converted_buf;
 		c->converted_buf_all_size = size;
 	}
 

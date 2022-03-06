@@ -44,7 +44,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 
 #ifdef WIN32
 	const char *windir = getenv("windir");
-	path = (char *)alloca(strlen(windir) + 16);
+	path = (char *)alloca(strlen(windir) + 32);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	#define TRY_LOAD(NAME) \

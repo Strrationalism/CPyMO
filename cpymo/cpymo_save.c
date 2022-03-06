@@ -281,6 +281,32 @@ error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save)
 
 error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 {
+	// reset states
+	cpymo_vars_clear_locals(&e->vars);
+
+	cpymo_interpreter_free(e->interpreter);
+	free(e->interpreter);
+	e->interpreter = NULL;
+
+	cpymo_wait_reset(&e->wait);
+	cpymo_flash_reset(&e->flash);
+	cpymo_fade_reset(&e->fade);
+	cpymo_bg_reset(&e->bg);
+	cpymo_anime_off(&e->anime);
+	cpymo_select_img_reset(&e->select_img);
+	cpymo_charas_free(&e->charas); cpymo_charas_init(&e->charas);
+	cpymo_scroll_reset(&e->scroll);
+	cpymo_say_free(&e->say); cpymo_say_init(&e->say);
+	cpymo_text_clear(&e->text);
+	
+	cpymo_audio_channel_reset(e->audio.channels + CPYMO_AUDIO_CHANNEL_VO);
+	cpymo_audio_bgm_stop(e);
+	cpymo_audio_se_stop(e);
+
+	cpymo_backlog_free(&e->backlog); cpymo_backlog_init(&e->backlog);
+
+
+	// load save data
 	char *strbuf = NULL;
 
 	#define FAIL if (err != CPYMO_ERR_SUCC)
@@ -320,15 +346,13 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	}
 
 	// BGM
-	cpymo_audio_channel_reset(e->audio.channels + CPYMO_AUDIO_CHANNEL_VO);
-	cpymo_audio_bgm_stop(e);
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
 	if (*strbuf) cpymo_audio_bgm_play(e, cpymo_parser_stream_span_pure(strbuf), true);
 	
 	
 	// SE
-	cpymo_audio_se_stop(e);
+	
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
 	if (*strbuf) cpymo_audio_se_play(e, cpymo_parser_stream_span_pure(strbuf), true);
@@ -382,7 +406,6 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	}
 
 	// CHARA
-	cpymo_charas_kill_all(e, 0);
 	while (true) {
 		err = cpymo_save_read_string(&strbuf, save);
 		FAIL{ THROW; };
@@ -411,7 +434,6 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	}
 
 	// ANIME
-	cpymo_anime_off(&e->anime);
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
 
@@ -427,7 +449,6 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	}
 
 	// LOCAL VARS
-	cpymo_vars_clear_locals(&e->vars);
 	while (true) {
 		err = cpymo_save_read_string(&strbuf, save);
 		FAIL{ THROW; };
@@ -441,8 +462,6 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	}
 
 	// INTERPRETER
-	cpymo_interpreter_free(e->interpreter);
-	e->interpreter = NULL;
 	cpymo_interpreter **slot = &e->interpreter;
 	while (true) {
 		err = cpymo_save_read_string(&strbuf, save);
@@ -467,6 +486,11 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 
 		slot = &(*slot)->caller;
 	}
+
+	if (strbuf) free(strbuf);
+	strbuf = NULL;
+
+	if (e->interpreter == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
 
 	cpymo_interpreter_goto_line(e->interpreter, (uint64_t)e->interpreter->checkpoint.cur_line);
 

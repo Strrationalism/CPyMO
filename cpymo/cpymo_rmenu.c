@@ -33,6 +33,15 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 	return CPYMO_ERR_SUCC;
 }
 
+static inline float cpymo_rmenu_zoom(const cpymo_engine *e) 
+{
+	if (cpymo_gameconfig_is_symbian(&e->gameconfig)) {
+		if (e->gameconfig.platform[4] == '5') return 1.3f;		// s60v5
+		else return 1.6f;	// s60v3
+	}
+	else return 1.0f;	// android
+}
+
 static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 {
 	const cpymo_rmenu *r = (const cpymo_rmenu *)ui_data;
@@ -40,11 +49,15 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_bg_draw(e);
 	cpymo_scroll_draw(&e->scroll);
 
+	float zoom = cpymo_rmenu_zoom(e);
+	float w = (float)r->bg_w * zoom;
+	float h = (float)r->bg_h * zoom;
+
 	float bg_xywh[4] = {
-		((float)e->gameconfig.imagesize_w - (float)r->bg_w) / 2,
-		((float)e->gameconfig.imagesize_h - (float)r->bg_h) / 2 - 0.018f * (float)e->gameconfig.imagesize_h,
-		(float)r->bg_w,
-		(float)r->bg_h,
+		((float)e->gameconfig.imagesize_w - (float)w) / 2,
+		((float)e->gameconfig.imagesize_h - (float)h) / 2 - 0.018f * (float)e->gameconfig.imagesize_h,
+		(float)w,
+		(float)h,
 	};
 
 	if (r->bg) {
@@ -56,8 +69,8 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 			r->bg,
 			0,
 			0,
-			r->bg_w,
-			r->bg_h,
+			w,
+			h,
 			1.0f,
 			cpymo_backend_image_draw_type_ui_bg);
 	}
@@ -174,7 +187,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		return err;
 	}
 
-	const float font_size = 16 / 240.0f * e->gameconfig.imagesize_h * 0.75f;
+	const float font_size = cpymo_rmenu_zoom(e) * 16 / 240.0f * e->gameconfig.imagesize_h * 0.75f;
 
 	#define RMENU_ITEM(_, TEXT, ENABLED) \
 		err = cpymo_select_img_configuare_select_text( \

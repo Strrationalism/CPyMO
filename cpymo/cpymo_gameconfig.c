@@ -62,11 +62,6 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 		return;
 	}
 
-	/*D("fontaa") {
-		o->fontaa = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
-		return;
-	}*/
-
 	D("hint") {
 		o->hint = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
 		return;

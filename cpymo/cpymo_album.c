@@ -493,7 +493,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 	}
 
 	if (e->input.mouse_button && e->prev_input.mouse_button) {
-		if (e->input.mouse_position_useable && e->input.mouse_position_useable) {
+		if (e->input.mouse_position_useable) {
 			album->mouse_x_sum += e->input.mouse_x - e->prev_input.mouse_x;
 		}
 	}

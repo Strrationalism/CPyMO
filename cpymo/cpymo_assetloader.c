@@ -11,7 +11,7 @@ error_t cpymo_assetloader_init(cpymo_assetloader * out, const cpymo_gameconfig *
 	error_t err;
 	const size_t gamedir_strlen = strlen(gamedir);
 
-	char *chbuf = (char *)malloc(gamedir_strlen + 18);
+	char *chbuf = (char *)malloc(gamedir_strlen + 24);
 	out->gamedir = chbuf;
 
 	out->game_config = config;

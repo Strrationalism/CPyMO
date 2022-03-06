@@ -148,7 +148,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 		}
 
 		i++;
-	} while (cpymo_parser_next_line(&p));
+	} while (cpymo_parser_next_line(&p) && i < box->music_count);
 
 	assert(i == box->music_count);
 	cpymo_list_ui_set_current_node(e, ENCODE_NODE(0));

@@ -37,15 +37,15 @@ error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 			out_package->file_count,
 			out_package->stream);
 
+	if (count != out_package->file_count) {
+		cpymo_package_close(out_package);
+		return CPYMO_ERR_BAD_FILE_FORMAT;
+	}
+
 	for (uint32_t i = 0; i < out_package->file_count; ++i) {
 		cpymo_package_index *file = &out_package->files[i];
 		file->file_length = end_le32toh(file->file_length);
 		file->file_offset = end_le32toh(file->file_offset);
-	}
-
-	if (count != out_package->file_count) {
-		cpymo_package_close(out_package);
-		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
 	return CPYMO_ERR_SUCC;

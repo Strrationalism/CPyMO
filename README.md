@@ -106,6 +106,12 @@ CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。
 2. 启动Homebrew Launcher，建议使用这里的Homebrew Launcher Dummy（https://github.com/PabloMK7/homebrew_launcher_dummy ）。
 3. 执行cpymo.3dsx。
 
+### 在3DS中没有声音？
+
+你需要确保已经Dump了3DS的DSP固件。    
+如果你没有Dump，那么你需要先安装DSP1（https://github.com/zoogie/DSP1/releases/tag/v1.0），并使用它Dump你的3DS的DSP固件。
+
+
 ### 关于字体
 
 3DS版本的CPyMO不会加载游戏中自带的字体或者其他TTF字体，而是使用[思源黑体](https://github.com/adobe-fonts/source-han-sans)。    

@@ -28,8 +28,9 @@ error_t cpymo_hash_flags_reserve(cpymo_hash_flags *f, size_t size)
 	else if (f->flag_buf_size < size) {
 		assert(f->flag_buf_size != 0);
 		size *= 2;
-		f->flags = (cpymo_hash_flag *)realloc(f->flags, size * sizeof(cpymo_hash_flag));
+		cpymo_hash_flag *flags = (cpymo_hash_flag *)realloc(f->flags, size * sizeof(cpymo_hash_flag));
 		if (f->flags == NULL) return CPYMO_ERR_OUT_OF_MEM;
+		f->flags = flags;
 
 		f->flag_buf_size = size;
 	}
