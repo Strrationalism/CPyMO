@@ -78,7 +78,7 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_parser_stream_span nam
 bool cpymo_vars_is_constant(cpymo_parser_stream_span expr)
 {
 	for (size_t i = 0; i < expr.len; ++i) {
-		if (!isdigit((int)expr.begin[i])) {
+		if (!isdigit((int)expr.begin[i]) && expr.begin[i] != '-') {
 			return false;
 		}
 	}
