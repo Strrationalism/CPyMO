@@ -69,8 +69,8 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 			r->bg,
 			0,
 			0,
-			w,
-			h,
+			(float)r->bg_w,
+			(float)r->bg_h,
 			1.0f,
 			cpymo_backend_image_draw_type_ui_bg);
 	}
