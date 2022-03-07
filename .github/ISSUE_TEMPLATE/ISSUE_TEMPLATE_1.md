@@ -1,6 +1,6 @@
 ---
 name: 兼容性缺陷报告
-about: 兼容性缺陷报告
+about: 对某个已知游戏存在兼容性问题，请使用这个模板。
 title: "[Compatibility]: "
 labels: bug, compatibility
 assignees: Seng-Jik
