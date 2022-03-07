@@ -55,7 +55,15 @@ const static float text_scale_divisor = 28.0f;
 
 float cpymo_backend_text_width(cpymo_parser_stream_span text, float logic_size)
 {
-    return logic_size * cpymo_parser_stream_span_utf8_len(text) / 1.35f;
+    cpymo_backend_text t = NULL;
+    float w;
+    error_t err = cpymo_backend_text_create(&t, &w, text, logic_size);
+    if (err != CPYMO_ERR_SUCC) {
+        return logic_size * cpymo_parser_stream_span_utf8_len(text) / 1.35f;
+    }
+
+    cpymo_backend_text_free(t);
+    return w;
 }
 
 error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_parser_stream_span utf8_string, float single_character_size_in_logical_screen)
@@ -90,7 +98,8 @@ error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_p
         single_character_size_in_logical_screen / text_scale_divisor,
         &w, NULL);
 
-    *out_w = cpymo_backend_text_width(utf8_string, single_character_size_in_logical_screen);
+    //*out_w = cpymo_backend_text_width(utf8_string, single_character_size_in_logical_screen);
+    *out_w = w;
 
     return CPYMO_ERR_SUCC;
 }
