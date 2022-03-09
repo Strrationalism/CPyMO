@@ -23,17 +23,14 @@ error_t cpymo_assetloader_load_bg_image(cpymo_backend_image *img, int *w, int *h
 error_t cpymo_assetloader_load_chara(char **out_buffer, size_t *buf_size, const char *chara_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara_mask(char **out_buffer, size_t *buf_size, const char *chara_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_voice(char **out_buffer, size_t *buf_size, const char *voice_name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_se(char **out_buffer, size_t *buf_size, const char *se_name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_bgm(char **out_buffer, size_t *buf_size, const char *bgm_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_script(char **out_buffer, size_t *buf_size, const char *script_name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_video(char **out_buffer, size_t *buf_size, const char *video_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system(char **out_buffer, size_t *buf_size, const char *asset_name, const char *ext, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 
 error_t cpymo_assetloader_get_bgm_path(char **out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l);
+error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span se_name, const cpymo_assetloader *l);
 error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l);
+error_t cpymo_assetloader_get_video_path(char **out_str, cpymo_parser_stream_span movie_name, const cpymo_assetloader *l);
 
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image *out_image, 

@@ -260,43 +260,11 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, i
 	}
 }
 
-error_t cpymo_assetloader_load_voice(char ** out_buffer, size_t * buf_size, const char * voice_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_file(
-		out_buffer, buf_size, "voice",
-		voice_name, loader->game_config->voiceformat,
-		loader->use_pkg_voice, &loader->pkg_voice, 
-		loader);
-}
-
-error_t cpymo_assetloader_load_se(char ** out_buffer, size_t * buf_size, const char * se_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_file(
-		out_buffer, buf_size, "se",
-		se_name, loader->game_config->seformat,
-		loader->use_pkg_se, &loader->pkg_se,
-		loader);
-}
-
-error_t cpymo_assetloader_load_bgm(char ** out_buffer, size_t * buf_size, const char * bgm_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_filesystem_file(
-		out_buffer, buf_size, "bgm", bgm_name, 
-		loader->game_config->bgmformat, loader);
-}
-
 error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, const char * script_name, const cpymo_assetloader * loader)
 {
 	return cpymo_assetloader_load_filesystem_file(
 		out_buffer, buf_size, "script", script_name,
 		"txt", loader);
-}
-
-error_t cpymo_assetloader_load_video(char ** out_buffer, size_t * buf_size, const char * video_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_filesystem_file(
-		out_buffer, buf_size, "video", video_name,
-		"mp4", loader);
 }
 
 error_t cpymo_assetloader_load_system(char ** out_buffer, size_t * buf_size, const char * system_name, const char * ext, const cpymo_assetloader * loader)
@@ -374,6 +342,11 @@ error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span
 error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
 {
 	return cpymo_assetloader_get_fs_path(out_str, vo_name, "voice", l->game_config->voiceformat, l);
+}
+
+error_t cpymo_assetloader_get_video_path(char ** out_str, cpymo_parser_stream_span movie_name, const cpymo_assetloader * l)
+{
+	return cpymo_assetloader_get_fs_path(out_str, movie_name, "video", "mp4", l);
 }
 
 error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
