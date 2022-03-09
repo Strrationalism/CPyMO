@@ -357,7 +357,7 @@ error_t cpymo_audio_channel_play_file(
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
-	AVCodec *codec = NULL;
+	const AVCodec *codec = NULL;
 	c->stream_id = av_find_best_stream(
 		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
 	if (result != 0) {
