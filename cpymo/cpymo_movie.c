@@ -124,9 +124,11 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	averr = avformat_find_stream_info(m->format_context, NULL);
 	THROW_AVERR(averr < 0, CPYMO_ERR_NOT_FOUND);
 
-	const AVCodec *video_codec = NULL;
-	m->video_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_VIDEO, -1, -1, &video_codec, 0);
+	m->video_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 	THROW(m->video_stream_index < 0, CPYMO_ERR_NOT_FOUND, "Could not find video stream");
+
+	const AVCodec *video_codec = 
+		avcodec_find_decoder(m->format_context->streams[m->video_stream_index]->codecpar->codec_id);
 	THROW(video_codec == NULL, CPYMO_ERR_NOT_FOUND, "Could not find video codec");
 
 	m->video_codec_context = avcodec_alloc_context3(video_codec);
@@ -140,9 +142,13 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 		m->format_context->streams[m->video_stream_index]->codecpar);
 	THROW_AVERR(averr < 0, CPYMO_ERR_UNKNOWN);
 
-	const AVCodec *audio_codec = NULL;
-	m->audio_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, &audio_codec, 0);
-	if (m->audio_stream_index >= 0 && audio_codec && e->audio.enabled) {
+	m->audio_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+	if (m->audio_stream_index >= 0 && e->audio.enabled) {
+		const AVCodec *audio_codec = 
+			avcodec_find_decoder(
+				m->format_context->streams[m->audio_stream_index]->codecpar->codec_id);
+		if (audio_codec == NULL) goto AUDIO_FAILED;
+
 		m->audio_codec_context = avcodec_alloc_context3(audio_codec);
 		if (m->audio_codec_context == NULL) goto AUDIO_FAILED;
 
@@ -166,7 +172,6 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	}
 	else {
 		AUDIO_FAILED:
-		audio_codec = NULL;
 		m->audio_codec_context = NULL;
 		m->audio_frame = NULL;
 	}
