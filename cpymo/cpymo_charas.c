@@ -287,7 +287,7 @@ void cpymo_charas_fast_kill_all(cpymo_charas * c)
 
 error_t cpymo_charas_pos(cpymo_engine *e, int chara_id, int coord_mode, float x, float y)
 {
-	struct cpymo_chara *c;
+	struct cpymo_chara *c = NULL;
 	error_t err = cpymo_charas_find(&e->charas, &c, chara_id);
 	CPYMO_THROW(err);
 
