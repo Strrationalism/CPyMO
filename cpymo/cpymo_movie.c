@@ -14,6 +14,8 @@ typedef struct {
 	AVFrame *video_frame, *audio_frame;
 
 	bool no_more_content;
+
+	float current_time;
 } cpymo_movie;
 
 static error_t cpymo_movie_send_packets(cpymo_movie *m)
@@ -109,12 +111,20 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 {
 	cpymo_movie *m = (cpymo_movie *)ui_data;
+	m->current_time += dt;
 
-	if (cpymo_movie_send_video_frame_to_backend(m) == CPYMO_ERR_NO_MORE_CONTENT) {
-		cpymo_ui_exit(e);
+	const float video_current_frame_time = 
+		(float)
+		(m->video_frame->best_effort_timestamp 
+			* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
+
+	if (video_current_frame_time < m->current_time) {
+		if (cpymo_movie_send_video_frame_to_backend(m) == CPYMO_ERR_NO_MORE_CONTENT) {
+			cpymo_ui_exit(e);
+		}
+
+		cpymo_engine_request_redraw(e);
 	}
-
-	cpymo_engine_request_redraw(e);
 
 	return CPYMO_ERR_SUCC;
 }
@@ -164,6 +174,7 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	m->no_more_content = false;
 	m->audio_frame = NULL;
 	m->video_frame = NULL;
+	m->current_time = 0;
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
@@ -239,6 +250,7 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	m->video_frame = av_frame_alloc();
 	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVFrame");
 
+	m->video_frame->best_effort_timestamp = 0;
 	do {
 		err = cpymo_movie_send_packets(m);
 	} while (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_NO_MORE_CONTENT);
