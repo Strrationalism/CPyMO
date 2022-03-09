@@ -149,6 +149,11 @@ static error_t cpymo_audio_channel_next_frame(cpymo_audio_channel *c)
 		// No frame received, send more packet to codec.
 		result = av_read_frame(c->format_context, c->packet);
 		if (result == 0) {
+			if (c->packet->stream_index != c->stream_id) {
+				av_packet_unref(c->packet);
+				goto RETRY;
+			}
+
 			result = avcodec_send_packet(c->codec_context, c->packet);
 			av_packet_unref(c->packet);
 			if (result != 0) {
@@ -352,8 +357,9 @@ error_t cpymo_audio_channel_play_file(
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
+	const AVCodec *codec = NULL;
 	c->stream_id = av_find_best_stream(
-		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
 	if (result != 0) {
 		cpymo_audio_channel_reset_unsafe(c);
 		printf("[Error] Can not find best stream from %s.\n", filename);
@@ -362,7 +368,6 @@ error_t cpymo_audio_channel_play_file(
 
 	AVStream *stream = c->format_context->streams[c->stream_id];
 	assert(c->codec_context == NULL);
-	const AVCodec *codec = avcodec_find_decoder(stream->codecpar->codec_id);
 	c->codec_context = avcodec_alloc_context3(codec);
 	avcodec_parameters_to_context(c->codec_context, stream->codecpar);
 	c->codec_context->pkt_timebase = stream->time_base;
