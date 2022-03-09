@@ -15,7 +15,8 @@ add_executable (cpymo
 	"cpymo_backend_text.c" 
 	"posix_win32.h" 
 	"cpymo_backend_save.c" 
-	"cpymo_backend_audio.c")
+	"cpymo_backend_audio.c" 
+	"cpymo_backend_movie.c")
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
 	target_sources (cpymo PRIVATE "pymo-icon-windows.rc")
