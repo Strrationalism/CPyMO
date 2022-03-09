@@ -25,9 +25,12 @@ void cpymo_backend_movie_free()
 	tex = NULL;
 }
 
-void cpymo_backend_movie_update_yuv_surface(const void *pixels, size_t linesize)
+void cpymo_backend_movie_update_yuv_surface(
+	const void *y, size_t y_pitch,
+	const void *u, size_t u_pitch,
+	const void *v, size_t v_pitch)
 {
-	SDL_UpdateTexture(tex, NULL, pixels, (int)linesize);
+	SDL_UpdateYUVTexture(tex, NULL, (const Uint8 *)y, (int)y_pitch, (const Uint8 *)u, (int)u_pitch, (const Uint8 *)v, (int)v_pitch);
 }
 
 void cpymo_backend_movie_draw_yuv_surface()
