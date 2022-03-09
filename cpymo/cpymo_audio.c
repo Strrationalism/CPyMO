@@ -357,9 +357,9 @@ error_t cpymo_audio_channel_play_file(
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
-	const AVCodec *codec = NULL;
+	
 	c->stream_id = av_find_best_stream(
-		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
+		c->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
 	if (result != 0) {
 		cpymo_audio_channel_reset_unsafe(c);
 		printf("[Error] Can not find best stream from %s.\n", filename);
@@ -367,6 +367,12 @@ error_t cpymo_audio_channel_play_file(
 	}
 
 	AVStream *stream = c->format_context->streams[c->stream_id];
+	const AVCodec *codec = avcodec_find_decoder(stream->codecpar->codec_id);
+	if (codec == NULL) {
+		cpymo_audio_channel_reset_unsafe(c);
+		printf("[Error] Can not find codec.\n");
+		return CPYMO_ERR_NOT_FOUND;
+	}
 	assert(c->codec_context == NULL);
 	c->codec_context = avcodec_alloc_context3(codec);
 	avcodec_parameters_to_context(c->codec_context, stream->codecpar);
