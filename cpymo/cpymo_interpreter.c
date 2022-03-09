@@ -5,6 +5,7 @@
 #include "cpymo_config_ui.h"
 #include "cpymo_save_ui.h"
 #include "cpymo_save.h"
+#include "cpymo_movie.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -439,6 +440,18 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		float time = cpymo_parser_stream_span_atoi(time_str) / 1000.0f;
 		cpymo_fade_start_fadein(engine, time);
 		return CPYMO_ERR_SUCC;
+	}
+
+	D("movie") {
+		POP_ARG(movie_name);
+		char *movie_path = NULL;
+		error_t err = cpymo_assetloader_get_video_path(&movie_path, movie_name, &engine->assetloader);
+		CPYMO_THROW(err);
+
+		err = cpymo_movie_play(engine, movie_path);
+		free(movie_path);
+
+		return err;
 	}
 
 	D("textbox") {
