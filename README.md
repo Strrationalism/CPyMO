@@ -76,7 +76,7 @@ Unpack a pymo package:
 如果你使用其他Unix-like操作系统，则在sh中执行该脚本，之后执行make install。    
 之后ffmpeg的3ds版本即可安装到devkitPro的portlibs文件夹下。    
 
-目前本人所使用的版本是 https://github.com/FFmpeg/FFmpeg 中的commit 4ac85ae4481089ca34772dee255f920ffc9827b6。
+目前本人所使用的版本是 https://github.com/FFmpeg/FFmpeg 中的 release/5.0 分支（commit 911d7f167c30f27a042b8558dfcf012b3c20e858）。
 
 ### 产生cia文件
 于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。    
