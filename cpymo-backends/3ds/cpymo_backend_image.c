@@ -99,7 +99,7 @@ void trans_size(float *w, float *h) {
     }
     else {
         if(fill_screen) {
-            *w = *w / game_width * (400 + 20);
+            *w = *w / game_width * (400 + 20 * fabsf(render_3d_offset));
             *h = *h / game_height * 240;
         }
         else {
@@ -123,42 +123,12 @@ void trans_pos(float *x, float *y) {
     }
     else {
         if(fill_screen) {
-            *x = *x / game_width * (400 + 20) - 10;
+            *x = *x / game_width * (400 + 20 * fabsf(render_3d_offset)) - 10 * fabsf(render_3d_offset);
             *y = *y / game_height * 240;
         }
         else {
             *x = *x / game_width * viewport_width + offset_x;
             *y = *y / game_height * viewport_height + offset_y;
-        }
-    }
-}
-
-void cpymo_backend_image_fill_screen_edges()
-{
-    const u32 col = C2D_Color32(0, 0, 0, 255);
-    if(drawing_bottom_screen) {
-        // enhanced_3ds_display_mode
-        if(offset_x > 0.5f) {
-            C2D_DrawRectSolid(0, 0, 0, offset_xb, 240, col);
-            C2D_DrawRectSolid(offset_xb + viewport_width_bottom, 0, 0, offset_xb, 240, col);
-        }
-
-        if(offset_y > 0.5f) {
-            C2D_DrawRectSolid(0, 0, 0, 320, offset_yb, col);
-            C2D_DrawRectSolid(0, offset_yb + viewport_height_bottom, 0, 320, offset_yb, col);
-        }
-    }
-    else {
-        if(!fill_screen) {
-            if(offset_x > 0.5f) {
-                C2D_DrawRectSolid(-10 * render_3d_offset - 10, 0, 0, offset_x + 10, 240, col);
-                C2D_DrawRectSolid(-10 * render_3d_offset + offset_x + viewport_width, 0, 0, offset_x + 10, 240, col);
-            }
-
-            if(offset_y > 0.5f) {
-                C2D_DrawRectSolid(0, 0, 0, 400, offset_y, col);
-                C2D_DrawRectSolid(0, offset_y + viewport_height, 0, 400, offset_y, col);
-            }
         }
     }
 }
