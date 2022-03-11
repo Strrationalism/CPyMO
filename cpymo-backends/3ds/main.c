@@ -27,7 +27,6 @@ float render_3d_offset;
 bool fill_screen;
 
 extern void cpymo_backend_image_init(float, float);
-extern void cpymo_backend_image_fill_screen_edges();
 
 extern error_t cpymo_backend_text_sys_init();
 extern void cpymo_backend_text_sys_free();
@@ -275,14 +274,12 @@ int main(void) {
 			C2D_SceneBegin(screen1);
 			render_3d_offset = slider;
 			cpymo_engine_draw(&engine);
-			cpymo_backend_image_fill_screen_edges();
 
 			if(slider > 0){
 				C2D_TargetClear(screen2, clr);
 				C2D_SceneBegin(screen2);
 				render_3d_offset = -slider;
 				cpymo_engine_draw(&engine);
-				cpymo_backend_image_fill_screen_edges();
 			}
 
 			if(screen3) {
@@ -293,7 +290,6 @@ int main(void) {
 					render_3d_offset = 0;
 					drawing_bottom_screen = true;
 					cpymo_engine_draw(&engine);
-					cpymo_backend_image_fill_screen_edges();
 				}
 			}
 
