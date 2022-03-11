@@ -97,7 +97,10 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 
 		cpymo_engine_request_redraw(e);
 	}
-	else if (CPYMO_INPUT_JUST_PRESSED(e, ok) || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+	else if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+		cpymo_engine_request_redraw(e);
+	}
+	else if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
 		ui->selection = cpymo_msgbox_ui_get_mouse_selection(e);
 		cpymo_engine_request_redraw(e);
 	}
