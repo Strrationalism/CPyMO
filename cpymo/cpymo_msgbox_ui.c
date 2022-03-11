@@ -98,6 +98,7 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 		cpymo_engine_request_redraw(e);
 	}
 	else if (CPYMO_INPUT_JUST_PRESSED(e, ok) || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+		ui->selection = cpymo_msgbox_ui_get_mouse_selection(e);
 		cpymo_engine_request_redraw(e);
 	}
 	else if (CPYMO_INPUT_JUST_RELEASED(e, ok)) {
@@ -242,7 +243,7 @@ error_t cpymo_msgbox_ui_enter(
 
 	ui->confirm = confirm;
 	ui->confirm_data = confirm_data;
-	ui->selection = -1;
+	ui->selection = confirm ? -1 : 0;
 
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 
