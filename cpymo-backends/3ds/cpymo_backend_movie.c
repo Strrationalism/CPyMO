@@ -97,6 +97,7 @@ void cpymo_backend_movie_free_surface()
 	y2rExit();
 	C3D_TexDelete(&tex);
 	free(tex_line_by_line);
+	tex_line_by_line = NULL;
 }
 
 static void cpymo_backend_movie_update_tex()
