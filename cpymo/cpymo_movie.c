@@ -152,6 +152,8 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 {
 	cpymo_movie *m = (cpymo_movie *)ui_data;
 
+	cpymo_audio_bgm_stop(e);
+
 	if (m->audio_frame) av_frame_free(&m->audio_frame);
 	if (m->video_frame) av_frame_free(&m->video_frame);
 	if (m->packet) av_packet_free(&m->packet);

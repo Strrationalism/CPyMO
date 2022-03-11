@@ -588,6 +588,13 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
 		NULL, CPYMO_AUDIO_CHANNEL_BGM, loop);
 }
 
+error_t cpymo_audio_movie_play(cpymo_engine *e, cpymo_parser_stream_span moviename)
+{
+	return cpymo_audio_high_level_play(
+		e, moviename, &cpymo_assetloader_get_video_path,
+		NULL, CPYMO_AUDIO_CHANNEL_BGM, false);
+}
+
 void cpymo_audio_bgm_stop(cpymo_engine * engine)
 {
 	if (engine->audio.bgm_name) {
