@@ -1,5 +1,6 @@
 #include "cpymo_movie.h"
 #include "cpymo_engine.h"
+#include <assert.h>
 #include <cpymo_backend_movie.h>
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -76,20 +77,31 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 	RETRY:
 	int err = avcodec_receive_frame(m->video_codec_context, m->video_frame);
 	if (err == 0) {
-		if (m->video_frame->format != AV_PIX_FMT_YUV420P) {
-			printf("[Error] Unsupported pixel format: %d.\n", m->video_frame->format);
-			return CPYMO_ERR_UNSUPPORTED;
-		}
+		
 
-		cpymo_backend_movie_update_yuv_surface(
-			m->video_frame->data[0],
-			(size_t)m->video_frame->linesize[0],
-			m->video_frame->data[1],
-			(size_t)m->video_frame->linesize[1],
-			m->video_frame->data[2],
-			(size_t)m->video_frame->linesize[2]
-		);
+		switch (m->video_frame->format) {
+		case AV_PIX_FMT_YUV420P: 
+		case AV_PIX_FMT_YUV422P: 
+		case AV_PIX_FMT_YUV420P16: 
+		case AV_PIX_FMT_YUV422P16: 
+			cpymo_backend_movie_update_yuv_surface(
+				m->video_frame->data[0],
+				(size_t)m->video_frame->linesize[0],
+				m->video_frame->data[1],
+				(size_t)m->video_frame->linesize[1],
+				m->video_frame->data[2],
+				(size_t)m->video_frame->linesize[2]
+			);
+			break;
+		case AV_PIX_FMT_YUYV422: 
+			cpymo_backend_movie_update_yuyv_surface(
+				m->video_frame->data[0],
+				(size_t)m->video_frame->linesize[0]
+			);
+		default: assert(false);
+		};
 
+		
 		return CPYMO_ERR_SUCC;
 	}
 	else if (err == AVERROR(EAGAIN)) {
@@ -153,7 +165,7 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	case cpymo_backend_movie_how_to_play_unsupported:
 		printf("[Warning] This platform does not support video playing.\n");
 		return CPYMO_ERR_SUCC;
-	case cpymo_backend_movie_how_to_play_send_yuv_surface:
+	case cpymo_backend_movie_how_to_play_send_surface:
 		break;
 	};
 	
@@ -251,13 +263,24 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVFrame");
 
 	m->video_frame->best_effort_timestamp = 0;
-	do {
-		err = cpymo_movie_send_packets(m);
-	} while (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_NO_MORE_CONTENT);
 
 	int width = m->format_context->streams[m->video_stream_index]->codecpar->width;
 	int height = m->format_context->streams[m->video_stream_index]->codecpar->height;
-	err = cpymo_backend_movie_init((size_t)width, (size_t)height);
+
+	enum AVPixelFormat format = 
+		(enum AVPixelFormat)m->format_context->streams[m->video_stream_index]->codecpar->format;
+
+	enum cpymo_backend_movie_format backend_format;
+	switch (format) {
+	case AV_PIX_FMT_YUV420P: backend_format = cpymo_backend_movie_format_yuv420p; break;
+	case AV_PIX_FMT_YUV422P: backend_format = cpymo_backend_movie_format_yuv422p; break;
+	case AV_PIX_FMT_YUV420P16: backend_format = cpymo_backend_movie_format_yuv420p16; break;
+	case AV_PIX_FMT_YUV422P16: backend_format = cpymo_backend_movie_format_yuv422p16; break;
+	case AV_PIX_FMT_YUYV422: backend_format = cpymo_backend_movie_format_yuyv422; break;
+	default: THROW(true, CPYMO_ERR_UNSUPPORTED, "[Error] Movie pixel format unsupported.\n");
+	};
+
+	err = cpymo_backend_movie_init((size_t)width, (size_t)height, backend_format);
 	THROW(err != CPYMO_ERR_SUCC, err, "Could not init movie backend");
 
 	return CPYMO_ERR_SUCC;

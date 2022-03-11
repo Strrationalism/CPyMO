@@ -5,17 +5,34 @@ static SDL_Texture *tex = NULL;
 extern SDL_Renderer *renderer;
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
-	return cpymo_backend_movie_how_to_play_send_yuv_surface;
+	return cpymo_backend_movie_how_to_play_send_surface;
 }
 
-error_t cpymo_backend_movie_init(size_t width, size_t height)
+error_t cpymo_backend_movie_init(size_t width, size_t height, enum cpymo_backend_movie_format format)
 {
 	SDL_assert(tex == NULL);
 
-	tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, (int)width, (int)height);
+	SDL_PixelFormatEnum sdlfmt;
+	switch (format) {
+	case cpymo_backend_movie_format_yuv420p: 
+	case cpymo_backend_movie_format_yuv422p: 
+	case cpymo_backend_movie_format_yuv420p16:
+	case cpymo_backend_movie_format_yuv422p16:
+		sdlfmt = SDL_PIXELFORMAT_IYUV; break;
+	case cpymo_backend_movie_format_yuyv422:
+		sdlfmt = SDL_PIXELFORMAT_YUY2; break;
+	default: return CPYMO_ERR_UNSUPPORTED;
+	};
+
+	tex = SDL_CreateTexture(renderer, sdlfmt, SDL_TEXTUREACCESS_STREAMING, (int)width, (int)height);
 	if (tex == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_backend_movie_update_yuyv_surface(const void *p, size_t pitch)
+{
+	SDL_UpdateTexture(tex, NULL, p, (int)pitch);
 }
 
 void cpymo_backend_movie_free()
