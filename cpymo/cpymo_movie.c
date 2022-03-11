@@ -137,6 +137,9 @@ static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 		cpymo_engine_request_redraw(e);
 	}
 
+	if (CPYMO_INPUT_JUST_RELEASED(e, skip))
+		cpymo_ui_exit(e);
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -183,6 +186,7 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	m->video_codec_context = NULL;
 	m->audio_codec_context = NULL;
 	m->no_more_content = false;
+	m->packet = NULL;
 	m->audio_frame = NULL;
 	m->video_frame = NULL;
 	m->current_time = 0;
