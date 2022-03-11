@@ -19,8 +19,8 @@ enum cpymo_backend_movie_format {
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play();
 
-error_t cpymo_backend_movie_init(size_t width, size_t height, enum cpymo_backend_movie_format format);
-void cpymo_backend_movie_free();
+error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo_backend_movie_format format);
+void cpymo_backend_movie_free_surface();
 
 void cpymo_backend_movie_update_yuv_surface(
 	const void *y, size_t y_pitch,
@@ -29,7 +29,7 @@ void cpymo_backend_movie_update_yuv_surface(
 
 void cpymo_backend_movie_update_yuyv_surface(const void *, size_t pitch);
 
-void cpymo_backend_movie_draw_yuv_surface();
+void cpymo_backend_movie_draw_surface();
 
 
 #endif

@@ -444,14 +444,20 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	D("movie") {
 		POP_ARG(movie_name);
-		char *movie_path = NULL;
-		error_t err = cpymo_assetloader_get_video_path(&movie_path, movie_name, &engine->assetloader);
-		CPYMO_THROW(err);
 
-		err = cpymo_movie_play(engine, movie_path);
-		free(movie_path);
+		if (engine->gameconfig.playvideo) {
+			char *movie_path = NULL;
+			error_t err = cpymo_assetloader_get_video_path(&movie_path, movie_name, &engine->assetloader);
+			CPYMO_THROW(err);
 
-		return err;
+			err = cpymo_movie_play(engine, movie_path);
+			free(movie_path);
+			return err;
+		}
+		else {
+			printf("[Info] Playvideo is disabled in gameconfig.\n");
+			CONT_NEXTLINE;
+		}
 	}
 
 	D("textbox") {

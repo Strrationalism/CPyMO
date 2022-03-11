@@ -8,7 +8,7 @@ enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
 	return cpymo_backend_movie_how_to_play_send_surface;
 }
 
-error_t cpymo_backend_movie_init(size_t width, size_t height, enum cpymo_backend_movie_format format)
+error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo_backend_movie_format format)
 {
 	SDL_assert(tex == NULL);
 
@@ -35,7 +35,7 @@ void cpymo_backend_movie_update_yuyv_surface(const void *p, size_t pitch)
 	SDL_UpdateTexture(tex, NULL, p, (int)pitch);
 }
 
-void cpymo_backend_movie_free()
+void cpymo_backend_movie_free_surface()
 {
 	SDL_assert(tex);
 	SDL_DestroyTexture(tex);
@@ -50,7 +50,7 @@ void cpymo_backend_movie_update_yuv_surface(
 	SDL_UpdateYUVTexture(tex, NULL, (const Uint8 *)y, (int)y_pitch, (const Uint8 *)u, (int)u_pitch, (const Uint8 *)v, (int)v_pitch);
 }
 
-void cpymo_backend_movie_draw_yuv_surface()
+void cpymo_backend_movie_draw_surface()
 {
 	SDL_RenderCopy(renderer, tex, NULL, NULL);
 }

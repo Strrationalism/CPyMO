@@ -15,7 +15,7 @@ export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 --disable-filters \
 --disable-indevs \
 --disable-protocols \
---disable-bsfs \
+--enable-bsfs \
 --disable-muxers \
 --enable-protocol=file \
 --enable-static \
@@ -35,4 +35,6 @@ export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 --disable-securetransport \
 --disable-xlib \
 --disable-zlib \
---disable-debug 
+--disable-debug \
+--enable-gpl \
+--enable-version3 

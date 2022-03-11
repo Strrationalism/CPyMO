@@ -15,6 +15,7 @@ typedef struct {
 	AVFrame *video_frame, *audio_frame;
 
 	bool no_more_content;
+	bool backend_inited;
 
 	float current_time;
 } cpymo_movie;
@@ -77,8 +78,6 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 	RETRY:
 	int err = avcodec_receive_frame(m->video_codec_context, m->video_frame);
 	if (err == 0) {
-		
-
 		switch (m->video_frame->format) {
 		case AV_PIX_FMT_YUV420P: 
 		case AV_PIX_FMT_YUV422P: 
@@ -143,7 +142,7 @@ static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 
 static void cpymo_movie_draw(const cpymo_engine *e, const void *ui_data)
 {
-	cpymo_backend_movie_draw_yuv_surface();
+	cpymo_backend_movie_draw_surface();
 }
 
 static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
@@ -156,7 +155,7 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 	if (m->audio_codec_context) avcodec_free_context(&m->audio_codec_context);
 	if (m->video_codec_context) avcodec_free_context(&m->video_codec_context);
 	if (m->format_context) avformat_close_input(&m->format_context);
-	cpymo_backend_movie_free();
+	if (m->backend_inited) cpymo_backend_movie_free_surface();
 }
 
 error_t cpymo_movie_play(cpymo_engine * e, const char *path)
@@ -187,6 +186,7 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	m->audio_frame = NULL;
 	m->video_frame = NULL;
 	m->current_time = 0;
+	m->backend_inited = false;
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
@@ -277,11 +277,14 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	case AV_PIX_FMT_YUV420P16: backend_format = cpymo_backend_movie_format_yuv420p16; break;
 	case AV_PIX_FMT_YUV422P16: backend_format = cpymo_backend_movie_format_yuv422p16; break;
 	case AV_PIX_FMT_YUYV422: backend_format = cpymo_backend_movie_format_yuyv422; break;
-	default: THROW(true, CPYMO_ERR_UNSUPPORTED, "[Error] Movie pixel format unsupported.\n");
+	default: THROW(true, CPYMO_ERR_UNSUPPORTED, "[Error] Movie pixel format unsupported");
 	};
 
-	err = cpymo_backend_movie_init((size_t)width, (size_t)height, backend_format);
-	THROW(err != CPYMO_ERR_SUCC, err, "Could not init movie backend");
+	err = cpymo_backend_movie_init_surface((size_t)width, (size_t)height, backend_format);
+	THROW(err == CPYMO_ERR_UNSUPPORTED, err, "[Error] Movie backend could not support this video");
+	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Movie backend init failed");
+
+	m->backend_inited = true;
 
 	return CPYMO_ERR_SUCC;
 }
