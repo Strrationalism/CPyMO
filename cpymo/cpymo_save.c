@@ -352,7 +352,6 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	
 	
 	// SE
-	
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
 	if (*strbuf) cpymo_audio_se_play(e, cpymo_parser_stream_span_pure(strbuf), true);

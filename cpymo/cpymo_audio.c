@@ -570,6 +570,11 @@ static error_t cpymo_audio_high_level_play(
 
 error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
 {
+	if (e->audio.bgm_name) {
+		free(e->audio.bgm_name);
+		e->audio.bgm_name = NULL;
+	}
+
 	if (loop) {
 		char *bgm_name = (char *)realloc(e->audio.bgm_name, bgmname.len + 1);
 		if (bgm_name) {
@@ -598,6 +603,11 @@ void cpymo_audio_bgm_stop(cpymo_engine * engine)
 
 error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_parser_stream_span sename, bool loop)
 {
+	if (e->audio.se_name) {
+		free(e->audio.se_name);
+		e->audio.se_name = NULL;
+	}
+
 	if (loop) {
 		char *se_name = (char *)realloc(e->audio.se_name, sename.len + 1);
 		if (se_name) {
