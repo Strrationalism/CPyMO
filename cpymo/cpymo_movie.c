@@ -16,6 +16,7 @@ typedef struct {
 
 	bool no_more_content;
 	bool backend_inited;
+	bool skip_pressed;
 
 	float current_time;
 } cpymo_movie;
@@ -135,8 +136,11 @@ static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 	}
 
 	if (CPYMO_INPUT_JUST_RELEASED(e, skip)) {
-		cpymo_ui_exit(e);
-		return CPYMO_ERR_SUCC;
+		if (m->skip_pressed) m->skip_pressed = false;
+		else {
+			cpymo_ui_exit(e);
+			return CPYMO_ERR_SUCC;
+		}
 	}
 
 	return CPYMO_ERR_SUCC;
@@ -192,6 +196,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 	m->video_frame = NULL;
 	m->current_time = 0;
 	m->backend_inited = false;
+	m->skip_pressed = e->input.skip;
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
