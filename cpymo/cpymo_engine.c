@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cpymo_backend_input.h>
+#include "cpymo_msgbox_ui.h"
 #include "cpymo_save_global.h"
 
 static void cpymo_logo() {
@@ -20,6 +21,11 @@ static void cpymo_logo() {
 	puts("");
 	puts("https://github.com/Seng-Jik/cpymo");
 	puts("");
+}
+
+static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) {
+	cpymo_msgbox_ui_enter(e, cpymo_parser_stream_span_pure("需为此游戏安装mo2pymo补丁才可以正常进行游戏"), NULL, NULL);
+	return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
@@ -126,16 +132,6 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	out->skipping = false;
 	out->redraw = true;
 
-	// checks
-	if (out->gameconfig.scripttype[0] != 'p'
-		|| out->gameconfig.scripttype[1] != 'y'
-		|| out->gameconfig.scripttype[2] != 'm'
-		|| out->gameconfig.scripttype[3] != '\0')
-	{
-		printf("[Warning] Script type is %s, some commands maybe unsupported.\n", out->gameconfig.scripttype);
-		printf("[Warning] If you are running MO1 script or MO2 script, you can convert it using https://github.com/Seng-Jik/cpymo/blob/main/mo2pymo.ps1\n");
-	}
-
 	// load config
 	err = cpymo_save_config_load(out);
 	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_CAN_NOT_OPEN_FILE) {
@@ -149,6 +145,15 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	}
 
 	cpymo_logo();
+
+	// checks
+	if (out->gameconfig.scripttype[0] != 'p'
+		|| out->gameconfig.scripttype[1] != 'y'
+		|| out->gameconfig.scripttype[2] != 'm'
+		|| out->gameconfig.scripttype[3] != '\0')
+	{
+		cpymo_wait_callback_after_seconds(&out->wait, 0, &cpymo_engine_non_pymo_warning);
+	}
 
 	return CPYMO_ERR_SUCC;
 }
