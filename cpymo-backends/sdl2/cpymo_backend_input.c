@@ -130,8 +130,8 @@ void cpymo_input_refresh_joysticks()
 	if (gamecontrollers) {
 		memset(gamecontrollers, 0, sizeof(gamecontrollers[0]) * gamecontrollers_count);
 		size_t j = 0;
-		for (int i = 0; i < gamecontrollers_count; ++i)
-			if (SDL_IsGameController(i))
-				gamecontrollers[j++] = SDL_GameControllerOpen(i);
+		for (size_t i = 0; i < gamecontrollers_count; ++i)
+			if (SDL_IsGameController((int)i))
+				gamecontrollers[j++] = SDL_GameControllerOpen((int)i);
 	}
 }
