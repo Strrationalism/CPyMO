@@ -7,12 +7,12 @@
 
 typedef struct {
 	AVFormatContext *format_context;
-	int video_stream_index, audio_stream_index;
+	int video_stream_index;
 
-	AVCodecContext *video_codec_context, *audio_codec_context;
+	AVCodecContext *video_codec_context;
 
 	AVPacket *packet;
-	AVFrame *video_frame, *audio_frame;
+	AVFrame *video_frame;
 
 	bool no_more_content;
 	bool backend_inited;
@@ -29,29 +29,17 @@ static error_t cpymo_movie_send_packets(cpymo_movie *m)
 	if (err == AVERROR_EOF) {
 		m->no_more_content = true;
 
-		err = 0;
-		if (m->audio_codec_context) {
-			err = avcodec_send_packet(m->audio_codec_context, NULL);
-			if (err < 0) {
-				printf("[Error] Could not flush video codec: %s.\n", av_err2str(err));
-			}
-		}
-
-		int err2 = avcodec_send_packet(m->video_codec_context, NULL);
-		if (err2 < 0) {
+		err = avcodec_send_packet(m->video_codec_context, NULL);
+		if (err < 0) {
 			printf("[Error] Could not flush audio codec: %s.\n", av_err2str(err));
 		}
 
-		if (err < 0 || err2 < 0) {
+		if (err < 0) {
 			return CPYMO_ERR_UNKNOWN;
 		}
 	}
 	else if (err == 0) {
-		if (m->packet->stream_index == m->audio_stream_index && m->audio_codec_context) {
-			err = avcodec_send_packet(m->audio_codec_context, m->packet);
-			av_packet_unref(m->packet);
-		}
-		else if (m->packet->stream_index == m->video_stream_index) {
+		if (m->packet->stream_index == m->video_stream_index) {
 			err = avcodec_send_packet(m->video_codec_context, m->packet);
 			av_packet_unref(m->packet);
 		}
@@ -154,10 +142,8 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 	cpymo_audio_bgm_stop(e);
 
-	if (m->audio_frame) av_frame_free(&m->audio_frame);
 	if (m->video_frame) av_frame_free(&m->video_frame);
 	if (m->packet) av_packet_free(&m->packet);
-	if (m->audio_codec_context) avcodec_free_context(&m->audio_codec_context);
 	if (m->video_codec_context) avcodec_free_context(&m->video_codec_context);
 	if (m->format_context) avformat_close_input(&m->format_context);
 	if (m->backend_inited) cpymo_backend_movie_free_surface();
@@ -186,10 +172,8 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 
 	m->format_context = NULL;
 	m->video_codec_context = NULL;
-	m->audio_codec_context = NULL;
 	m->no_more_content = false;
 	m->packet = NULL;
-	m->audio_frame = NULL;
 	m->video_frame = NULL;
 	m->current_time = 0;
 	m->backend_inited = false;
@@ -227,40 +211,6 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 
 	averr = avcodec_open2(m->video_codec_context, video_codec, NULL);
 	THROW_AVERR(averr, CPYMO_ERR_UNKNOWN);
-
-	m->audio_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
-	if (m->audio_stream_index >= 0 && e->audio.enabled && false) {	// Disable Audio
-		const AVCodec *audio_codec = 
-			avcodec_find_decoder(
-				m->format_context->streams[m->audio_stream_index]->codecpar->codec_id);
-		if (audio_codec == NULL) goto AUDIO_FAILED;
-
-		m->audio_codec_context = avcodec_alloc_context3(audio_codec);
-		if (m->audio_codec_context == NULL) goto AUDIO_FAILED;
-
-		if (avcodec_parameters_to_context(
-			m->audio_codec_context,
-			m->format_context->streams[m->audio_stream_index]->codecpar)) {
-			avcodec_free_context(&m->audio_codec_context);
-			goto AUDIO_FAILED;
-		}
-
-		if (avcodec_open2(m->audio_codec_context, audio_codec, NULL)) {
-			avcodec_free_context(&m->audio_codec_context);
-			goto AUDIO_FAILED;
-		}
-
-		m->audio_frame = av_frame_alloc();
-		if (m->audio_frame == NULL) {
-			avcodec_free_context(&m->audio_codec_context);
-			goto AUDIO_FAILED;
-		}
-	}
-	else {
-		AUDIO_FAILED:
-		m->audio_codec_context = NULL;
-		m->audio_frame = NULL;
-	}
 
 	m->packet = av_packet_alloc();
 	THROW(m->packet == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVPacket");
