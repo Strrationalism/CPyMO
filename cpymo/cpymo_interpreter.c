@@ -446,20 +446,12 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(movie_name);
 
 		if (engine->gameconfig.playvideo) {
-			char *movie_path = NULL;
-			error_t err = cpymo_assetloader_get_video_path(&movie_path, movie_name, &engine->assetloader);
-			CPYMO_THROW(err);
-
+			return cpymo_movie_play(engine, movie_name);
+		}
+		else {
 			cpymo_audio_bgm_stop(engine);
 			cpymo_audio_se_stop(engine);
 			cpymo_audio_channel_reset(&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO]);
-
-			cpymo_audio_movie_play(engine, movie_name);
-			err = cpymo_movie_play(engine, movie_path);
-			free(movie_path);
-			return err;
-		}
-		else {
 			printf("[Info] Playvideo is disabled in gameconfig.\n");
 			CONT_NEXTLINE;
 		}

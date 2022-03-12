@@ -149,8 +149,12 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 	if (m->backend_inited) cpymo_backend_movie_free_surface();
 }
 
-error_t cpymo_movie_play(cpymo_engine * e, const char *path)
+error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 {
+	cpymo_audio_bgm_stop(e);
+	cpymo_audio_se_stop(e);
+	cpymo_audio_channel_reset(&e->audio.channels[CPYMO_AUDIO_CHANNEL_VO]);
+
 	switch (cpymo_backend_movie_how_to_play()) {
 	case cpymo_backend_movie_how_to_play_unsupported:
 		printf("[Warning] This platform does not support video playing.\n");
@@ -180,6 +184,7 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
+			if (path) free(path); \
 			printf("[Error] %s: %s.\n", MESSAGE, path); \
 			cpymo_ui_exit(e); \
 			return ERRCODE; \
@@ -187,6 +192,10 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 
 	#define THROW_AVERR(ERR_COND, ERRCODE) \
 		THROW(ERR_COND, ERRCODE, av_err2str(averr));
+
+	char *path = NULL;
+	err = cpymo_assetloader_get_video_path(&path, videoname, &e->assetloader);
+	THROW(err != CPYMO_ERR_SUCC, err, "Faild to get video path");
 
 	int averr = avformat_open_input(&m->format_context, path, NULL, NULL);
 	THROW_AVERR(averr, CPYMO_ERR_CAN_NOT_OPEN_FILE);
@@ -241,6 +250,14 @@ error_t cpymo_movie_play(cpymo_engine * e, const char *path)
 	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Movie backend init failed");
 
 	m->backend_inited = true;
+
+	cpymo_audio_channel_play_file(
+		&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
+		path,
+		NULL,
+		false);
+	
+	free(path);
 
 	return CPYMO_ERR_SUCC;
 }
