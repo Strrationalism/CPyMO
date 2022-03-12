@@ -64,14 +64,14 @@ static error_t cpymo_movie_send_packets(cpymo_movie *m)
 
 static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 {
-	RETRY:
+RETRY: {
 	int err = avcodec_receive_frame(m->video_codec_context, m->video_frame);
 	if (err == 0) {
 		switch (m->video_frame->format) {
-		case AV_PIX_FMT_YUV420P: 
-		case AV_PIX_FMT_YUV422P: 
-		case AV_PIX_FMT_YUV420P16: 
-		case AV_PIX_FMT_YUV422P16: 
+		case AV_PIX_FMT_YUV420P:
+		case AV_PIX_FMT_YUV422P:
+		case AV_PIX_FMT_YUV420P16:
+		case AV_PIX_FMT_YUV422P16:
 			cpymo_backend_movie_update_yuv_surface(
 				m->video_frame->data[0],
 				(size_t)m->video_frame->linesize[0],
@@ -81,7 +81,7 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 				(size_t)m->video_frame->linesize[2]
 			);
 			break;
-		case AV_PIX_FMT_YUYV422: 
+		case AV_PIX_FMT_YUYV422:
 			cpymo_backend_movie_update_yuyv_surface(
 				m->video_frame->data[0],
 				(size_t)m->video_frame->linesize[0]
@@ -96,7 +96,7 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 
 		if (video_current_frame_time < m->current_time)
 			goto RETRY;
-		
+
 		return CPYMO_ERR_SUCC;
 	}
 	else if (err == AVERROR(EAGAIN)) {
@@ -113,7 +113,7 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 		printf("[Error] Failed to receive frame.\n");
 		return CPYMO_ERR_UNKNOWN;
 	}
-}
+} }
 
 static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 {
