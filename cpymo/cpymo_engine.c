@@ -184,7 +184,6 @@ void cpymo_engine_free(cpymo_engine *engine)
 
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
-	delta_time_sec = cpymo_utils_clampf(delta_time_sec, 0.001f, 0.15f);
 	error_t err;
 	*redraw = engine->redraw;
 	engine->redraw = false;

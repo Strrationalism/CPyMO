@@ -88,6 +88,13 @@ static error_t cpymo_movie_send_video_frame_to_backend(cpymo_movie *m)
 		default: assert(false);
 		};
 
+		const float video_current_frame_time =
+			(float)
+			(m->video_frame->best_effort_timestamp
+				* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
+
+		if (video_current_frame_time < m->current_time)
+			goto RETRY;
 		
 		return CPYMO_ERR_SUCC;
 	}
@@ -118,15 +125,19 @@ static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 			* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
 
 	if (video_current_frame_time < m->current_time) {
-		if (cpymo_movie_send_video_frame_to_backend(m) == CPYMO_ERR_NO_MORE_CONTENT) {
+		error_t err = cpymo_movie_send_video_frame_to_backend(m);
+		if (err == CPYMO_ERR_NO_MORE_CONTENT) {
 			cpymo_ui_exit(e);
+			return CPYMO_ERR_SUCC;
 		}
-
-		cpymo_engine_request_redraw(e);
+		else if (err == CPYMO_ERR_SUCC)
+			cpymo_engine_request_redraw(e);
 	}
 
-	if (CPYMO_INPUT_JUST_RELEASED(e, skip))
+	if (CPYMO_INPUT_JUST_RELEASED(e, skip)) {
 		cpymo_ui_exit(e);
+		return CPYMO_ERR_SUCC;
+	}
 
 	return CPYMO_ERR_SUCC;
 }
