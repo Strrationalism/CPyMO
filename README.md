@@ -12,11 +12,10 @@
 
 ![LICENSE](https://www.gnu.org/graphics/agplv3-88x31.png)
 
-此项目尚在工作中！欢迎提交代码！
-
 此项目仅用于您运行**合法持有**的游戏软件副本，持有盗版副本可能会让您面临法律问题。    
 这是一个使用C实现的pymo引擎的复刻，以方便在各种平台上制作并运行pymo游戏。      
 
+如果你需要使用CPyMO制作游戏，可以参见[CPyMO + YukimiScript开发模板](https://github.com/Strrationalism/CPyMO-YukimiScript-Template)。
 
 pymo原版参见：https://github.com/pymo/pymo    
 原作者：chen_xin_ming    
