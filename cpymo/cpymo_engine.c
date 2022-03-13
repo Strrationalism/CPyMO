@@ -19,7 +19,7 @@ static void cpymo_logo() {
 	puts("This software is licensed under AGPLv3.");
 	puts("You can only run copies of game that you LEGALLY own.");
 	puts("");
-	puts("https://github.com/Seng-Jik/cpymo");
+	puts("https://github.com/Strrationalism/CPyMO");
 	puts("");
 }
 
