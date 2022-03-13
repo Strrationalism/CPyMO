@@ -199,29 +199,40 @@ error_t cpymo_charas_new_chara(
 	ch->chara_id = chara_id;
 	ch->layer = layer;
 	ch->alive = true;
+	ch->next = NULL;
 	cpymo_tween_assign(&ch->pos_x, x);
 	cpymo_tween_assign(&ch->pos_y, y);
 	cpymo_tween_assign(&ch->alpha, begin_alpha);
 	cpymo_tween_to(&ch->alpha, 1.0f, time);
 
-	struct cpymo_chara *prev = e->charas.chara;
-	while (prev) {
-		struct cpymo_chara *next = prev->next;
-		if (next == NULL) break;
-
-		if (next->layer >= layer && prev->layer <= layer)
-			break;
-		else
-			prev = next;
+	if (e->charas.chara == NULL) {
+		e->charas.chara = ch;
 	}
-
-	if (prev) {
-		ch->next = prev->next;
-		prev->next = ch;
+	else if (e->charas.chara->layer > layer) {
+		if (e->charas.chara->layer >= layer) {
+			ch->next = e->charas.chara;
+			e->charas.chara = ch;
+		}
+		else {
+			e->charas.chara = ch;
+		}
 	}
 	else {
-		ch->next = NULL;
-		e->charas.chara = ch;
+		struct cpymo_chara *prev = e->charas.chara;
+		while (prev) {
+			struct cpymo_chara *next = prev->next;
+
+			if (next == NULL) {
+				prev->next = ch;
+				break;
+			}
+			else if (prev->layer <= layer && next->layer >= layer) {
+				ch->next = prev->next;
+				prev->next = ch;
+				break;
+			}
+			else prev = prev->next;
+		}
 	}
 	
 
