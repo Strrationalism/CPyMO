@@ -15,7 +15,6 @@
 extern C3D_RenderTarget *screen1, *screen2;
 extern float render_3d_offset;
 extern bool drawing_bottom_screen;
-extern const bool cpymo_input_fast_kill_pressed;
 extern bool enhanced_3ds_display_mode;
 
 typedef struct {
@@ -342,8 +341,9 @@ char * select_game()
 	
 	drawing_bottom_screen = false;
 	float prevSlider = NAN;
-	while (aptMainLoop() && !cpymo_input_fast_kill_pressed) {
+	while (aptMainLoop()) {
 		hidScanInput();
+		if (hidKeysDown() & KEY_START) return NULL;
 
 		update_select_game(&ui);
 		if (ui.ok) break;

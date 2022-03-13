@@ -31,8 +31,6 @@ extern void cpymo_backend_image_init(float, float);
 extern error_t cpymo_backend_text_sys_init();
 extern void cpymo_backend_text_sys_free();
 
-extern const bool cpymo_input_fast_kill_pressed;
-
 bool enhanced_3ds_display_mode = true;
 bool drawing_bottom_screen;
 
@@ -258,12 +256,13 @@ int main(void) {
 
 		if(hidKeysDown() & KEY_SELECT) {
 			redraw = true;
-			fill_screen = !fill_screen;
-		}
-
-		if((hidKeysDown() & KEY_START) && screen3 != NULL) {
-			redraw = true;
-			enhanced_3ds_display_mode = !enhanced_3ds_display_mode;
+			if (screen3) {
+				enhanced_3ds_display_mode = !enhanced_3ds_display_mode;
+				if (!enhanced_3ds_display_mode) fill_screen = !fill_screen;
+			}
+			else {
+				fill_screen = !fill_screen;
+			}
 		}
 
 		if(redraw) {
@@ -298,7 +297,7 @@ int main(void) {
 			gspWaitForVBlank();
 		}
 
-		if(cpymo_input_fast_kill_pressed) break;
+		if(hidKeysDown() & KEY_START) break;
 	}
 
 	EXIT:
