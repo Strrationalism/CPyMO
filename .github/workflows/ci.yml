@@ -50,7 +50,7 @@ jobs:
     - name: Install Makerom
       run: |
         curl https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.18/makerom-v0.18-ubuntu_x86_64.zip --output makerom.zip
-        unzip makerom.zip
+        jar xvf makerom.zip
         chmod +x makerom
 
     - name: Install FFmpeg
