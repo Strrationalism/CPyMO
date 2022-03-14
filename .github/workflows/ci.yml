@@ -46,6 +46,12 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
+        
+    - name: Install Makerom
+      run: |
+         wget https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.17/makerom-v0.17-ubuntu_x86_64.zip
+         unzip makerom-v0.17-ubuntu_x86_64.zip -d .
+         chmod +x makerom
 
     - name: Install FFmpeg
       run: |
