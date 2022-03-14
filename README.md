@@ -131,7 +131,8 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 
 ### 启动
 
-游戏需要放到SD卡根目录，使得gameconfig.txt可用。
+将游戏放入SD卡的`/pymogames/startup`目录，使得`/pymogames/startup`可用，之后即可启动CPyMO运行此目录下的游戏。    
+
 
 
 

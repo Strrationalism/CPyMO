@@ -26,6 +26,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
+
+
 #if _WIN32 && !NDEBUG
 #include <crtdbg.h>
 #endif
@@ -47,8 +52,10 @@ extern void cpymo_backend_font_free();
 extern void cpymo_backend_audio_init();
 extern void cpymo_backend_audio_free();
 
+
 static void set_window_icon(const char *gamedir) 
 {
+#ifndef __SWITCH__
 	int w, h, channel;
 	char *icon_path = (char *)alloca(strlen(gamedir) + 10);
 	if (icon_path == NULL) return;
@@ -70,6 +77,7 @@ static void set_window_icon(const char *gamedir)
 	SDL_SetWindowIcon(window, surface);
 	SDL_FreeSurface(surface);
 	stbi_image_free(icon);
+#endif
 }
 
 static void ensure_save_dir(const char *gamedir)
@@ -88,7 +96,12 @@ int main(int argc, char **argv)
 	engine.audio.enabled = false;
 
 	int ret = 0;
+
+#ifdef __SWITCH__
+	const char *gamedir = "./pymogames/startup";
+#else
 	const char *gamedir = "./";
+#endif
 
 	if (argc == 2) {
 		gamedir = argv[1];
@@ -126,9 +139,17 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
 #endif
 
+#ifdef __SWITCH__
+	uint16_t window_size_w = 1280;
+	uint16_t window_size_h = 720;
+#else
+	uint16_t window_size_w = engine.gameconfig.imagesize_w;
+	uint16_t window_size_h = engine.gameconfig.imagesize_h;
+#endif // !__SWITCH__
+
 	if (SDL_CreateWindowAndRenderer(
-		engine.gameconfig.imagesize_w,
-		engine.gameconfig.imagesize_h,
+		window_size_w,
+		window_size_h,
 		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE,
 		&window,
 		&renderer) != 0) {
@@ -171,7 +192,12 @@ int main(int argc, char **argv)
 		SDL_UnlockAudio();
 	}
 
-	while (1) {
+	while (
+		1
+#ifdef __SWITCH
+		&& appletMainLoop()
+#endif
+		) {
 		bool redraw_by_event = false;
 
 		extern float mouse_wheel;

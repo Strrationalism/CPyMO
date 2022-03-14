@@ -7,6 +7,10 @@
 
 #include "posix_win32.h"
 
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
+
 stbtt_fontinfo font;
 static unsigned char *ttf_buffer = NULL;
 
@@ -29,7 +33,7 @@ static error_t cpymo_backend_font_try_load_font(const char *path)
 
 void cpymo_backend_font_free()
 {
-	free(ttf_buffer);
+	if (ttf_buffer) free(ttf_buffer);
 	ttf_buffer = NULL;
 }
 
@@ -74,6 +78,25 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	TRY_LOAD("SIMLI.ttf");
 
 	//free(path);
+#endif
+
+#ifdef __SWITCH__
+	Result r = plInitialize(PlServiceType_User);
+	if (R_FAILED(r)) return CPYMO_ERR_NOT_FOUND;
+
+	PlFontData font_infos[PlSharedFontType_Total];
+	s32 total_fonts;
+	r = plGetSharedFont(SetLanguage_ZHCN, font_infos, PlSharedFontType_Total, &total_fonts);
+	if (R_FAILED(r)) return CPYMO_ERR_NOT_FOUND;
+	for (s32 i = 1; i < total_fonts; ++i) {		// Skip 0 font, font 0 is shit.
+		const void *address = font_infos[i].address;
+		if (stbtt_InitFont(&font, address, stbtt_GetFontOffsetForIndex(address, 0)) == 0) {
+			continue;
+		}
+
+		return CPYMO_ERR_SUCC;
+	}
+	plExit();
 #endif
 
 
