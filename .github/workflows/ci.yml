@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-switch:
-    name: ubuntu-18.04
+    name: 'Nintendo Switch'
     runs-on: ubuntu-18.04
     container: devkitpro/devkita64:latest
  
@@ -23,14 +23,13 @@ jobs:
 
     - name: Install Dependents
       run: |
-        pacman -s switch-ffmpeg
-        pacman -s switch-sdl2
+        pacman -S switch-ffmpeg
+        pacman -S switch-sdl2
 
     - name: Build
       run: |
-        cd cpymo-backends/switch
+        cd ./cpymo-backends/switch
         make -j
-        cd ..
     
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
@@ -39,7 +38,7 @@ jobs:
         path: ./cpymo-backends/switch/CPyMO.nro
 
   build-3ds:
-    name: ubuntu-18.04
+    name: 'Nintendo 3DS'
     runs-on: ubuntu-18.04
     container: devkitpro/devkitarm:latest
  
@@ -49,12 +48,11 @@ jobs:
         submodules: true
 
     - name: Install FFmpeg
-      run: |
-        ./cpymo-backends/3ds/install-3ds-ffmpeg.sh
+      run: ./cpymo-backends/3ds/install-3ds-ffmpeg.sh
 
     - name: Build
       run: |
-        cd cpymo-backends/3ds
+        cd ./cpymo-backends/3ds
         make cia -j
         cd ..
     
@@ -74,6 +72,7 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    name: 'Desktop'
     runs-on: ${{ matrix.os }}
     
     strategy:
