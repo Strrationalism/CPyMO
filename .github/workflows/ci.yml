@@ -49,9 +49,8 @@ jobs:
 
     - name: Install FFmpeg
       run: |
-        cd ./cpymo-backends/3ds
-        git update-index --chmod=+x ./install-3ds-ffmpeg.sh
-        ./install-3ds-ffmpeg.sh
+        git update-index --chmod=+x ./cpymo-backends/3ds/install-3ds-ffmpeg.sh
+        ./cpymo-backends/3ds/install-3ds-ffmpeg.sh
 
     - name: Build
       run: |
