@@ -34,6 +34,7 @@ enum cpymo_backend_image_draw_type {
 	cpymo_backend_image_draw_type_bg,
 	cpymo_backend_image_draw_type_chara,
 	cpymo_backend_image_draw_type_ui_bg,
+	cpymo_backend_image_draw_type_ui_element_bg,
 	cpymo_backend_image_draw_type_ui_element,
 	cpymo_backend_image_draw_type_text_say,
 	cpymo_backend_image_draw_type_text_say_textbox,

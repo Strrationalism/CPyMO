@@ -48,7 +48,11 @@ static int cpymo_msgbox_ui_get_mouse_selection(cpymo_engine *e)
 
 	float screen_w = (float)e->gameconfig.imagesize_w, screen_h = (float)e->gameconfig.imagesize_h;
 
-	if (e->input.mouse_position_useable) {
+	const cpymo_input *input = &e->input;
+	if (!input->mouse_position_useable)
+		input = &e->prev_input;
+
+	if (input->mouse_position_useable) {
 		float xywh[4];
 		cpymo_msgbox_ui_get_btn_rect(
 			xywh,
@@ -57,8 +61,8 @@ static int cpymo_msgbox_ui_get_mouse_selection(cpymo_engine *e)
 			screen_w,
 			ui->cancel_btn ? screen_h * 0.5f : screen_h * 0.618f);
 
-		float x = e->input.mouse_x;
-		float y = e->input.mouse_y;
+		float x = input->mouse_x;
+		float y = input->mouse_y;
 		if (x >= xywh[0] && x <= xywh[0] + xywh[2] && y >= xywh[1] && y <= xywh[1] + xywh[3])
 			return 0;
 

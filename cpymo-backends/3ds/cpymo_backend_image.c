@@ -25,8 +25,9 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
         case cpymo_backend_image_draw_type_text_say: return 2.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_bg: return 2.5f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_text: return 3.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_ui_element_bg: return 3.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_ui_element: return 2.5f * render_3d_offset;
-        case cpymo_backend_image_draw_type_ui_bg: return 3.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_ui_bg: return -10.0f * render_3d_offset;
         default: return 0.0f;
     }
 }
@@ -42,13 +43,22 @@ const extern bool fill_screen;
 const extern bool enhanced_3ds_display_mode;
 const extern bool drawing_bottom_screen;
 
+bool enhanced_3ds_display_mode_touch_ui_enabled(void);
+
 bool enhanced_3ds_display_mode_select(enum cpymo_backend_image_draw_type t)
 {
     if(enhanced_3ds_display_mode) {
-        if(t == cpymo_backend_image_draw_type_text_say_textbox
-        || t == cpymo_backend_image_draw_type_text_say) return drawing_bottom_screen;
+        if (enhanced_3ds_display_mode_touch_ui_enabled()) {
+            if (t == cpymo_backend_image_draw_type_ui_element) return drawing_bottom_screen;
+            else if(t == cpymo_backend_image_draw_type_ui_element_bg) return drawing_bottom_screen;
+            else return !drawing_bottom_screen;
+        }
+        else {
+            if(t == cpymo_backend_image_draw_type_text_say_textbox
+            || t == cpymo_backend_image_draw_type_text_say) return drawing_bottom_screen;
 
-        else return !drawing_bottom_screen;
+            else return !drawing_bottom_screen;
+        }
     }
     else return true;
 }
@@ -73,7 +83,7 @@ void cpymo_backend_image_init(float game_w, float game_h)
 
     if(ratio_wb > ratio_h) {
         viewport_width_bottom = 320;
-        viewport_height_bottom = game_h / ratio_w;
+        viewport_height_bottom = game_h / ratio_wb;
     }
     else {
         viewport_width_bottom = game_w / ratio_h;

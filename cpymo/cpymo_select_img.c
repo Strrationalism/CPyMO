@@ -164,11 +164,16 @@ static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, const cpymo_engine *e) {
 	assert(sel >= 0 && sel < (int)o->all_selections);
 
-	if (!e->input.mouse_position_useable) return false;
+	const cpymo_input *input = &e->input;
+	if (!input->mouse_position_useable) {
+		input = &e->prev_input;
+		if(!input->mouse_position_useable)
+			return false;
+	}
 	cpymo_select_img_selection *s = &o->selections[sel];
 	
-	float x = e->input.mouse_x;
-	float y = e->input.mouse_y;
+	float x = input->mouse_x;
+	float y = input->mouse_y;
 
 	if (s->image) {
 		float left = s->x - (float)s->w / 2.0f;

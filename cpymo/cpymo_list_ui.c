@@ -13,8 +13,14 @@ static inline float cpymo_list_ui_get_y(const cpymo_engine *e, int relative_to_c
 
 static int cpymo_list_ui_get_selection_relative_to_cur_by_mouse(const cpymo_engine *e)
 {
-	if (!e->input.mouse_position_useable) return INT_MAX;
-	const float mouse_y = e->input.mouse_y;
+	const cpymo_input *input = &e->input;
+	if (!input->mouse_position_useable) {
+		input = &e->prev_input;
+		if (!input->mouse_position_useable)
+			return INT_MAX;
+	}
+
+	const float mouse_y = input->mouse_y;
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
 
@@ -26,7 +32,7 @@ static int cpymo_list_ui_get_selection_relative_to_cur_by_mouse(const cpymo_engi
 	if (prev) {
 		float top = y - (ui->from_bottom_to_top ? -ui->node_height : ui->node_height);
 		float bottom = top + ui->node_height;
-
+		
 		if (mouse_y >= top && mouse_y < bottom) return -1;
 	}
 
@@ -251,12 +257,12 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_scroll_draw(&e->scroll);
 
 	float xywh[] = {0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h };
-	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_bg);
+	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_ui_bg);
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
 	xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
 	xywh[3] = ui->node_height;
-	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_bg);
+	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_ui_element_bg);
 
 	// For Debugging!
 	/*cpymo_color red;

@@ -34,9 +34,17 @@ extern void cpymo_backend_text_sys_free();
 bool enhanced_3ds_display_mode = true;
 bool drawing_bottom_screen;
 
+bool enhanced_3ds_display_mode_touch_ui_enabled(void)
+{
+	if (!enhanced_3ds_display_mode) return false;
+	if (engine.ui) return true;
+	return false;
+}
+
 float enhanced_3ds_bottom_yoffset()
 {
-	if(engine.say.msgbox && engine.say.namebox) {
+	if (enhanced_3ds_display_mode_touch_ui_enabled()) return 0;
+	else if(engine.say.msgbox && engine.say.namebox) {
 		float ratio = (float)engine.gameconfig.imagesize_w / (float)engine.say.msgbox_w;
 		float msg_h = (float)engine.say.msgbox_h * ratio;
 		float y = (float)engine.gameconfig.imagesize_h - msg_h;
@@ -107,6 +115,8 @@ static void load_screen_mode()
 }
 
 int main(void) {
+	engine.ui = NULL;
+	engine.say.active = false;
 	bool is_new_3ds = false;
 	APT_CheckNew3DS(&is_new_3ds);
 
