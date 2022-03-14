@@ -65,10 +65,10 @@ jobs:
         path: ./cpymo-backends/3ds/cpymo.3dsx
 
     - name: Upload CIA
-          uses: actions/upload-artifact@v2.3.0
-          with:
-            name: CIA
-            path: ./cpymo-backends/3ds/cpymo.cia
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CIA
+        path: ./cpymo-backends/3ds/cpymo.cia
             
   build-desktop:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
