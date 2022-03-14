@@ -23,8 +23,8 @@ jobs:
 
     - name: Install Dependents
       run: |
-        dkp-pacman -S switch-ffmpeg
-        dkp-pacman -S switch-sdl2
+        dkp-pacman -S --noconfirm switch-ffmpeg
+        dkp-pacman -S --noconfirm switch-sdl2
 
     - name: Build
       run: |
@@ -48,7 +48,9 @@ jobs:
         submodules: true
 
     - name: Install FFmpeg
-      run: sudo ./cpymo-backends/3ds/install-3ds-ffmpeg.sh
+      run: |
+        cd ./cpymo-backends/3ds
+        ./install-3ds-ffmpeg.sh
 
     - name: Build
       run: |
