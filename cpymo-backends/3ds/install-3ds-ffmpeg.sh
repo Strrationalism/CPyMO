@@ -1,5 +1,10 @@
 #!/bin/sh
 
+curl https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz --output ffmpeg-5.0.tar.gz
+tar -xf ffmpeg-5.0.tar.gz
+
+cd ffmpeg-5.0
+
 export PATH=$DEVKITARM/bin:$PATH
 export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 
@@ -38,3 +43,9 @@ export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 --disable-debug \
 --enable-gpl \
 --enable-version3 
+
+make install -j
+
+cd ..
+rm ffmpeg-5.0.tar.gz -f
+rm ffmpeg-5.0 -rf

@@ -62,21 +62,12 @@ Unpack a pymo package:
 
 ### 额外依赖
 
-* DevkitPro
-  - libctru
-  - citro2d
-  - citro3d
-* ffmpeg
+* devkitPro + 3ds dev
+* FFmpeg 5.0
 
-#### 编译ffmpeg到3DS平台
+#### 安装3DS用的FFmpeg依赖
 
-将`cpymo-backends/3ds/ffmpeg-configure-3ds`复制到ffmpeg源码文件夹下：
-
-如果你使用Windows，则需要在msys2中执行该脚本，之后执行make install。    
-如果你使用其他Unix-like操作系统，则在sh中执行该脚本，之后执行make install。    
-之后ffmpeg的3ds版本即可安装到devkitPro的portlibs文件夹下。    
-
-目前本人所使用的版本是 https://github.com/FFmpeg/FFmpeg 中的 release/5.0 分支（commit 911d7f167c30f27a042b8558dfcf012b3c20e858）。
+在终端或devkitPro的MSYS2控制台（如果你使用Windows的话），cd到`cpymo-backends/3ds/`目录下，执行`./install-3ds-ffmpeg.sh`。
 
 ### 产生cia文件
 于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。    
@@ -123,9 +114,9 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 
 ### 额外依赖
 
-* DevkitPro
-  - switch-sdl2
-  - switch-ffmpeg
+* devkitPro + switch dev
+* switch-sdl2
+* switch-ffmpeg
 
 直接使用devkitPro pacman安装即可。
 
