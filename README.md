@@ -31,6 +31,7 @@ pymo原版参见：https://github.com/pymo/pymo
     - Linux
     - macOS
     - Nintendo 3DS
+    - Nintendo Switch
 
 # cpymo-tool
 
@@ -117,5 +118,20 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 
 3DS版本的CPyMO不会加载游戏中自带的字体或者其他TTF字体，而是使用[思源黑体](https://github.com/adobe-fonts/source-han-sans)。    
 思源黑体已经被转换为可以被3DS直接识别的bcfnt格式，CPyMO for 3DS中的思源黑体将会按照其原本的[SIL协议](https://github.com/adobe-fonts/source-han-sans/blob/master/LICENSE.txt)随CPyMO for 3DS一起分发。    
+
+## 编译到任天堂Switch平台
+
+### 额外依赖
+
+* DevkitPro
+  - switch-sdl2
+  - switch-ffmpeg
+
+直接使用devkitPro pacman安装即可。
+
+### 启动
+
+游戏需要放到SD卡根目录，使得gameconfig.txt可用。
+
 
 
