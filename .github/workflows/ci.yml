@@ -49,9 +49,10 @@ jobs:
         
     - name: Install Makerom
       run: |
-         wget https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.17/makerom-v0.17-ubuntu_x86_64.zip
-         unzip makerom-v0.17-ubuntu_x86_64.zip -d .
-         chmod +x makerom
+        cd ./cpymo-backends/3ds
+        wget https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.17/makerom-v0.17-ubuntu_x86_64.zip
+        unzip makerom-v0.17-ubuntu_x86_64.zip -d .
+        chmod +x makerom
 
     - name: Install FFmpeg
       run: |
@@ -63,6 +64,7 @@ jobs:
       run: |
         cd ./cpymo-backends/3ds
         make -j
+        ./makerom -f cia -o cpymo.cia -elf cpymo.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
     
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
@@ -70,6 +72,7 @@ jobs:
         name: CPyMO for Nintendo 3DS
         path: |
           ./cpymo-backends/3ds/cpymo.3dsx
+          ./cpymo-backends/3ds/cpymo.cia
             
   build-desktop:
     name: 'Desktop'
