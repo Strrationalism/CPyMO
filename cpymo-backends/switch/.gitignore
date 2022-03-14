@@ -1,0 +1,4 @@
+*.elf
+*.nacp
+*.nro
+build/
