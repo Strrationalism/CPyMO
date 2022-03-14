@@ -37,7 +37,10 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+APP_TITLE	:= CPyMO
+APP_AUTHOR	:= Strrationalism Studio
+ICON		:= ../3ds/icon.png
+TARGET		:=	CPyMO
 BUILD		:=	build
 SOURCES		:=	../sdl2 ../../cpymo
 DATA		:=	data
