@@ -64,7 +64,8 @@ jobs:
       run: |
         cd ./cpymo-backends/3ds
         make -j
-        ./makerom -f cia -o cpymo.cia -elf cpymo.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
+        make cpymo-strip.elf -j
+        ./makerom -f cia -o cpymo.cia -elf cpymo-strip.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
     
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
