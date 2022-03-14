@@ -40,7 +40,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 APP_TITLE	:= CPyMO
 APP_AUTHOR	:= Strrationalism Studio
 ICON		:= icon.jpg
-TARGET		:=	CPyMO
+TARGET		:=	cpymo
 BUILD		:=	build
 SOURCES		:=	../sdl2 ../../cpymo
 DATA		:=	data

@@ -35,7 +35,7 @@ jobs:
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Nintendo Switch
-        path: ./cpymo-backends/switch/CPyMO.nro
+        path: ./cpymo-backends/switch/cpymo.nro
 
   build-3ds:
     name: 'Nintendo 3DS'
