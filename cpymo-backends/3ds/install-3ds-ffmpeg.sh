@@ -8,6 +8,8 @@ cd ffmpeg-5.0
 export PATH=$DEVKITARM/bin:$PATH
 export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 
+chmod +x ./configure
+
 ./configure --prefix=$DEVKITPRO/portlibs/3ds/ \
 --enable-cross-compile \
 --cross-prefix=$DEVKITARM/bin/arm-none-eabi- \

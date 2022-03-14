@@ -34,7 +34,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: NRO
+        name: CPyMO for Nintendo Switch
         path: ./cpymo-backends/switch/CPyMO.nro
 
   build-3ds:
@@ -49,66 +49,23 @@ jobs:
 
     - name: Install FFmpeg
       run: |
-        curl https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz --output ffmpeg-5.0.tar.gz
-        tar -xf ffmpeg-5.0.tar.gz
-        cd ffmpeg-5.0
-        export PATH=$DEVKITARM/bin:$PATH
-        export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
-        chmod +x ./configure
-        ./configure --prefix=$DEVKITPRO/portlibs/3ds/ \
-        --enable-cross-compile \
-        --cross-prefix=$DEVKITARM/bin/arm-none-eabi- \
-        --disable-shared \
-        --disable-runtime-cpudetect \
-        --disable-armv5te \
-        --disable-programs \
-        --disable-doc \
-        --disable-encoders \
-        --disable-filters \
-        --disable-indevs \
-        --disable-protocols \
-        --enable-bsfs \
-        --disable-muxers \
-        --enable-protocol=file \
-        --enable-static \
-        --disable-decoder=gif,webp,bmp,dds,mjpeg,jpeg1s,jpeg2000,photocd,png,ppm,psd,qpeg,sga,sgi,smvjpeg,text \
-        --disable-parser=bmp,gif,mjpeg,webp,png,ipu,jpeg2000,pnm \
-        --arch=armv6k \
-        --cpu=mpcore \
-        --disable-armv6t2 \
-        --disable-neon \
-        --target-os=none \
-        --extra-cflags=" -O3 -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math $ARCH" \
-        --extra-cxxflags=" -O3 -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math -fno-rtti -fno-exceptions -std=gnu++11 $ARCH" \
-        --extra-ldflags=" -specs=3dsx.specs $ARCH -L$DEVKITARM/lib  -L$DEVKITPRO/libctru/lib  -L$DEVKITPRO/portlibs/3ds/lib -lctru " \
-        --disable-bzlib \
-        --disable-iconv \
-        --disable-lzma \
-        --disable-securetransport \
-        --disable-xlib \
-        --disable-zlib \
-        --disable-debug \
-        --enable-gpl \
-        --enable-version3 
-        make install -j
+        cd ./cpymo-backends/3ds
+        chmod +x ./install-3ds-ffmpeg.sh
+        ./install-3ds-ffmpeg.sh
 
     - name: Build
       run: |
         cd ./cpymo-backends/3ds
-        make cia -j
+        make cia -j -f makefile
         cd ..
     
-    - name: Upload 3DSX
+    - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: 3DSX
-        path: ./cpymo-backends/3ds/cpymo.3dsx
-
-    - name: Upload CIA
-      uses: actions/upload-artifact@v2.3.0
-      with:
-        name: CIA
-        path: ./cpymo-backends/3ds/cpymo.cia
+        name: CPyMO for Nintendo 3DS
+        path: |
+          ./cpymo-backends/3ds/cpymo.3dsx
+          ./cpymo-backends/3ds/cpymo.cia
             
   build-desktop:
     name: 'Desktop'
@@ -170,7 +127,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: for ${{ runner.os }}
+        name: CPyMO for ${{ runner.os }}
         path: |
             ./build/build/*cpymo*
             ./build/build/MinSizeRel/*cpymo*
