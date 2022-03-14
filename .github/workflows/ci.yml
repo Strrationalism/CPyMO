@@ -56,7 +56,7 @@ jobs:
     - name: Build
       run: |
         cd ./cpymo-backends/3ds
-        make cia -j -f makefile
+        make cia -j
         cd ..
     
     - name: Upload
