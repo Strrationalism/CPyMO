@@ -1,4 +1,4 @@
-name: CMake
+name: CI
 
 on:
   push:
@@ -11,7 +11,66 @@ env:
   BUILD_TYPE: MinSizeRel
 
 jobs:
-  build:
+  build-switch:
+    name: ubuntu-18.04
+    runs-on: ubuntu-18.04
+    container: devkitpro/devkita64:latest
+ 
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Install Dependents
+      run: |
+        pacman -s switch-ffmpeg
+        pacman -s switch-sdl2
+
+    - name: Build
+      run: |
+        cd cpymo-backends/switch
+        make -j
+        cd ..
+    
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: NRO
+        path: ./cpymo-backends/switch/CPyMO.nro
+
+  build-3ds:
+    name: ubuntu-18.04
+    runs-on: ubuntu-18.04
+    container: devkitpro/devkitarm:latest
+ 
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Install FFmpeg
+      run: |
+        ./cpymo-backends/3ds/install-3ds-ffmpeg.sh
+
+    - name: Build
+      run: |
+        cd cpymo-backends/3ds
+        make cia -j
+        cd ..
+    
+    - name: Upload 3DSX
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: 3DSX
+        path: ./cpymo-backends/3ds/cpymo.3dsx
+
+    - name: Upload CIA
+          uses: actions/upload-artifact@v2.3.0
+          with:
+            name: CIA
+            path: ./cpymo-backends/3ds/cpymo.cia
+            
+  build-desktop:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -73,7 +132,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: Build Artifact on ${{ runner.os }}
+        name: for ${{ runner.os }}
         path: |
             ./build/build/*cpymo*
             ./build/build/MinSizeRel/*cpymo*
