@@ -137,7 +137,9 @@ jobs:
       with:
         name: CPyMO for ${{ runner.os }}
         path: |
-            ./build/build/*cpymo*
-            ./build/build/MinSizeRel/*cpymo*
+            ./build/build/cpymo
+            ./build/build/cpymo-tool
+            ./build/build/MinSizeRel/cpymo.exe
+            ./build/build/MinSizeRel/cpymo-tool.exe
 
       
