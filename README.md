@@ -30,7 +30,7 @@ pymo原版参见：https://github.com/pymo/pymo
     - Windows
     - Linux
     - macOS
-    - Nintendo 3DS
+    - Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
     - Nintendo Switch
 
 # cpymo-tool
