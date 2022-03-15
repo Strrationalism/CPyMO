@@ -46,10 +46,10 @@ error_t cpymo_gameconfig_parse_from_file(cpymo_gameconfig *out_config, const cha
 static inline bool cpymo_gameconfig_is_symbian(const cpymo_gameconfig *g)
 {
 	return
-		g->platform[0] == 's'
+		(g->platform[0] == 's' || g->platform[0] == 'S')
 		&& g->platform[1] == '6'
 		&& g->platform[2] == '0'
-		&& g->platform[3] == 'v';
+		&& (g->platform[3] == 'v' || g->platform[3] == 'V');
 }
 
 static inline float cpymo_gameconfig_font_size(const cpymo_gameconfig *c)
