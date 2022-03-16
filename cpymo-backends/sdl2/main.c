@@ -45,8 +45,6 @@
 #include <sys/types.h>
 #endif
 
-#include <cpymo_game_selector.h>
-
 #include "posix_win32.h"
 
 SDL_Window *window;
@@ -135,6 +133,7 @@ static void ensure_save_dir(const char *gamedir)
 }
 
 #ifdef USE_GAME_SELECTOR
+#include <cpymo_game_selector.h>
 static error_t after_start_game(cpymo_engine *e)
 {
 	if (SDL_RenderSetLogicalSize(renderer, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
