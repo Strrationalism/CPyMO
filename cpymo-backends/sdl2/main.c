@@ -358,7 +358,6 @@ int main(int argc, char **argv)
 
 	SDL_Quit();
 
-
 	#if _WIN32 && !NDEBUG
 	_CrtDumpMemoryLeaks();
 	#endif
