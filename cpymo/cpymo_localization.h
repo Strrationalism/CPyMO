@@ -35,6 +35,8 @@ typedef struct {
 
 	error_t (*date_str)(char **out_str, int month, int day);
 
+	const char *game_selector_empty;
+	const char *game_selector_empty_secondary;
 } cpymo_localization;
 
 struct cpymo_engine;

@@ -7,6 +7,7 @@
 #include <cpymo_backend_input.h>
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_save_global.h"
+#include <cpymo_backend_input.h>
 
 static void cpymo_logo() {
 	puts("   __________        __  _______");
@@ -144,6 +145,8 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		fprintf(stderr, "[Error] Global save data broken! %s\n", cpymo_error_message(err));
 	}
 
+	out->input = out->prev_input = cpymo_input_snapshot();
+
 	cpymo_logo();
 
 	// checks
@@ -160,13 +163,15 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
-	error_t err = cpymo_save_global_save(engine);
-	if (err != CPYMO_ERR_SUCC) 
-		fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
+	if (engine->assetloader.gamedir) {
+		error_t err = cpymo_save_global_save(engine);
+		if (err != CPYMO_ERR_SUCC)
+			fprintf(stderr, "[Error] Can not save global savedata. %s\n", cpymo_error_message(err));
 
-	err = cpymo_save_config_save(engine);
-	if (err != CPYMO_ERR_SUCC)
-		fprintf(stderr, "[Error] Can not save config. %s\n", cpymo_error_message(err));
+		err = cpymo_save_config_save(engine);
+		if (err != CPYMO_ERR_SUCC)
+			fprintf(stderr, "[Error] Can not save config. %s\n", cpymo_error_message(err));
+	}
 	
 	if (engine->ui) cpymo_ui_exit(engine);
 	cpymo_hash_flags_free(&engine->flags);
@@ -179,11 +184,11 @@ void cpymo_engine_free(cpymo_engine *engine)
 	cpymo_select_img_free(&engine->select_img);
 	cpymo_anime_free(&engine->anime);
 	cpymo_bg_free(&engine->bg);
-	cpymo_interpreter_free(engine->interpreter);
+	if(engine->interpreter) cpymo_interpreter_free(engine->interpreter);
 	free(engine->interpreter);
 	cpymo_vars_free(&engine->vars);
 	cpymo_assetloader_free(&engine->assetloader);
-	free(engine->title);
+	if (engine->title) free(engine->title);
 	cpymo_audio_free(&engine->audio);
 }
 

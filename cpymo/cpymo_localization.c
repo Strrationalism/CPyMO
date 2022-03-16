@@ -89,7 +89,10 @@ const cpymo_localization chs = {
 	&F(chs, save_are_you_sure_load),
 	"确定要加载自动存档吗？",
 
-	&F(chs, date_str)
+	&F(chs, date_str),
+
+	"未找到游戏",
+	"你需要将游戏放在SD卡中的\"pymogames\"文件夹下，\n并确保路径中只包含英文、数字和下划线。\n"
 };
 
 STR_I(enu, save_already_save_to, 32, "Already save to slot %d.");
@@ -129,7 +132,10 @@ const cpymo_localization enu = {
 	&F(enu, save_are_you_sure_load),
 	"Are you sure you want to load from auto slot?",
 
-	&F(enu, date_str)
+	&F(enu, date_str),
+
+	"No games found",
+	"Please make sure folder \"pymogames\" is in SD card root,\nand that you have at least one game in it."
 };
 
 #ifndef DEFAULT_LANG

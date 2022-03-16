@@ -79,7 +79,7 @@ void cpymo_assetloader_free(cpymo_assetloader * loader)
 		if (loader->use_pkg_chara) cpymo_package_close(&loader->pkg_chara);
 		if (loader->use_pkg_se) cpymo_package_close(&loader->pkg_se);
 		if (loader->use_pkg_voice) cpymo_package_close(&loader->pkg_voice);
-		free((void *)loader->gamedir);
+		if (loader->gamedir) free((void *)loader->gamedir);
 	}
 }
 

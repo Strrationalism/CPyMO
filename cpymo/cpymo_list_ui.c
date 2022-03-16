@@ -244,8 +244,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			CPYMO_THROW(err);
 		}
 	}
-
-	if (mouse_button_state == cpymo_key_hold_result_released)
+	else if (mouse_button_state == cpymo_key_hold_result_released)
 		ui->scroll_delta_y_sum = 0;
 
 	return CPYMO_ERR_SUCC;
