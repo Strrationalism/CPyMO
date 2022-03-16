@@ -57,47 +57,6 @@ extern void cpymo_backend_font_free();
 extern void cpymo_backend_audio_init();
 extern void cpymo_backend_audio_free();
 
-
-#ifdef __SWITCH__
-#define GAME_SELECTOR_DIR "/pymogames/"
-#include <dirent.h>
-cpymo_game_selector_item *get_game_list(void)
-{
-	cpymo_game_selector_item *item = NULL;
-	cpymo_game_selector_item *item_tail = NULL;
-
-	DIR *dir = opendir(GAME_SELECTOR_DIR);
-
-	if (dir) {
-		struct dirent* ent;
-		while ((ent = readdir(dir))) {
-			char *path = (char *)malloc(strlen(ent->d_name) + 16);
-			sprintf(path, GAME_SELECTOR_DIR "/%s", ent->d_name);
-
-			cpymo_game_selector_item *cur = NULL;
-			error_t err = cpymo_game_selector_item_create(&cur, &path);
-			if (err != CPYMO_ERR_SUCC) {
-				free(path);
-				continue;
-			}
-
-			if (item == NULL) {
-				item = cur;
-				item_tail = cur;
-			}
-			else {
-				item_tail->next = cur;
-				item_tail = cur;
-			}
-
-		}
-		closedir(dir);
-	}
-
-	return item;
-}
-#endif
-
 static void set_window_icon(const char *gamedir) 
 {
 #ifndef __SWITCH__
@@ -150,6 +109,47 @@ static error_t after_start_game(cpymo_engine *e)
 	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
 
 	return CPYMO_ERR_SUCC;
+}
+#endif
+
+
+#ifdef __SWITCH__
+#define GAME_SELECTOR_DIR "/pymogames/"
+#include <dirent.h>
+cpymo_game_selector_item *get_game_list(void)
+{
+	cpymo_game_selector_item *item = NULL;
+	cpymo_game_selector_item *item_tail = NULL;
+
+	DIR *dir = opendir(GAME_SELECTOR_DIR);
+
+	if (dir) {
+		struct dirent* ent;
+		while ((ent = readdir(dir))) {
+			char *path = (char *)malloc(strlen(ent->d_name) + 16);
+			sprintf(path, GAME_SELECTOR_DIR "/%s", ent->d_name);
+
+			cpymo_game_selector_item *cur = NULL;
+			error_t err = cpymo_game_selector_item_create(&cur, &path);
+			if (err != CPYMO_ERR_SUCC) {
+				free(path);
+				continue;
+			}
+
+			if (item == NULL) {
+				item = cur;
+				item_tail = cur;
+			}
+			else {
+				item_tail->next = cur;
+				item_tail = cur;
+			}
+
+		}
+		closedir(dir);
+	}
+
+	return item;
 }
 #endif
 
