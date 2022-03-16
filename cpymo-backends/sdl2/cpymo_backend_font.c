@@ -46,7 +46,6 @@ error_t cpymo_backend_font_init(const char *gamedir)
 		if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 		sprintf(path, "%s/system/default.ttf", gamedir);
 		err = cpymo_backend_font_try_load_font(path);
-		//free(path);
 		if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
 	}
 
@@ -80,8 +79,6 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	TRY_LOAD("simsunb.ttf");
 	TRY_LOAD("simfang.ttf");
 	TRY_LOAD("SIMLI.ttf");
-
-	//free(path);
 #endif
 
 #ifdef __SWITCH__
