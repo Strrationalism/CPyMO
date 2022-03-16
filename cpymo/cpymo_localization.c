@@ -132,7 +132,11 @@ const cpymo_localization enu = {
 	&F(enu, date_str)
 };
 
+#ifndef DEFAULT_LANG
+#define DEFAULT_LANG chs
+#endif
+
 const cpymo_localization *cpymo_localization_get(struct cpymo_engine *e)
 {
-	return &enu;
+	return &DEFAULT_LANG;
 }
