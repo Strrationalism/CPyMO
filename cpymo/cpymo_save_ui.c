@@ -3,6 +3,7 @@
 #include "cpymo_list_ui.h"
 #include "cpymo_save.h"
 #include "cpymo_msgbox_ui.h"
+#include "cpymo_localization.h"
 #include <assert.h>
 
 #define MAX_SAVES 10
@@ -36,19 +37,26 @@ static error_t cpymo_save_confirm(cpymo_engine *e, void *data)
 	uintptr_t save_id = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(data);
 	error_t err = cpymo_save_write(e, (unsigned short)save_id);
 
-	char message[128];
-	if (err == CPYMO_ERR_SUCC) {
-		sprintf(message, "已经保存到存档 %d", (int)save_id);
-	}
-	else {
-		sprintf(message, "保存失败：%s", cpymo_error_message(err));
-	}
+	const cpymo_localization *l = cpymo_localization_get(e);
 
-	return cpymo_msgbox_ui_enter(
+	char *msg = NULL;
+	error_t errstr;
+	if (err == CPYMO_ERR_SUCC) 
+		errstr = l->save_already_save_to(&msg, (int)save_id);
+	else 
+		errstr = l->save_failed(&msg, err);
+	
+	if (errstr != CPYMO_ERR_SUCC) return errstr;
+
+	err = cpymo_msgbox_ui_enter(
 		e,
-		cpymo_parser_stream_span_pure(message),
+		cpymo_parser_stream_span_pure(msg),
 		NULL,
 		NULL);
+
+	free(msg);
+
+	return err;
 }
 
 static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
@@ -63,13 +71,17 @@ static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
 		else return CPYMO_ERR_SUCC;
 	}
 	else {
-		char text[48];
-		sprintf(text, "确定要保存到存档 %d 吗？", (int)save_id);
-		return cpymo_msgbox_ui_enter(
+		char *msg = NULL;
+		const cpymo_localization *l = cpymo_localization_get(e);
+		error_t err = l->save_are_you_sure_save_to(&msg, (int)save_id);
+		CPYMO_THROW(err);
+		err = cpymo_msgbox_ui_enter(
 			e,
-			cpymo_parser_stream_span_pure(text),
+			cpymo_parser_stream_span_pure(msg),
 			&cpymo_save_confirm,
 			selected);
+		free(msg);
+		return err;
 	}
 }
 
@@ -180,8 +192,23 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 				}
 			}
 
-			if (i == 0) sprintf(text_buf, "自动存档  %s\n%s", title.title, tmp_str);
-			else sprintf(text_buf, "存档 %d      %s\n%s", (int)i, title.title, tmp_str);
+			const cpymo_localization *l = cpymo_localization_get(e);
+
+			char *str = NULL;
+			error_t err;
+			if (i == 0)  err = l->save_auto_title(&str, title.title);
+			else err = l->save_title(&str, (int)i, title.title);
+
+			if (err != CPYMO_ERR_SUCC) {
+				free(tmp_str);
+				free(title.say_name);
+				free(title.title);
+				free(title.say_text);
+				return err;
+			}
+
+			snprintf(text_buf, sizeof(text_buf), "%s\n%s", str, tmp_str);
+			free(str);
 
 			free(tmp_str);
 
@@ -190,8 +217,15 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 			free(title.say_text);
 		}
 		else {
-			if (i == 0) sprintf(text_buf, "自动存档  空");
-			else sprintf(text_buf, "存档 %d      空", (int)i);
+			error_t err;
+			const cpymo_localization *l = cpymo_localization_get(e);
+			char *msg = NULL;
+			if (i == 0) err = l->save_auto_title(&msg, "");
+			else err = l->save_title(&msg, (int)i, "");
+
+			CPYMO_THROW(err);
+			strncpy(text_buf, msg, sizeof(text_buf) - 1);
+			free(msg);
 		}
 
 		float w;
@@ -218,18 +252,23 @@ static error_t cpymo_save_ui_load_savedata_yesnobox_confirm(cpymo_engine *e, voi
 
 error_t cpymo_save_ui_load_savedata_yesnobox(cpymo_engine * e, unsigned short save_id)
 {
-	char str[48];
+	char *str = NULL;
+	error_t err = CPYMO_ERR_SUCC;
+	const cpymo_localization *l = cpymo_localization_get(e);
+
 	if (save_id) {
-		sprintf(str, "确定要加载存档 %d 吗？", save_id);
-	}
-	else {
-		strcpy(str, "确定要加载自动存档吗？");
+		err = l->save_are_you_sure_load(&str, (int)save_id);
+		CPYMO_THROW(err);
 	}
 
-	return cpymo_msgbox_ui_enter(
+	err = cpymo_msgbox_ui_enter(
 		e,
-		cpymo_parser_stream_span_pure(str),
+		cpymo_parser_stream_span_pure(str ? str : l->save_are_you_sure_load_auto_save),
 		&cpymo_save_ui_load_savedata_yesnobox_confirm,
 		(void *)(uintptr_t)save_id);
+
+	if (str) free(str);
+
+	return err;
 }
 

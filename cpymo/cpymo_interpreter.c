@@ -6,6 +6,7 @@
 #include "cpymo_save_ui.h"
 #include "cpymo_save.h"
 #include "cpymo_movie.h"
+#include "cpymo_localization.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -1349,10 +1350,12 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("date") {
 		int fmonth = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FMONTH"));
 		int fdate = cpymo_vars_get(&engine->vars, cpymo_parser_stream_span_pure("FDATE"));
-		char str[16];
-		sprintf(str, "%d/%d",
-			cpymo_utils_clamp(fmonth, 1, 12),
-			cpymo_utils_clamp(fdate, 1, 31));
+		char *str = NULL;
+
+		const cpymo_localization *l = cpymo_localization_get(engine);
+		error_t err = l->date_str(&str, fmonth, fdate);
+		CPYMO_THROW(err);
+				
 
 		POP_ARG(date_bg); ENSURE(date_bg);
 		POP_ARG(x_str); ENSURE(x_str);
@@ -1364,11 +1367,14 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		cpymo_color col =
 			cpymo_parser_stream_span_as_color(col_str);
 
-		return cpymo_floating_hint_start(
+		err = cpymo_floating_hint_start(
 			engine,
 			cpymo_parser_stream_span_pure(str),
 			date_bg,
 			x, y, col, 1.5f);
+
+		free(str);
+		return err;
 	}
 
 	D("config") {

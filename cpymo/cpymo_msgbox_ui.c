@@ -1,5 +1,6 @@
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_engine.h"
+#include "cpymo_localization.h"
 
 typedef struct {
 	cpymo_backend_text message;
@@ -52,11 +53,15 @@ static int cpymo_msgbox_ui_get_mouse_selection(cpymo_engine *e)
 	if (!input->mouse_position_useable)
 		input = &e->prev_input;
 
+	float btn_width =
+		ui->confirm_btn_width > ui->cancel_btn_width ?
+		ui->confirm_btn_width : ui->cancel_btn_width;
+
 	if (input->mouse_position_useable) {
 		float xywh[4];
 		cpymo_msgbox_ui_get_btn_rect(
 			xywh,
-			ui->confirm_btn_width,
+			btn_width,
 			fontsize,
 			screen_w,
 			ui->cancel_btn ? screen_h * 0.5f : screen_h * 0.618f);
@@ -69,7 +74,7 @@ static int cpymo_msgbox_ui_get_mouse_selection(cpymo_engine *e)
 		if (ui->cancel_btn) {
 			cpymo_msgbox_ui_get_btn_rect(
 				xywh,
-				ui->cancel_btn_width,
+				btn_width,
 				fontsize,
 				screen_w,
 				screen_h * 0.5f + fontsize * 1.75f + (8.0f / (fontsize / 32)));
@@ -140,7 +145,8 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 }
 
 static void cpymo_msgbox_ui_draw_btn(
-	cpymo_backend_text btn_txt, 
+	cpymo_backend_text btn_txt,
+	float btn_width,
 	float txt_width, 
 	float font_size, 
 	float screen_w,
@@ -150,7 +156,7 @@ static void cpymo_msgbox_ui_draw_btn(
 	bool key_down)
 {
 	float xywh[4];
-	cpymo_msgbox_ui_get_btn_rect(xywh, txt_width, font_size, screen_w, y);
+	cpymo_msgbox_ui_get_btn_rect(xywh, btn_width, font_size, screen_w, y);
 
 	cpymo_color gray;
 	gray.r = 128;
@@ -191,8 +197,11 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 
 	bool key_down = e->input.mouse_button || e->input.ok;
 
+	float btn_width = ui->confirm_btn_width > ui->cancel_btn_width ? ui->confirm_btn_width : ui->cancel_btn_width;
+
 	cpymo_msgbox_ui_draw_btn(
 		ui->confirm_btn, 
+		btn_width,
 		ui->confirm_btn_width, 
 		fontsize, 
 		screen_w, 
@@ -204,6 +213,7 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 	if (ui->cancel_btn) {
 		cpymo_msgbox_ui_draw_btn(
 			ui->cancel_btn,
+			btn_width,
 			ui->cancel_btn_width,
 			fontsize,
 			screen_w,
@@ -247,6 +257,8 @@ error_t cpymo_msgbox_ui_enter(
 	ui->message = NULL;
 	ui->confirm_btn = NULL;
 	ui->cancel_btn = NULL;
+	ui->cancel_btn_width = 0;
+	ui->confirm_btn_width = 0;
 
 	ui->confirm = confirm;
 	ui->confirm_data = confirm_data;
@@ -260,10 +272,12 @@ error_t cpymo_msgbox_ui_enter(
 		return err;
 	}
 
+	const cpymo_localization *l = cpymo_localization_get(e);
+
 	err = cpymo_backend_text_create(
 		&ui->confirm_btn, 
 		&ui->confirm_btn_width, 
-		cpymo_parser_stream_span_pure("确定"), 
+		cpymo_parser_stream_span_pure(l->msgbox_ok), 
 		fontsize);
 	if (err != CPYMO_ERR_SUCC) {
 		cpymo_ui_exit(e);
@@ -274,7 +288,7 @@ error_t cpymo_msgbox_ui_enter(
 		err = cpymo_backend_text_create(
 			&ui->cancel_btn,
 			&ui->cancel_btn_width,
-			cpymo_parser_stream_span_pure("取消"),
+			cpymo_parser_stream_span_pure(l->msgbox_cancel),
 			fontsize);
 		if (err != CPYMO_ERR_SUCC) {
 			cpymo_ui_exit(e);

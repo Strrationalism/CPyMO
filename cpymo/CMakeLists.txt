@@ -41,5 +41,6 @@ add_library (cpymolib STATIC
 	"cpymo_save.h" "cpymo_save.c" 
 	"cpymo_save_ui.h" "cpymo_save_ui.c" 
 	"cpymo_msgbox_ui.h" "cpymo_msgbox_ui.c" 
-	"cpymo_movie.h" "cpymo_movie.c")
+	"cpymo_movie.h" "cpymo_movie.c" 
+	"cpymo_localization.h" "cpymo_localization.c")
 

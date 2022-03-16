@@ -4,6 +4,7 @@
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_save_ui.h"
 #include "cpymo_save.h"
+#include "cpymo_localization.h"
 #include <assert.h>
 
 typedef struct {
@@ -118,7 +119,8 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	case 6: 
 		cpymo_msgbox_ui_enter(
 			e, 
-			cpymo_parser_stream_span_pure("确定要重新启动游戏吗？"), 
+			cpymo_parser_stream_span_pure(
+				cpymo_localization_get(e)->rmenu_restat_game_confirm_message), 
 			&cpymo_rmenu_restart_game, 
 			NULL);
 		break;
@@ -207,14 +209,16 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 
 	cpymo_select_img_configuare_set_ok_callback(&rmenu->menu, &cpymo_rmenu_ok);
 
-	RMENU_ITEM(0, "存档", true);
-	RMENU_ITEM(1, "读档", true);
-	RMENU_ITEM(2, "快进", e->select_img.selections == NULL);
-	RMENU_ITEM(3, "隐藏对话框", e->select_img.selections == NULL);
-	RMENU_ITEM(4, "对话历史", true);
-	RMENU_ITEM(5, "设置", true)
-	RMENU_ITEM(6, "重启游戏", true);
-	RMENU_ITEM(7, "返回游戏", true);
+	const cpymo_localization *l = cpymo_localization_get(e);
+
+	RMENU_ITEM(0, l->rmenu_save, true);
+	RMENU_ITEM(1, l->rmenu_load, true);
+	RMENU_ITEM(2, l->rmenu_skip, e->select_img.selections == NULL);
+	RMENU_ITEM(3, l->rmenu_hide_window, e->select_img.selections == NULL);
+	RMENU_ITEM(4, l->rmenu_backlog, true);
+	RMENU_ITEM(5, l->rmenu_config, true)
+	RMENU_ITEM(6, l->rmenu_restart, true);
+	RMENU_ITEM(7, l->rmenu_back_to_game, true);
 
 	float xywh[4] = {
 		((float)e->gameconfig.imagesize_w - (float)rmenu->bg_w) / 2,

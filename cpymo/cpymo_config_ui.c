@@ -2,6 +2,7 @@
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
 #include "cpymo_save_global.h"
+#include "cpymo_localization.h"
 #include <assert.h>
 
 typedef struct {
@@ -222,12 +223,14 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 			cpymo_ui_exit(e); \
 			return err; \
 		}
+
+	const cpymo_localization *l = cpymo_localization_get(e);
 		
-	INIT_ITEM(ITEM_BGM_VOL, "背景音乐音量", 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * 10));
-	INIT_ITEM(ITEM_SE_VOL, "音效音量", 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * 10));
-	INIT_ITEM(ITEM_VO_VOL, "语音音量", 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * 10));
-	INIT_ITEM(ITEM_TEXT_SPEED, "文字速度", 0, 5, (int)e->gameconfig.textspeed);
-	INIT_ITEM(ITEM_FONT_SIZE, "文字大小", 12, 32, (int)e->gameconfig.fontsize);
+	INIT_ITEM(ITEM_BGM_VOL, l->config_bgmvol, 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * 10));
+	INIT_ITEM(ITEM_SE_VOL, l->config_sevol, 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * 10));
+	INIT_ITEM(ITEM_VO_VOL, l->config_vovol, 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * 10));
+	INIT_ITEM(ITEM_TEXT_SPEED, l->config_sayspeed, 0, 5, (int)e->gameconfig.textspeed);
+	INIT_ITEM(ITEM_FONT_SIZE, l->config_fontsize, 12, 32, (int)e->gameconfig.fontsize);
 
 	return CPYMO_ERR_SUCC;
 }
