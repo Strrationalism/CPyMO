@@ -8,7 +8,23 @@
 typedef struct {
 	cpymo_game_selector_item *items;
 	cpymo_game_selector_callback before_init, after_init;
+	size_t draw_times;
 } cpymo_game_selector;
+
+error_t cpymo_game_selector_init_refresh(cpymo_engine *e, float dt, void *selected)
+{
+	cpymo_game_selector *ui = (cpymo_game_selector *)cpymo_list_ui_data(e);
+	cpymo_engine_request_redraw(e);
+
+	if (ui->draw_times) {
+		ui->draw_times--;
+	}
+	else {
+		cpymo_list_ui_set_custom_update(e, NULL);
+	}
+
+	return CPYMO_ERR_SUCC;
+}
 
 static void cpymo_game_selector_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
@@ -135,6 +151,7 @@ static cpymo_game_selector_item *cpymo_game_selector_item_remove_invalid(cpymo_g
 typedef struct {
 	cpymo_backend_text msg1, msg2;
 	float msg1_w, msg2_w;
+	size_t draw_times;
 } cpymo_game_selector_empty_ui;
 
 static void cpymo_game_selector_empty_ui_draw(const cpymo_engine *e, const void *ui_data)
@@ -160,6 +177,11 @@ static void cpymo_game_selector_empty_ui_draw(const cpymo_engine *e, const void 
 
 static error_t cpymo_game_selector_empty_ui_update(cpymo_engine *e, void *ui_data, float dt)
 {
+	cpymo_game_selector_empty_ui *ui = (cpymo_game_selector_empty_ui *)ui_data;
+	if (ui->draw_times) {
+		cpymo_engine_request_redraw(e);
+		ui->draw_times--;
+	}
 	return CPYMO_ERR_SUCC;
 }
 
@@ -168,6 +190,109 @@ static void cpymo_game_selector_empty_ui_delete(cpymo_engine *e, void *ui_)
 	cpymo_game_selector_empty_ui *ui = (cpymo_game_selector_empty_ui *)ui_;
 	if (ui->msg1) cpymo_backend_text_free(ui->msg1);
 	if (ui->msg2) cpymo_backend_text_free(ui->msg2);
+}
+
+typedef struct {
+	cpymo_game_selector_item *items;
+	cpymo_game_selector_callback before_reinit, after_reinit;
+	size_t nodes_per_screen;
+} cpymo_game_selector_lazy_init;
+
+static void cpymo_game_selector_lazy_init_delete(cpymo_engine *e, void *ui_data)
+{
+	cpymo_game_selector_lazy_init *ui = (cpymo_game_selector_lazy_init *)ui_data;
+	if (ui->items) cpymo_game_selector_item_free_all(ui->items);
+}
+
+static void cpymo_game_selector_lazy_init_draw(const cpymo_engine *e, const void *_) {}
+
+static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, float _)
+{
+	float fontsize = (float)e->gameconfig.fontsize;
+	cpymo_game_selector_lazy_init *data = (cpymo_game_selector_lazy_init *)ui_;
+
+	cpymo_game_selector_item_load_info(data->items, fontsize);
+	data->items = cpymo_game_selector_item_remove_invalid(NULL, data->items);
+
+	if (data->items) {
+		cpymo_game_selector *ui = NULL;
+		cpymo_game_selector_item *items = data->items;
+		data->items = NULL;
+		cpymo_game_selector_callback
+			before_reinit = data->before_reinit,
+			after_reinit = data->after_reinit;
+
+		error_t err = cpymo_list_ui_enter(
+			e,
+			(void **)&ui,
+			sizeof(cpymo_game_selector),
+			&cpymo_game_selector_draw_node,
+			&cpymo_game_selector_ok,
+			&cpymo_game_selector_delete,
+			items,
+			&cpymo_game_selector_get_next,
+			&cpymo_game_selector_get_prev,
+			false,
+			data->nodes_per_screen
+		);
+
+		cpymo_list_ui_set_custom_update(e, &cpymo_game_selector_init_refresh);
+
+		ui->before_init = before_reinit;
+		ui->after_init = after_reinit;
+		ui->draw_times = 45;
+
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_game_selector_item_free_all(items);
+			return err;
+		}
+
+		ui->items = items;
+		return CPYMO_ERR_SUCC;
+	}
+	else {
+		cpymo_game_selector_empty_ui *ui = NULL;
+		error_t err = cpymo_ui_enter(
+			(void **)&ui,
+			e,
+			sizeof(*ui),
+			&cpymo_game_selector_empty_ui_update,
+			&cpymo_game_selector_empty_ui_draw,
+			&cpymo_game_selector_empty_ui_delete);
+
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_engine_free(e);
+			return err;
+		}
+
+		ui->msg1 = NULL;
+		ui->msg2 = NULL;
+		ui->msg1_w = 0;
+		ui->msg2_w = 0;
+		ui->draw_times = 45;
+
+		const cpymo_localization *l = cpymo_localization_get(e);
+
+		err = cpymo_backend_text_create(&ui->msg1, &ui->msg1_w,
+			cpymo_parser_stream_span_pure(l->game_selector_empty),
+			fontsize * 2.0f);
+
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_engine_free(e);
+			return err;
+		}
+
+		err = cpymo_backend_text_create(&ui->msg2, &ui->msg2_w,
+			cpymo_parser_stream_span_pure(l->game_selector_empty_secondary),
+			fontsize * 2.0f / 1.3f);
+
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_engine_free(e);
+			return err;
+		}
+
+		return CPYMO_ERR_SUCC;
+	}
 }
 
 error_t cpymo_engine_init_with_game_selector(
@@ -215,78 +340,25 @@ error_t cpymo_engine_init_with_game_selector(
 
 	e->input = e->prev_input = cpymo_input_snapshot();
 
-	float fontsize = (float)fontsize_;
+	cpymo_game_selector_lazy_init *d = NULL;
+	err = cpymo_ui_enter(
+		(void **)&d,
+		e,
+		sizeof(*d),
+		&cpymo_game_selector_lazy_init_update,
+		&cpymo_game_selector_lazy_init_draw,
+		&cpymo_game_selector_lazy_init_delete);
 
-	cpymo_game_selector_item_load_info(*gamedirs_movein, fontsize);
-	*gamedirs_movein = cpymo_game_selector_item_remove_invalid(NULL, *gamedirs_movein);
-
-	if (*gamedirs_movein) {
-		cpymo_game_selector *ui = NULL;
-		err = cpymo_list_ui_enter(
-			e,
-			(void **)&ui,
-			sizeof(cpymo_game_selector),
-			&cpymo_game_selector_draw_node,
-			&cpymo_game_selector_ok,
-			&cpymo_game_selector_delete,
-			*gamedirs_movein,
-			&cpymo_game_selector_get_next,
-			&cpymo_game_selector_get_prev,
-			false,
-			nodes_per_screen
-		);
-
-		ui->before_init = before_reinit;
-		ui->after_init = after_reinit;
-
-		if (err != CPYMO_ERR_SUCC) {
-			cpymo_engine_free(e);
-			return err;
-		}
-
-		ui->items = *gamedirs_movein;
-		*gamedirs_movein = NULL;
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_engine_free(e);
+		return err;
 	}
-	else {
-		cpymo_game_selector_empty_ui *ui = NULL;
-		err = cpymo_ui_enter(
-			(void **)&ui, 
-			e, 
-			sizeof(*ui),
-			&cpymo_game_selector_empty_ui_update,
-			&cpymo_game_selector_empty_ui_draw,
-			&cpymo_game_selector_empty_ui_delete);
 
-		if (err != CPYMO_ERR_SUCC) {
-			cpymo_engine_free(e);
-			return err;
-		}
-
-		ui->msg1 = NULL;
-		ui->msg2 = NULL;
-		ui->msg1_w = 0;
-		ui->msg2_w = 0;
-
-		const cpymo_localization *l = cpymo_localization_get(e);
-
-		err = cpymo_backend_text_create(&ui->msg1, &ui->msg1_w,
-			cpymo_parser_stream_span_pure(l->game_selector_empty),
-			fontsize * 2.0f);
-
-		if (err != CPYMO_ERR_SUCC) {
-			cpymo_engine_free(e);
-			return err;
-		}
-
-		err = cpymo_backend_text_create(&ui->msg2, &ui->msg2_w,
-			cpymo_parser_stream_span_pure(l->game_selector_empty_secondary),
-			fontsize * 2.0f / 1.3f);
-
-		if (err != CPYMO_ERR_SUCC) {
-			cpymo_engine_free(e);
-			return err;
-		}
-	}
+	d->after_reinit = after_reinit;
+	d->before_reinit = before_reinit;
+	d->nodes_per_screen = nodes_per_screen;
+	d->items = *gamedirs_movein;
+	*gamedirs_movein = NULL;
 
 	return CPYMO_ERR_SUCC;
 }

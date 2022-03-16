@@ -31,9 +31,10 @@
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-#define GAME_SELECTOR_DIR "/pymogames/"
+#define USE_GAME_SELECTOR
+#define GAME_SELECTOR_FONTSIZE 32
+#define GAME_SELECTOR_COUNT_PER_SCREEN 8
 #endif
-
 
 #if _WIN32 && !NDEBUG
 #include <crtdbg.h>
@@ -43,6 +44,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #endif
+
+#include <cpymo_game_selector.h>
 
 #include "posix_win32.h"
 
@@ -56,6 +59,46 @@ extern void cpymo_backend_font_free();
 extern void cpymo_backend_audio_init();
 extern void cpymo_backend_audio_free();
 
+
+#ifdef __SWITCH__
+#define GAME_SELECTOR_DIR "/pymogames/"
+#include <dirent.h>
+cpymo_game_selector_item *get_game_list(void)
+{
+	cpymo_game_selector_item *item = NULL;
+	cpymo_game_selector_item *item_tail = NULL;
+
+	DIR *dir = opendir(GAME_SELECTOR_DIR);
+
+	if (dir) {
+		struct dirent* ent;
+		while ((ent = readdir(dir))) {
+			char *path = (char *)malloc(strlen(ent->d_name) + 16);
+			sprintf(path, GAME_SELECTOR_DIR "/%s", ent->d_name);
+
+			cpymo_game_selector_item *cur = NULL;
+			error_t err = cpymo_game_selector_item_create(&cur, &path);
+			if (err != CPYMO_ERR_SUCC) {
+				free(path);
+				continue;
+			}
+
+			if (item == NULL) {
+				item = cur;
+				item_tail = cur;
+			}
+			else {
+				item_tail->next = cur;
+				item_tail = cur;
+			}
+
+		}
+		closedir(dir);
+	}
+
+	return item;
+}
+#endif
 
 static void set_window_icon(const char *gamedir) 
 {
@@ -91,6 +134,26 @@ static void ensure_save_dir(const char *gamedir)
 	mkdir(save_dir, 0777);
 }
 
+#ifdef USE_GAME_SELECTOR
+static error_t after_start_game(cpymo_engine *e)
+{
+	if (SDL_RenderSetLogicalSize(renderer, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	cpymo_backend_font_free();
+	error_t err = cpymo_backend_font_init(e->assetloader.gamedir);
+	CPYMO_THROW(err);
+
+	ensure_save_dir(e->assetloader.gamedir);
+	set_window_icon(e->assetloader.gamedir);
+
+	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
+
+	return CPYMO_ERR_SUCC;
+}
+#endif
+
 int main(int argc, char **argv) 
 {
 	//_CrtSetBreakAlloc(1371);
@@ -101,17 +164,15 @@ int main(int argc, char **argv)
 
 	int ret = 0;
 
-#ifdef __SWITCH__
-	const char *gamedir = "./pymogames/startup";
-#else
+#ifndef USE_GAME_SELECTOR
 	const char *gamedir = "./";
-#endif
 
 	if (argc == 2) {
 		gamedir = argv[1];
 	}
 
 	ensure_save_dir(gamedir);
+#endif
 
 	// SDL2 has 2 memory leaks!
 	if (SDL_Init(
@@ -126,7 +187,17 @@ int main(int argc, char **argv)
 
 	cpymo_backend_audio_init();
 
+#ifndef USE_GAME_SELECTOR
 	error_t err = cpymo_engine_init(&engine, gamedir);
+#else
+	cpymo_game_selector_item *item = get_game_list();
+	error_t err = cpymo_engine_init_with_game_selector(
+		&engine, SCREEN_WIDTH, SCREEN_HEIGHT, 
+		GAME_SELECTOR_FONTSIZE, GAME_SELECTOR_COUNT_PER_SCREEN, 
+		&item, NULL, &after_start_game);
+
+	if (err != CPYMO_ERR_SUCC) cpymo_game_selector_item_free_all(item);
+#endif
 
 	if (err != CPYMO_ERR_SUCC) {
 		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));
@@ -159,8 +230,12 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
+#ifndef USE_GAME_SELECTOR
 	set_window_icon(gamedir);
+	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
+#else
+	SDL_SetWindowTitle(window, "CPyMO");
+#endif
 	
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
 		SDL_Log("[Error] Can not set logical size: %s", SDL_GetError());
@@ -173,7 +248,11 @@ int main(int argc, char **argv)
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+#ifndef USE_GAME_SELECTOR
 	if (cpymo_backend_font_init(gamedir) != CPYMO_ERR_SUCC) {
+#else
+	if (cpymo_backend_font_init(NULL) != CPYMO_ERR_SUCC) {
+#endif
 		SDL_Log("[Error] Can not find font file, try put default.ttf into <gamedir>/system/.");
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);

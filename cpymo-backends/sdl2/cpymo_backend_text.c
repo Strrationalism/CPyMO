@@ -19,6 +19,11 @@ typedef struct {
     cpymo_backend_image img;
 } cpymo_backend_text_internal;
 
+#ifdef __SWITCH__
+#define TEXT_LINE_Y_OFFSET 12
+#else
+#define TEXT_LINE_Y_OFFSET 0
+#endif
 
 static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline) {
     float xpos = 0;
@@ -35,7 +40,8 @@ static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_p
 
         if (codepoint == '\n') {
             xpos = 0;
-            y_base += baseline;
+
+            y_base += baseline + TEXT_LINE_Y_OFFSET;
 
             continue;
         }
