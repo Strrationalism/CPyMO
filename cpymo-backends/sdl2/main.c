@@ -28,6 +28,10 @@
 
 #ifdef __SWITCH__
 #include <switch.h>
+
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
+#define GAME_SELECTOR_DIR "/pymogames/"
 #endif
 
 
@@ -135,17 +139,13 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 
-#if !NDEBUG
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
-#endif
-
-#ifdef __SWITCH__
-	uint16_t window_size_w = 1280;
-	uint16_t window_size_h = 720;
+#if (defined SCREEN_WIDTH && defined SCREEN_HEIGHT)
+	const uint16_t window_size_w = SCREEN_WIDTH;
+	const uint16_t window_size_h = SCREEN_HEIGHT;
 #else
-	uint16_t window_size_w = engine.gameconfig.imagesize_w;
-	uint16_t window_size_h = engine.gameconfig.imagesize_h;
-#endif // !__SWITCH__
+	const uint16_t window_size_w = engine.gameconfig.imagesize_w;
+	const uint16_t window_size_h = engine.gameconfig.imagesize_h;
+#endif
 
 	if (SDL_CreateWindowAndRenderer(
 		window_size_w,
