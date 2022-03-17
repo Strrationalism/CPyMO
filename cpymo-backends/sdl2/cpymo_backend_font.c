@@ -49,36 +49,58 @@ error_t cpymo_backend_font_init(const char *gamedir)
 		if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	const char *windir = getenv("windir");
 	path = (char *)alloca(strlen(windir) + 32);
 	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	#define TRY_LOAD(NAME) \
-		sprintf(path, "%s/fonts/%s", windir, NAME); \
-		err = cpymo_backend_font_try_load_font(path); \
-		if (err == CPYMO_ERR_SUCC) { \
-			return CPYMO_ERR_SUCC; \
-		}
+	const char *fonts[] = {
+		"msyh.ttc",
+		"msyhbd.ttc",
+		"msyhl.ttc",
+		"msyi.ttf",
+		"meiryo.ttc",
+		"meiryob.ttc",
+		"mingliub.ttc",
+		"msgothic.ttc",
+		"msjh.ttc",
+		"msjhbd.ttc",
+		"msjhl.ttc",
+		"msmincho.ttc",
+		"simhei.ttf",
+		"simkai.ttf",
+		"simsun.ttc"
+		"simsunb.ttf",
+		"simfang.ttf",
+		"SIMLI.ttf"
+	};
 
-	TRY_LOAD("msyh.ttc");
-	TRY_LOAD("msyhbd.ttc");
-	TRY_LOAD("msyhl.ttc");
-	TRY_LOAD("msyi.ttf");
-	TRY_LOAD("meiryo.ttc");
-	TRY_LOAD("meiryob.ttc");
-	TRY_LOAD("mingliub.ttc");
-	TRY_LOAD("msgothic.ttc");
-	TRY_LOAD("msjh.ttc");
-	TRY_LOAD("msjhbd.ttc");
-	TRY_LOAD("msjhl.ttc");
-	TRY_LOAD("msmincho.ttc");
-	TRY_LOAD("simhei.ttf");
-	TRY_LOAD("simkai.ttf");
-	TRY_LOAD("simsun.ttc");
-	TRY_LOAD("simsunb.ttf");
-	TRY_LOAD("simfang.ttf");
-	TRY_LOAD("SIMLI.ttf");
+	for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i) {
+		sprintf(path, "%s/fonts/%s", windir, fonts[i]);
+		err = cpymo_backend_font_try_load_font(path);
+		if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
+	}
+#endif
+
+#ifdef __LINUX__
+	const char *fonts[] = {
+		"/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"
+	};
+
+	for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i) 
+		if (cpymo_backend_font_try_load_font(fonts[i]) == CPYMO_ERR_SUCC)
+			return CPYMO_ERR_SUCC;
+#endif
+
+#ifdef __APPLE__
+	const char *fonts[] = {
+		"/System/Library/Fonts/STHeiti Medium.ttc",
+		"/System/Library/Fonts/STHeiti Light.ttc"
+	};
+
+	for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i)
+		if (cpymo_backend_font_try_load_font(fonts[i]) == CPYMO_ERR_SUCC)
+			return CPYMO_ERR_SUCC;
 #endif
 
 #ifdef __SWITCH__
