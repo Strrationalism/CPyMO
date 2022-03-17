@@ -183,8 +183,33 @@ static cpymo_game_selector_item *load_game_list()
 	return items;
 }
 
+static char *get_last_selected_game_dir()
+{
+	char *str = NULL;
+	size_t len;
+	error_t err = cpymo_utils_loadfile("/pymogames/last_game.txt", &str, &len);
+
+	if (err != CPYMO_ERR_SUCC) return NULL;
+
+	char *ret = realloc(str, len + 1);
+	if (ret == NULL) {
+		free(str);
+		return NULL;
+	}
+
+	ret[len] = '\0';
+	return ret;
+}
+
 static error_t before_select_game(cpymo_engine *e, const char *gamedir)
 {
+	size_t len = strlen(gamedir);
+	FILE *f = fopen("/pymogames/last_game.txt", "wb");
+	if (f) {
+		fwrite(gamedir, len, 1, f);
+		fclose(f);
+	}
+
 	ensure_save_dir(gamedir);
 
 	enhanced_3ds_display_mode = true;
@@ -279,11 +304,13 @@ int main(void) {
 	cpymo_backend_audio_init();
 	
 	cpymo_game_selector_item *item = load_game_list();
+	char *last_select_game = get_last_selected_game_dir();
 	error_t err = cpymo_engine_init_with_game_selector(
-		&engine, 400, 240, 22, 20, 3, &item, &before_select_game, &after_select_game);
+		&engine, 400, 240, 22, 20, 3, &item, &before_select_game, &after_select_game, &last_select_game);
 	
 	if (err != CPYMO_ERR_SUCC) {
 		printf("[Error] cpymo_engine_init_with_game_selector: %s.", cpymo_error_message(err));
+		if (last_select_game) free(last_select_game);
 		cpymo_game_selector_item_free_all(item);
 		cpymo_backend_text_sys_free();
 		C3D_RenderTargetDelete(screen1);

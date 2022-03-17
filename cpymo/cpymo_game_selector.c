@@ -4,6 +4,7 @@
 #include "cpymo_localization.h"
 #include <stb_image.h>
 #include <assert.h>
+#include <string.h>
 
 typedef struct {
 	cpymo_game_selector_item *items;
@@ -202,12 +203,14 @@ typedef struct {
 	cpymo_game_selector_callback before_reinit, after_reinit;
 	float empty_message_font_size;
 	size_t nodes_per_screen;
+	char *last_selected_gamedir;
 } cpymo_game_selector_lazy_init;
 
 static void cpymo_game_selector_lazy_init_delete(cpymo_engine *e, void *ui_data)
 {
 	cpymo_game_selector_lazy_init *ui = (cpymo_game_selector_lazy_init *)ui_data;
 	if (ui->items) cpymo_game_selector_item_free_all(ui->items);
+	if (ui->last_selected_gamedir) free(ui->last_selected_gamedir);
 }
 
 static void cpymo_game_selector_lazy_init_draw(const cpymo_engine *e, const void *_) {}
@@ -220,6 +223,12 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 	cpymo_game_selector_item_load_info(data->items, fontsize);
 	data->items = cpymo_game_selector_item_remove_invalid(NULL, data->items);
 
+	cpymo_game_selector_item *last_selected = data->items;
+	while (last_selected) {
+		if (strcmp(last_selected->gamedir, data->last_selected_gamedir) == 0) break;
+		last_selected = last_selected->next;
+	}
+
 	if (data->items) {
 		cpymo_game_selector *ui = NULL;
 		cpymo_game_selector_item *items = data->items;
@@ -228,6 +237,14 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			after_reinit = data->after_reinit,
 			before_reinit = data->before_reinit;
 
+		int relative = 0;
+		if (last_selected) {
+			if (last_selected->prev) {
+				last_selected = last_selected->prev;
+				relative = 1;
+			}
+		}
+
 		error_t err = cpymo_list_ui_enter(
 			e,
 			(void **)&ui,
@@ -235,12 +252,15 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			&cpymo_game_selector_draw_node,
 			&cpymo_game_selector_ok,
 			&cpymo_game_selector_delete,
-			items,
+			last_selected ? last_selected : items,
 			&cpymo_game_selector_get_next,
 			&cpymo_game_selector_get_prev,
 			false,
 			data->nodes_per_screen
 		);
+
+		cpymo_list_ui *list_ui = (cpymo_list_ui *)cpymo_ui_data(e);
+		list_ui->selection_relative_to_cur = relative;
 
 		cpymo_list_ui_set_custom_update(e, &cpymo_game_selector_init_refresh);
 
@@ -308,7 +328,8 @@ error_t cpymo_engine_init_with_game_selector(
 	float empty_message_font_size,
 	size_t nodes_per_screen, cpymo_game_selector_item **gamedirs_movein,
 	cpymo_game_selector_callback before_reinit,
-	cpymo_game_selector_callback after_reinit)
+	cpymo_game_selector_callback after_reinit,
+	char **last_selected_game_dir_movein)
 {
 	cpymo_audio_init(&e->audio);
 
@@ -368,6 +389,8 @@ error_t cpymo_engine_init_with_game_selector(
 	d->items = *gamedirs_movein;
 	d->before_reinit = before_reinit;
 	d->empty_message_font_size = empty_message_font_size;
+	d->last_selected_gamedir = *last_selected_game_dir_movein;
+	*last_selected_game_dir_movein = NULL;
 	*gamedirs_movein = NULL;
 
 	return CPYMO_ERR_SUCC;

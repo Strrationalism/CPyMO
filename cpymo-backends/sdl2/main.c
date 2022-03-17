@@ -92,10 +92,47 @@ static void ensure_save_dir(const char *gamedir)
 	mkdir(save_dir, 0777);
 }
 
+static char *get_last_selected_game_dir()
+{
+#ifdef __SWITCH__
+	char *str = NULL;
+	size_t len;
+	error_t err = cpymo_utils_loadfile("/pymogames/last_game.txt", &str, &len);
+
+	if (err != CPYMO_ERR_SUCC) return NULL;
+
+	char *ret = realloc(str, len + 1);
+	if (ret == NULL) {
+		free(str);
+		return NULL;
+	}
+
+	ret[len] = '\0';
+	return ret;
+
+#else
+	return NULL;
+#endif
+}
+
+static void save_last_selected_game_dir(const char *gamedir)
+{
+#ifdef __SWITCH__
+	size_t len = strlen(gamedir);
+	FILE *f = fopen("/pymogames/last_game.txt", "wb");
+	if (f == NULL) return;
+
+	fwrite(gamedir, len, 1, f);
+	fclose(f);
+#endif
+}
+
 #ifdef USE_GAME_SELECTOR
 #include <cpymo_game_selector.h>
 static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
+	save_last_selected_game_dir(gamedir);
+
 	if (SDL_RenderSetLogicalSize(renderer, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
@@ -154,7 +191,7 @@ cpymo_game_selector_item *get_game_list(void)
 }
 #endif
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
 	//_CrtSetBreakAlloc(1371);
 
@@ -190,15 +227,20 @@ int main(int argc, char **argv)
 #ifndef USE_GAME_SELECTOR
 	error_t err = cpymo_engine_init(&engine, gamedir);
 #else
+	char *last_selected_game_dir = get_last_selected_game_dir();
 	cpymo_game_selector_item *item = get_game_list();
 	error_t err = cpymo_engine_init_with_game_selector(
-		&engine, SCREEN_WIDTH, SCREEN_HEIGHT, 
-		GAME_SELECTOR_FONTSIZE, 
+		&engine, SCREEN_WIDTH, SCREEN_HEIGHT,
+		GAME_SELECTOR_FONTSIZE,
 		GAME_SELECTOR_EMPTY_MSG_FONTSIZE,
 		GAME_SELECTOR_COUNT_PER_SCREEN,
-		&item, NULL, &after_start_game);
+		&item, NULL, &after_start_game,
+		&last_selected_game_dir);
 
-	if (err != CPYMO_ERR_SUCC) cpymo_game_selector_item_free_all(item);
+	if (err != CPYMO_ERR_SUCC) {
+		if (last_selected_game_dir) free(last_selected_game_dir);
+		cpymo_game_selector_item_free_all(item);
+	}
 #endif
 
 	if (err != CPYMO_ERR_SUCC) {

@@ -27,7 +27,8 @@ error_t cpymo_engine_init_with_game_selector(
 	float empty_message_font_size,
 	size_t nodes_per_screen, cpymo_game_selector_item **gamedirs_movein,
 	cpymo_game_selector_callback before_reinit,
-	cpymo_game_selector_callback after_reinit);
+	cpymo_game_selector_callback after_reinit,
+	char **last_selected_game_dir_movein);
 
 error_t cpymo_game_selector_item_create(cpymo_game_selector_item **out, char **game_dir_move_in);
 void cpymo_game_selector_item_free_all(cpymo_game_selector_item *item);
