@@ -3,7 +3,6 @@
 #include <cpymo_engine.h>
 #include <citro3d.h>
 #include <citro2d.h>
-#include "select_game.h"
 #include <stdbool.h>
 #include <libavutil/log.h>
 
@@ -19,7 +18,8 @@
 #include <stb_image_write.h>
 
 #include <cpymo_backend_text.h>
-#include "cpymo_backend_save.h"
+#include <cpymo_backend_save.h>
+#include <cpymo_game_selector.h>
 
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2, *screen3 = NULL;
@@ -31,7 +31,7 @@ extern void cpymo_backend_image_init(float, float);
 extern error_t cpymo_backend_text_sys_init();
 extern void cpymo_backend_text_sys_free();
 
-bool enhanced_3ds_display_mode = true;
+bool enhanced_3ds_display_mode = false;
 bool drawing_bottom_screen;
 
 bool enhanced_3ds_display_mode_touch_ui_enabled(void)
@@ -81,6 +81,7 @@ static void ensure_save_dir(const char *gamedir)
 
 static void save_screen_mode()
 {
+	if (engine.assetloader.gamedir == NULL) return;
 	FILE *sav = cpymo_backend_write_save(engine.assetloader.gamedir, "3ds-display-mode.csav");
 
 	if (sav) {
@@ -92,9 +93,9 @@ static void save_screen_mode()
 	}
 }
 
-static void load_screen_mode()
+static void load_screen_mode(const char *gamedir)
 {
-	FILE *sav = cpymo_backend_read_save(engine.assetloader.gamedir, "3ds-display-mode.csav");
+	FILE *sav = cpymo_backend_read_save(gamedir, "3ds-display-mode.csav");
 
 	if (sav) {
 		uint8_t save;
@@ -112,6 +113,105 @@ static void load_screen_mode()
 
 		fclose(sav);
 	}
+}
+
+static cpymo_game_selector_item *load_game_list()
+{
+	if (R_FAILED(fsInit())) return NULL;
+
+	FS_Archive archive;
+	Result err = FSUSER_OpenArchive(&archive, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
+
+	if (R_FAILED(err)) {
+		fsExit();
+		return NULL;
+	}
+
+	Handle handle;
+	err = FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, "/pymogames/"));
+	if (R_FAILED(err)) {
+		FSUSER_CloseArchive(archive);
+		fsExit();
+		return NULL;
+	}
+
+	cpymo_game_selector_item *items = NULL, *tail = NULL;
+
+	u32 result = 0;
+	do {
+		FS_DirectoryEntry item;
+		err = FSDIR_Read(handle, &result, 1, &item);
+
+		if (R_FAILED(err) || result != 1 || (item.attributes & FS_ATTRIBUTE_DIRECTORY) == 0) 
+			continue;
+
+		size_t name_len = 0;
+		for (size_t i = 0; i < sizeof(item.name) / sizeof(item.name[0]); ++i) {
+			if (item.name[i] == 0) break;
+			++name_len;
+		}
+
+		char *path = (char *)malloc(name_len + 16);
+		if (path == NULL) continue;
+
+		strcpy(path, "/pymogames/");
+		for (size_t i = 0; i < name_len; ++i)
+			path[i + 11] = (char)item.name[i];
+		path[name_len + 11] = '\0';
+
+		cpymo_game_selector_item *cur = NULL;
+		error_t err = cpymo_game_selector_item_create(&cur, &path);
+		if (err != CPYMO_ERR_SUCC) {
+			free(path);
+			continue;
+		}
+
+		if (items == NULL) {
+			items = cur;
+			tail = cur;
+		}
+		else {
+			tail->next = cur;
+			tail = cur;
+		}
+	} while(result);
+
+	FSDIR_Close(handle);
+	FSUSER_CloseArchive(archive);
+	fsExit();
+
+	return items;
+}
+
+static error_t before_select_game(cpymo_engine *e, const char *gamedir)
+{
+	ensure_save_dir(gamedir);
+
+	enhanced_3ds_display_mode = true;
+
+	hidScanInput();
+	if (hidKeysHeld() & KEY_L) {
+		consoleInit(GFX_BOTTOM, NULL);
+		gfxSetDoubleBuffering(GFX_BOTTOM, false);
+
+		enhanced_3ds_display_mode = false;
+	}
+
+	if(enhanced_3ds_display_mode) {
+		screen3 = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+		load_screen_mode(gamedir);
+	}
+
+	if (screen3 == NULL) 
+		enhanced_3ds_display_mode = false;
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t after_select_game(cpymo_engine *e, const char *gamedir)
+{
+	cpymo_backend_image_init(e->gameconfig.imagesize_w, e->gameconfig.imagesize_h);
+	return CPYMO_ERR_SUCC;
 }
 
 int main(void) {
@@ -174,30 +274,17 @@ int main(void) {
 	}
 
 	cpymo_backend_image_init(400, 240);
-	char *gamedir = select_game();
-	if (gamedir == NULL) {
-		cpymo_backend_text_sys_free();
-		C3D_RenderTargetDelete(screen1);
-		C3D_RenderTargetDelete(screen2);
-		C2D_Fini();
-		C3D_Fini();
-		gfxExit();
-		return 0;
-	}
-
-	if(!enhanced_3ds_display_mode) {
-		consoleInit(GFX_BOTTOM, NULL);
-		gfxSetDoubleBuffering(GFX_BOTTOM, false);
-	}
 
 	extern void cpymo_backend_audio_init();
 	cpymo_backend_audio_init();
-
-	ensure_save_dir(gamedir);
-	error_t err = cpymo_engine_init(&engine, gamedir);
-	free(gamedir);
+	
+	cpymo_game_selector_item *item = load_game_list();
+	error_t err = cpymo_engine_init_with_game_selector(
+		&engine, 400, 240, 22, 20, 3, &item, &before_select_game, &after_select_game);
+	
 	if (err != CPYMO_ERR_SUCC) {
-		printf("[Error] cpymo_engine_init: %s.", cpymo_error_message(err));
+		printf("[Error] cpymo_engine_init_with_game_selector: %s.", cpymo_error_message(err));
+		cpymo_game_selector_item_free_all(item);
 		cpymo_backend_text_sys_free();
 		C3D_RenderTargetDelete(screen1);
 		C3D_RenderTargetDelete(screen2);
@@ -206,23 +293,6 @@ int main(void) {
 		gfxExit();
 		return 0;
 	}
-
-	cpymo_backend_image_init(engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
-
-	if(enhanced_3ds_display_mode) {
-		screen3 = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-		if(screen3 == NULL) {
-			cpymo_engine_free(&engine);
-			C3D_RenderTargetDelete(screen1);
-			C3D_RenderTargetDelete(screen2);
-			C2D_Fini();
-			C3D_Fini();
-			gfxExit();
-			return 0;
-		}
-	}
-	
-	load_screen_mode();
 
 	const u32 clr = C2D_Color32(0, 0, 0, 0);
 
@@ -264,7 +334,7 @@ int main(void) {
 			prevSlider = slider;
 		}
 
-		if(hidKeysDown() & KEY_SELECT) {
+		if (hidKeysDown() & KEY_SELECT) {
 			redraw = true;
 			if (screen3) {
 				enhanced_3ds_display_mode = !enhanced_3ds_display_mode;
@@ -275,7 +345,7 @@ int main(void) {
 			}
 		}
 
-		if(redraw) {
+		if(redraw || true) {
 			drawing_bottom_screen = false;
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(screen1, clr);
@@ -315,7 +385,7 @@ int main(void) {
 	save_screen_mode();
 
 	cpymo_backend_text_sys_free();
-	if(enhanced_3ds_display_mode) C3D_RenderTargetDelete(screen3);
+	if(screen3) C3D_RenderTargetDelete(screen3);
 	C3D_RenderTargetDelete(screen2);
 	C3D_RenderTargetDelete(screen1);
 	cpymo_engine_free(&engine);

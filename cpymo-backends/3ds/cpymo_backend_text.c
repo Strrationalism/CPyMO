@@ -99,7 +99,13 @@ error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_p
         &w, NULL);
 
     //*out_w = cpymo_backend_text_width(utf8_string, single_character_size_in_logical_screen);
-    *out_w = w;
+    
+    float factor = 1.05f;
+
+    if (single_character_size_in_logical_screen < 39)
+        factor = 1.07f;
+
+    *out_w = w * factor;
 
     return CPYMO_ERR_SUCC;
 }
