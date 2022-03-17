@@ -30,6 +30,7 @@ target_link_libraries(cpymo PRIVATE
 	${FFMPEG_LIBRARIES})
 	
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+	set(CMAKE_C_FLAGS "-D__LINUX__")
     target_link_libraries(cpymo PRIVATE X11)
 endif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
