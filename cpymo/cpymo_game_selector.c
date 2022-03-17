@@ -31,7 +31,7 @@ static void cpymo_game_selector_draw_node(const cpymo_engine *e, const void *nod
 {
 	cpymo_game_selector_item *item = (cpymo_game_selector_item *)node_to_draw;
 	
-	float game_icon_size = 3 * e->gameconfig.fontsize;
+	float game_icon_size = 3 * (float)e->gameconfig.fontsize;
 	if (item->icon) {
 		cpymo_backend_image_draw(16, y + 6, game_icon_size, game_icon_size, item->icon, 0, 0,
 			item->icon_w, item->icon_h, 1.0f, cpymo_backend_image_draw_type_ui_element);

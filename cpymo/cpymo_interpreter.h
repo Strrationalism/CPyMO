@@ -12,6 +12,8 @@ struct cpymo_interpreter {
 	char *script_content;
 	cpymo_parser script_parser;
 
+	bool no_more_content;
+
 	struct cpymo_interpreter *caller;
 
 	struct {

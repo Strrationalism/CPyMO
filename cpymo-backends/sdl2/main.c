@@ -92,6 +92,7 @@ static void ensure_save_dir(const char *gamedir)
 	mkdir(save_dir, 0777);
 }
 
+#ifdef USE_GAME_SELECTOR
 static char *get_last_selected_game_dir()
 {
 #ifdef __SWITCH__
@@ -126,6 +127,7 @@ static void save_last_selected_game_dir(const char *gamedir)
 	fclose(f);
 #endif
 }
+#endif
 
 #ifdef USE_GAME_SELECTOR
 #include <cpymo_game_selector.h>

@@ -25,6 +25,7 @@ error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_
 	out->script_name[0] = '\0';
 	out->caller = NULL;
 	out->checkpoint.cur_line = 0;
+	out->no_more_content = false;
 	
 	size_t script_len = strlen(script_format) + 64;
 	out->script_content = (char *)malloc(script_len);
@@ -59,6 +60,7 @@ error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * scri
 
 	out->script_content = NULL;
 	out->checkpoint.cur_line = 0;
+	out->no_more_content = false;
 	size_t script_len = 0;
 
 	error_t err =
@@ -145,8 +147,12 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 			cpymo_error_message(err));
 	}
 
-	if (!cpymo_parser_next_line(&interpreter->script_parser))
-		return CPYMO_ERR_NO_MORE_CONTENT;
+	if (!cpymo_parser_next_line(&interpreter->script_parser)) {
+		if (interpreter->no_more_content)
+			return CPYMO_ERR_NO_MORE_CONTENT;
+		else
+			interpreter->no_more_content = true;
+	}
 
 	return CPYMO_ERR_SUCC;
 }
