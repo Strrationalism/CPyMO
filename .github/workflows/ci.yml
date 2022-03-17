@@ -28,14 +28,14 @@ jobs:
 
     - name: Build
       run: |
-        cd ./cpymo-backends/switch
-        make -j
+        cd ./cpymo-backends/sdl2
+        make -j -f Makefile.Switch
     
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Nintendo Switch
-        path: ./cpymo-backends/switch/cpymo.nro
+        path: ./cpymo-backends/sdl2/cpymo.nro
 
   build-3ds:
     name: 'Nintendo 3DS'

@@ -39,11 +39,11 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 APP_TITLE	:= CPyMO
 APP_AUTHOR	:= Strrationalism Studio
-ICON		:= icon.jpg
+ICON		:= pymo-icon-switch.jpg
 TARGET		:=	cpymo
 BUILD		:=	build
 SOURCES		:=	../sdl2 ../../cpymo
-DATA		:=	data
+#DATA		:=	data
 INCLUDES	:=	../include ../../cpymo ../../stb ../../endianness.h
 #ROMFS	:=	romfs
 
@@ -165,9 +165,12 @@ endif
 #---------------------------------------------------------------------------------
 all: $(BUILD)
 
+run: all
+	@yuzu $(TARGET).nro
+
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile.Switch
 
 #---------------------------------------------------------------------------------
 clean:

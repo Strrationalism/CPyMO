@@ -120,6 +120,11 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 
 直接使用devkitPro pacman安装即可。
 
+### 编译
+
+cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到任天堂Switch平台。    
+使用`make run -j -f Makefile.Swtich`即可使用yuzu模拟器运行。    
+
 ### 启动
 
 将游戏放入SD卡的`/pymogames/startup`目录，使得`/pymogames/startup`可用，之后即可启动CPyMO运行此目录下的游戏。    

@@ -33,6 +33,7 @@
 #define SCREEN_HEIGHT 1080
 #define USE_GAME_SELECTOR
 #define GAME_SELECTOR_FONTSIZE 32
+#define GAME_SELECTOR_EMPTY_MSG_FONTSIZE (GAME_SELECTOR_FONTSIZE * 2.0f)
 #define GAME_SELECTOR_COUNT_PER_SCREEN 8
 #endif
 
@@ -93,18 +94,18 @@ static void ensure_save_dir(const char *gamedir)
 
 #ifdef USE_GAME_SELECTOR
 #include <cpymo_game_selector.h>
-static error_t after_start_game(cpymo_engine *e)
+static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
 	if (SDL_RenderSetLogicalSize(renderer, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
 
 	cpymo_backend_font_free();
-	error_t err = cpymo_backend_font_init(e->assetloader.gamedir);
+	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
 
-	ensure_save_dir(e->assetloader.gamedir);
-	set_window_icon(e->assetloader.gamedir);
+	ensure_save_dir(gamedir);
+	set_window_icon(gamedir);
 
 	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
 
@@ -192,7 +193,9 @@ int main(int argc, char **argv)
 	cpymo_game_selector_item *item = get_game_list();
 	error_t err = cpymo_engine_init_with_game_selector(
 		&engine, SCREEN_WIDTH, SCREEN_HEIGHT, 
-		GAME_SELECTOR_FONTSIZE, GAME_SELECTOR_COUNT_PER_SCREEN, 
+		GAME_SELECTOR_FONTSIZE, 
+		GAME_SELECTOR_EMPTY_MSG_FONTSIZE,
+		GAME_SELECTOR_COUNT_PER_SCREEN,
 		&item, NULL, &after_start_game);
 
 	if (err != CPYMO_ERR_SUCC) cpymo_game_selector_item_free_all(item);

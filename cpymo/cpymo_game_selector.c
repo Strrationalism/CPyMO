@@ -49,9 +49,13 @@ static error_t cpymo_game_selector_ok(cpymo_engine *e, void *selected)
 	item->gamedir = NULL;
 
 	cpymo_game_selector *sel = (cpymo_game_selector *)cpymo_list_ui_data(e);
+
 	if (sel->before_init) {
-		error_t err = sel->before_init(e);
-		CPYMO_THROW(err);
+		error_t err = sel->before_init(e, gamedir);
+		if (err != CPYMO_ERR_SUCC) {
+			free(gamedir);
+			return err;
+		}
 	}
 
 	cpymo_game_selector_callback after = sel->after_init;
@@ -63,7 +67,7 @@ static error_t cpymo_game_selector_ok(cpymo_engine *e, void *selected)
 	CPYMO_THROW(err);
 
 	if (after) {
-		err = after(e);
+		err = after(e, gamedir);
 		CPYMO_THROW(err);
 	}
 	
@@ -152,25 +156,26 @@ typedef struct {
 	cpymo_backend_text msg1, msg2;
 	float msg1_w, msg2_w;
 	size_t draw_times;
+	float font_size;
 } cpymo_game_selector_empty_ui;
 
 static void cpymo_game_selector_empty_ui_draw(const cpymo_engine *e, const void *ui_data)
 {
 	cpymo_game_selector_empty_ui *ui = (cpymo_game_selector_empty_ui *)ui_data;
 
-	float fontsize = (float)e->gameconfig.fontsize;
+	float fontsize = ui->font_size;
 
 	cpymo_backend_text_draw(
 		ui->msg1, 
 		(e->gameconfig.imagesize_w - ui->msg1_w) / 2, 
-		(e->gameconfig.imagesize_h - fontsize) / 2 - fontsize,
+		(e->gameconfig.imagesize_h - fontsize) / 2,
 		cpymo_color_white, 0.5f,
 		cpymo_backend_image_draw_type_ui_element);
 
 	cpymo_backend_text_draw(
 		ui->msg2, 
 		(e->gameconfig.imagesize_w - ui->msg2_w) / 2, 
-		(e->gameconfig.imagesize_h - fontsize) / 2 + fontsize,
+		(e->gameconfig.imagesize_h - fontsize) / 2 + fontsize + fontsize / 2,
 		cpymo_color_white, 0.25f,
 		cpymo_backend_image_draw_type_ui_element);
 }
@@ -195,6 +200,7 @@ static void cpymo_game_selector_empty_ui_delete(cpymo_engine *e, void *ui_)
 typedef struct {
 	cpymo_game_selector_item *items;
 	cpymo_game_selector_callback before_reinit, after_reinit;
+	float empty_message_font_size;
 	size_t nodes_per_screen;
 } cpymo_game_selector_lazy_init;
 
@@ -219,8 +225,8 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 		cpymo_game_selector_item *items = data->items;
 		data->items = NULL;
 		cpymo_game_selector_callback
-			before_reinit = data->before_reinit,
-			after_reinit = data->after_reinit;
+			after_reinit = data->after_reinit,
+			before_reinit = data->before_reinit;
 
 		error_t err = cpymo_list_ui_enter(
 			e,
@@ -238,8 +244,8 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 
 		cpymo_list_ui_set_custom_update(e, &cpymo_game_selector_init_refresh);
 
-		ui->before_init = before_reinit;
 		ui->after_init = after_reinit;
+		ui->before_init = before_reinit;
 		ui->draw_times = 45;
 
 		if (err != CPYMO_ERR_SUCC) {
@@ -252,6 +258,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 	}
 	else {
 		cpymo_game_selector_empty_ui *ui = NULL;
+		float font_size = data->empty_message_font_size;
 		error_t err = cpymo_ui_enter(
 			(void **)&ui,
 			e,
@@ -270,12 +277,13 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 		ui->msg1_w = 0;
 		ui->msg2_w = 0;
 		ui->draw_times = 45;
+		ui->font_size = font_size;
 
 		const cpymo_localization *l = cpymo_localization_get(e);
 
 		err = cpymo_backend_text_create(&ui->msg1, &ui->msg1_w,
 			cpymo_parser_stream_span_pure(l->game_selector_empty),
-			fontsize * 2.0f);
+			font_size);
 
 		if (err != CPYMO_ERR_SUCC) {
 			cpymo_engine_free(e);
@@ -284,7 +292,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 
 		err = cpymo_backend_text_create(&ui->msg2, &ui->msg2_w,
 			cpymo_parser_stream_span_pure(l->game_selector_empty_secondary),
-			fontsize * 2.0f / 1.3f);
+			font_size / 1.3f);
 
 		if (err != CPYMO_ERR_SUCC) {
 			cpymo_engine_free(e);
@@ -297,6 +305,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 
 error_t cpymo_engine_init_with_game_selector(
 	cpymo_engine * e, size_t screen_w, size_t screen_h, size_t fontsize_, 
+	float empty_message_font_size,
 	size_t nodes_per_screen, cpymo_game_selector_item **gamedirs_movein,
 	cpymo_game_selector_callback before_reinit,
 	cpymo_game_selector_callback after_reinit)
@@ -355,9 +364,10 @@ error_t cpymo_engine_init_with_game_selector(
 	}
 
 	d->after_reinit = after_reinit;
-	d->before_reinit = before_reinit;
 	d->nodes_per_screen = nodes_per_screen;
 	d->items = *gamedirs_movein;
+	d->before_reinit = before_reinit;
+	d->empty_message_font_size = empty_message_font_size;
 	*gamedirs_movein = NULL;
 
 	return CPYMO_ERR_SUCC;

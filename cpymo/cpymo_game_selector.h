@@ -20,10 +20,11 @@ typedef struct cpymo_game_selector_item {
 	float gametitle_w;
 } cpymo_game_selector_item;
 
-typedef error_t (*cpymo_game_selector_callback)(struct cpymo_engine *);
+typedef error_t (*cpymo_game_selector_callback)(struct cpymo_engine *, const char *gamedir);
 
 error_t cpymo_engine_init_with_game_selector(
 	struct cpymo_engine *e, size_t screen_w, size_t screen_h, size_t font_size, 
+	float empty_message_font_size,
 	size_t nodes_per_screen, cpymo_game_selector_item **gamedirs_movein,
 	cpymo_game_selector_callback before_reinit,
 	cpymo_game_selector_callback after_reinit);
