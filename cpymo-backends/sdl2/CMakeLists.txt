@@ -18,19 +18,22 @@ add_executable (cpymo
 	"cpymo_backend_audio.c" 
 	"cpymo_backend_movie.c")
 
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-	target_sources (cpymo PRIVATE "pymo-icon-windows.rc")
-endif (CMAKE_SYSTEM_NAME MATCHES "Windows")
-
 target_link_libraries(cpymo PRIVATE 
 	SDL2::SDL2 
 	SDL2::SDL2main 
 	SDL2::SDL2-static 
 	cpymolib
 	${FFMPEG_LIBRARIES})
-	
-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+
+
+if (VCPKG_LIBRARY_LINKAGE EQUAL "static")
+	target_link_libraries(cpymo PRIVATE SDL2::SDL2-static)
+endif ()
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	target_sources (cpymo PRIVATE "pymo-icon-windows.rc")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set(CMAKE_C_FLAGS "-D__LINUX__")
     target_link_libraries(cpymo PRIVATE X11)
-endif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+endif ()
 
