@@ -85,6 +85,12 @@ error_t cpymo_backend_font_init(const char *gamedir)
 #ifdef __LINUX__
 	const char *fonts[] = {
 		"/usr/share/fonts/truetype/unifont/unifont.ttf"
+
+		// Ubuntu
+		"/usr/share/fonts/opentype/NotoSansCJK-Regular.ttc",
+		"/usr/share/fonts/opentype/NotoSerifCJK-Regular.ttc",
+		"/usr/share/fonts/opentype/NotoSansCJK-Bold.ttc",
+		"/usr/share/fonts/opentype/NotoSerifCJK-Bold.ttc"
 	};
 
 	for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i) 
