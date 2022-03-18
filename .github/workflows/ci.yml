@@ -23,6 +23,7 @@ jobs:
       - name: Install Dependents
         run: |
           sudo apt-get install nasm
+          sudo apt-get install yasm
           git clone https://github.com/microsoft/vcpkg --depth 1
           chmod +x ./vcpkg/bootstrap-vcpkg.sh
           ./vcpkg/bootstrap-vcpkg.sh
