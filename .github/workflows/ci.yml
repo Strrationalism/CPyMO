@@ -22,13 +22,13 @@ jobs:
 
       - name: Install Dependents
         run: |
-            sudo apt-get install nasm
-            git clone https://github.com/microsoft/vcpkg --depth 1
-            chmod +x ./vcpkg/bootstrap-vcpkg.sh
-            ./vcpkg/bootstrap-vcpkg.sh
-            chmod +x ./vcpkg/vcpkg
-            ./vcpkg/vcpkg install ffmpeg:x86-android ffmpeg:x64-android ffmpeg:arm-android ffmpeg:arm64-android
-            ./vcpkg/vcpkg install sdl2:x86-android sdl2:x64-android sdl2:arm-android sdl2:arm64-android
+          sudo apt-get install nasm
+          git clone https://github.com/microsoft/vcpkg --depth 1
+          chmod +x ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/bootstrap-vcpkg.sh
+          chmod +x ./vcpkg/vcpkg
+          ./vcpkg/vcpkg install ffmpeg:x86-android ffmpeg:x64-android ffmpeg:arm-android ffmpeg:arm64-android
+          ./vcpkg/vcpkg install sdl2:x86-android sdl2:x64-android sdl2:arm-android sdl2:arm64-android
 
   build-switch:
     name: 'Nintendo Switch'
@@ -106,7 +106,7 @@ jobs:
             triplet: x64-windows-static
           - os: ubuntu-latest
             triplet: x64-linux
-          - os: macos-latest
+          - os: macos-10.15
             triplet: x64-osx
             
     steps:
