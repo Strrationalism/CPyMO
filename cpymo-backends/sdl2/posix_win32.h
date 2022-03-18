@@ -1,5 +1,6 @@
 #ifndef _WIN32
 #include <dirent.h>
+#include <sys/stat.h>
 #endif
 
 #ifdef _WIN32
