@@ -90,8 +90,12 @@ error_t cpymo_backend_font_init(const char *gamedir)
 		"/usr/share/fonts/opentype/NotoSansCJK-Bold.ttc",
 		"/usr/share/fonts/opentype/NotoSerifCJK-Bold.ttc",
 
-		// ?
-		"/usr/share/fonts/truetype/unifont/unifont.ttf"
+		// Deepin
+		"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+		"/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc",
+		"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+		"/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc",
+		"/usr/share/fonts/truetype/unifont/unifont.ttf",
 	};
 
 	for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i) 
