@@ -22,8 +22,8 @@ jobs:
 
       - name: Install Dependents
         run: 
-            vcpkg install ffmpeg:x86-android ffmpeg:x64-android ffmpeg:arm-android ffmpeg:arm64-android \
-                          sdl2:x86-android sdl2:x64-android sdl2:arm-android sdl2:arm64-android
+            vcpkg install ffmpeg:x86-android ffmpeg:x64-android ffmpeg:arm-android ffmpeg:arm64-android
+            vcpkg install sdl2:x86-android sdl2:x64-android sdl2:arm-android sdl2:arm64-android
 
   build-switch:
     name: 'Nintendo Switch'
