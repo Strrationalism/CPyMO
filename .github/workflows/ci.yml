@@ -11,6 +11,20 @@ env:
   BUILD_TYPE: MinSizeRel
 
 jobs:
+  build-android:
+    name: 'Android'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Install Dependents
+        run: 
+            vcpkg install ffmpeg:x86-android ffmpeg:x64-android ffmpeg:arm-android ffmpeg:arm64-android \
+                          sdl2:x86-android sdl2:x64-android sdl2:arm-android sdl2:arm64-android
+
   build-switch:
     name: 'Nintendo Switch'
     runs-on: ubuntu-latest
@@ -81,7 +95,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ windows-latest, macos-latest, ubuntu-latest ]
+        os: [ windows-latest, macos-10.15, ubuntu-latest ]
         include:
           - os: windows-latest
             triplet: x64-windows-static
