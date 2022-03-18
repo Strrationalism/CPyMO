@@ -21,7 +21,6 @@ add_executable (cpymo
 target_link_libraries(cpymo PRIVATE 
 	SDL2::SDL2 
 	SDL2::SDL2main 
-	SDL2::SDL2-static 
 	cpymolib
 	${FFMPEG_LIBRARIES})
 
