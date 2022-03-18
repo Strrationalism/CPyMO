@@ -55,9 +55,8 @@ static inline void cpymo_backend_update_volume(size_t cid)
         volume[cid] = new_volume;
         
         float mix[12];
-        memset(mix + 2, 0, sizeof(mix) - 2 * sizeof(float));
-        mix[0] = new_volume;
-        mix[1] = new_volume;
+        for (size_t i = 0; i < 12; ++i)
+            mix[i] = new_volume;
 
         ndspChnSetMix(cid, mix);
     }
@@ -138,9 +137,12 @@ void cpymo_backend_audio_init()
     memset(audio_buf, 0, BUF_SIZE * BUFFERS * CPYMO_AUDIO_MAX_CHANNELS);
     memset(waveBuf, 0, sizeof(waveBuf));
 
+    ndspSetOutputMode(NDSP_OUTPUT_SURROUND);
+    ndspSetClippingMode(NDSP_CLIP_NORMAL);
+    ndspSurroundSetPos(NDSP_SPKPOS_WIDE);
+
     for(int cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
         ndspChnReset(cid);
-        ndspSetOutputMode(NDSP_OUTPUT_STEREO);
         ndspChnSetInterp(cid, NDSP_INTERP_LINEAR);
         ndspChnSetRate(cid, SAMPLERATE);
         ndspChnSetFormat(cid, NDSP_FORMAT_STEREO_PCM16);
