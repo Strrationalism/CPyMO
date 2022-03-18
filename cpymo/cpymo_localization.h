@@ -23,7 +23,9 @@ typedef struct {
 		*config_sevol,
 		*config_vovol,
 		*config_sayspeed,
-		*config_fontsize;
+		*config_fontsize,
+
+		*config_sayspeeds[6];
 
 	error_t (*save_already_save_to)(char **out_str, int save_id);
 	error_t (*save_failed)(char **out_str, error_t);

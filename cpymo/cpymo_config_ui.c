@@ -85,8 +85,26 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 		item->show_value = NULL;
 	}
 
-	char val_str[8];
-	sprintf(val_str, "%d", val);
+	const cpymo_localization *l = cpymo_localization_get(e);
+
+	char val_str_buf[8];
+	const char *val_str = val_str_buf;
+	switch (item_index) {
+	case ITEM_BGM_VOL:	
+	case ITEM_SE_VOL:
+	case ITEM_VO_VOL:
+		if (val) sprintf(val_str_buf, "%d0%%", val);
+		else val_str = "0%";
+		break;
+	case ITEM_FONT_SIZE:
+		sprintf(val_str_buf, "%d", val);
+		break;
+	case ITEM_TEXT_SPEED:
+		assert(val >= 0 && val <= 5);
+		val_str = l->config_sayspeeds[val];
+		break;
+	}
+	
 	error_t err = cpymo_backend_text_create(
 		&item->show_value, 
 		&item->show_value_width, 

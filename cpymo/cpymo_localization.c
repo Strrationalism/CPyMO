@@ -80,6 +80,7 @@ const cpymo_localization chs = {
 	"语音音量",
 	"文字速度",
 	"文字大小",
+	{ "很慢", "慢", "中", "快", "很快", "瞬间" },
 
 	&F(chs, save_already_save_to),
 	&F(chs, save_failed),
@@ -123,6 +124,7 @@ const cpymo_localization enu = {
 	"Voice Volume",
 	"Text Speed",
 	"Font Size",
+	{ "Very Slow", "Slow", "Normal", "Fast", "Very Fast", "Instant" },
 
 	&F(enu, save_already_save_to),
 	&F(enu, save_failed),
