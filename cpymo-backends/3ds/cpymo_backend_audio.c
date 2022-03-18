@@ -138,8 +138,7 @@ void cpymo_backend_audio_init()
     memset(waveBuf, 0, sizeof(waveBuf));
 
     ndspSetOutputMode(NDSP_OUTPUT_SURROUND);
-    ndspSurroundSetPos(NDSP_SPKPOS_WIDE);
-
+    
     for(int cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
         ndspChnReset(cid);
         ndspChnSetInterp(cid, NDSP_INTERP_LINEAR);
