@@ -186,7 +186,7 @@ const cpymo_localization enu = {
 };
 
 #ifndef DEFAULT_LANG
-#define DEFAULT_LANG enu
+#define DEFAULT_LANG chs
 #endif
 
 const cpymo_localization *cpymo_localization_get(struct cpymo_engine *e)
