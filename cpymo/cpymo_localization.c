@@ -96,12 +96,57 @@ const cpymo_localization chs = {
 	"你需要将游戏放在SD卡中的\"pymogames\"文件夹下，\n并确保路径中只包含英文、数字和下划线。\n"
 };
 
+
+STR_I(cht, save_already_save_to, 32, "已經保存到檔案 %d");
+STR_E(cht, save_failed, 32, "保存失敗：%s");
+STR_I(cht, save_are_you_sure_save_to, 64, "確定要保存到檔案 %d 嗎？");
+STR_I_S(cht, save_title, 32, "檔案 %d      %s");
+STR_S(cht, save_auto_title, 32, "自動存檔  %s");
+STR_I(cht, save_are_you_sure_load, 64, "確定要加載檔案 %d 嗎？");
+STR_I_I(cht, date_str, 32, "%d 月 %d 日");
+
+const cpymo_localization cht = {
+	"確定",
+	"取消",
+
+	"保存進度",
+	"讀取進度",
+	"快進",
+	"隱藏對話",
+	"對話歷史",
+	"設定",
+	"重啓遊戲",
+	"返回遊戲",
+
+	"確定要重新啟動遊戲嗎？",
+
+	"背景音樂音量",
+	"音效音量",
+	"語音音量",
+	"文字速度",
+	"文字大小",
+	{ "很慢", "慢", "中", "快", "很快", "瞬間" },
+
+	&F(cht, save_already_save_to),
+	&F(cht, save_failed),
+	&F(cht, save_are_you_sure_save_to),
+	&F(cht, save_title),
+	&F(cht, save_auto_title),
+	&F(cht, save_are_you_sure_load),
+	"確定要加載自動存檔嗎？",
+
+	&F(cht, date_str),
+
+	"未找到遊戲",
+	"你需要將遊戲放在SD卡中的\"pymogames\"資料夾下，\n並確保路徑中只包含英文、數位和底線。 \n"
+};
+
 STR_I(enu, save_already_save_to, 32, "Already save to slot %d.");
 STR_E(enu, save_failed, 32, "Save failed: %s");
-STR_I(enu, save_are_you_sure_save_to, 64, "Are you sure you want to save to slot %d ?")
-STR_I_S(enu, save_title, 16, "Slot %d    %s");
+STR_I(enu, save_are_you_sure_save_to, 64, "Are you sure you want\nto save to slot %d?")
+STR_I_S(enu, save_title, 16, "Slot %d   %s");
 STR_S(enu, save_auto_title, 16, "Auto Slot  %s");
-STR_I(enu, save_are_you_sure_load, 64, "Are you sure you want to load from slot %d ?");
+STR_I(enu, save_are_you_sure_load, 64, "Are you sure you want to\nload from slot %d?");
 STR_I_I(enu, date_str, 16, "%d / %d");
 
 const cpymo_localization enu = {
@@ -117,7 +162,7 @@ const cpymo_localization enu = {
 	"Restart Game",
 	"Back to Game",
 
-	"Are you sure you want to restart the game?",
+	"Are you sure you want to\nrestart the game?",
 
 	"BGM Volume",
 	"SE Volume",
@@ -132,7 +177,7 @@ const cpymo_localization enu = {
 	&F(enu, save_title),
 	&F(enu, save_auto_title),
 	&F(enu, save_are_you_sure_load),
-	"Are you sure you want to load from auto slot?",
+	"Are you sure you want to\nload from auto slot?",
 
 	&F(enu, date_str),
 
@@ -141,7 +186,7 @@ const cpymo_localization enu = {
 };
 
 #ifndef DEFAULT_LANG
-#define DEFAULT_LANG chs
+#define DEFAULT_LANG enu
 #endif
 
 const cpymo_localization *cpymo_localization_get(struct cpymo_engine *e)
