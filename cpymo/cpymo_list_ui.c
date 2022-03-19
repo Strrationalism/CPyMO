@@ -195,6 +195,14 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			cpymo_list_ui_fix_key_scroll(e);
 			cpymo_engine_request_redraw(e);
 		}
+		else {
+			if (ui->no_more_content_callback) {
+				error_t err = ui->no_more_content_callback(e, false);
+				CPYMO_THROW(err);
+				if (!cpymo_ui_enabled(e))
+					return CPYMO_ERR_SUCC;
+			}
+		}
 	}
 
 	else if (just_press_down) {
@@ -203,6 +211,14 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			ui->selection_relative_to_cur = r;
 			cpymo_list_ui_fix_key_scroll(e);
 			cpymo_engine_request_redraw(e);
+		}
+		else {
+			if (ui->no_more_content_callback) {
+				error_t err = ui->no_more_content_callback(e, true);
+				CPYMO_THROW(err);
+				if (!cpymo_ui_enabled(e))
+					return CPYMO_ERR_SUCC;
+			}
 		}
 	}
 
@@ -334,6 +350,7 @@ error_t cpymo_list_ui_enter(
 	data->allow_scroll = true;
 	data->custom_update = NULL;
 	data->scroll_delta_y_sum = 0;
+	data->no_more_content_callback = NULL;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);

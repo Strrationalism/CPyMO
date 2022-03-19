@@ -13,6 +13,7 @@ typedef void *(*cpymo_list_ui_get_node)(const struct cpymo_engine *, const void 
 typedef void (*cpymo_list_ui_draw_node)(const struct cpymo_engine *, const void *node_to_draw, float y);
 typedef error_t (*cpymo_list_ui_ok)(struct cpymo_engine *, void *selected);
 typedef error_t(*cpymo_list_ui_custom_update)(struct cpymo_engine *, float dt, void *selected);
+typedef error_t(*cpymo_list_ui_selecting_no_more_content_callback)(struct cpymo_engine *, bool is_down);
 
 typedef struct {
 	cpymo_ui_deleter ui_data_deleter;
@@ -33,6 +34,8 @@ typedef struct {
 	float scroll_delta_y_sum;
 
 	bool allow_scroll;
+
+	cpymo_list_ui_selecting_no_more_content_callback no_more_content_callback;
 
 	float current_y;
 } cpymo_list_ui;
@@ -64,6 +67,9 @@ static inline void cpymo_list_ui_set_custom_update(struct cpymo_engine *e, cpymo
 
 static inline void *cpymo_list_ui_data(struct cpymo_engine *e)
 { return ((uint8_t *)cpymo_ui_data(e)) + sizeof(cpymo_list_ui); }
+
+static inline void cpymo_list_ui_set_selecting_no_more_content_callback(struct cpymo_engine *e, cpymo_list_ui_selecting_no_more_content_callback c)
+{ ((cpymo_list_ui *)cpymo_ui_data(e))->no_more_content_callback = c; }
 
 static inline const void *cpymo_list_ui_data_const(const struct cpymo_engine *e)
 { return ((uint8_t *)cpymo_ui_data_const(e)) + sizeof(cpymo_list_ui); }

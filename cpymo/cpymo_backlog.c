@@ -195,7 +195,7 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 
 	cpymo_list_ui_set_custom_update(e, &cpymo_backlog_ui_update);
 
-	ui->press_key_down_to_close = false;
+	ui->press_key_down_to_close = true;
 
 	return CPYMO_ERR_SUCC;
 }
