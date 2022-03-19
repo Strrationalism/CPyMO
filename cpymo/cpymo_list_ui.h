@@ -77,5 +77,7 @@ static inline const void *cpymo_list_ui_data_const(const struct cpymo_engine *e)
 static inline void cpymo_list_ui_exit(struct cpymo_engine *e)
 { cpymo_ui_exit(e); }
 
+void cpymo_list_ui_enable_loop(struct cpymo_engine *);
+
 
 #endif

@@ -258,11 +258,13 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			false,
 			data->nodes_per_screen
 		);
+		CPYMO_THROW(err);
 
 		cpymo_list_ui *list_ui = (cpymo_list_ui *)cpymo_ui_data(e);
 		list_ui->selection_relative_to_cur = relative;
 
 		cpymo_list_ui_set_custom_update(e, &cpymo_game_selector_init_refresh);
+		cpymo_list_ui_enable_loop(e);
 
 		ui->after_init = after_reinit;
 		ui->before_init = before_reinit;

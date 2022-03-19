@@ -116,7 +116,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 {
 	cpymo_save_ui *ui = NULL;
 	uintptr_t first = is_load_ui ? 0 : 1;
-	cpymo_list_ui_enter(
+	error_t err = cpymo_list_ui_enter(
 		e,
 		(void **)&ui,
 		sizeof(*ui),
@@ -128,6 +128,9 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 		&cpymo_save_ui_get_prev,
 		false,
 		4);
+	CPYMO_THROW(err);
+	
+	cpymo_list_ui_enable_loop(e);
 
 	ui->is_load_ui = is_load_ui;
 

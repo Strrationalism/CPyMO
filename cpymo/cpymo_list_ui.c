@@ -362,3 +362,43 @@ error_t cpymo_list_ui_enter(
 	return err;
 }
 
+static error_t cpymo_list_ui_selecting_no_more_content_callback_looping(cpymo_engine *e, bool is_down)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
+
+	if (is_down) {
+		ui->selection_relative_to_cur = 0;
+		while (true) {
+			void *next = ui->get_prev(e, ui + 1, ui->current_node);
+			if (next == NULL) break;
+			ui->current_node = next;
+		}
+		
+	}
+	else {
+		ui->selection_relative_to_cur = 0;
+		while (true) {
+			void *next = ui->get_next(e, ui + 1, ui->current_node);
+			if (next == NULL) break;
+			ui->current_node = next;
+		}
+
+		int nodes_per_screen = (size_t)((float)e->gameconfig.imagesize_h / ui->node_height);
+		while (ui->selection_relative_to_cur < nodes_per_screen - 1) {
+			void *prev = ui->get_prev(e, ui + 1, ui->current_node);
+			if (prev == NULL) break;
+			ui->current_node = prev;
+			ui->selection_relative_to_cur++;
+		}
+	}
+
+	cpymo_engine_request_redraw(e);
+
+	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_list_ui_enable_loop(cpymo_engine *e)
+{
+	cpymo_list_ui_set_selecting_no_more_content_callback(e, 
+		&cpymo_list_ui_selecting_no_more_content_callback_looping);
+}

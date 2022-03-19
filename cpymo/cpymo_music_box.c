@@ -79,6 +79,8 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 		5);
 	CPYMO_THROW(err);
 
+	cpymo_list_ui_enable_loop(e);
+
 	box->music_list = NULL;
 	size_t music_list_size = 0;
 	err = cpymo_assetloader_load_script(

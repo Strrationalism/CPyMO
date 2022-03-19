@@ -211,6 +211,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 
 	cpymo_list_ui_set_scroll_enabled(e, false);
 	cpymo_list_ui_set_custom_update(e, &cpymo_config_ui_update);
+	cpymo_list_ui_enable_loop(e);
 
 	for (size_t i = 0; i < sizeof(ui->items) / sizeof(ui->items[0]); ++i) {
 		ui->items[i].show_name = NULL;
