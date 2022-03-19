@@ -25,7 +25,7 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
         case cpymo_backend_image_draw_type_text_say: return 2.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_bg: return 2.5f * render_3d_offset;
         case cpymo_backend_image_draw_type_titledate_text: return 3.0f * render_3d_offset;
-        case cpymo_backend_image_draw_type_ui_element_bg: return 3.0f * render_3d_offset;
+        case cpymo_backend_image_draw_type_ui_element_bg: return 2.0f * render_3d_offset;
         case cpymo_backend_image_draw_type_ui_element: return 2.5f * render_3d_offset;
         case cpymo_backend_image_draw_type_ui_bg: return -10.0f * render_3d_offset;
         default: return 0.0f;

@@ -275,7 +275,9 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_ui_bg);
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
+	xywh[0] = -30;
 	xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
+	xywh[2] += 60;
 	xywh[3] = ui->node_height;
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_ui_element_bg);
 
