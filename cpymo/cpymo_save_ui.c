@@ -6,7 +6,7 @@
 #include "cpymo_localization.h"
 #include <assert.h>
 
-#define MAX_SAVES 10
+#define MAX_SAVES 31
 
 typedef struct {
 	cpymo_backend_text text;
