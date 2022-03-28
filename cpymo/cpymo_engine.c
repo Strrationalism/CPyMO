@@ -8,6 +8,7 @@
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_save_global.h"
 #include <cpymo_backend_input.h>
+#include "cpymo_localization.h"
 
 static void cpymo_logo() {
 	puts("   __________        __  _______");
@@ -25,7 +26,8 @@ static void cpymo_logo() {
 }
 
 static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) {
-	cpymo_msgbox_ui_enter(e, cpymo_parser_stream_span_pure("需为此游戏安装mo2pymo补丁才可以正常进行游戏"), NULL, NULL);
+	const cpymo_localization *l = cpymo_localization_get(e);
+	cpymo_msgbox_ui_enter(e, cpymo_parser_stream_span_pure(l->mo2pymo_required), NULL, NULL);
 	return CPYMO_ERR_SUCC;
 }
 

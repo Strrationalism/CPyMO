@@ -246,6 +246,7 @@ int main(int argc, char **argv)
 #endif
 
 	if (err != CPYMO_ERR_SUCC) {
+		cpymo_backend_audio_free();
 		SDL_Log("[Error] cpymo_engine_init (%s)", cpymo_error_message(err));
 		SDL_Quit();
 		return -1;
