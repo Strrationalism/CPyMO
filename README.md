@@ -58,6 +58,14 @@ Unpack a pymo package:
 
 如果你使用Microsoft Visual Studio，默认的CMakeSettings.json中指示的依赖版本为x64-windows-static。
 
+### 视障帮助功能
+
+github action及release上的版本默认会开启视障帮助功能，如果你需要禁用视障帮助功能，可在编译时定义宏NON_VISUALLY_IMPAIRED_HELP.
+
+视障帮助功能将会把游戏中的文本复制到剪切板供读屏软件读取。    
+
+仅Windows、macOS和Linux版本支持视障帮助功能。
+
 ## 编译到任天堂3DS平台
 
 ### 额外依赖

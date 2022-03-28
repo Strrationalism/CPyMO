@@ -206,6 +206,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			name_or_text.len = 0;
 		}
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+		char *full_text = (char *)malloc(name_or_text.len + text.len + 1);
+		if (full_text) {
+			memset(full_text, 0, name_or_text.len + text.len + 1);
+			strncpy(full_text, name_or_text.begin, name_or_text.len);
+			strncat(full_text, text.begin, text.len);
+			cpymo_backend_text_visually_impaired_help(full_text);
+			free(full_text);
+		}
+#endif
+
 		cpymo_text_clear(&engine->text);
 
 		return cpymo_say_start(engine, name_or_text, text);
@@ -227,6 +238,16 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			engine->gameconfig.imagesize_h / 240.0f * 1.2f;
 		POP_ARG(show_immediately_str);
 		bool show_immediately = cpymo_parser_stream_span_atoi(show_immediately_str) != 0;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+		char *full_text = (char *)malloc(content.len + 1);
+		if (full_text) {
+			memset(full_text, 0, content.len + 1);
+			strncpy(full_text, content.begin, content.len);
+			cpymo_backend_text_visually_impaired_help(full_text);
+			free(full_text);
+		}
+#endif
 
 		return cpymo_text_new(engine, x1, y1, x2, y2, col, fontsize, content, show_immediately);
 	}
@@ -259,6 +280,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("title_dsp") {
 		if (strlen(engine->title) <= 0)
 			CONT_NEXTLINE;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+		cpymo_backend_text_visually_impaired_help(engine->title);
+#endif
 
 		return cpymo_floating_hint_start(
 			engine,

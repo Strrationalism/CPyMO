@@ -7,6 +7,7 @@
 #include <math.h>
 #include <cpymo_utils.h>
 #include <SDL_render.h>
+#include <SDL_clipboard.h>
 #include <assert.h>
 
 extern stbtt_fontinfo font;
@@ -188,3 +189,10 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
 
     return (float)w;
 }
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+void cpymo_backend_text_visually_impaired_help(const char *text)
+{
+    SDL_SetClipboardText(text);
+}
+#endif

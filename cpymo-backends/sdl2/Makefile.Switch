@@ -52,7 +52,7 @@ INCLUDES	:=	../include ../../cpymo ../../stb ../../endianness.h
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
+CFLAGS	:=	-g -Wall -O3 -ffunction-sections -DNON_VISUALLY_IMPAIRED_HELP \
 			$(ARCH) $(DEFINES) \
 			-I$(PORTLIBS)/include/SDL2
 
