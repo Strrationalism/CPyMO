@@ -272,6 +272,7 @@ int main(int argc, char **argv)
 		&window,
 		&renderer) != 0) {
 		cpymo_engine_free(&engine);
+		cpymo_backend_audio_free();
 		SDL_Log("[Error] Can not create window and renderer: %s", SDL_GetError());
 		SDL_Quit();
 		return -1;
@@ -289,6 +290,7 @@ int main(int argc, char **argv)
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
 		cpymo_engine_free(&engine);
+		cpymo_backend_audio_free();
 		SDL_Quit();
 		return -1;
 	}
@@ -304,6 +306,7 @@ int main(int argc, char **argv)
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
 		cpymo_engine_free(&engine);
+		cpymo_backend_audio_free();
 		SDL_Quit();
 		return -1;
 	}
