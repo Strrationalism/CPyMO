@@ -21,11 +21,14 @@ error_t cpymo_backend_text_sys_init()
         return CPYMO_ERR_UNKNOWN;
     }
 
-    font = C2D_FontLoad("romfs:/font.bcfnt");
+    font = C2D_FontLoad("sdmc:/pymogames/font.bcfnt");
     if(font == NULL) {
-        cfguExit();
-        romfsExit();
-        return CPYMO_ERR_UNKNOWN;
+        font = C2D_FontLoad("romfs:/font.bcfnt");
+        if (font == NULL) {
+            cfguExit();
+            romfsExit();
+            return CPYMO_ERR_UNKNOWN;
+        }
     }
 
     return CPYMO_ERR_SUCC;
