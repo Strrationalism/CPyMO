@@ -104,6 +104,10 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 		val_str = l->config_sayspeeds[val];
 		break;
 	}
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	cpymo_backend_text_visually_impaired_help(val_str);
+#endif
 	
 	error_t err = cpymo_backend_text_create(
 		&item->show_value, 
@@ -192,6 +196,27 @@ static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
 		(int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(selected));
 }
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
+{
+	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const cpymo_localization *l = cpymo_localization_get(e);
+	const char *p;
+	switch (i) {
+	case ITEM_BGM_VOL: p = l->config_bgmvol; break;
+	case ITEM_SE_VOL: p = l->config_sevol; break;
+	case ITEM_VO_VOL: p = l->config_vovol; break;
+	case ITEM_FONT_SIZE: p = l->config_fontsize; break;
+	case ITEM_TEXT_SPEED: p = l->config_sayspeed; break;
+	default: assert(false);
+	}
+
+	cpymo_backend_text_visually_impaired_help(p);
+
+	return CPYMO_ERR_SUCC;
+}
+#endif
+
 error_t cpymo_config_ui_enter(cpymo_engine *e)
 {
 	cpymo_config_ui *ui = NULL;
@@ -208,6 +233,10 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		false,
 		5);
 	CPYMO_THROW(err);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	cpymo_list_ui_set_selection_changed_callback(e, &cpymo_config_ui_visual_im_help_selection_changed_callback);
+#endif
 
 	cpymo_list_ui_set_scroll_enabled(e, false);
 	cpymo_list_ui_set_custom_update(e, &cpymo_config_ui_update);
