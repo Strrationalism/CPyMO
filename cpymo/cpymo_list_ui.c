@@ -194,6 +194,11 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			ui->selection_relative_to_cur = r;
 			cpymo_list_ui_fix_key_scroll(e);
 			cpymo_engine_request_redraw(e);
+
+			if (ui->selection_changed) {
+				error_t err = ui->selection_changed(e, cpymo_list_ui_get_relative_id_to_cur(e, r));
+				CPYMO_THROW(err);
+			}
 		}
 		else {
 			if (ui->no_more_content_callback) {
@@ -211,6 +216,11 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			ui->selection_relative_to_cur = r;
 			cpymo_list_ui_fix_key_scroll(e);
 			cpymo_engine_request_redraw(e);
+
+			if (ui->selection_changed) {
+				error_t err = ui->selection_changed(e, cpymo_list_ui_get_relative_id_to_cur(e, r));
+				CPYMO_THROW(err);
+			}
 		}
 		else {
 			if (ui->no_more_content_callback) {
@@ -227,6 +237,11 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		if (s != ui->selection_relative_to_cur && s != INT_MAX) {
 			ui->selection_relative_to_cur = s;
 			cpymo_engine_request_redraw(e);
+
+			if (ui->selection_changed) {
+				error_t err = ui->selection_changed(e, cpymo_list_ui_get_relative_id_to_cur(e, s));
+				CPYMO_THROW(err);
+			}
 		}
 	}
 
@@ -353,6 +368,7 @@ error_t cpymo_list_ui_enter(
 	data->custom_update = NULL;
 	data->scroll_delta_y_sum = 0;
 	data->no_more_content_callback = NULL;
+	data->selection_changed = NULL;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
