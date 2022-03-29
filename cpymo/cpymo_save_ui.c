@@ -164,6 +164,8 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 	const float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 	size_t characters = (size_t)((float)e->gameconfig.imagesize_w / fontsize * 1.3f);
 
+	ui->items[0].orginal_text = NULL;
+
 	char text_buf[1024];
 	for (size_t i = is_load_ui ? 0 : 1; i < MAX_SAVES; ++i) {
 		FILE *save = cpymo_save_open_read(e, (unsigned short)i);

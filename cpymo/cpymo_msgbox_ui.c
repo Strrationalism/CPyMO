@@ -96,6 +96,10 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	const cpymo_localization *l = cpymo_localization_get(e);
+#endif
+
 	if ((CPYMO_INPUT_JUST_PRESSED(e, up) || CPYMO_INPUT_JUST_PRESSED(e, down))) {
 		if (ui->selection == -1) {
 			if (ui->cancel_btn) ui->selection = 1;
@@ -105,8 +109,16 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 		else if (ui->selection == 1 && ui->cancel_btn) ui->selection = 0;
 
 		cpymo_engine_request_redraw(e);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+		cpymo_backend_text_visually_impaired_help(ui->selection == 0 ? l->msgbox_ok : l->msgbox_cancel);
+#endif
 	}
 	else if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
+		if (ui->cancel_btn == NULL) {
+			ui->selection = 0;
+		}
+
 		cpymo_engine_request_redraw(e);
 	}
 	else if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
@@ -138,6 +150,11 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 		if (mouse_sel != ui->selection) {
 			ui->selection = mouse_sel;
 			cpymo_engine_request_redraw(e);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+			if (ui->selection >= 0)
+				cpymo_backend_text_visually_impaired_help(ui->selection == 0 ? l->msgbox_ok : l->msgbox_cancel);
+#endif
 		}
 	}
 
@@ -298,6 +315,19 @@ error_t cpymo_msgbox_ui_enter(
 	else {
 		ui->confirm = &cpymo_msgbox_ui_default_confirm;
 	}
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	char *msg = (char *)malloc(message.len + strlen(l->msgbox_cancel) + 1);
+	if (msg) {
+		cpymo_parser_stream_span_copy(msg, message.len + strlen(l->msgbox_cancel) + 1, message);
+		if (confirm) {
+			strcat(msg, l->msgbox_cancel);
+		}
+
+		cpymo_backend_text_visually_impaired_help(msg);
+		free(msg);
+	}
+#endif
 
 	return err;
 }
