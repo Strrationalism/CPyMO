@@ -34,6 +34,10 @@ typedef struct {
 	uint64_t hash;
 	bool has_selected;
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	char *original_text;
+#endif
+
 	enum cpymo_select_img_selection_hint_state hint_state : 3;
 } cpymo_select_img_selection;
 

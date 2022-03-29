@@ -32,6 +32,10 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 				cpymo_backend_image_free(img->selections[i].image); 
 			if (img->selections[i].or_text)
 				cpymo_backend_text_free(img->selections[i].or_text);
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+			if (img->selections[i].original_text)
+				free(img->selections[i].original_text);
+#endif
 		}
 	}
 
@@ -91,6 +95,9 @@ void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, 
 	cpymo_select_img_selection *sel = &e->select_img.selections[e->select_img.current_selection++];
 	sel->image = e->select_img.select_img_image;
 	sel->or_text = NULL;
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	sel->original_text = NULL;
+#endif
 
 	sel->x = x;
 	sel->y = y;
@@ -133,6 +140,10 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 
 	sel->hash = hash;
 	sel->has_selected = cpymo_hash_flags_check(&e->flags, hash);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	sel->original_text = NULL;
+#endif
 
 	return CPYMO_ERR_SUCC;
 }
@@ -236,10 +247,16 @@ void cpymo_select_img_configuare_end(cpymo_select_img *sel, cpymo_wait *wait, st
 			}
 
 			if (sel->selections[i].or_text) {
-				if (sel->selections[i].or_text)
-					cpymo_backend_text_free(sel->selections[i].or_text);
+				cpymo_backend_text_free(sel->selections[i].or_text);
 				sel->selections[i].or_text = NULL;
 			}
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+			if (sel->selections[i].original_text) {
+				free(sel->selections[i].original_text);
+				sel->selections[i].original_text = NULL;
+			}
+#endif
 		}
 	}
 
@@ -278,6 +295,12 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 	return err;
 }
 
+#ifdef NON_VISUALLY_IMPAIRED_HELP
+#define CALL_VISUALLY_IMPAIRED(X)
+#else
+#define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_visually_impaired_help(X)
+#endif
+
 error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 {
 	if (o->selections) {
@@ -287,11 +310,15 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 		if (cpymo_key_pluse_output(&o->key_down)) {
 			cpymo_select_img_move(o, 1);
 			cpymo_engine_request_redraw(e);
+
+			CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
 		}
 
 		if (cpymo_key_pluse_output(&o->key_up)) {
 			cpymo_select_img_move(o, -1);
 			cpymo_engine_request_redraw(e);
+
+			CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
 		}
 
 		if (cpymo_input_mouse_moved(e) && e->input.mouse_position_useable) {
@@ -300,6 +327,8 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 					if (i != o->current_selection) {
 						o->current_selection = i;
 						cpymo_engine_request_redraw(e);
+
+						CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
 					}
 				}
 			}
@@ -466,6 +495,12 @@ error_t cpymo_select_img_configuare_select_text(
 	s->hash = hash;
 	s->has_selected = cpymo_hash_flags_check(flags, hash);
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	s->original_text = (char *)malloc(text.len + 1);
+	if (s->original_text)
+		cpymo_parser_stream_span_copy(s->original_text, text.len + 1, text);
+#endif
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -558,4 +593,6 @@ void cpymo_select_img_configuare_end_select_text(
 			sel->show_option_background = false;
 		}
 	}
+
+	CALL_VISUALLY_IMPAIRED(sel->selections[sel->current_selection].original_text);
 }
