@@ -14,6 +14,11 @@ typedef struct {
 	uintptr_t music_count;
 	cpymo_parser_stream_span *music_filename;
 	cpymo_backend_text *music_title;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	char **music_title_text;
+#endif
+
 	float font_size;
 } cpymo_music_box;
 
@@ -23,6 +28,14 @@ static void cpymo_music_box_deleter(cpymo_engine *e, void *ui_)
 
 	for (uintptr_t i = 0; i < box->music_count; ++i)
 		cpymo_backend_text_free(box->music_title[i]);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	if (box->music_title_text) {
+		for (uintptr_t i = 0; i < box->music_count; ++i)
+			if (box->music_title_text[i]) free(box->music_title_text[i]);
+		free(box->music_title_text);
+	}
+#endif
 
 	free(box->music_list);
 	free(box->music_filename);
@@ -62,6 +75,21 @@ static error_t cpymo_musicbox_ok(struct cpymo_engine *e, void *selected)
 	cpymo_audio_bgm_play(e, box->music_filename[node_index], true);
 	return CPYMO_ERR_SUCC;
 }
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+static error_t cpymo_musicbox_visual_help_selection_change(cpymo_engine *e, void *selected)
+{
+	const cpymo_music_box *box = (cpymo_music_box *)cpymo_list_ui_data_const(e);
+	
+	if (box->music_title_text) {
+		uintptr_t node_index = DECODE_NODE(selected);
+		if (box->music_title_text[node_index])
+			cpymo_backend_text_visually_impaired_help(box->music_title_text[node_index]);
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+#endif
 
 error_t cpymo_music_box_enter(cpymo_engine *e)
 {
@@ -125,6 +153,13 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	uintptr_t i = 0;
 	const cpymo_gameconfig *c = &e->gameconfig;
 	box->font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	box->music_title_text = malloc(sizeof(char *) * box->music_count);
+	cpymo_list_ui_set_selection_changed_callback(
+		e, &cpymo_musicbox_visual_help_selection_change);
+#endif
+
 	do {
 		cpymo_parser_stream_span music_file =
 			cpymo_parser_curline_pop_commacell(&p);
@@ -138,6 +173,16 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 		if (music_file.len == 0) continue;
 
 		box->music_filename[i] = music_file;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+		if (box->music_title_text) {
+			box->music_title_text[i] = (char *)malloc(music_title.len + 1);
+			if (box->music_title_text[i]) {
+				cpymo_parser_stream_span_copy(box->music_title_text[i], music_title.len + 1, music_title);
+			}
+		}
+#endif
+
 		float width;
 		error_t err = cpymo_backend_text_create(&box->music_title[i], &width, music_title, box->font_size);
 		if (err != CPYMO_ERR_SUCC) {
