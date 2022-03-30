@@ -196,7 +196,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			cpymo_engine_request_redraw(e);
 
 			if (ui->selection_changed) {
-				error_t err = ui->selection_changed(e, cpymo_list_ui_get_relative_id_to_cur(e, r));
+				error_t err = ui->selection_changed(e, 
+					cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur));
 				CPYMO_THROW(err);
 			}
 		}
@@ -218,7 +219,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			cpymo_engine_request_redraw(e);
 
 			if (ui->selection_changed) {
-				error_t err = ui->selection_changed(e, cpymo_list_ui_get_relative_id_to_cur(e, r));
+				error_t err = ui->selection_changed(e, 
+					cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur));
 				CPYMO_THROW(err);
 			}
 		}
@@ -239,7 +241,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			cpymo_engine_request_redraw(e);
 
 			if (ui->selection_changed) {
-				error_t err = ui->selection_changed(e, cpymo_list_ui_get_relative_id_to_cur(e, s));
+				error_t err = ui->selection_changed(e, 
+					cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur));
 				CPYMO_THROW(err);
 			}
 		}
