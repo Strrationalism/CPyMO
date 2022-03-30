@@ -13,6 +13,11 @@ typedef struct {
 	size_t max_lines;
 
 	char vo_filename[32];
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	char *text;
+#endif
+
 } cpymo_backlog_record;
 
 typedef struct {
@@ -22,6 +27,10 @@ typedef struct {
 
 	bool owning_name;
 	cpymo_backend_text pending_name;
+	
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	char *pending_text;
+#endif
 } cpymo_backlog;
 
 void cpymo_backlog_init(cpymo_backlog *);
@@ -30,6 +39,12 @@ void cpymo_backlog_free(cpymo_backlog *);
 void cpymo_backlog_record_write_vo(
 	cpymo_backlog *,
 	cpymo_parser_stream_span vo);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+void cpymo_backlog_record_write_full_text(
+	cpymo_backlog *,
+	char *text);
+#endif
 
 void cpymo_backlog_record_write_name(
 	cpymo_backlog *,

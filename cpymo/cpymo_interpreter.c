@@ -213,7 +213,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			strncpy(full_text, name_or_text.begin, name_or_text.len);
 			strncat(full_text, text.begin, text.len);
 			cpymo_backend_text_visually_impaired_help(full_text);
-			free(full_text);
+			cpymo_backlog_record_write_full_text(&engine->backlog, full_text);
 		}
 #endif
 

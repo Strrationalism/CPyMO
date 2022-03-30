@@ -4,18 +4,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-
+#include <assert.h>
 void cpymo_backlog_init(cpymo_backlog *b)
 {
 	b->next_record_to_write = 0;
 	b->pending_vo_filename[0] = '\0';
 	b->owning_name = false;
 	b->pending_name = NULL;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	b->pending_text = NULL;
+#endif
+
 	for (size_t i = 0; i < CPYMO_BACKLOG_MAX_RECORDS; i++) {
 		b->records[i].vo_filename[0] = '\0';
 		b->records[i].owning_name = false;
 		b->records[i].name = NULL;
 		b->records[i].lines = NULL;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+		b->records[i].text = NULL;
+#endif
 	}
 }
 
@@ -38,6 +47,11 @@ static void cpymo_backlog_record_clean(cpymo_backlog_record *rec)
 
 	rec->max_lines = 0;
 	rec->vo_filename[0] = '\0';
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	if (rec->text) free(rec->text);
+	rec->text = NULL;
+#endif
 }
 
 void cpymo_backlog_free(cpymo_backlog *b)
@@ -49,6 +63,10 @@ void cpymo_backlog_free(cpymo_backlog *b)
 		cpymo_backlog_record *rec = &b->records[i];
 		cpymo_backlog_record_clean(rec);
 	}
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	if (b->pending_text) free(b->pending_text);
+#endif
 }
 
 void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_parser_stream_span vo)
@@ -56,6 +74,14 @@ void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_parser_stream_span vo
 	cpymo_parser_stream_span_copy(
 		b->pending_vo_filename, sizeof(b->pending_vo_filename), vo);
 }
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+void cpymo_backlog_record_write_full_text(cpymo_backlog *b, char * text)
+{
+	assert(b->pending_text == NULL);
+	b->pending_text = text;
+}
+#endif
 
 void cpymo_backlog_record_write_name(cpymo_backlog *b, cpymo_backend_text name)
 {
@@ -78,6 +104,11 @@ error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text **t
 	rec->lines = *textlines_moveinto;
 	*textlines_moveinto = NULL;
 	rec->max_lines = max_lines;
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	rec->text = b->pending_text;
+	b->pending_text = NULL;
+#endif
 	
 	strcpy(rec->vo_filename, b->pending_vo_filename);
 	b->pending_vo_filename[0] = '\0';
@@ -171,6 +202,19 @@ static error_t cpymo_backlog_ui_update(cpymo_engine *e, float dt, void *selected
 	return CPYMO_ERR_SUCC;
 }
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+static error_t cpymo_backlog_ui_selection_changed(cpymo_engine *e, void *selected)
+{
+	if (selected) {
+		size_t index = (size_t)DEC(selected);
+		if (e->backlog.records[index].text) {
+			cpymo_backend_text_visually_impaired_help(e->backlog.records[index].text);
+		}
+	}
+	return CPYMO_ERR_SUCC;
+}
+#endif
+
 error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 {
 	cpymo_backlog_ui *ui = NULL;
@@ -194,6 +238,13 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 	CPYMO_THROW(err);
 
 	cpymo_list_ui_set_custom_update(e, &cpymo_backlog_ui_update);
+
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	cpymo_list_ui_set_selection_changed_callback(
+		e, &cpymo_backlog_ui_selection_changed);
+	if (e->backlog.records[first].text)
+		cpymo_backend_text_visually_impaired_help(e->backlog.records[first].text);
+#endif
 
 	ui->press_key_down_to_close = true;
 
