@@ -1,4 +1,5 @@
 #include "cpymo_select_img.h"
+#include "cpymo_localization.h"
 #include "cpymo_engine.h"
 #include "cpymo_rmenu.h"
 #include <memory.h>
@@ -594,5 +595,17 @@ void cpymo_select_img_configuare_end_select_text(
 		}
 	}
 
-	CALL_VISUALLY_IMPAIRED(sel->selections[sel->current_selection].original_text);
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	const char *hint_header = cpymo_localization_get(e)->visual_help_selection;
+	size_t hint_header_len = strlen(hint_header);
+	const char *hint_content = sel->selections[sel->current_selection].original_text;
+	size_t hint_content_len = strlen(hint_content);
+	char *full_first_hint = (char *)malloc(1 + hint_header_len + hint_content_len);
+	if (full_first_hint) {
+		strcpy(full_first_hint, hint_header);
+		strcpy(full_first_hint + hint_header_len, hint_content);
+		cpymo_backend_text_visually_impaired_help(full_first_hint);
+		free(full_first_hint);
+	}
+#endif
 }
