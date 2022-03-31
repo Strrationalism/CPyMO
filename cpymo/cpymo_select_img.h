@@ -121,7 +121,7 @@ static inline void cpymo_select_img_free(cpymo_select_img *img)
 }
 
 error_t cpymo_select_img_configuare_select_text(
-	cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
+	struct cpymo_engine *e, cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
 	cpymo_parser_stream_span text, bool enabled, 
 	enum cpymo_select_img_selection_hint_state hint_mode,
 	uint64_t hash, float fontsize);

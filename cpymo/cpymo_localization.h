@@ -42,6 +42,7 @@ typedef struct {
 		*game_selector_empty_secondary;
 
 	const char *mo2pymo_required;
+	const char *visual_help_selection;
 } cpymo_localization;
 
 struct cpymo_engine;

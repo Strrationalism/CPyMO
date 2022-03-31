@@ -1033,6 +1033,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			}
 
 			err = cpymo_select_img_configuare_select_text(
+				engine,
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags, 
 				text, true, hint_mode, sel_hash, cpymo_gameconfig_font_size(&engine->gameconfig));
 
@@ -1076,6 +1077,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
 
 			err = cpymo_select_img_configuare_select_text(
+				engine,
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
 				text, true, cpymo_select_img_selection_nohint, hash, cpymo_gameconfig_font_size(&engine->gameconfig));
 
@@ -1125,6 +1127,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
 
 			err = cpymo_select_img_configuare_select_text(
+				engine,
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
 				text, cpymo_vars_eval(&engine->vars, expr) != 0, cpymo_select_img_selection_nohint, hash,
 				cpymo_gameconfig_font_size(&engine->gameconfig));
