@@ -94,8 +94,7 @@ const cpymo_localization chs = {
 
 	"未找到游戏",
 	"你需要将游戏放在SD卡中的\"pymogames\"文件夹下，\n并确保路径中只包含英文、数字和下划线。\n",
-	"需为此游戏安装mo2pymo补丁才可以正常进行游戏",
-	"选项："
+	"需为此游戏安装mo2pymo补丁才可以正常进行游戏"
 };
 
 
@@ -141,8 +140,7 @@ const cpymo_localization cht = {
 
 	"未找到遊戲",
 	"你需要將遊戲放在SD卡中的\"pymogames\"資料夾下，\n並確保路徑中只包含英文、數位和底線。 \n",
-	"需為此遊戲安裝mo2pymo補丁才可以正常進行遊戲",
-	"選項："
+	"需為此遊戲安裝mo2pymo補丁才可以正常進行遊戲"
 };
 
 STR_I(enu, save_already_save_to, 32, "Already save to slot %d.");
@@ -187,8 +185,7 @@ const cpymo_localization enu = {
 
 	"No games found",
 	"Please make sure folder \"pymogames\" is in SD card root,\nand that you have at least one game in it.",
-	"You need to install mo2pymo patch for this game to play",
-	"Selection: "
+	"You need to install mo2pymo patch for this game to play"
 };
 
 #ifndef DEFAULT_LANG

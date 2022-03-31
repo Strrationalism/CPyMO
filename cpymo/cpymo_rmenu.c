@@ -193,7 +193,6 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 
 	#define RMENU_ITEM(_, TEXT, ENABLED) \
 		err = cpymo_select_img_configuare_select_text( \
-			e, \
 			&rmenu->menu, \
 			&e->assetloader, \
 			&e->gameconfig, \

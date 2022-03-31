@@ -1,7 +1,6 @@
 #include "cpymo_select_img.h"
 #include "cpymo_engine.h"
 #include "cpymo_rmenu.h"
-#include "cpymo_localization.h"
 #include <memory.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -455,7 +454,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 }
 
 error_t cpymo_select_img_configuare_select_text(
-	cpymo_engine *e, cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
+	cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
 	cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode, 
 	uint64_t hash, float fontsize)
 {
@@ -497,14 +496,9 @@ error_t cpymo_select_img_configuare_select_text(
 	s->has_selected = cpymo_hash_flags_check(flags, hash);
 
 #ifndef NON_VISUALLY_IMPAIRED_HELP
-	
-	const char *selection = cpymo_localization_get(e)->visual_help_selection;
-	size_t selection_len = strlen(selection);
-	s->original_text = (char *)malloc(text.len + 1 + selection_len);
-	if (s->original_text) {
-		strcpy(s->original_text, selection);
-		cpymo_parser_stream_span_copy(s->original_text + selection_len, text.len + 1, text);
-	}
+	s->original_text = (char *)malloc(text.len + 1);
+	if (s->original_text)
+		cpymo_parser_stream_span_copy(s->original_text, text.len + 1, text);
 #endif
 
 	return CPYMO_ERR_SUCC;
