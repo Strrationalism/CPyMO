@@ -2,6 +2,9 @@
 # 将此代码复制粘贴到记事本，保存到目标PyMO游戏目录下命名为"mo2pymo.ps1"
 # 右键点击“使用PowerShell”执行即可
 
+# 为了运行此代码，你需要升级到PowerShell 5.1及以上版本。
+
+
 function Write-Help {
     Write-Host "此补丁用于将使用MO1和MO2脚本编写的PyMO游戏转换为PyMO脚本。"
     Write-Host "此补丁仅用于以下PyMO游戏："
