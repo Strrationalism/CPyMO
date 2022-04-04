@@ -64,7 +64,7 @@ void cpymo_textbox_draw(
         }
     }
 
-    if (tb->msg_cursor_visible) {
+    if (tb->msg_cursor_visible && e->say.msg_cursor) {
         float ratio = 
             tb->character_size
             / (float)(e->say.msg_cursor_w > e->say.msg_cursor_h ? e->say.msg_cursor_w : e->say.msg_cursor_h);

@@ -197,8 +197,8 @@ static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, co
 	}
 
 	if (s->or_text) {
-		float left = (float)s->w / 2.0f - (float)o->sel_highlight_w / 2.0f + s->x;
-		float w = (float)o->sel_highlight_w;
+		float w = o->sel_highlight ? o->sel_highlight_w : o->selections[sel].w;
+		float left = (float)s->w / 2.0f - w / 2.0f + s->x;
 		float right = left + w;
 		float top = s->y - (float)s->h;
 		float bottom = s->y;
@@ -469,7 +469,10 @@ error_t cpymo_select_img_configuare_select_text(
 			loader,
 			cpymo_gameconfig_is_symbian(gc));
 
-		if (err != CPYMO_ERR_SUCC) sel->sel_highlight = NULL;
+		if (err != CPYMO_ERR_SUCC) {
+			sel->sel_highlight = NULL;
+			printf("[Warning] Can not load sel_highlight image.\n");
+		}
 	}
 
 	assert(sel->selections);

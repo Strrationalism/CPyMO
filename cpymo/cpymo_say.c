@@ -99,11 +99,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 		namebox_x += offx;
 		namebox_y -= offy;
 
-		if (e->say.name && e->say.namebox)
-			cpymo_backend_image_draw(
-				namebox_x, namebox_y, namebox_w, namebox_h,
-				e->say.namebox, 0, 0, e->say.namebox_w, e->say.namebox_h, 1.0f,
-				cpymo_backend_image_draw_type_text_say_textbox);
+		const cpymo_color gray = { 127, 127, 127 };
 
 		if (e->say.msgbox) {
 			cpymo_backend_image_draw(
@@ -111,10 +107,31 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 				e->say.msgbox, 0, 0, e->say.msgbox_w, e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_text_say_textbox);
 		}
+		else {
+			float xywh[] = {
+				0,
+				e->gameconfig.imagesize_h * 0.75f,
+				(float)e->gameconfig.imagesize_w,
+				e->gameconfig.imagesize_h * 0.25f
+			};
+
+			cpymo_backend_image_fill_rects(xywh, 1, gray, 0.5f, cpymo_backend_image_draw_type_text_say_textbox);
+		}
 
 		if (e->say.name) {
 			float name_x =
 				namebox_w / 2 - (float)e->say.name_width / 2 + namebox_x;
+
+			if (e->say.namebox) {
+				cpymo_backend_image_draw(
+					namebox_x, namebox_y, namebox_w, namebox_h,
+					e->say.namebox, 0, 0, e->say.namebox_w, e->say.namebox_h, 1.0f,
+					cpymo_backend_image_draw_type_text_say_textbox);
+			}
+			else {
+				float xywh[] = { namebox_x, namebox_y, namebox_w, namebox_h };
+				cpymo_backend_image_fill_rects(xywh, 1, gray, 0.5f, cpymo_backend_image_draw_type_text_say_textbox);
+			}
 
 			cpymo_backend_text_draw(
 				e->say.name,
@@ -182,10 +199,30 @@ error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_parser_str
 {
 	cpymo_say_lazy_init(say, l);
 	error_t err = cpymo_say_load_namebox_image(say, namebox, l);
-	CPYMO_THROW(err);
+	if (err != CPYMO_ERR_SUCC) {
+		say->namebox = NULL;
+		say->namebox_w = l->game_config->imagesize_w * 0.25f;
+		say->namebox_h = cpymo_gameconfig_font_size(l->game_config) * 1.5f;
+
+		say->msgbox = NULL;
+		say->msgbox_w = l->game_config->imagesize_w;
+		say->msgbox_h = l->game_config->imagesize_h * 0.25f;
+
+		printf("[Warning] Can not load namebox image.\n");
+
+		return err;
+	}
 
 	err = cpymo_say_load_msgbox_image(say, msgbox, l);
-	CPYMO_THROW(err);
+	if (err != CPYMO_ERR_SUCC) {
+		say->msgbox = NULL;
+		say->msgbox_w = l->game_config->imagesize_w;
+		say->msgbox_h = l->game_config->imagesize_h * 0.25f;
+
+		printf("[Warning] Can not load msgbox image.\n");
+
+		return err;
+	}
 
 	return CPYMO_ERR_SUCC;
 }
