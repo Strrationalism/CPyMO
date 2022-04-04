@@ -113,6 +113,18 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 如果你没有Dump，那么你需要先安装DSP1（https://github.com/zoogie/DSP1/releases/tag/v1.0 ），并使用它Dump你的3DS的DSP固件。
 
 
+### 为3DS适配游戏
+
+如果你需要为3DS适配PyMO游戏，那么建议你使用以下参数：
+
+* 分辨率：400×240
+* 音频格式：ogg，16bit signed little-endian，32000Hz
+* 背景格式：jpg
+* 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
+* platform参数：pygame
+* 默认字体大小：28
+* 视频格式：H264 MP4，低于30FPS，Old 3DS请不要使用视频
+
 ### 关于字体
 
 3DS版本的CPyMO不会加载游戏中自带的字体或者其他TTF字体，而是使用[思源黑体](https://github.com/adobe-fonts/source-han-sans)。    
@@ -133,12 +145,20 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 ### 编译
 
 cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到任天堂Switch平台。    
-使用`make run -j -f Makefile.Swtich`即可使用yuzu模拟器运行。    
+使用`make run -j -f Makefile.Swtich`即可使用yuzu模拟器运行。  
 
 ### 启动
 
 将游戏放入SD卡的`/pymogames/startup`目录，使得`/pymogames/startup`可用，之后即可启动CPyMO运行此目录下的游戏。    
 
+### 为Switch适配游戏
 
+如果你需要为Switch适配游戏，那么建议你使用以下参数：
+
+* 分辨率：1920×1080
+* 音频格式：ogg，32bit signed float little-endian，48000Hz
+* 图片格式：带透明通道的png，不要使用mask灰阶图片
+* platform参数：pygame
+* 视频格式：H264 MP4
 
 
