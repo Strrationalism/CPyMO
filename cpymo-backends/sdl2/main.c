@@ -46,6 +46,10 @@
 #include <sys/types.h>
 #endif
 
+#if _WIN32 || __LINUX__ || __APPLE__
+#define ENABLE_ALT_ENTER_FULLSCREEN
+#endif
+
 #include "posix_win32.h"
 
 SDL_Window *window;
@@ -357,6 +361,18 @@ int main(int argc, char **argv)
 				extern void cpymo_input_refresh_joysticks();
 				cpymo_input_refresh_joysticks();
 			}
+#ifdef ENABLE_ALT_ENTER_FULLSCREEN
+			else if (event.type == SDL_KEYDOWN) {
+				if (event.key.keysym.sym == SDLK_RETURN && (event.key.keysym.mod & KMOD_ALT)) {
+					if (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) {
+						SDL_SetWindowFullscreen(window, 0);
+					}
+					else {
+						SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+					}
+				}
+			}
+#endif
 		}
 
 		bool need_to_redraw = false;

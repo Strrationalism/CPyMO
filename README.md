@@ -62,6 +62,10 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 仅Windows、macOS和Linux版本支持视障帮助功能。
 
+## 全屏
+
+按下Alt + Enter键可在全屏/窗口模式中切换。
+
 # 编译到任天堂3DS平台
 
 ## 额外依赖
@@ -174,6 +178,10 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 ## SDL2后端
 
 SDL2后端在目录`cpymo-backends/sdl2`中。
+
+### 全屏切换
+
+定义宏`ENABLE_ALT_ENTER_FULLSCREEN`可启用按下Alt+Enter键切换全屏的功能。
 
 ### 游戏选择器
 
