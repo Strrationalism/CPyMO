@@ -2,6 +2,7 @@
 #include "cpymo_rmenu.h"
 #include "cpymo_engine.h"
 #include "cpymo_save.h"
+#include <stdlib.h>
 #include <assert.h>
 
 #define DISABLE_TEXTBOX(SAY) \
@@ -201,12 +202,12 @@ error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_parser_str
 	error_t err = cpymo_say_load_namebox_image(say, namebox, l);
 	if (err != CPYMO_ERR_SUCC) {
 		say->namebox = NULL;
-		say->namebox_w = l->game_config->imagesize_w * 0.25f;
-		say->namebox_h = cpymo_gameconfig_font_size(l->game_config) * 1.5f;
+		say->namebox_w = (int)(l->game_config->imagesize_w * 0.25f);
+		say->namebox_h = (int)(cpymo_gameconfig_font_size(l->game_config) * 1.5f);
 
 		say->msgbox = NULL;
-		say->msgbox_w = l->game_config->imagesize_w;
-		say->msgbox_h = l->game_config->imagesize_h * 0.25f;
+		say->msgbox_w = (int)l->game_config->imagesize_w;
+		say->msgbox_h = (int)(l->game_config->imagesize_h * 0.25f);
 
 		printf("[Warning] Can not load namebox image.\n");
 
@@ -217,7 +218,7 @@ error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_parser_str
 	if (err != CPYMO_ERR_SUCC) {
 		say->msgbox = NULL;
 		say->msgbox_w = l->game_config->imagesize_w;
-		say->msgbox_h = l->game_config->imagesize_h * 0.25f;
+		say->msgbox_h = (int)(l->game_config->imagesize_h * 0.25f);
 
 		printf("[Warning] Can not load msgbox image.\n");
 

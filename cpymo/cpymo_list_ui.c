@@ -1,6 +1,8 @@
 #include "cpymo_list_ui.h"
 #include "cpymo_engine.h"
 #include <assert.h>
+#include <limits.h>
+#include <math.h>
 
 static inline float cpymo_list_ui_get_y(const cpymo_engine *e, int relative_to_current)
 {

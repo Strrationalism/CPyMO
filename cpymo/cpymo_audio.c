@@ -3,6 +3,18 @@
 #include <cpymo_backend_audio.h>
 #include "cpymo_engine.h"
 
+#ifndef DISABLE_FFMPEG_AUDIO
+static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
+{
+	c->enabled = false;
+	c->loop = false;
+	c->format_context = NULL;
+	c->codec_context = NULL;
+	c->swr_context = NULL;
+	c->converted_frame_current_offset = 0;
+	c->io_context = NULL;
+}
+
 static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 {
 	if (c->swr_context) swr_free(&c->swr_context);
@@ -17,7 +29,7 @@ static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 	cpymo_audio_channel_init(c);
 }
 
-void cpymo_audio_channel_reset(cpymo_audio_channel *c)
+static void cpymo_audio_channel_reset(cpymo_audio_channel *c)
 {
 	cpymo_backend_audio_lock();
 	c->enabled = false;
@@ -282,7 +294,7 @@ static int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offs
 	};
 }
 
-error_t cpymo_audio_channel_play_file(
+static error_t cpymo_audio_channel_play_file(
 	cpymo_audio_channel *c, 
 	const char * filename, const cpymo_package_stream_reader *package_reader, 
 	bool loop)
@@ -520,8 +532,18 @@ void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *
 	}
 }
 
+bool cpymo_audio_enabled(cpymo_engine * e)
+{
+	return e->audio.enabled;
+}
+
 bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 {
+	if (e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].loop) {
+		printf("[Error] Can not wait a looping SE.\n");
+		return true;
+	}
+
 	if (cpymo_input_foward_key_just_pressed(e)) {
 		return true;
 	}
@@ -653,3 +675,98 @@ error_t cpymo_audio_vo_play(cpymo_engine * e, cpymo_parser_stream_span voname)
 		CPYMO_AUDIO_CHANNEL_VO, false);
 }
 
+void cpymo_audio_vo_stop(cpymo_engine * e)
+{
+	cpymo_audio_channel_reset(e->audio.channels + CPYMO_AUDIO_CHANNEL_VO);
+}
+
+void cpymo_audio_play_video(cpymo_engine * e, const char * path)
+{
+	cpymo_audio_channel_play_file(
+		&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
+		path,
+		NULL,
+		false);
+}
+
+const char * cpymo_audio_get_bgm_name(cpymo_engine * e)
+{
+	return e->audio.bgm_name;
+}
+
+const char * cpymo_audio_get_se_name(cpymo_engine * e)
+{
+	return e->audio.se_name;
+}
+
+#endif
+
+#ifdef DISABLE_AUDIO
+#include <string.h>
+
+const char * cpymo_audio_get_bgm_name(cpymo_engine * e)
+{
+	return "";
+}
+
+const char * cpymo_audio_get_se_name(cpymo_engine * e)
+{
+	return "";
+}
+
+bool cpymo_audio_enabled(cpymo_engine * e)
+{ return false; }
+
+void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *s)
+{ memset(dst, 0, len); }
+
+bool cpymo_audio_channel_get_samples(
+	void **samples,
+	size_t *in_out_len,
+	size_t channelID,
+	cpymo_audio_system *s)
+{
+	*in_out_len = 0;
+	return false;
+}
+
+void cpymo_audio_init(cpymo_audio_system *s)
+{
+	for (size_t i = 0; i < CPYMO_AUDIO_MAX_CHANNELS; ++i)
+		s->volumes[i] = 0;
+}
+
+void cpymo_audio_free(cpymo_audio_system *s) {}
+
+float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s)
+{
+	return s->volumes[cid];
+}
+
+void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol)
+{
+	s->volumes[cid] = vol;
+}
+
+struct cpymo_engine;
+bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
+{ return true; }
+
+error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+{ return CPYMO_ERR_SUCC; }
+
+void cpymo_audio_bgm_stop(struct cpymo_engine *e) {}
+
+error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sename, bool loop)
+{ return CPYMO_ERR_SUCC; }
+
+void cpymo_audio_se_stop(struct cpymo_engine *e) {}
+
+error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname)
+{ return CPYMO_ERR_SUCC; }
+
+void cpymo_audio_vo_stop(struct cpymo_engine *e) {}
+
+void cpymo_audio_play_video(struct cpymo_engine *e, const char *path) {}
+
+#endif

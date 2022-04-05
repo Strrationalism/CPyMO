@@ -5,6 +5,8 @@
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_localization.h"
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define MAX_SAVES 31
 

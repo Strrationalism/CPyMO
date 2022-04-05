@@ -5,6 +5,11 @@
 #include <cpymo_engine.h>
 #include <assert.h>
 
+#ifdef DISABLE_AUDIO
+#define DISABLE_SDL2_AUDIO_BACKEND
+#endif
+
+#ifndef DISABLE_SDL2_AUDIO_BACKEND
 static bool audio_enabled;
 extern cpymo_engine engine;
 
@@ -152,3 +157,12 @@ void cpymo_backend_audio_unlock(void)
 {
 	SDL_UnlockAudio();
 }
+#else
+
+void cpymo_backend_audio_init() {}
+void cpymo_backend_audio_free() {}
+void cpymo_backend_audio_reset() {}
+const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void) 
+{ return NULL; }
+
+#endif

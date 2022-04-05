@@ -5,6 +5,8 @@
 #include <cpymo_backend_save.h>
 #include <endianness.h>
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 static inline void cpymo_save_get_filename(char *dst, unsigned short save_id)
 {
@@ -59,10 +61,12 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	WRITE_STR(e->say.msgbox_name);
 	
 	// BGM
-	WRITE_STR(e->audio.bgm_name);
+	const char *bgm_name = cpymo_audio_get_bgm_name(e);
+	WRITE_STR(bgm_name);
 
 	// SE
-	WRITE_STR(e->audio.se_name);
+	const char *se_name = cpymo_audio_get_se_name(e);
+	WRITE_STR(se_name);
 
 	// FADEOUT
 	{
@@ -299,7 +303,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	cpymo_say_free(&e->say); cpymo_say_init(&e->say);
 	cpymo_text_clear(&e->text);
 	
-	cpymo_audio_channel_reset(e->audio.channels + CPYMO_AUDIO_CHANNEL_VO);
+	cpymo_audio_vo_stop(e);
 	cpymo_audio_bgm_stop(e);
 	cpymo_audio_se_stop(e);
 

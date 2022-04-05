@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, uint64_t hash, bool save_enabled)
 {
@@ -197,7 +198,7 @@ static bool cpymo_select_img_mouse_in_selection(cpymo_select_img *o, int sel, co
 	}
 
 	if (s->or_text) {
-		float w = o->sel_highlight ? o->sel_highlight_w : o->selections[sel].w;
+		float w = o->sel_highlight ? (float)o->sel_highlight_w : o->selections[sel].w;
 		float left = (float)s->w / 2.0f - w / 2.0f + s->x;
 		float right = left + w;
 		float top = s->y - (float)s->h;

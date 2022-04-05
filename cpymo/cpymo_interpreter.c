@@ -481,7 +481,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		else {
 			cpymo_audio_bgm_stop(engine);
 			cpymo_audio_se_stop(engine);
-			cpymo_audio_channel_reset(&engine->audio.channels[CPYMO_AUDIO_CHANNEL_VO]);
+			cpymo_audio_vo_stop(engine);
 			printf("[Info] Playvideo is disabled in gameconfig.\n");
 			CONT_NEXTLINE;
 		}
@@ -1246,16 +1246,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("wait_se") {
-		if (engine->audio.enabled) {
-			cpymo_audio_channel *c = &engine->audio.channels[CPYMO_AUDIO_CHANNEL_SE];
-			if (c->loop) {
-				printf("[Error] Can not wait_se with a looping se.\n");
-				CONT_NEXTLINE;
-			}
-			else {
-				cpymo_wait_register(&engine->wait, &cpymo_audio_wait_se);
-				return CPYMO_ERR_SUCC;
-			}
+		if (cpymo_audio_enabled(engine)) {
+			cpymo_wait_register(&engine->wait, &cpymo_audio_wait_se);
+			return CPYMO_ERR_SUCC;
 		}
 		else {
 			CONT_NEXTLINE;

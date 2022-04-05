@@ -4,6 +4,7 @@
 #include "cpymo_parser.h"
 #include <cpymo_backend_text.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #define ENCODE_NODE(INDEX) CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX)
 #define DECODE_NODE(PTR) CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR)

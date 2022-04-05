@@ -12,6 +12,18 @@
 #define CPYMO_AUDIO_CHANNEL_SE 1
 #define CPYMO_AUDIO_CHANNEL_VO 2
 
+#ifdef DISABLE_AUDIO
+#define DISABLE_FFMPEG_AUDIO
+#endif
+
+#ifdef DISABLE_AUDIO
+typedef struct {
+	float volumes[CPYMO_AUDIO_MAX_CHANNELS];
+} cpymo_audio_system;
+#endif
+
+#ifndef DISABLE_FFMPEG_AUDIO
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
@@ -45,18 +57,7 @@ typedef struct {
 	char *bgm_name, *se_name;
 } cpymo_audio_system;
 
-static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
-{
-	c->enabled = false;
-	c->loop = false;
-	c->format_context = NULL;
-	c->codec_context = NULL;
-	c->swr_context = NULL;
-	c->converted_frame_current_offset = 0;
-	c->io_context = NULL;
-}
-
-void cpymo_audio_channel_reset(cpymo_audio_channel *);
+#endif
 
 void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *s);
 bool cpymo_audio_channel_get_samples(
@@ -64,12 +65,6 @@ bool cpymo_audio_channel_get_samples(
 	size_t *in_out_len,
 	size_t channelID,
 	cpymo_audio_system *);
-
-error_t cpymo_audio_channel_play_file(
-	cpymo_audio_channel *channel, 
-	const char *filename,
-	const cpymo_package_stream_reader *package_reader,
-	bool loop);
 
 void cpymo_audio_init(cpymo_audio_system *);
 void cpymo_audio_free(cpymo_audio_system *);
@@ -79,6 +74,8 @@ float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s);
 void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol);
 
 struct cpymo_engine;
+bool cpymo_audio_enabled(struct cpymo_engine *e);
+
 bool cpymo_audio_wait_se(struct cpymo_engine *, float);
 
 error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop);
@@ -88,5 +85,11 @@ error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sen
 void cpymo_audio_se_stop(struct cpymo_engine *e);
 
 error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname);
+void cpymo_audio_vo_stop(struct cpymo_engine *e);
+
+void cpymo_audio_play_video(struct cpymo_engine *e, const char *path);
+
+const char *cpymo_audio_get_bgm_name(struct cpymo_engine *e);
+const char *cpymo_audio_get_se_name(struct cpymo_engine *e);
 
 #endif

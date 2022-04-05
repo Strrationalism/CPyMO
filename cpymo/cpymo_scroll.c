@@ -1,6 +1,7 @@
 #include "cpymo_scroll.h"
 #include "cpymo_utils.h"
 #include "cpymo_engine.h"
+#include <stdlib.h>
 #include <assert.h>
 
 void cpymo_scroll_draw(const cpymo_scroll * s)

@@ -4,6 +4,7 @@
 #include "cpymo_save_global.h"
 #include "cpymo_localization.h"
 #include <assert.h>
+#include <math.h>
 
 typedef struct {
 	cpymo_backend_text show_name;

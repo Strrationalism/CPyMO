@@ -1,6 +1,8 @@
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_engine.h"
 #include "cpymo_localization.h"
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	cpymo_backend_text message;

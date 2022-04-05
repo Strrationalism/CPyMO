@@ -178,7 +178,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 {
 	cpymo_audio_bgm_stop(e);
 	cpymo_audio_se_stop(e);
-	cpymo_audio_channel_reset(&e->audio.channels[CPYMO_AUDIO_CHANNEL_VO]);
+	cpymo_audio_vo_stop(e);
 
 	switch (cpymo_backend_movie_how_to_play()) {
 	case cpymo_backend_movie_how_to_play_unsupported:
@@ -279,11 +279,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 
 	m->backend_inited = true;
 
-	cpymo_audio_channel_play_file(
-		&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
-		path,
-		NULL,
-		false);
+	cpymo_audio_play_video(e, path);
 	
 	free(path);
 

@@ -6,7 +6,10 @@
 #include <cpymo_interpreter.h>
 #include <string.h>
 #include <cpymo_backend_text.h>
+
+#if !(defined DISABLE_FFMPEG_AUDIO && defined DISABLE_FFMPEG_MOVIE)
 #include <libavutil/log.h>
+#endif
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -201,9 +204,13 @@ int main(int argc, char **argv)
 {
 	//_CrtSetBreakAlloc(1371);
 
+#if !(defined DISABLE_FFMPEG_AUDIO && defined DISABLE_FFMPEG_MOVIE)
 	av_log_set_level(AV_LOG_ERROR);
+#endif
 
+#ifndef DISABLE_FFMPEG_AUDIO
 	engine.audio.enabled = false;
+#endif
 
 	int ret = 0;
 
@@ -220,7 +227,9 @@ int main(int argc, char **argv)
 	// SDL2 has 2 memory leaks!
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
+#ifndef DISABLE_AUDIO
 		SDL_INIT_AUDIO |
+#endif
 		SDL_INIT_VIDEO |
 		SDL_INIT_JOYSTICK |
 		SDL_INIT_GAMECONTROLLER) != 0) {

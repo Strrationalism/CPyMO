@@ -6,6 +6,8 @@
 #include "cpymo_save.h"
 #include "cpymo_localization.h"
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 typedef struct {
 	cpymo_backend_image bg;
