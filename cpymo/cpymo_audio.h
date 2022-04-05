@@ -4,10 +4,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswresample/swresample.h>
-
 #include "cpymo_package.h"
 #include "cpymo_error.h"
 
@@ -15,6 +11,10 @@
 #define CPYMO_AUDIO_CHANNEL_BGM 0
 #define CPYMO_AUDIO_CHANNEL_SE 1
 #define CPYMO_AUDIO_CHANNEL_VO 2
+
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswresample/swresample.h>
 
 typedef struct {
 	bool enabled, loop;
@@ -58,6 +58,13 @@ static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 
 void cpymo_audio_channel_reset(cpymo_audio_channel *);
 
+void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *s);
+bool cpymo_audio_channel_get_samples(
+	void **samples,
+	size_t *in_out_len,
+	size_t channelID,
+	cpymo_audio_system *);
+
 error_t cpymo_audio_channel_play_file(
 	cpymo_audio_channel *channel, 
 	const char *filename,
@@ -67,18 +74,9 @@ error_t cpymo_audio_channel_play_file(
 void cpymo_audio_init(cpymo_audio_system *);
 void cpymo_audio_free(cpymo_audio_system *);
 
-void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *s);
-bool cpymo_audio_channel_get_samples(
-	void **samples, 
-	size_t *in_out_len, 
-	size_t channelID, 
-	cpymo_audio_system *);
+float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s);
 
-static inline float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s)
-{ return s->channels[cid].volume; }
-
-static inline void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol)
-{ s->channels[cid].volume = vol; }
+void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol);
 
 struct cpymo_engine;
 bool cpymo_audio_wait_se(struct cpymo_engine *, float);

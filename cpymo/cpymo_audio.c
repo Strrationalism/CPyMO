@@ -568,6 +568,16 @@ static error_t cpymo_audio_high_level_play(
 	return CPYMO_ERR_SUCC;
 }
 
+float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s)
+{
+	return s->channels[cid].volume;
+}
+
+void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol)
+{
+	s->channels[cid].volume = vol;
+}
+
 error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
 {
 	if (e->audio.bgm_name) {
