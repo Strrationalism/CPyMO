@@ -49,7 +49,7 @@
 #include <sys/types.h>
 #endif
 
-#if _WIN32 || __LINUX__ || __APPLE__
+#if (defined _WIN32) || (defined __LINUX__) || (defined __APPLE__)
 #define ENABLE_ALT_ENTER_FULLSCREEN
 #endif
 
@@ -67,7 +67,7 @@ extern void cpymo_backend_audio_free();
 
 static void set_window_icon(const char *gamedir) 
 {
-#ifdef _WIN32 || __LINUX__ || __APPLE__
+#if (defined _WIN32) || (defined __LINUX__) || (defined __APPLE__)
 	int w, h, channel;
 	char *icon_path = (char *)alloca(strlen(gamedir) + 10);
 	if (icon_path == NULL) return;
