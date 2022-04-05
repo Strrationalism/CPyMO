@@ -24,7 +24,6 @@ jobs:
         git clone https://github.com/rw-r-r-0644/ffmpeg-wiiu.git --depth 1
         cp ./ffmpeg-wiiu/configure-wiiu ./FFmpeg/configure-wiiu
         cd ./FFmpeg
-        chmod +x ./configure-wiiu
         ./configure-wiiu
         make install -j
         cd ..
