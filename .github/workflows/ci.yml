@@ -21,11 +21,6 @@ jobs:
       with:
         submodules: true
 
-    - name: Install Dependents
-      run: |
-        dkp-pacman -S --noconfirm switch-ffmpeg
-        dkp-pacman -S --noconfirm switch-sdl2
-
     - name: Build
       run: |
         cd ./cpymo-backends/sdl2
