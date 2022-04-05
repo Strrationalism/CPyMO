@@ -6,11 +6,15 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: MinSizeRel
+
 jobs:
-  build-wiiu:
-    name: 'Nintendo WiiU'
+  build-switch:
+    name: 'Nintendo Switch'
     runs-on: ubuntu-latest
-    container: devkitpro/devkitppc:latest
+    container: devkitpro/devkita64:latest
  
     steps:
     - uses: actions/checkout@v1
@@ -19,23 +23,123 @@ jobs:
 
     - name: Install Dependents
       run: |
-        dkp-pacman -S --noconfirm wut-sdl2
-        git clone https://github.com/FFmpeg/FFmpeg.git --depth 1
-        git clone https://github.com/rw-r-r-0644/ffmpeg-wiiu.git --depth 1
-        cp ./ffmpeg-wiiu/configure-wiiu ./FFmpeg/configure-wiiu
-        cd ./FFmpeg
-        ./configure-wiiu
-        make install -j
-        cd ..
+        dkp-pacman -S --noconfirm switch-ffmpeg
+        dkp-pacman -S --noconfirm switch-sdl2
 
     - name: Build
       run: |
         cd ./cpymo-backends/sdl2
-        make -j -f Makefile.WiiU
+        make -j -f Makefile.Switch
     
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for WiiU
-        path: ./cpymo-backends/sdl2
+        name: CPyMO for Nintendo Switch
+        path: ./cpymo-backends/sdl2/cpymo.nro
 
+  build-3ds:
+    name: 'Nintendo 3DS'
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitarm:latest
+ 
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+        
+    - name: Install Makerom
+      run: |
+        cd ./cpymo-backends/3ds
+        wget https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.17/makerom-v0.17-ubuntu_x86_64.zip
+        unzip makerom-v0.17-ubuntu_x86_64.zip -d .
+        chmod +x makerom
+
+    - name: Install FFmpeg
+      run: |
+        cd ./cpymo-backends/3ds
+        chmod +x ./install-3ds-ffmpeg.sh
+        ./install-3ds-ffmpeg.sh
+
+    - name: Build
+      run: |
+        cd ./cpymo-backends/3ds
+        make -j
+        make cpymo-strip.elf -j
+        ./makerom -f cia -o cpymo.cia -elf cpymo-strip.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
+    
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Nintendo 3DS
+        path: |
+          ./cpymo-backends/3ds/cpymo.3dsx
+          ./cpymo-backends/3ds/cpymo.cia
+            
+  build-desktop:
+    name: 'Desktop'
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ windows-latest, macos-10.15, ubuntu-latest ]
+        include:
+          - os: windows-latest
+            triplet: x64-windows-static
+          - os: ubuntu-latest
+            triplet: x64-linux
+          - os: macos-10.15
+            triplet: x64-osx
+            
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+        
+    - uses: ilammy/msvc-dev-cmd@v1
+      if: ${{ runner.os == 'Windows' }}
+        
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
+      if: ${{ runner.os != 'Windows' }}
+        
+    - name: Donwload vcpkg
+      run: git clone https://github.com/microsoft/vcpkg --depth 1
+
+    - name: Bootstrap vcpkg
+      run: ./vcpkg/bootstrap-vcpkg.sh
+      if: ${{ runner.os != 'Windows' }}
+
+    - name: Bootstrap vcpkg (Windows)
+      run: ./vcpkg/bootstrap-vcpkg.bat
+      if: ${{ runner.os == 'Windows' }}
+
+    - name: Install SDL2
+      run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
+      
+    - name: Install X11 for Linux
+      run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
+      if: ${{ runner.os == 'Linux' }}
+
+    - name: Install FFMPEG
+      run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake "-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for ${{ runner.os }}
+        path: |
+            ./build/build/cpymo
+            ./build/build/cpymo-tool
+            ./build/build/MinSizeRel/cpymo.exe
+            ./build/build/MinSizeRel/cpymo-tool.exe
+
+      
