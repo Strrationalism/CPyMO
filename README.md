@@ -161,4 +161,35 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 * platform参数：pygame
 * 视频格式：H264 MP4
 
+## 移植提示
+
+### 通用选项
+
+#### 视障帮助
+
+使用宏`NON_VISUALLY_IMPAIRED_HELP`可以关闭视障帮助功能。
+
+### SDL2后端
+
+SDL2后端在目录`cpymo-backends/sdl2`中。
+
+#### 游戏选择器
+
+使用宏`USE_GAME_SELECTOR`可启用游戏选择器。    
+一旦使用游戏选择器：
+* 你需要修改`main.c`中的`static char *get_last_selected_game_dir()`以获取上一次启动的游戏。
+* 你需要修改`main.c`中的`cpymo_game_selector_item *get_game_list()`以获取游戏列表。
+* 你需要定义宏`SCREEN_WIDTH`和`SCREEN_HEIGHT`来定义屏幕宽度和高度。
+* 你需要定义以下宏以布局游戏选择器UI：
+    - `GAME_SELECTOR_FONTSIZE`
+    - `GAME_SELECTOR_EMPTY_MSG_FONTSIZE`
+    - `GAME_SELECTOR_COUNT_PER_SCREEN`
+* 定义宏`GAME_SELECTOR_DIR`以游戏选择目录。
+
+#### 加载系统字体
+
+定位到`cpymo_backend_font.c`中的函数`error_t cpymo_backend_font_init(const char *gamedir)`，向此函数添加用于加载系统字体的代码。
+
+
+
 
