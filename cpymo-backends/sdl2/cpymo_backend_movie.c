@@ -12,7 +12,7 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 {
 	SDL_assert(tex == NULL);
 
-	SDL_PixelFormatEnum sdlfmt;
+	int sdlfmt;
 	switch (format) {
 	case cpymo_backend_movie_format_yuv420p: 
 	case cpymo_backend_movie_format_yuv422p: 

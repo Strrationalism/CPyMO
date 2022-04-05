@@ -85,11 +85,20 @@ void cpymo_backend_image_draw(
 	src_rect.w = srcw;
 	src_rect.h = srch;
 
+#if SDL_VERSION_ATLEAST(2, 0, 10)
 	SDL_FRect dst_rect;
 	dst_rect.x = dstx;
 	dst_rect.y = dsty;
 	dst_rect.w = dstw;
 	dst_rect.h = dsth;
+#else
+	SDL_Rect dst_rect;
+	dst_rect.x = (int)dstx;
+	dst_rect.y = (int)dsty;
+	dst_rect.w = (int)dstw;
+	dst_rect.h = (int)dsth;
+#define SDL_RenderCopyF SDL_RenderCopy
+#endif
 
 	const Uint8 a = (Uint8)(alpha * 255);
 	SDL_SetTextureAlphaMod((SDL_Texture *)src, a);
@@ -107,8 +116,19 @@ void cpymo_backend_image_draw(
 void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_color color, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, (Uint8)(alpha * 255));
+#if SDL_VERSION_ATLEAST(2, 0, 10)
 	if (SDL_RenderFillRectsF(renderer, (SDL_FRect *)xywh, (int)count) != 0)
 		SDL_Log("Warning: SDL_RenderFillRectsF failed, %s", SDL_GetError());
+#else 
+	for (size_t i = 0; i < count; ++i) {
+		SDL_Rect rect;
+		rect.x = (int)xywh[i * 4];
+		rect.y = (int)xywh[i * 4 + 1];
+		rect.w = (int)xywh[i * 4 + 2];
+		rect.h = (int)xywh[i * 4 + 3];
+		SDL_RenderFillRect(renderer, &rect);
+	}
+#endif
 }
 
 bool cpymo_backend_image_album_ui_writable() { return true; }
