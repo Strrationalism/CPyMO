@@ -120,13 +120,13 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 
 	switch (item_index) {
 	case ITEM_BGM_VOL:
-		e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = (float)val / 10.0f;
+		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, (float)val / 10.0f);
 		break;
 	case ITEM_SE_VOL:
-		e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume = (float)val / 10.0f;
+		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio, (float)val / 10.0f);
 		break;
 	case ITEM_VO_VOL:
-		e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = (float)val / 10.0f;
+		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, (float)val / 10.0f);
 		break;
 	case ITEM_FONT_SIZE:
 		e->gameconfig.fontsize = (uint16_t)val;
@@ -273,10 +273,12 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		}
 
 	const cpymo_localization *l = cpymo_localization_get(e);
+
+	
 		
-	INIT_ITEM(ITEM_BGM_VOL, l->config_bgmvol, 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * 10));
-	INIT_ITEM(ITEM_SE_VOL, l->config_sevol, 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * 10));
-	INIT_ITEM(ITEM_VO_VOL, l->config_vovol, 0, 10, (int)roundf(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * 10));
+	INIT_ITEM(ITEM_BGM_VOL, l->config_bgmvol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio) * 10));
+	INIT_ITEM(ITEM_SE_VOL, l->config_sevol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio) * 10));
+	INIT_ITEM(ITEM_VO_VOL, l->config_vovol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio) * 10));
 	INIT_ITEM(ITEM_TEXT_SPEED, l->config_sayspeed, 0, 5, (int)e->gameconfig.textspeed);
 	INIT_ITEM(ITEM_FONT_SIZE, l->config_fontsize, 12, 32, (int)e->gameconfig.fontsize);
 

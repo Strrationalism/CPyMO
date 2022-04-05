@@ -165,7 +165,7 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 	cpymo_audio_bgm_stop(e);
 
-	e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = m->bgm_volume;
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, m->bgm_volume);
 
 	if (m->video_frame) av_frame_free(&m->video_frame);
 	if (m->packet) av_packet_free(&m->packet);
@@ -207,8 +207,8 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 	m->current_time = 0;
 	m->backend_inited = false;
 	m->skip_pressed = e->input.skip;
-	m->bgm_volume = e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume;
-	e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = 1.0f;
+	m->bgm_volume = cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio);
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, 1.0f);
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \

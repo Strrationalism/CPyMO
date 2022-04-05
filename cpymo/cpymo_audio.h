@@ -74,8 +74,11 @@ bool cpymo_audio_channel_get_samples(
 	size_t channelID, 
 	cpymo_audio_system *);
 
-static inline float cpymo_audio_get_channel_volume(size_t cid, cpymo_audio_system *s)
+static inline float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s)
 { return s->channels[cid].volume; }
+
+static inline void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol)
+{ s->channels[cid].volume = vol; }
 
 struct cpymo_engine;
 bool cpymo_audio_wait_se(struct cpymo_engine *, float);

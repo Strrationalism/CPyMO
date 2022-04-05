@@ -159,9 +159,9 @@ error_t cpymo_save_global_save(const cpymo_engine *e)
 error_t cpymo_save_config_save(const cpymo_engine *e)
 {
 	uint16_t config[] = {
-		(uint16_t)(e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume * UINT16_MAX),
-		(uint16_t)(e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume * UINT16_MAX),
-		(uint16_t)(e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume * UINT16_MAX),
+		(uint16_t)(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio) * UINT16_MAX),
+		(uint16_t)(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio) * UINT16_MAX),
+		(uint16_t)(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio) * UINT16_MAX),
 		(uint16_t)e->gameconfig.fontsize,
 		(uint16_t)e->gameconfig.textspeed
 	};
@@ -192,9 +192,9 @@ error_t cpymo_save_config_load(cpymo_engine *e)
 	for (size_t i = 0; i < sizeof(config) / sizeof(config[0]); ++i)
 		config[i] = end_le16toh(config[i]);
 
-	e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = config[0] / (float)UINT16_MAX;
-	e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume = config[1] / (float)UINT16_MAX;
-	e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = config[2] / (float)UINT16_MAX;
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, config[0] / (float)UINT16_MAX);
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio, config[1] / (float)UINT16_MAX);
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, config[2] / (float)UINT16_MAX);
 	e->gameconfig.fontsize = config[3];
 	e->gameconfig.textspeed = config[4];
 

@@ -50,10 +50,10 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// set default volume for audio system
 	{
 		float v = cpymo_utils_clamp(out->gameconfig.bgmvolume, 0, 5) * 0.2f;
-		out->audio.channels[CPYMO_AUDIO_CHANNEL_BGM].volume = v;
-		out->audio.channels[CPYMO_AUDIO_CHANNEL_SE].volume = v;
+		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &out->audio, v);
+		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &out->audio, v);
 		v = cpymo_utils_clamp(out->gameconfig.vovolume, 0, 5) * 0.2f;
-		out->audio.channels[CPYMO_AUDIO_CHANNEL_VO].volume = v;
+		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &out->audio, v);
 	}
 
 	// create asset loader
@@ -165,6 +165,8 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
+	if (engine->ui) cpymo_ui_exit(engine);
+
 	if (engine->assetloader.gamedir) {
 		error_t err = cpymo_save_global_save(engine);
 		if (err != CPYMO_ERR_SUCC)
@@ -175,7 +177,6 @@ void cpymo_engine_free(cpymo_engine *engine)
 			fprintf(stderr, "[Error] Can not save config. %s\n", cpymo_error_message(err));
 	}
 	
-	if (engine->ui) cpymo_ui_exit(engine);
 	cpymo_hash_flags_free(&engine->flags);
 	cpymo_text_free(&engine->text);
 	cpymo_say_free(&engine->say);
