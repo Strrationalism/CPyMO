@@ -1,5 +1,11 @@
 #include "cpymo_movie.h"
 #include "cpymo_engine.h"
+
+#ifdef DISABLE_MOVIE
+#define DISABLE_FFMPEG_MOVIE
+#endif
+
+#ifndef DISABLE_FFMPEG_MOVIE
 #include <assert.h>
 #include <cpymo_backend_movie.h>
 #include <libavformat/avformat.h>
@@ -283,3 +289,11 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 
 	return CPYMO_ERR_SUCC;
 }
+#endif
+
+#ifdef DISABLE_MOVIE
+error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
+{
+	return CPYMO_ERR_SUCC;
+}
+#endif

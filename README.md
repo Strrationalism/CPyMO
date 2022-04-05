@@ -169,6 +169,12 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 使用宏`NON_VISUALLY_IMPAIRED_HELP`可以关闭视障帮助功能。
 
+#### 播放视频
+
+使用宏`DISABLE_FFMPEG_MOVIE`可关闭视频播放器对FFmpeg的依赖，你可以替换为自己的`error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)`函数进行视频播放。
+
+使用宏`DISABLE_MOVIE`可完全播放所有的视频播放功能。
+
 ### SDL2后端
 
 SDL2后端在目录`cpymo-backends/sdl2`中。
