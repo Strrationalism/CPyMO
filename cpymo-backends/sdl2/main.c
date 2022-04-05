@@ -7,7 +7,7 @@
 #include <string.h>
 #include <cpymo_backend_text.h>
 
-#if !(defined DISABLE_FFMPEG_AUDIO && defined DISABLE_FFMPEG_MOVIE)
+#if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
 #include <libavutil/log.h>
 #endif
 
@@ -67,7 +67,7 @@ extern void cpymo_backend_audio_free();
 
 static void set_window_icon(const char *gamedir) 
 {
-#ifndef __SWITCH__
+#ifdef _WIN32 || __LINUX__ || __APPLE__
 	int w, h, channel;
 	char *icon_path = (char *)alloca(strlen(gamedir) + 10);
 	if (icon_path == NULL) return;
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 {
 	//_CrtSetBreakAlloc(1371);
 
-#if !(defined DISABLE_FFMPEG_AUDIO && defined DISABLE_FFMPEG_MOVIE)
+#if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
 	av_log_set_level(AV_LOG_ERROR);
 #endif
 
