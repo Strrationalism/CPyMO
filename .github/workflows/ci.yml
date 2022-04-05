@@ -19,7 +19,7 @@ jobs:
 
     - name: Install Dependents
       run: |
-        dkp-pacman -S --noconfirm wiiu-sdl2
+        dkp-pacman -S --noconfirm wut-sdl2
         git clone https://github.com/FFmpeg/FFmpeg.git --depth 1
         git clone https://github.com/rw-r-r-0644/ffmpeg-wiiu.git --depth 1
         cp ./ffmpeg-wiiu/configure-wiiu ./FFmpeg/configure-wiiu
