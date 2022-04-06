@@ -243,6 +243,8 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 			free(title.say_name);
 			free(title.title);
 			free(title.say_text);
+
+			cpymo_utils_replace_str_newline_n(text_buf);
 		}
 		else {
 			error_t err;
