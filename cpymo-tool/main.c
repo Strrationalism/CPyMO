@@ -29,11 +29,11 @@ void help() {
 	printf("    cpymo-tool unpack <pak-file> <extension-with \".\"> <output-dir>\n");
 	printf("Pack a pymo package:\n");
 	printf("    cpymo-tool pack <out-pak-file> <files-to-pack...>\n");
-	printf("Resize image or image package:\n");
+	printf("Resize image:\n");
 	printf(
 		"    cpymo-tool resize \n"
 		"        <src-image-file> <dst-image-file> <resize-ratio-w> <resize-ratio-h>\n"
-		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>] [--pak]");
+		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]");
 	printf("\n");
 }
 
@@ -74,7 +74,6 @@ int main(int argc, const char **argv) {
 			const char *resize_ratio_h = NULL;
 			bool load_mask = false, create_mask = false;
 			const char *out_format = NULL;
-			bool pak = false;
 
 			for (int i = 2; i < argc; ++i) {
 				cpymo_parser_stream_span a = cpymo_parser_stream_span_pure(argv[i]);
@@ -97,8 +96,6 @@ int main(int argc, const char **argv) {
 						
 						out_format = argv[i];
 					}
-					else if (cpymo_parser_stream_span_equals_str(a, "--pak"))
-						pak = true;
 					else {
 						printf("[Error] Unknown option: %s\n", argv[i]);
 						help();
@@ -135,25 +132,24 @@ int main(int argc, const char **argv) {
 			double ratio_w = atof(resize_ratio_w);
 			double ratio_h = atof(resize_ratio_h);
 
-			if (!pak) {
-				if (out_format == NULL) {
-					out_format = strrchr(dst_file, '.');
-					if (out_format) out_format++;
-				}
-
-				if (out_format == NULL) {
-					printf("[Error] Can not get image format, please specify it with --out-format.\n");
-					return -1;
-				}
-				
-				error_t err = 
-					cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
-
-				if (err != CPYMO_ERR_SUCC) {
-					printf("[Error] %s...\n", cpymo_error_message(err));
-					return -1;
-				}
+			if (out_format == NULL) {
+				out_format = strrchr(dst_file, '.');
+				if (out_format) out_format++;
 			}
+
+			if (out_format == NULL) {
+				printf("[Error] Can not get image format, please specify it with --out-format.\n");
+				return -1;
+			}
+				
+			error_t err = 
+				cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
+
+			if (err != CPYMO_ERR_SUCC) {
+				printf("[Error] %s...\n", cpymo_error_message(err));
+				return -1;
+			}
+			
 		}
 		else help();
 	}
