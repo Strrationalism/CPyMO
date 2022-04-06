@@ -27,21 +27,20 @@ static error_t cpymo_album_generate_album_ui_image(
 	stbi_uc *pixels = NULL;
 
 	{
-		char *image_buf = NULL;
-		size_t image_buf_size = 0;
-		error_t err = cpymo_assetloader_load_system(&image_buf, &image_buf_size, "albumbg", "png", loader);
-		if (err == CPYMO_ERR_SUCC) {
-			int w2, h2, channels;
-			pixels = stbi_load_from_memory((stbi_uc *)image_buf, (int)image_buf_size, &w2, &h2, &channels, 3);
-			free(image_buf);
+		char *path = (char *)malloc(strlen(loader->gamedir) + 22);
+		if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
+		strcpy(path, loader->gamedir);
+		strcat(path, "/system/albumbg.png");
 
-			if (pixels != NULL) {
-				*ref_w = (size_t)w2;
-				*ref_h = (size_t)h2;
-			}
+		int w2, h2;
+		pixels = stbi_load(path, &w2, &h2, NULL, 3);
+		free(path);
+
+		if (pixels != NULL) {
+			*ref_w = (size_t)w2;
+			*ref_h = (size_t)h2;
 		}
-
-		if (pixels == NULL) {
+		else {
 			pixels = (stbi_uc *)malloc(*ref_w * *ref_h * 3);
 			if (pixels == NULL) return CPYMO_ERR_OUT_OF_MEM;
 			memset(pixels, 0, *ref_w * *ref_h * 3);
@@ -85,32 +84,22 @@ static error_t cpymo_album_generate_album_ui_image(
 		if (thumb_right_bottom_x >= *ref_w || thumb_right_bottom_y >= *ref_h) continue;
 
 		int cg_w, cg_h;
-		stbi_uc *thumb_pixels = NULL;
+		void *thumb_pixels = NULL;
 		for (int i = 0; i < thumb_count; ++i) {
 			// Try load ONE thumb.
-			char bgname[64];
 			cpymo_parser_stream_span bgname_span = 
 				cpymo_parser_curline_pop_commacell(&album_list_parser);
 			cpymo_parser_stream_span_trim(&bgname_span);
-			if (bgname_span.len <= 0) continue;
-			cpymo_parser_stream_span_copy(bgname, sizeof(bgname), bgname_span);
+		
+			error_t err = cpymo_assetloader_load_bg_pixels(&thumb_pixels, &cg_w, &cg_h, bgname_span, loader);
 
-			char *buf = NULL;
-			size_t buf_size = 0;
-			error_t err = cpymo_assetloader_load_bg(&buf, &buf_size, bgname, loader);
-			if (err != CPYMO_ERR_SUCC) continue;
-
-			int cg_channels;
-			thumb_pixels = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &cg_w, &cg_h, &cg_channels, 3);
-			free(buf);
-
-			if (thumb_pixels != NULL) break;
+			if (err != CPYMO_ERR_SUCC) break;
 		}
 
 		if (thumb_pixels == NULL) continue;
 
 		stbir_resize_uint8(
-			thumb_pixels, cg_w, cg_h, cg_w * 3, 
+			(stbi_uc *)thumb_pixels, cg_w, cg_h, cg_w * 3, 
 			pixels + 3 * thumb_left_top_y * *ref_w + 3 * thumb_left_top_x, 
 			(int)thumb_width, (int)thumb_height, (int)*ref_w * 3, 3);
 		free(thumb_pixels);
@@ -158,27 +147,19 @@ static error_t cpymo_album_load_ui_image(
 	strcat(assetname, "_");
 	strcat(assetname, page_str);
 
-	char *buf = NULL;
-	size_t buf_size = 0;
-	error_t err = cpymo_assetloader_load_system(&buf, &buf_size, assetname, "png", loader);
+	int w, h;
+	error_t err = cpymo_assetloader_load_system_image(
+		out_image, &w, &h, cpymo_parser_stream_span_pure(assetname), loader);
 	free(assetname);
 
 	if (err != CPYMO_ERR_SUCC) {
-		GENERATE:
 		return cpymo_album_generate_album_ui_image(
 			out_image, album_list_text, ui_file_name, page, loader, ref_w, ref_h);
 	}
 	else {
-		int w, h, c;
-		stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &c, 3);
-		free(buf);
-
-		if (px == NULL) goto GENERATE;
-		else {
-			*ref_w = (size_t)w;
-			*ref_h = (size_t)h;
-			return cpymo_backend_image_load(out_image, px, w, h, cpymo_backend_image_format_rgb);
-		}
+		*ref_w = (size_t)w;
+		*ref_h = (size_t)h;
+		return CPYMO_ERR_SUCC;
 	}
 }
 
@@ -646,32 +627,19 @@ error_t cpymo_album_enter(
 	cpymo_key_pluse_init(&album->key_up, e->input.up);
 	cpymo_key_pluse_init(&album->key_down, e->input.down);
 
-	char *buf = NULL;
-	size_t buf_size;
-	err = cpymo_assetloader_load_system(
-		&buf, &buf_size, "cvThumb", "png", &e->assetloader);
+	int w, h;
+	err = cpymo_assetloader_load_system_image(
+		&album->cv_thumb_cover,
+		&w,
+		&h,
+		cpymo_parser_stream_span_pure("cvThumb"),
+		&e->assetloader);
 
 	if (err == CPYMO_ERR_SUCC) {
-		int w, h, c;
-		stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &c, 3);
-		free(buf);
-
-		if (px != NULL) {
-			err = cpymo_backend_image_load(
-				&album->cv_thumb_cover, px, w, h, 
-				cpymo_backend_image_format_rgb);
-
-			album->cv_thumb_cover_w = (size_t)w;
-			album->cv_thumb_cover_h = (size_t)h;
-
-			if (err != CPYMO_ERR_SUCC) {
-				free(px);
-				album->cv_thumb_cover = NULL;
-			}
-		}
+		album->cv_thumb_cover_w = (size_t)w;
+		album->cv_thumb_cover_h = (size_t)h;
 	}
 	
-
 	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
 		album->cg_infos[i].title = NULL;
 	}

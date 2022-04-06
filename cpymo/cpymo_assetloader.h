@@ -18,11 +18,10 @@ typedef struct {
 error_t cpymo_assetloader_init(cpymo_assetloader *out, const cpymo_gameconfig *config, const char *gamedir);
 void cpymo_assetloader_free(cpymo_assetloader *loader);
 
-error_t cpymo_assetloader_load_bg(char **out_buffer, size_t *buf_size, const char *bg_name, const cpymo_assetloader *loader);
+error_t cpymo_assetloader_load_bg_pixels(void **px, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *l);
 error_t cpymo_assetloader_load_bg_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_script(char **out_buffer, size_t *buf_size, const char *script_name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_system(char **out_buffer, size_t *buf_size, const char *asset_name, const char *ext, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 
 error_t cpymo_assetloader_get_bgm_path(char **out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader);
