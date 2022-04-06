@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <cpymo_utils.h>
 #include <stdint.h>
+#include <cpymo_parser.h>
 
 static error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename)
 {
@@ -124,13 +125,14 @@ error_t cpymo_tool_resize_image(
     err = cpymo_tool_resize_image_internal(&image, ratio_w, ratio_h, create_mask);
     if (err != CPYMO_ERR_SUCC) goto CLEAN;
 	
-    if (cpymo_utils_string_equals_ignore_case(out_format, "jpg")) {
+    cpymo_parser_stream_span out_format_span = cpymo_parser_stream_span_pure(out_format);
+    if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "jpg")) {
         stbi_write_jpg(output_file, image.main_width, image.main_height, image.main_out_channels, image.main_image, 100);			
     }
-    else if (cpymo_utils_string_equals_ignore_case(out_format, "bmp")) {
+    else if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "bmp")) {
         stbi_write_bmp(output_file, image.main_width, image.main_height, image.main_out_channels, image.main_image);
     }
-    else if(cpymo_utils_string_equals_ignore_case(out_format, "png")) {
+    else if(cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "png")) {
 		stbi_write_png(output_file, image.main_width, image.main_height, image.main_out_channels, image.main_image, 0);
 	}
 	else {
@@ -147,13 +149,13 @@ error_t cpymo_tool_resize_image(
 			goto CLEAN;
         }
 
-		if (cpymo_utils_string_equals_ignore_case(out_format, "jpg")) {
+		if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "jpg")) {
 			stbi_write_jpg(out_mask, image.mask_width, image.mask_height, 1, image.mask_image, 100);			
 		}
-		else if (cpymo_utils_string_equals_ignore_case(out_format, "bmp")) {
+		else if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "bmp")) {
 			stbi_write_bmp(out_mask, image.mask_width, image.mask_height, 1, image.mask_image);
 		}
-        else if (cpymo_utils_string_equals_ignore_case(out_format, "png")) {
+        else if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "png")) {
             stbi_write_png(out_mask, image.mask_width, image.mask_height, 1, image.mask_image, 0);
         }
         else {

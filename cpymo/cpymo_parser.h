@@ -42,6 +42,8 @@ cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span);
 
 bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const char *str);
 bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_stream_span b);
+bool cpymo_parser_stream_span_equals_ignore_case(cpymo_parser_stream_span a, cpymo_parser_stream_span b);
+bool cpymo_parser_stream_span_equals_str_ignore_case(cpymo_parser_stream_span a, const char *b);
 bool cpymo_parser_stream_span_starts_with_str_ignore_case(cpymo_parser_stream_span span, const char *prefix);
 
 cpymo_parser_stream_span cpymo_parser_stream_span_utf8_try_head(cpymo_parser_stream_span *tail);

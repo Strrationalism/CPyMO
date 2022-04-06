@@ -242,26 +242,30 @@ cpymo_color cpymo_parser_stream_span_as_color(cpymo_parser_stream_span span)
 
 bool cpymo_parser_stream_span_equals_str(cpymo_parser_stream_span span, const char * str)
 {
-	if (*str == '\0' && span.len == 0) return true;
-	else if (*str == '\0' || span.len == 0) return false;
-	else if (*str == span.begin[0]) {
-		span.begin++;
-		span.len--;
-		return cpymo_parser_stream_span_equals_str(span, str + 1);
-	}
-	else return false;
+	return cpymo_parser_stream_span_equals(span, cpymo_parser_stream_span_pure(str));
 }
 
 bool cpymo_parser_stream_span_equals(cpymo_parser_stream_span a, cpymo_parser_stream_span b)
 {
-	if (a.len == 0 && b.len == 0) return true;
-	else if (a.len == 0 || b.len == 0) return false;
-	else if (a.begin[0] == b.begin[0]) {
-		a.begin++; a.len--;
-		b.begin++; b.len--;
-		return cpymo_parser_stream_span_equals(a, b);
-	}
-	else return false;
+	if (a.len != b.len) return false;
+	for (size_t i = 0; i < a.len; ++i)
+		if (a.begin[i] != b.begin[i])
+			return false;
+	return true;
+}
+
+bool cpymo_parser_stream_span_equals_ignore_case(cpymo_parser_stream_span a, cpymo_parser_stream_span b)
+{
+	if (a.len != b.len) return false;
+	for (size_t i = 0; i < a.len; ++i)
+		if (tolower(a.begin[i]) != tolower(b.begin[i]))
+			return false;
+	return true;
+}
+
+bool cpymo_parser_stream_span_equals_str_ignore_case(cpymo_parser_stream_span a, const char * b)
+{
+	return cpymo_parser_stream_span_equals_ignore_case(a, cpymo_parser_stream_span_pure(b));
 }
 
 bool cpymo_parser_stream_span_starts_with_str_ignore_case(cpymo_parser_stream_span span, const char * prefix)

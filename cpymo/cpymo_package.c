@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <endianness.h>
+#include <stb_image.h>
 
 error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 {
@@ -57,10 +58,10 @@ void cpymo_package_close(cpymo_package * package)
 	fclose(package->stream);
 }
 
-error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, const char * filename)
+error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package * package, cpymo_parser_stream_span filename)
 {
 	for (uint32_t i = 0; i < package->file_count; ++i) {
-		if (cpymo_utils_string_equals_ignore_case(package->files[i].file_name, filename)) {
+		if (cpymo_parser_stream_span_equals_str_ignore_case(filename, package->files[i].file_name)) {
 			*out_index = package->files[i];
 			return CPYMO_ERR_SUCC;
 		}
@@ -69,7 +70,7 @@ error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *
 	return CPYMO_ERR_NOT_FOUND;
 }
 
-error_t cpymo_package_read_file(char *out_buffer, const cpymo_package * package, const cpymo_package_index * index)
+error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package * package, const cpymo_package_index * index)
 {
 	fseek(package->stream, index->file_offset, SEEK_SET);
 	const size_t count = fread(out_buffer, index->file_length, 1, package->stream);
@@ -79,14 +80,53 @@ error_t cpymo_package_read_file(char *out_buffer, const cpymo_package * package,
 	return CPYMO_ERR_SUCC;
 }
 
+static int cpymo_package_read_image_callbacks_read(void *u, char *d, int s)
+{
+	return cpymo_package_stream_reader_read(d, (size_t)s, (cpymo_package_stream_reader *)u);
+}
+
+static void cpymo_package_read_image_callbacks_skip(void *u, int n)
+{
+	cpymo_package_stream_reader_seek_cur(n, (cpymo_package_stream_reader *)u);
+}
+
+static int cpymo_package_reader_image_callback_eof(void *u)
+{
+	return cpymo_package_stream_reader_eof((cpymo_package_stream_reader *)u);
+}
+
+error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, const cpymo_package_index * index)
+{
+	const stbi_io_callbacks cb = {
+		&cpymo_package_read_image_callbacks_read,
+		&cpymo_package_read_image_callbacks_skip,
+		&cpymo_package_reader_image_callback_eof
+	};
+	
+	cpymo_package_stream_reader reader = cpymo_package_stream_reader_create(pkg, index);
+	stbi_uc *px = stbi_load_from_callbacks(&cb, &reader, w, h, NULL, channels);
+
+	if (px == NULL) {
+		return CPYMO_ERR_BAD_FILE_FORMAT;
+	}
+	
+	*pixels = px;
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, cpymo_parser_stream_span filename)
+{
+	cpymo_package_index i;
+	error_t err = cpymo_package_find(&i, pkg, filename);
+	CPYMO_THROW(err);
+	
+	return cpymo_package_read_image_from_index(pixels, w, h, channels, pkg, &i);
+}
 
 error_t cpymo_package_stream_reader_find_create(cpymo_package_stream_reader * r, const cpymo_package * package, cpymo_parser_stream_span filename)
 {
 	cpymo_package_index index;
-	char name[32];
-	cpymo_parser_stream_span_copy(name, sizeof(name), filename);
-	
-	error_t err = cpymo_package_find(&index, package, name);
+	error_t err = cpymo_package_find(&index, package, filename);
 	CPYMO_THROW(err);
 
 	*r = cpymo_package_stream_reader_create(package, &index);

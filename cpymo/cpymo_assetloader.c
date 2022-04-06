@@ -83,230 +83,10 @@ void cpymo_assetloader_free(cpymo_assetloader * loader)
 	}
 }
 
-static error_t cpymo_assetloader_load_filesystem_file(
-	char **out_buffer,
-	size_t *buf_size,
-	const char *asset_type,
-	const char *asset_name,
-	const char *asset_ext_name,
-	const cpymo_assetloader *assetloader) 
-{
-	char *path = 
-		(char *)malloc(
-			strlen(assetloader->gamedir) 
-			+ strlen(asset_type)
-			+ strlen(asset_name)
-			+ strlen(asset_ext_name)
-			+ 8);
-
-	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
-
-	sprintf(
-		path, 
-		"%s/%s/%s.%s", 
-		assetloader->gamedir, 
-		asset_type, 
-		asset_name, 
-		asset_ext_name);
-
-	const error_t err = cpymo_utils_loadfile(path, out_buffer, buf_size);
-
-	free(path);
-
-	return err;
-}
-
-static error_t cpymo_assetloader_load_file(
-	char **out_buffer,
-	size_t *buf_size,
-	const char *asset_type,
-	const char *asset_name,
-	const char *asset_ext_name,
-	const bool is_using_pkg,
-	const cpymo_package *pkg,
-	const cpymo_assetloader *loader)
-{
-	assert(*out_buffer == NULL);
-	if (is_using_pkg) {
-		cpymo_package_index index;
-		error_t err = cpymo_package_find(&index, pkg, asset_name);
-		if (err != CPYMO_ERR_SUCC) return err;
-
-		*buf_size = (size_t)index.file_length;
-		*out_buffer = (char *)malloc(*buf_size);
-		err = cpymo_package_read_file(*out_buffer, pkg, &index);
-
-		if (err != CPYMO_ERR_SUCC) free(*out_buffer);
-
-		return err;
-	}
-	else 
-		return cpymo_assetloader_load_filesystem_file(
-			out_buffer,
-			buf_size,
-			asset_type,
-			asset_name,
-			asset_ext_name,
-			loader);	
-}
-
-error_t cpymo_assetloader_load_bg(char ** out_buffer, size_t * buf_size, const char * bg_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_file(
-		out_buffer, buf_size, "bg",
-		bg_name, loader->game_config->bgformat,
-		loader->use_pkg_bg, &loader->pkg_bg,
-		loader);
-}
-
-error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
-{
-	char bg_name[40];
-	cpymo_parser_stream_span_copy(bg_name, sizeof(bg_name), name);
-
-	char *buf = NULL;
-	size_t buf_size = 0;
-	error_t err = cpymo_assetloader_load_bg(&buf, &buf_size, bg_name, loader);
-	if (err != CPYMO_ERR_SUCC) return err;
-
-	int channels;
-	stbi_uc *pixels = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, w, h, &channels, 3);
-	free(buf);
-
-	if (pixels == NULL)
-		return CPYMO_ERR_BAD_FILE_FORMAT;
-
-	err = cpymo_backend_image_load(
-		img,
-		pixels,
-		*w,
-		*h,
-		cpymo_backend_image_format_rgb);
-
-	if (err != CPYMO_ERR_SUCC) {
-		free(pixels);
-		return err;
-	}
-
-	return CPYMO_ERR_SUCC;
-}
-
-error_t cpymo_assetloader_load_chara(char ** out_buffer, size_t * buf_size, const char * chara_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_file(
-		out_buffer, buf_size, "chara",
-		chara_name, loader->game_config->charaformat,
-		loader->use_pkg_chara, &loader->pkg_chara,
-		loader);
-}
-
-error_t cpymo_assetloader_load_chara_mask(char ** out_buffer, size_t * buf_size, const char * chara_name, const cpymo_assetloader * loader)
-{
-	char filename[64];
-	sprintf(filename, "%s_mask", chara_name);
-
-	error_t err = cpymo_assetloader_load_file(
-		out_buffer, buf_size, "chara",
-		filename, loader->game_config->charamaskformat,
-		loader->use_pkg_chara, &loader->pkg_chara,
-		loader);
-
-	return err;
-}
-
-error_t cpymo_assetloader_load_chara_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
-{
-	char *buf = NULL;
-	size_t buf_size;
-
-	char chname[48];
-	cpymo_parser_stream_span_copy(chname, sizeof(chname), name);
-
-	error_t err = cpymo_assetloader_load_chara(&buf, &buf_size, chname, loader);
-	CPYMO_THROW(err);
-
-	int iw, ih, ic;
-	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &iw, &ih, &ic, 4);
-	free(buf);
-	buf = NULL;
-
-	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
-
-	*w = iw;
-	*h = ih;
-
-	if (cpymo_gameconfig_is_symbian(loader->game_config)) {
-		err = cpymo_assetloader_load_chara_mask(&buf, &buf_size, chname, loader);
-
-		int mw = 0, mh = 0, mc = 0;
-		stbi_uc *mask_px = NULL;
-
-		if (err == CPYMO_ERR_SUCC) {
-			mask_px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &mw, &mh, &mc, 1);
-			free(buf);
-			buf = NULL;
-		}
-
-		if (mask_px == NULL) {
-			fprintf(stderr, "[Warning] Can not load mask in chara %s.\n", chname);
-			return cpymo_backend_image_load(img, px, iw, ih, cpymo_backend_image_format_rgba);
-		} 
-		else {
-			return cpymo_backend_image_load_with_mask(img, px, mask_px, iw, ih, mw, mh);
-		}
-	}
-	else {
-		return cpymo_backend_image_load(img, px, iw, ih, cpymo_backend_image_format_rgba);
-	}
-}
-
-error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, const char * script_name, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_filesystem_file(
-		out_buffer, buf_size, "script", script_name,
-		"txt", loader);
-}
-
-error_t cpymo_assetloader_load_system(char ** out_buffer, size_t * buf_size, const char * system_name, const char * ext, const cpymo_assetloader * loader)
-{
-	return cpymo_assetloader_load_filesystem_file(
-		out_buffer, buf_size, "system", system_name,
-		ext, loader);
-}
-
-error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
-{
-	char *buf = NULL;
-	size_t buf_size;
-
-	char *path = (char *)malloc(name.len + 1);
-	if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
-	cpymo_parser_stream_span_copy(path, name.len + 1, name);
-
-	error_t err = cpymo_assetloader_load_system(&buf, &buf_size, path, "png", loader);
-	free(path);
-
-	CPYMO_THROW(err);
-
-	int w, h, c;
-	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &c, 1);
-	free(buf);
-
-	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
-
-	err = cpymo_backend_masktrans_create(out, px, w, h);
-	if (err != CPYMO_ERR_SUCC) {
-		free(px);
-		return err;
-	}
-
-	return CPYMO_ERR_SUCC;
-}
-
 static error_t cpymo_assetloader_get_fs_path(
-	char **out_str, 
-	cpymo_parser_stream_span asset_name, 
-	const char *asset_type, 
+	char **out_str,
+	cpymo_parser_stream_span asset_name,
+	const char *asset_type,
 	const char *asset_ext,
 	const cpymo_assetloader *l)
 {
@@ -328,11 +108,235 @@ static error_t cpymo_assetloader_get_fs_path(
 	strncat(str, asset_name.begin, asset_name.len);
 	strcat(str, ".");
 	strcat(str, asset_ext);
-	
+
 	*out_str = str;
 	return CPYMO_ERR_SUCC;
 }
 
+static error_t cpymo_assetloader_load_filesystem_file(
+	char **out_buffer,
+	size_t *buf_size,
+	const char *asset_type,
+	cpymo_parser_stream_span asset_name,
+	const char *asset_ext_name,
+	const cpymo_assetloader *assetloader) 
+{
+	char *path = NULL;
+	error_t err = cpymo_assetloader_get_fs_path(
+		&path, 
+		asset_name, 
+		asset_type, 
+		asset_ext_name, 
+		assetloader);
+	CPYMO_THROW(err);
+
+	err = cpymo_utils_loadfile(path, out_buffer, buf_size);
+
+	free(path);
+
+	return err;
+}
+
+static error_t cpymo_assetloader_load_file(
+	char **out_buffer,
+	size_t *buf_size,
+	const char *asset_type,
+	cpymo_parser_stream_span asset_name,
+	const char *asset_ext_name,
+	const bool is_using_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader)
+{
+	assert(*out_buffer == NULL);
+	if (is_using_pkg) {
+		cpymo_package_index index;
+		error_t err = cpymo_package_find(&index, pkg, asset_name);
+		if (err != CPYMO_ERR_SUCC) return err;
+
+		*buf_size = (size_t)index.file_length;
+		*out_buffer = (char *)malloc(*buf_size);
+		err = cpymo_package_read_file_from_index(*out_buffer, pkg, &index);
+
+		if (err != CPYMO_ERR_SUCC) free(*out_buffer);
+
+		return err;
+	}
+	else {
+		return cpymo_assetloader_load_filesystem_file(
+			out_buffer,
+			buf_size,
+			asset_type,
+			asset_name,
+			asset_ext_name,
+			loader);
+	}
+}
+
+static error_t cpymo_assetloader_load_filesystem_image_pixels(
+	void **pixels,
+	int *w,
+	int *h,
+	int c,
+	const char *asset_type,
+	cpymo_parser_stream_span asset_name,
+	const char *asset_ext_name,
+	const cpymo_assetloader *l)
+{
+	char *path = NULL;
+	error_t err = cpymo_assetloader_get_fs_path(&path, asset_name, asset_type, asset_ext_name, l);
+	CPYMO_THROW(err);
+	
+	*pixels = stbi_load(path, w, h, NULL, c);
+	free(path);
+
+	if (*pixels == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+	
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_assetloader_load_image_pixels(
+	void **pixels,
+	int *w,
+	int *h,
+	int c,
+	const char *asset_type,
+	cpymo_parser_stream_span asset_name,
+	const char *asset_ext_name,
+	bool using_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *l)
+{
+	if (using_pkg) 
+		return cpymo_package_read_image(pixels, w, h, c, pkg, asset_name);
+	else return cpymo_assetloader_load_filesystem_image_pixels(
+		pixels,
+		w,
+		h,
+		c,
+		asset_type,
+		asset_name,
+		asset_ext_name,
+		l);
+}
+
+error_t cpymo_assetloader_load_bg(char ** out_buffer, size_t * buf_size, const char * bg_name, const cpymo_assetloader * loader)
+{
+	return cpymo_assetloader_load_file(
+		out_buffer, buf_size, "bg",
+		cpymo_parser_stream_span_pure(bg_name), loader->game_config->bgformat,
+		loader->use_pkg_bg, &loader->pkg_bg,
+		loader);
+}
+
+error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{
+	void *pixels = NULL;
+	error_t err = cpymo_assetloader_load_image_pixels(
+		&pixels, w, h, 3, "bg", name, 
+		loader->game_config->bgformat, loader->use_pkg_bg, &loader->pkg_bg, loader);
+	CPYMO_THROW(err);
+
+	err = cpymo_backend_image_load(
+		img,
+		pixels,
+		*w,
+		*h,
+		cpymo_backend_image_format_rgb);
+
+	if (err != CPYMO_ERR_SUCC) {
+		free(pixels);
+		return err;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_assetloader_load_image_with_mask(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_parser_stream_span name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader)
+{
+	void *pixels = NULL;
+	error_t err = cpymo_assetloader_load_image_pixels(
+		&pixels, w, h, 4, 
+		asset_type, name, asset_ext,
+		use_pkg, pkg, loader);
+	CPYMO_THROW(err);
+
+	if (cpymo_gameconfig_is_symbian(loader->game_config)) {
+		char *filename = (char *)malloc(name.len + 6);
+		if (filename == NULL) goto LOAD_WITHOUT_MASK;
+		
+		strncpy(filename, name.begin, name.len);
+		strcpy(filename + name.len, "_mask");
+
+		void *mask = NULL;
+		int mw, mh;
+		err = cpymo_assetloader_load_image_pixels(
+			&mask, &mw, &mh, 1,
+			asset_type, cpymo_parser_stream_span_pure(filename), mask_ext,
+			use_pkg, pkg, loader);
+		free(filename);
+		if (err == CPYMO_ERR_SUCC) {
+			error_t err = cpymo_backend_image_load_with_mask(img, pixels, mask, *w, *h, mw, mh);
+			if (err != CPYMO_ERR_SUCC) {
+				free(mask);
+				goto LOAD_WITHOUT_MASK;
+			}
+		}
+		else goto LOAD_WITHOUT_MASK;
+	}
+	else {
+	LOAD_WITHOUT_MASK:
+		err = cpymo_backend_image_load(img, pixels, *w, *h, cpymo_backend_image_format_rgba);
+		if (err != CPYMO_ERR_SUCC) free(pixels);
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader)
+{
+	return cpymo_assetloader_load_image_with_mask(
+		img, w, h,
+		name, "chara", loader->game_config->charaformat, loader->game_config->charamaskformat,
+		loader->use_pkg_chara, &loader->pkg_chara, loader);
+}
+
+error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, const char * script_name, const cpymo_assetloader * loader)
+{
+	return cpymo_assetloader_load_filesystem_file(
+		out_buffer, buf_size, "script", cpymo_parser_stream_span_pure(script_name),
+		"txt", loader);
+}
+
+static error_t cpymo_assetloader_load_system(char ** out_buffer, size_t * buf_size, const char * system_name, const char * ext, const cpymo_assetloader * loader)
+{
+	return cpymo_assetloader_load_filesystem_file(
+		out_buffer, buf_size, "system", cpymo_parser_stream_span_pure(system_name),
+		ext, loader);
+}
+
+error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{
+	void *px = NULL;
+	int w, h;
+	error_t err = cpymo_assetloader_load_filesystem_image_pixels(&px, &w, &h, 1, "system", name, "png", loader);
+	CPYMO_THROW(err);
+
+	err = cpymo_backend_masktrans_create(out, px, w, h);
+	if (err != CPYMO_ERR_SUCC) {
+		free(px);
+		return err;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
 
 error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader)
 {
@@ -358,59 +362,9 @@ error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,
 	cpymo_parser_stream_span filename_span,
-	const char * ext, 
-	const cpymo_assetloader * loader,
-	bool load_mask)
+	const cpymo_assetloader * loader)
 {
-	char filename[128];
-	cpymo_parser_stream_span_copy(filename, sizeof(filename) - 10, filename_span);
-	char *buf = NULL;
-	size_t buf_size = 0;
-	error_t err = cpymo_assetloader_load_system(&buf, &buf_size, filename, "png", loader);
-	if (err != CPYMO_ERR_SUCC) return err;
-
-	int w, h, c;
-	stbi_uc *px = stbi_load_from_memory((stbi_uc *)buf, (int)buf_size, &w, &h, &c, 4);
-	free(buf);
-
-	if (px == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
-
-	cpymo_backend_image img;
-	if (load_mask) {
-		strcat(filename, "_mask");
-		char *mask_buf = NULL; size_t mask_size = 0;
-		err = cpymo_assetloader_load_system(&mask_buf, &mask_size, filename, "png", loader);
-		if (err != CPYMO_ERR_SUCC) mask_buf = NULL;
-
-		int mw, mh, mc;
-		stbi_uc *mask_px = NULL;
-		if (err == CPYMO_ERR_SUCC) {
-			mask_px = stbi_load_from_memory((stbi_uc *)mask_buf, (int)mask_size, &mw, &mh, &mc, 1);
-		}
-
-		if (mask_buf) free(mask_buf);
-
-		if (mask_px) {
-			err = cpymo_backend_image_load_with_mask(
-				&img, px, mask_px, w, h, mw, mh);
-		}
-		else {
-			goto LOAD_WITHOUT_MASK;
-		}
-	}
-	else {
-	LOAD_WITHOUT_MASK:
-		err = cpymo_backend_image_load(&img, px, w, h, cpymo_backend_image_format_rgba);
-	}
-
-	if (err != CPYMO_ERR_SUCC) {
-		free(px);
-		return err;
-	}
-
-	*out_image = img;
-	*out_width = w;
-	*out_height = h;
-	return CPYMO_ERR_SUCC;
+	return cpymo_assetloader_load_image_with_mask(
+		out_image, out_width, out_height, filename_span, "system", "png", "png", false, NULL, loader);
 }
 

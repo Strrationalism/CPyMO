@@ -159,9 +159,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		&rmenu->bg_w,
 		&rmenu->bg_h,
 		cpymo_parser_stream_span_pure("menu"),
-		"png",
-		&e->assetloader,
-		cpymo_gameconfig_is_symbian(&e->gameconfig));
+		&e->assetloader);
 
 	if (err != CPYMO_ERR_SUCC) {
 		rmenu->bg = NULL;

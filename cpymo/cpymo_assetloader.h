@@ -20,8 +20,6 @@ void cpymo_assetloader_free(cpymo_assetloader *loader);
 
 error_t cpymo_assetloader_load_bg(char **out_buffer, size_t *buf_size, const char *bg_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_bg_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_chara(char **out_buffer, size_t *buf_size, const char *chara_name, const cpymo_assetloader *loader);
-error_t cpymo_assetloader_load_chara_mask(char **out_buffer, size_t *buf_size, const char *chara_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_script(char **out_buffer, size_t *buf_size, const char *script_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system(char **out_buffer, size_t *buf_size, const char *asset_name, const char *ext, const cpymo_assetloader *loader);
@@ -36,8 +34,6 @@ error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image *out_image, 
 	int *w, int *h,
 	cpymo_parser_stream_span asset_name, 
-	const char *ext, 
-	const cpymo_assetloader *loader,
-	bool load_mask);
+	const cpymo_assetloader *loader);
 
 #endif

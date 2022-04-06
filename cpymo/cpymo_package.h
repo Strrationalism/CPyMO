@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "cpymo_parser.h"
 #include "cpymo_error.h"
 
@@ -20,9 +21,17 @@ typedef struct {
 
 error_t cpymo_package_open(cpymo_package *out_package, const char *path);
 void cpymo_package_close(cpymo_package *package);
-error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, const char* filename);
-error_t cpymo_package_read_file(char *out_buffer, const cpymo_package *package, const cpymo_package_index *index);
+error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, cpymo_parser_stream_span filename);
+error_t cpymo_package_find_old_style(cpymo_package_index *out_index, const cpymo_package *package, const char* filename);
+error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package *package, const cpymo_package_index *index);
 
+error_t cpymo_package_read_image_from_index(
+	void **pixels, int *w, int *h, int channels, 
+	const cpymo_package *pkg, const cpymo_package_index *index);
+
+error_t cpymo_package_read_image(
+	void **pixels, int *w, int *h, int channels,
+	const cpymo_package *pkg, cpymo_parser_stream_span filename);
 
 typedef struct {
 	size_t file_offset;
@@ -48,5 +57,13 @@ size_t cpymo_package_stream_reader_read(
 	char *dst_buf,
 	size_t dst_buf_size,
 	cpymo_package_stream_reader *r);
+
+static inline bool cpymo_package_stream_reader_eof(cpymo_package_stream_reader *r)
+{ return r->current >= r->file_length; }
+
+static inline void cpymo_package_stream_reader_seek_cur(
+	intptr_t seek,
+	cpymo_package_stream_reader *r)
+{ r->current += seek; }
 
 #endif

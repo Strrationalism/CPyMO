@@ -34,9 +34,7 @@ error_t cpymo_anime_on(
 		&img,
 		&w, &h,
 		filename_span,
-		"png",
-		&engine->assetloader,
-		cpymo_gameconfig_is_symbian(&engine->gameconfig));
+		&engine->assetloader);
 	if (err != CPYMO_ERR_SUCC) return err;
 
 	engine->anime.anime_image = img;

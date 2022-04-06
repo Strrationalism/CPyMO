@@ -90,9 +90,7 @@ error_t cpymo_floating_hint_start(
 			&hint->background_w,
 			&hint->background_h,
 			background,
-			"png",
-			&engine->assetloader,
-			cpymo_gameconfig_is_symbian(&engine->gameconfig));
+			&engine->assetloader);
 
 		if (err != CPYMO_ERR_SUCC) {
 			hint->background = NULL;

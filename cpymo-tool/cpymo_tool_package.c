@@ -50,7 +50,7 @@ error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const cha
 			continue;
 		}
 
-		error_t err = cpymo_package_read_file(buf, &pkg, file_index);
+		error_t err = cpymo_package_read_file_from_index(buf, &pkg, file_index);
 		if (err != CPYMO_ERR_SUCC) {
 			printf("[Error] Can not read file, error code: %d.\n", err);
 			fclose(out);

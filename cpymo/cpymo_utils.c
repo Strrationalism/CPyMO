@@ -46,15 +46,7 @@ void cpymo_utils_replace_str_newline_n(char *str)
 	}
 }
 
-bool cpymo_utils_string_equals_ignore_case(const char * str1, const char * str2)
-{
-	if (*str1 == '\0' && *str2 == '\0') return true;
-	else if (*str1 == '\0' || *str2 == '\0') return false;
-	else {
-		if (toupper(*str1) == toupper(*str2)) return cpymo_utils_string_equals_ignore_case(str1 + 1, str2 + 1);
-		else return false;
-	}
-}
+
 
 void cpymo_utils_attach_mask_to_rgba(void *rgba_, void *mask_, int w, int h)
 {

@@ -70,9 +70,7 @@ error_t cpymo_select_img_configuare_begin(
 			&sel->select_img_image,
 			&sel->select_img_image_w, &sel->select_img_image_h,
 			image_name_or_empty_when_select_imgs,
-			"png",
-			loader,
-			cpymo_gameconfig_is_symbian(gameconfig));
+			loader);
 
 		if (err != CPYMO_ERR_SUCC) {
 			free(sel->selections);
@@ -125,9 +123,7 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 		&sel->w,
 		&sel->h,
 		image_name,
-		"png",
-		&e->assetloader,
-		cpymo_gameconfig_is_symbian(&e->gameconfig)
+		&e->assetloader
 	);
 
 	if (err != CPYMO_ERR_SUCC) {
@@ -466,9 +462,7 @@ error_t cpymo_select_img_configuare_select_text(
 			&sel->sel_highlight_w,
 			&sel->sel_highlight_h,
 			cpymo_parser_stream_span_pure("sel_highlight"),
-			"png",
-			loader,
-			cpymo_gameconfig_is_symbian(gc));
+			loader);
 
 		if (err != CPYMO_ERR_SUCC) {
 			sel->sel_highlight = NULL;
@@ -535,9 +529,7 @@ void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpy
 			&engine->select_img.hint_w[i],
 			&engine->select_img.hint_h[i],
 			cpymo_parser_stream_span_pure(hint_pic_name),
-			"png",
-			&engine->assetloader,
-			cpymo_gameconfig_is_symbian(&engine->gameconfig)
+			&engine->assetloader
 		);
 		
 		if (err != CPYMO_ERR_SUCC) {
@@ -589,9 +581,7 @@ void cpymo_select_img_configuare_end_select_text(
 			&sel->option_background_w,
 			&sel->option_background_h,
 			cpymo_parser_stream_span_pure("option"),
-			"png",
-			&e->assetloader,
-			cpymo_gameconfig_is_symbian(&e->gameconfig));
+			&e->assetloader);
 
 		if (err != CPYMO_ERR_SUCC) {
 			sel->option_background = NULL;
