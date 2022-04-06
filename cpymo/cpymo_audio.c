@@ -93,7 +93,7 @@ static error_t cpymo_audio_channel_flush_converter(cpymo_audio_channel *c)
 
 	if (samples == 0) return CPYMO_ERR_NO_MORE_CONTENT;
 	if (samples < 0) {
-		printf("[Warning] swr_convert: %s.", av_err2str(samples));
+		printf("[Warning] swr_convert: %s.\n", av_err2str(samples));
 		return CPYMO_ERR_UNKNOWN;
 	}
 
@@ -127,7 +127,7 @@ static error_t cpymo_audio_channel_convert_current_frame(cpymo_audio_channel *c)
 
 	if (samples <= 0) {
 		const char *err = av_err2str(samples);
-		printf("[Warning] swr_convert: %s.", err);
+		printf("[Warning] swr_convert: %s.\n", err);
 		return CPYMO_ERR_UNKNOWN;
 	}
 

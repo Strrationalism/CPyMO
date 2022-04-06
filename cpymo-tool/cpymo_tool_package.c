@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <cpymo_package.h>
 #include <endianness.h>
+#include <cpymo_utils.h>
 #include "cpymo_tool_package.h"
 
 error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const char *out_path) {
@@ -58,7 +59,7 @@ error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const cha
 		}
 
 		if (fwrite(buf, file_index->file_length, 1, out) != 1) {
-			printf("[Error] Can not write to file.");
+			printf("[Error] Can not write to file.\n");
 		}
 
 		fclose(out);
@@ -83,7 +84,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 		const char *path = files_to_pack[i];
 		FILE *file = fopen(path, "rb");
 		if (file == NULL) {
-			printf("Can not open file %s", path);
+			printf("Can not open file %s\n", path);
 			free(index);
 			return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 		}
@@ -133,7 +134,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 
 	FILE *out_pak = fopen(out_pack_path, "wb");
 	if (out_pak == NULL) {
-		printf("[Error] Can not open %s.", out_pack_path);
+		printf("[Error] Can not open %s.\n", out_pack_path);
 		free(index);
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 	}
@@ -141,7 +142,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 	uint32_t file_count_store = end_htole32(file_count);
 	size_t count = fwrite(&file_count_store, sizeof(uint32_t), 1, out_pak);
 	if (count != 1) {
-		printf("[Error] Can not write file_count to package.");
+		printf("[Error] Can not write file_count to package.\n");
 		free(index);
 		fclose(out_pak);
 		return CPYMO_ERR_UNKNOWN;
@@ -151,7 +152,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 	free(index);
 
 	if (count != file_count) {
-		printf("[Error] Can not write file index to package.");
+		printf("[Error] Can not write file index to package.\n");
 		fclose(out_pak);
 	}
 
@@ -160,7 +161,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 
 		FILE *f = fopen(path, "rb");
 		if (f == NULL) {
-			printf("[Error] Can not open file %s.", path);
+			printf("[Error] Can not open file %s.\n", path);
 			fclose(out_pak);
 			free(buf);
 			return CPYMO_ERR_CAN_NOT_OPEN_FILE;
@@ -171,7 +172,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 		fseek(f, 0, SEEK_SET);
 
 		if (fread(buf, length, 1, f) != 1) {
-			printf("[Error] Can not read file %s.", path);
+			printf("[Error] Can not read file %s.\n", path);
 			fclose(out_pak);
 			fclose(f);
 			free(buf);
@@ -181,7 +182,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 		fclose(f);
 
 		if (fwrite(buf, length, 1, out_pak) != 1) {
-			printf("[Error] Can not write %s to package.", path);
+			printf("[Error] Can not write %s to package.\n", path);
 			fclose(out_pak);
 			free(buf);
 			return CPYMO_ERR_UNKNOWN;
@@ -197,3 +198,42 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 
 	return CPYMO_ERR_SUCC;
 }
+
+error_t cpymo_tool_get_file_list(char *** files, size_t * count, const char * list_file)
+{
+	char *ls_buf = NULL;
+	size_t ls_len;
+	error_t err = cpymo_utils_loadfile(list_file, &ls_buf, &ls_len);
+	CPYMO_THROW(err);
+	
+	cpymo_parser parser;
+	cpymo_parser_init(&parser, ls_buf, ls_len);
+
+	size_t reserve = 1;
+	do {
+		reserve++;
+	} while (cpymo_parser_next_line(&parser));
+
+	*files = (char **)malloc(reserve * sizeof(char *));
+	if (*files == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	cpymo_parser_reset(&parser);
+
+	*count = 0;
+	do {
+		cpymo_parser_stream_span line = cpymo_parser_curline_readuntil(&parser, '\n');
+		cpymo_parser_stream_span_trim(&line);
+
+		if (line.len) {
+			char **cur = *files + *count;
+			*cur = (char *)malloc(line.len + 1);
+			if (*cur == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+			cpymo_parser_stream_span_copy(*cur, line.len + 1, line);
+			++*count;
+		}
+	} while (cpymo_parser_next_line(&parser));
+
+	return CPYMO_ERR_SUCC;
+}
+

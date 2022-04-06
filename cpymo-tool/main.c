@@ -29,6 +29,7 @@ void help() {
 	printf("    cpymo-tool unpack <pak-file> <extension-with \".\"> <output-dir>\n");
 	printf("Pack a pymo package:\n");
 	printf("    cpymo-tool pack <out-pak-file> <files-to-pack...>\n");
+	printf("    cpymo-tool pack <out-pak-file> --file-list <file-list.txt>\n");
 	printf("Resize image:\n");
 	printf(
 		"    cpymo-tool resize \n"
@@ -40,7 +41,7 @@ void help() {
 int process_err(error_t e) {
 	if (e == CPYMO_ERR_SUCC) return 0;
 	else {
-		printf("[Error] %s", cpymo_error_message(e));
+		printf("[Error] %s\n", cpymo_error_message(e));
 		return -1;
 	}
 }
@@ -60,7 +61,26 @@ int main(int argc, const char **argv) {
 			else help();
 		}
 		else if (strcmp(argv[1], "pack") == 0) {
+			if (argc == 5) {
+				if (strcmp(argv[3], "--file-list") == 0) {
+					char **files = NULL;
+					size_t filecount;
+					error_t err = cpymo_tool_get_file_list(&files, &filecount, argv[4]);
+					if (err == CPYMO_ERR_SUCC) {
+						err = cpymo_tool_pack(argv[2], (const char **)files, (uint32_t)filecount);
+						
+						for (size_t i = 0; i < filecount; ++i)
+							if (files[i]) free(files[i]);
+						free(files);
+
+						return process_err(err);
+					}
+					return process_err(err);
+				}
+				else goto NORMAL_PACK;
+			}
 			if (argc >= 4) {
+				NORMAL_PACK:
 				const char *out_pak = argv[2];
 				const char **files_to_pack = argv + 3;
 				return process_err(cpymo_tool_pack(out_pak, files_to_pack, (uint32_t)argc - 3));
@@ -144,11 +164,7 @@ int main(int argc, const char **argv) {
 				
 			error_t err = 
 				cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
-
-			if (err != CPYMO_ERR_SUCC) {
-				printf("[Error] %s...\n", cpymo_error_message(err));
-				return -1;
-			}
+			return process_err(err);
 			
 		}
 		else help();

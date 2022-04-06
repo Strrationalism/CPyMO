@@ -108,7 +108,7 @@ RETRY:
 				if (retring) {
 					char label_name[32];
 					cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
-					fprintf(stderr, "[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
+					printf("[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
 					return CPYMO_ERR_NOT_FOUND;
 				}
 				else {
@@ -324,7 +324,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			ENSURE(layer_str);
 
 			if (command_buffer_size >= 16) {
-				fprintf(stderr, "[Warning] chara command buffer was overflow.");
+				printf("[Warning] chara command buffer was overflow.\n");
 			} 
 			else {
 				chara_ids[command_buffer_size] = chara_id;
@@ -563,9 +563,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		}
 		else {
 			free(buffer);
-			fprintf(
-				stderr,
-				"[Error] chara_anime has invalid argument in script %s(%u)",
+			printf(
+				"[Error] chara_anime has invalid argument in script %s(%u)\n",
 				interpreter->script_name,
 				(unsigned)interpreter->script_parser.cur_line);
 			CONT_NEXTLINE;
@@ -625,7 +624,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			ENSURE(layer_str);
 
 			if (command_buffer_size >= 16) {
-				fprintf(stderr, "[Warning] chara command buffer was overflow.");
+				printf("[Warning] chara command buffer was overflow.\n");
 			}
 			else {
 				chara_ids[command_buffer_size] = chara_id;
@@ -717,7 +716,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				&c,
 				chara_id);
 			if (err == CPYMO_ERR_NOT_FOUND) {
-				fprintf(stderr, "[Error] Character %d not found.\n", chara_id);
+				printf("[Error] Character %d not found.\n", chara_id);
 				return CPYMO_ERR_SUCC;
 			}
 			else { CPYMO_THROW(err); }
@@ -753,7 +752,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		if (err != CPYMO_ERR_SUCC) {
 			char anime_name[16];
 			cpymo_parser_stream_span_copy(anime_name, sizeof(anime_name), filename);
-			fprintf(stderr, "[Warning] Can not load anime %s in script %s(%u).", 
+			printf("[Warning] Can not load anime %s in script %s(%u).\n", 
 				anime_name, interpreter->script_name, (unsigned)interpreter->script_parser.cur_line);
 		}
 
@@ -937,8 +936,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			char *condition_str = (char *)malloc(condition.len + 1);
 			if (condition_str == NULL) return CPYMO_ERR_OUT_OF_MEM;
 			cpymo_parser_stream_span_copy(condition_str, condition.len + 1, condition);
-			fprintf(
-				stderr, 
+			printf( 
 				"[Error] Bad if expression \"%s\" in script %s(%u).\n", 
 				condition_str,
 				interpreter->script_name,
@@ -1264,9 +1262,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		int max_val = cpymo_parser_stream_span_atoi(max_val_str);
 
 		if (max_val - min_val <= 0) {
-			fprintf(
-				stderr,
-				"[Error] In script %s(%u), max value must bigger than min value for rand command.",
+			printf(
+				"[Error] In script %s(%u), max value must bigger than min value for rand command.\n",
 				interpreter->script_name,
 				(unsigned)interpreter->script_parser.cur_line);
 
@@ -1409,8 +1406,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		char buf[32];
 		cpymo_parser_stream_span_copy(buf, 32, command);
 
-		fprintf(
-			stderr,
+		printf(
 			"[Warning] Unknown command \"%s\" in script %s(%u).\n",
 			buf,
 			interpreter->script_name,

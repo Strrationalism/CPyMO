@@ -19,16 +19,6 @@ void cpymo_charas_free(cpymo_charas *c)
 		free(c->anime_pos);
 }
 
-/*static void print_charas(cpymo_charas *c)
-{
-	printf("==== charas ====\n");
-	struct cpymo_chara *ch = c->chara;
-	while (ch) {
-		printf("ID: %d, W: %d, H: %d, PTR: %p\n", ch->chara_id, ch->img_w, ch->img_h, ch->img);
-		ch = ch->next;
-	}
-}*/
-
 static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 {
 	cpymo_engine_request_redraw(e);
@@ -179,7 +169,7 @@ error_t cpymo_charas_new_chara(
 		if (err == CPYMO_ERR_NOT_FOUND || err == CPYMO_ERR_CAN_NOT_OPEN_FILE) {
 			char name[32];
 			cpymo_parser_stream_span_copy(name, sizeof(name), filename);
-			fprintf(stderr, "[Error] Can not load chara \"%s\".", name);
+			printf("[Error] Can not load chara \"%s\".", name);
 			return CPYMO_ERR_SUCC;
 		}
 

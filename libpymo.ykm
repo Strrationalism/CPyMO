@@ -1,0 +1,419 @@
+# You can find "PyMO Tutorial" from https://www.pymogames.com/PYMO%E6%95%99%E7%A8%8B.pdf
+# libpymo is a PyMO API wrapper for YukimiScript.
+# You can access the functions of PyMO engine from YukimiScript through libpymo with PyMO code generator.
+
+# Startup label:
+# Every file must has a scene which name is same to filename (without ext),
+# and this scene will be startup scene,
+# for example:
+#    File foo.ykm
+#        - scene "main"
+#        - scene "bar"
+#        - scene "foo"    # Startup from scene "foo"
+#
+# About name:
+# You must predefine name as a symbol using __define_character in header of scene or "$init" scene,
+# for example:
+#     - scene "main"
+#     @__define_character a "主角"
+#     # You can use a in text syntax in scene "main".
+# for example:
+#     - scene "$init"
+#     @__define_character g "全局主角"
+#     # You can use g in all scenes.
+#
+# About variable length parameters: 
+# Yukimiscript does not support variable length parameters, 
+# so the variable length parameters in pymo are divided into multiple commands, 
+# for example:
+#    @chara_multi 1 "a" 100
+#    @chara_multi 2 "b" 200
+#    @chara_multi_do --time 300
+# compiles to:
+#    #chara 1,"a",100,2,"b",200,300
+# libpymo also provides a macro that allows you to pass in a single group of arguments, 
+# and its formal parameters are consistent with pymo,
+# for example:
+#    @chara 1 "a" 100 300
+# compiles to:
+#    #chara 1,"a",100,300
+#
+# About color type:
+# You can use hexadecimal digits as color parameters, 
+# for example:
+#     @fade_out 0xFFFFFF 300
+# white, black, red, green, blue are predefined, you can pass predefined color symbols to color type:
+#     @fade_out red 300
+#
+# About coord_mode type:
+# You can pass cm0~cm6 to coord_mode parameters,
+# for example:
+#     @chara_y --coord_mode cm0 --charaID 1 --filename "a" --x 0 --y 0 --layer 0 --time 300
+
+
+# O. Compiler Supports
+
+- macro __type_coord_mode mode
+@__type_symbol mode cm0
+@__type_symbol mode cm1
+@__type_symbol mode cm2
+@__type_symbol mode cm3
+@__type_symbol mode cm4
+@__type_symbol mode cm5
+@__type_symbol mode cm6
+
+- macro __type_color color
+@__type color int
+@__type_symbol color white
+@__type_symbol color black
+@__type_symbol color red
+@__type_symbol color green
+@__type_symbol color blue
+
+- extern __define_character character_symbol name
+@__type character_symbol symbol
+@__type name string
+
+# I. Text
+
+- extern text content x1 y1 x2 y2 color size show_immediately
+- macro  text content x1 y1 x2 y2 color=white size=16 show_immediately=false
+@__type content string
+@__type x1 number
+@__type y1 number
+@__type x2 number
+@__type y2 number
+@__type_color color
+@__type size int
+@__type show_immediately bool
+@text content x1 y1 x2 y2 color size show_immediately
+
+- extern text_off
+
+- extern waitkey
+
+- extern title content
+@__type content string
+
+- extern title_dsp
+
+
+## II. Video
+
+- extern chara_multi charaID filename position layer
+@__type charaID int
+@__type filename string
+@__type position number
+@__type layer int
+
+- extern chara_multi_do time
+@__type time int
+
+- macro chara charaID filename position layer time
+@chara_multi charaID filename position layer
+@chara_multi_do time
+
+- extern chara_cls charaID time=300
+@__type charaID int
+@__type_symbol charaID a
+@__type time int
+
+- extern chara_pos charaID new_x new_y coord_mode
+- macro  chara_pos charaID new_x new_y coord_mode
+@__type charaID int
+@__type new_x number
+@__type new_y number
+@__type_coord_mode coord_mode
+@chara_pos charaID new_x new_y coord_mode
+
+- extern bg filename transition=BG_ALPHA time=300 x=0 y=0
+@__type filename string
+@__type transition string
+@__type_symbol transition BG_NOFADE
+@__type_symbol transition BG_ALPHA
+@__type_symbol transition BG_FADE
+@__type time int
+@__type x number
+@__type y number
+@__type_symbol time BG_VERYFAST
+@__type_symbol time BG_FAST
+@__type_symbol time BG_NORMAL
+@__type_symbol time BG_SLOW
+@__type_symbol time BG_VERYSLOW
+
+- extern flash color time
+- macro  flash color time
+@__type_color color
+@__type time int
+@flash color time
+
+- extern quake
+
+- extern fade_out color time
+- macro  fade_out color time
+@__type_color time
+@__type time int
+@fade_out color time
+
+- extern fade_in time
+@__type time int
+
+- extern movie filename
+@__type filename string
+
+- extern textbox message name
+@__type message string
+@__type name string
+
+- extern chara_quake_multi charaID
+@__type charaID int
+
+- extern chara_quake_multi_do
+
+- macro chara_quake charaID
+@chara_quake_multi charaID
+@chara_quake_multi_do
+
+- extern chara_down_multi charaID
+@__type charaID int
+
+- extern chara_down_multi_do
+
+- macro chara_down charaID
+@chara_down_multi charaID
+@chara_down_multi_do
+
+- extern chara_up_multi charaID
+@__type charaID int
+
+- extern chara_up_multi_do
+
+- macro chara_up charaID
+@chara_up_multi charaID
+@chara_up_multi_do
+
+- extern scroll filename startx starty endx endy time
+@__type filename string
+@__type startx number
+@__type starty number
+@__type endx number
+@__type endy number
+@__type time int
+
+- extern chara_y_multi charaID filename x y layer
+@__type charaID int
+@__type filename string
+@__type x number
+@__type y number
+@__type layer int
+
+- extern chara_y_multi_do coord_mode time
+- macro  chara_y_multi_do coord_mode time
+@__type time int
+@__type_coord_mode coord_mode
+@chara_y_multi_do coord_mode time
+
+- macro chara_y coord_mode charaID filename x y layer time
+@chara_y_multi charaID filename x y layer
+@chara_y_multi_do coord_mode time
+
+- extern chara_scroll coord_mode charaID endx endy time
+- macro  chara_scroll coord_mode charaID endx endy time
+@__type_coord_mode coord_mode
+@__type charaID int
+@__type endx number
+@__type endy number
+@__type time int
+
+- extern chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
+- macro  chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
+@__type charaID int
+@__type filename string
+@__type startx number
+@__type starty number
+@__type endx number
+@__type endy number
+@__type beginalpha int
+@__type layer int
+@__type time int
+@__type_coord_mode coord_mode
+@chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
+
+- extern anime_on num filename x y interval isloop=false
+@__type num int
+@__type filename string
+@__type x number
+@__type y number
+@__type interval int
+@__type isloop bool
+
+- extern anime_off filename
+@__type filename string
+
+- extern chara_anime offset_x offset_y
+@__type offset_x number
+@__type offset_y number
+
+- extern chara_anime_do charaID period loop_num
+@__type charaID int
+@__type period int
+@__type loop_num int
+
+
+# III. Variables
+
+- extern set var_name var_value
+@__type var_name symbol
+@__type var_value int
+@__type var_value symbol
+
+- extern add var_name add_value
+@__type var_name symbol
+@__type add_value int
+@__type add_value symbol
+
+- extern sub var_name sub_value
+@__type var_name symbol
+@__type sub_value int
+@__type sub_value symbol
+
+- extern goto label_name
+- macro  goto label_name
+@__type label_name string
+@__diagram_link_to label_name
+@goto label_name
+
+- extern if_goto condition_left condition_op condition_right label_name
+- macro  if_goto condition_left condition_op condition_right label_name
+@__type condition_left symbol
+@__type condition_right symbol
+@__type condition_right int
+@__type_symbol condition_op eq
+@__type_symbol condition_op gt
+@__type_symbol condition_op ge
+@__type_symbol condition_op lt
+@__type_symbol condition_op le
+@__type_symbol condition_op ne
+@__type label_name string
+@__diagram_link_to label_name
+@if_goto condition_left condition_op condition_right label_name
+
+- extern change filename
+- macro  change filename
+@__type filename string
+@__diagram_link_to filename
+@change filename
+
+- extern call filename
+- macro  call filename
+@__type filename string
+@__diagram_link_to filename
+@call filename
+
+- extern ret
+
+- extern sel choice_text
+@__type choice_text string
+
+- extern sel_do hint_pic=null
+@__type hint_pic null
+@__type hint_pic string
+
+- extern select_text text
+@__type text string
+
+- extern select_text_do x1 y1 x2 y2 color init_position
+- macro  select_text_do x1 y1 x2 y2 color=white init_position=0
+@__type x1 number
+@__type y1 number
+@__type x2 number
+@__type y2 number
+@__type_color color
+@__type init_position int
+@select_text_do x1 y1 x2 y2 color init_position
+
+- extern select_var choice_text var
+@__type choice_text string
+@__type var symbol
+@__type var int
+
+- extern select_var_do x1 y1 x2 y2 color init_position
+- macro  select_var_do x1 y1 x2 y2 color=white init_position=0
+@__type x1 number
+@__type y1 number
+@__type x2 number
+@__type y2 number
+@__type_color color
+@__type init_position int
+@select_var_do x1 y1 x2 y2 color init_position
+
+- extern select_img x y var
+@__type x number
+@__type y number
+@__type var symbol
+@__type var int
+
+- extern select_img_do filename init_position=0
+@__type filename string
+@__type init_position int
+
+- extern select_imgs filename x y var
+@__type filename string
+@__type x number
+@__type y number
+@__type var symbol
+@__type var int
+
+- extern select_imgs_do init_position=0
+@__type init_position int
+
+- extern wait time
+@__type time int
+
+- extern wait_se
+
+- extern rand var_name min_value max_value
+@__type var_name symbol
+@__type min_value int
+@__type max_value int
+
+
+# IV. Audio
+
+- extern bgm filename isloop=true
+@__type filename string
+@__type isloop bool
+
+- extern bgm_stop
+
+- extern se filename isloop=false
+@__type filename string
+@__type isloop bool
+
+- extern se_stop
+
+- extern vo filename
+@__type filename string
+
+
+# V. System
+
+- extern load save_num=null
+@__type save_num null
+@__type save_num int
+
+- extern album album_list_filename=null
+@__type album_list_filename string
+@__type album_list_filename null
+
+- extern music
+
+- extern date date_bg x y color
+- macro  date date_bg x y color=white
+@__type date_bg string
+@__type x number
+@__type y number
+@__type_color color
+@date date_bg x y color
+
+- extern config

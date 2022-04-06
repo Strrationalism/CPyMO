@@ -33,16 +33,6 @@ pymo原版参见：https://github.com/pymo/pymo
     - Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
     - Nintendo Switch
 
-# 用法
-
-```
-cpymo-tool
-Development tool for cpymo.
-
-Unpack a pymo package:
-    cpymo-tool unpack <pak-file> <extension_without "."> <output-dir>
-```
-
 # 编译到Windows、Linux或macOS
 
 ## 额外依赖
@@ -211,6 +201,44 @@ SDL2后端在目录`cpymo-backends/sdl2`中。
 ### 加载系统字体
 
 定位到`cpymo_backend_font.c`中的函数`error_t cpymo_backend_font_init(const char *gamedir)`，向此函数添加用于加载系统字体的代码。
+
+# 工具
+
+## cpymo-tool
+
+该工具用于开发PyMO游戏，与原版PyMO工具完全兼容，它提供以下功能：
+
+* PyMO数据包打包
+* PyMO数据包解包
+* 游戏图片缩放
+
+启动此程序即可看到详细用法。
+
+## pymo-converter
+
+该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包。    
+要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将cpymo-tool安装到命令行中。    
+
+pymo-converter目前支持将游戏适配到以下设备：
+
+* s60v3
+* s60v5
+* PyMO Android
+* Nintendo 3DS
+* Nintendo Switch
+
+## mo2pymo
+
+该工具用于将特定mo1、mo2游戏转换为PyMO游戏。
+
+## pymo2ykm
+
+该工具用于将PyMO脚本语言编译到[YukimiScript](github.com/Strrationalism/YukimiScript)语言。
+
+## libpymo
+
+该工具用于将PyMO API公开到[YukimiScript](github.com/Strrationalism/YukimiScript)语言中，    
+使得YukimiScript语言可以访问PyMO/CPyMO引擎的各项功能。    
 
 
 # 赞助

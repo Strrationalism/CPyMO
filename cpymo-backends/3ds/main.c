@@ -309,7 +309,7 @@ int main(void) {
 		&engine, 400, 240, 22, 20, 3, &item, &before_select_game, &after_select_game, &last_select_game);
 	
 	if (err != CPYMO_ERR_SUCC) {
-		printf("[Error] cpymo_engine_init_with_game_selector: %s.", cpymo_error_message(err));
+		printf("[Error] cpymo_engine_init_with_game_selector: %s.\n", cpymo_error_message(err));
 		if (last_select_game) free(last_select_game);
 		cpymo_game_selector_item_free_all(item);
 		cpymo_backend_text_sys_free();
