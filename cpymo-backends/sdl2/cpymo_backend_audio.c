@@ -5,6 +5,10 @@
 #include <cpymo_engine.h>
 #include <assert.h>
 
+#ifdef ENABLE_SDL2_MIXER_AUDIO_BACKEND
+#define DISABLE_SDL2_AUDIO_BACKEND
+#endif
+
 #ifdef DISABLE_AUDIO
 #define DISABLE_SDL2_AUDIO_BACKEND
 #endif

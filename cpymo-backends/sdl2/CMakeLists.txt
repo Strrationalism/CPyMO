@@ -16,7 +16,8 @@ add_executable (cpymo
 	"posix_win32.h" 
 	"cpymo_backend_save.c" 
 	"cpymo_backend_audio.c" 
-	"cpymo_backend_movie.c")
+	"cpymo_backend_movie.c" 
+	"cpymo_backend_audio_sdl2_mixer.c")
 
 target_link_libraries(cpymo PRIVATE 
 	SDL2::SDL2 

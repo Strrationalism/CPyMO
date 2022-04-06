@@ -57,6 +57,8 @@ typedef struct {
 	char *bgm_name, *se_name;
 } cpymo_audio_system;
 
+#else
+typedef void *cpymo_audio_system;
 #endif
 
 void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *s);

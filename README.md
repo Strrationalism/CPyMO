@@ -181,6 +181,21 @@ SDL2后端在目录`cpymo-backends/sdl2`中。
 
 如果你只想接触FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
 
+### SDL2_mixer音频后端
+
+如果你想解除FFmpeg依赖后依然可以播放音频，可以考虑启动SDL2_mixer音频后端支持。    
+SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。    
+
+启用SDL2_mixer音频后端之前，必须禁用FFmpeg视频播放器：
+
+* 定义`DISABLE_FFMPEG_MOVIE`来替换为自己的视频播放后端
+* 或者定义`DISABLE_MOVIE`彻底关闭视频播放器功能
+
+之后定义：
+
+1. 定义`DISABLE_FFMPEG_AUDIO`关闭FFmpeg音频依赖
+2. 定义`ENABLE_SDL2_MIXER_AUDIO_BACKEND`启用SDL2_Mixer音频后端。
+
 ### 全屏切换
 
 定义宏`ENABLE_ALT_ENTER_FULLSCREEN`可启用按下Alt+Enter键切换全屏的功能。
