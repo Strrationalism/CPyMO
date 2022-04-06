@@ -68,8 +68,13 @@ void cpymo_utils_attach_mask_to_rgba(void *rgba_, void *mask_, int w, int h)
 	}
 }
 
-void cpymo_utils_attach_mask_to_rgba_slow(void * rgba_, int w, int h, void * mask_, int mask_w, int mask_h)
+void cpymo_utils_attach_mask_to_rgba_ex(void * rgba_, int w, int h, void * mask_, int mask_w, int mask_h)
 {
+	if (w == mask_w && h == mask_h) {
+		cpymo_utils_attach_mask_to_rgba(rgba_, mask_, w, h);
+		return;
+	}
+	
 	char *rgba = (char *)rgba_;
 	char *mask = (char *)mask_;
 
