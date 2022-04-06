@@ -80,10 +80,11 @@ int main(int argc, const char **argv) {
 				else goto NORMAL_PACK;
 			}
 			if (argc >= 4) {
-				NORMAL_PACK:
-				const char *out_pak = argv[2];
-				const char **files_to_pack = argv + 3;
-				return process_err(cpymo_tool_pack(out_pak, files_to_pack, (uint32_t)argc - 3));
+				NORMAL_PACK: {
+					const char *out_pak = argv[2];
+					const char **files_to_pack = argv + 3;
+					return process_err(cpymo_tool_pack(out_pak, files_to_pack, (uint32_t)argc - 3));
+				}				
 			}
 			else help();
 		}
