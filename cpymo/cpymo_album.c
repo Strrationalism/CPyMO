@@ -149,7 +149,7 @@ static error_t cpymo_album_load_ui_image(
 
 	int w, h;
 	error_t err = cpymo_assetloader_load_system_image(
-		out_image, &w, &h, cpymo_parser_stream_span_pure(assetname), loader);
+		out_image, &w, &h, cpymo_parser_stream_span_pure(assetname), loader, false);
 	free(assetname);
 
 	if (err != CPYMO_ERR_SUCC) {
@@ -633,7 +633,8 @@ error_t cpymo_album_enter(
 		&w,
 		&h,
 		cpymo_parser_stream_span_pure("cvThumb"),
-		&e->assetloader);
+		&e->assetloader,
+		false);
 
 	if (err == CPYMO_ERR_SUCC) {
 		album->cv_thumb_cover_w = (size_t)w;

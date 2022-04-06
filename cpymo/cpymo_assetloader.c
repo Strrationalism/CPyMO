@@ -220,7 +220,8 @@ static error_t cpymo_assetloader_load_image_with_mask(
 	const char *mask_ext,
 	bool use_pkg,
 	const cpymo_package *pkg,
-	const cpymo_assetloader *loader)
+	const cpymo_assetloader *loader,
+	bool load_mask)
 {
 	void *pixels = NULL;
 	error_t err = cpymo_assetloader_load_image_pixels(
@@ -229,7 +230,7 @@ static error_t cpymo_assetloader_load_image_with_mask(
 		use_pkg, pkg, loader);
 	CPYMO_THROW(err);
 
-	if (cpymo_gameconfig_is_symbian(loader->game_config)) {
+	if (load_mask && cpymo_gameconfig_is_symbian(loader->game_config)) {
 		char *filename = (char *)malloc(name.len + 6);
 		if (filename == NULL) goto LOAD_WITHOUT_MASK;
 		
@@ -266,7 +267,7 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int
 	return cpymo_assetloader_load_image_with_mask(
 		img, w, h,
 		name, "chara", loader->game_config->charaformat, loader->game_config->charamaskformat,
-		loader->use_pkg_chara, &loader->pkg_chara, loader);
+		loader->use_pkg_chara, &loader->pkg_chara, loader, true);
 }
 
 error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, const char * script_name, const cpymo_assetloader * loader)
@@ -316,9 +317,10 @@ error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,
 	cpymo_parser_stream_span filename_span,
-	const cpymo_assetloader * loader)
+	const cpymo_assetloader * loader,
+	bool load_mask)
 {
 	return cpymo_assetloader_load_image_with_mask(
-		out_image, out_width, out_height, filename_span, "system", "png", "png", false, NULL, loader);
+		out_image, out_width, out_height, filename_span, "system", "png", "png", false, NULL, loader, load_mask);
 }
 

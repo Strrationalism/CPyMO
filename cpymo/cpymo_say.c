@@ -30,7 +30,8 @@ static void cpymo_say_lazy_init(cpymo_say *out, cpymo_assetloader *loader)
 			&out->msg_cursor_w,
 			&out->msg_cursor_h,
 			cpymo_parser_stream_span_pure("message_cursor"),
-			loader);
+			loader,
+			true);
 
 		if (err != CPYMO_ERR_SUCC) out->msg_cursor = NULL;
 	}
@@ -160,7 +161,8 @@ static inline error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_s
 		&say->msgbox_w,
 		&say->msgbox_h,
 		name,
-		l);
+		l,
+		true);
 
 	if (err != CPYMO_ERR_SUCC) say->msgbox = NULL;
 
@@ -183,7 +185,8 @@ static inline error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_
 		&say->namebox_w,
 		&say->namebox_h,
 		name,
-		l);
+		l,
+		true);
 
 	if (err != CPYMO_ERR_SUCC) say->namebox = NULL;
 

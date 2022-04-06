@@ -33,6 +33,7 @@ error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image *out_image, 
 	int *w, int *h,
 	cpymo_parser_stream_span asset_name, 
-	const cpymo_assetloader *loader);
+	const cpymo_assetloader *loader,
+	bool load_mask);
 
 #endif

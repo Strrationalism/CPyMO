@@ -90,7 +90,8 @@ error_t cpymo_floating_hint_start(
 			&hint->background_w,
 			&hint->background_h,
 			background,
-			&engine->assetloader);
+			&engine->assetloader,
+			true);
 
 		if (err != CPYMO_ERR_SUCC) {
 			hint->background = NULL;

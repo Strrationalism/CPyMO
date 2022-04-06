@@ -34,7 +34,8 @@ error_t cpymo_anime_on(
 		&img,
 		&w, &h,
 		filename_span,
-		&engine->assetloader);
+		&engine->assetloader,
+		true);
 	if (err != CPYMO_ERR_SUCC) return err;
 
 	engine->anime.anime_image = img;

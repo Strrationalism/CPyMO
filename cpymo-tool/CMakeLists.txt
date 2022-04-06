@@ -15,3 +15,6 @@ add_executable (cpymo-tool
 	${SRC} ${CPYMO_COMPONENTS})
 
 
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+	target_link_libraries(cpymo-tool m)
+endif ()
