@@ -79,7 +79,7 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
-		
+
     - name: Build
       run: |
         cd ./cpymo-backends/sdl2
