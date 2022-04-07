@@ -96,6 +96,13 @@ jobs:
         export PATH=$PATH:$PSPDEV/bin
         cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for PSP
+        path: |
+          ./cpymo-backends/sdl2/EBOOT.PBP
         
   build-desktop:
     name: 'Desktop'

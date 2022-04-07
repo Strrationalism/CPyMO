@@ -68,7 +68,7 @@ static error_t cpymo_game_selector_ok(cpymo_engine *e, void *selected)
 	CPYMO_THROW(err);
 
 	if (after) {
-		err = after(e, gamedir);
+		err = after(e, e->assetloader.gamedir);
 		CPYMO_THROW(err);
 	}
 	
@@ -116,8 +116,7 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 			cpymo_parser_stream_span_pure(game_config.gametitle), fontsize);
 
 		sprintf(path, "%s/icon.png", item->gamedir);
-		int c;
-		stbi_uc *pixels = stbi_load(path, &item->icon_w, &item->icon_h, &c, 4);
+		stbi_uc *pixels = stbi_load(path, &item->icon_w, &item->icon_h, NULL, 4);
 		if (pixels) {
 			err = cpymo_backend_image_load(&item->icon, pixels, item->icon_w, item->icon_h, cpymo_backend_image_format_rgba);
 			if (err != CPYMO_ERR_SUCC) {

@@ -42,16 +42,16 @@ error_t cpymo_backend_font_init(const char *gamedir, const char *custom)
 	char *path = (char *)alloca((gamedir ? strlen(gamedir) : 0) + 24);
 	error_t err = CPYMO_ERR_SUCC;
 
-	if (custom) {
-		err = cpymo_backend_font_try_load_font(custom);
-		if (err == CPYMO_ERR_SUCC) return err;
-	}
-
 	if (gamedir) {
 		if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 		sprintf(path, "%s/system/default.ttf", gamedir);
 		err = cpymo_backend_font_try_load_font(path);
 		if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
+	}
+
+	if (custom) {
+		err = cpymo_backend_font_try_load_font(custom);
+		if (err == CPYMO_ERR_SUCC) return err;
 	}
 
 #ifdef _WIN32

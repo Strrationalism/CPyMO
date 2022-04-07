@@ -21,10 +21,6 @@ static void *vo_data = NULL;
 static SDL_RWops *se_rwops = NULL;
 static SDL_RWops *vo_rwops = NULL;
 
-#ifdef __PSP__
-#define SDL2_MIXER_AUDIO_BACKEND_FREQ 22050
-#endif
-
 #ifndef SDL2_MIXER_AUDIO_BACKEND_FREQ
 #define SDL2_MIXER_AUDIO_BACKEND_FREQ 44100
 #endif
@@ -158,6 +154,10 @@ void cpymo_audio_bgm_stop(struct cpymo_engine *e)
 
 error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sename, bool loop)
 {
+#ifdef __PSP__
+	return CPYMO_ERR_SUCC;
+#endif
+
 	cpymo_audio_se_stop(e);
 
 	if (e->assetloader.use_pkg_se) {

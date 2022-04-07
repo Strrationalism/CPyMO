@@ -155,9 +155,11 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 		return CPYMO_ERR_UNKNOWN;
 	}
 
+#ifndef __PSP__
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir, GAME_SELECTOR_DIR "/default.ttf");
 	CPYMO_THROW(err);
+#endif
 
 	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);

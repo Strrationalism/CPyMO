@@ -159,6 +159,8 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 # 编译到索尼PSP平台
 
+PSP平台的CPyMO仅能运行s60v3数据包或下述“适配”的包。
+
 ## 额外依赖
 
 * [pspdev/pspdev](github.com/pspdev/pspdev)
@@ -175,7 +177,11 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 在PSP记忆棒根目录创建`pymogames`目录，在此目录下放置一个字体文件`default.ttf`和游戏文件夹。  
 
+在使用PPSSPP模拟器的情况下，你可能需要关闭`系统设置 - 快速内存访问`。
+
 ## 缺陷
+
+这些缺陷将不会得到修复：
 
 * 由于PSP生态中没有移植的FFmpeg库
     - 视频播放器功能已经禁用
@@ -184,20 +190,34 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 * 由于PSP机能有限
     - 仅能加载s60v3数据包或下述推荐的PSP数据包
 	- 在放入太多游戏时将无法加载游戏列表
+	- 加载音效会导致严重卡顿，故禁用音效
+* 由于stb_image会在PSP中崩溃
+    - 某些情况下使用icon.png会导致崩溃，如果出现了这种情况请删除icon.png
+* 由于SDL2 for PSP存在问题
+    - 游戏将会在屏幕左上角显示，而不是居中显示
 
 ## 为PSP适配游戏
 
 如果你需要为PSP适配游戏，那么建议你使用以下参数：
 
-* 分辨率：400×240
-* 音频格式：ogg，16 bit signed little-endian，22050Hz
-* 视频格式：不支持
-* 图片格式：
-    - 背景：jpg
-	- 其他：带透明通道的png
-* platform参数：pygame
+* 分辨率：480×272
+* 背景、立绘图像：jpg，立绘图像应当带jpg格式的透明通道mask图
+* 系统图像：png，带mask图
+* 声音格式：ogg, 16bit signed little-endian, 44100Hz
+* platform参数：s60v3
+* 不支持的内容：
+    * 视频
+	* 音效（se）
 
-# 移植提示
+### 利用pymo-converter从PyMO Android版本数据包创建psp版本的数据包
+
+1. 你需要安装cpymo-tool到你的系统中（添加到PATH环境变量），确保该命令可用。
+2. 下载pymo-converter.ps1。
+3. 使用命令行pymo-converter.ps1 psp <PyMO Android版本数据包路径> <输出的PSP版本的数据包路径>。
+4. 手动转换BGM音频为ogg格式，并修改gameconfig.txt中bgmformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
+5. 手动转换VO音频为ogg格式，并修改gameconfig.txt中的voformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
+
+# CPyMO移植提示
 
 CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”组成。
 
