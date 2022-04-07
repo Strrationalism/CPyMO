@@ -205,7 +205,7 @@ error_t cpymo_backend_image_load(
     switch(fmt) {
     case cpymo_backend_image_format_rgb: tex_fmt = GPU_RGB8; channels = 3; break;
     case cpymo_backend_image_format_rgba: tex_fmt = GPU_RGBA8; channels = 4; break;
-    default: assert(false);
+    default: assert(false); return CPYMO_ERR_UNKNOWN;
     };
 
     if(width > 1024 || height > 1024) {
