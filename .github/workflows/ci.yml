@@ -72,19 +72,19 @@ jobs:
 
   build-psp:
     name: 'PSP'
-	runs-on: ubuntu-latest
-	container: pspdev/pspdev
+    runs-on: ubuntu-latest
+    container: pspdev/pspdev:latest
 
     steps:
-	- uses: actions/checkout@v1
+    - uses: actions/checkout@v1
       with:
         submodules: true
 		
-	- name: Build
+    - name: Build
       run: |
         cd ./cpymo-backends/sdl2
-		make -f Makefile.PSP
-            
+        make -f Makefile.PSP
+        
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
