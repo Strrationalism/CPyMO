@@ -32,6 +32,7 @@ pymo原版参见：https://github.com/pymo/pymo
     - macOS
     - Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
     - Nintendo Switch
+    - Sony Playstation Portable
 
 # 编译到Windows、Linux或macOS
 
