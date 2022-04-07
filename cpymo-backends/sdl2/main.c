@@ -269,6 +269,7 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
+	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
 #if (defined SCREEN_WIDTH && defined SCREEN_HEIGHT)
 	const uint16_t window_size_w = SCREEN_WIDTH;
