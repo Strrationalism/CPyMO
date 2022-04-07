@@ -13,7 +13,7 @@ error_t cpymo_backend_image_load(
 	switch (fmt) {
 	case cpymo_backend_image_format_rgb: channels = 3; break;
 	case cpymo_backend_image_format_rgba: channels = 4; break;
-	default: assert(false);
+	default: assert(false); return CPYMO_ERR_UNKNOWN;
 	}
 
 	SDL_Surface *surface =
