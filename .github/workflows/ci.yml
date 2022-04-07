@@ -92,6 +92,8 @@ jobs:
 
     - name: Build
       run: |
+        export PSPDEV=/usr/local/pspdev
+        export PATH=$PATH:$PSPDEV/bin
         cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
         
