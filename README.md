@@ -139,7 +139,13 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 ## 启动
 
-将游戏放入SD卡的`/pymogames/startup`目录，使得`/pymogames/startup`可用，之后即可启动CPyMO运行此目录下的游戏。    
+将游戏放入SD卡的`/pymogames/`目录即可。
+
+## 自定义字体
+
+将字体文件改名为`default.ttf`放入`/pymogames/`目录即可加载该字体文件。
+
+默认将会加载Switch自带的字体。
 
 ## 为Switch适配游戏
 
@@ -151,9 +157,55 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 * platform参数：pygame
 * 视频格式：H264 MP4
 
+# 编译到索尼PSP平台
+
+## 额外依赖
+
+* [pspdev/pspdev](github.com/pspdev/pspdev)
+* psp-sdl2（已经包括到pspdev中）
+* psp-sdl2_mixer（已经包括到pspdev中）
+* psp-libvorbis（已经包括到pspdev中）
+* psp-libogg（已经包括到pspdev中）
+
+## 编译
+
+cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PSP平台。    
+
+## 启动
+
+在PSP记忆棒根目录创建`pymogames`目录，在此目录下放置一个字体文件`default.ttf`和游戏文件夹。  
+
+## 缺陷
+
+* 由于PSP生态中没有移植的FFmpeg库
+    - 视频播放器功能已经禁用
+	- 音频播放使用SDL2_mixer后端
+        - 音频不支持mp3格式
+* 由于PSP机能有限
+    - 仅能加载s60v3数据包或下述推荐的PSP数据包
+	- 在放入太多游戏时将无法加载游戏列表
+
+## 为PSP适配游戏
+
+如果你需要为PSP适配游戏，那么建议你使用以下参数：
+
+* 分辨率：400×240
+* 音频格式：ogg，16 bit signed little-endian，22050Hz
+* 视频格式：不支持
+* 图片格式：
+    - 背景：jpg
+	- 其他：带透明通道的png
+* platform参数：pygame
+
 # 移植提示
 
-## 通用选项
+CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”组成。
+
+通用代码放在`cpymo`文件夹中，后端放在`cpymo-backends`文件夹中。
+
+其中`cpymo-backends/include`中的代码规定了每个后端都应当实现的接口。
+
+## 通用部分
 
 ### 视障帮助
 

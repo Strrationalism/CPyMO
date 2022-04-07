@@ -166,19 +166,23 @@ static void cpymo_game_selector_empty_ui_draw(const cpymo_engine *e, const void 
 
 	float fontsize = ui->font_size;
 
-	cpymo_backend_text_draw(
-		ui->msg1, 
-		(e->gameconfig.imagesize_w - ui->msg1_w) / 2, 
-		(e->gameconfig.imagesize_h - fontsize) / 2,
-		cpymo_color_white, 0.5f,
-		cpymo_backend_image_draw_type_ui_element);
+	if (ui->msg1) {
+		cpymo_backend_text_draw(
+			ui->msg1,
+			(e->gameconfig.imagesize_w - ui->msg1_w) / 2,
+			(e->gameconfig.imagesize_h - fontsize) / 2,
+			cpymo_color_white, 0.5f,
+			cpymo_backend_image_draw_type_ui_element);
+	}
 
-	cpymo_backend_text_draw(
-		ui->msg2, 
-		(e->gameconfig.imagesize_w - ui->msg2_w) / 2, 
-		(e->gameconfig.imagesize_h - fontsize) / 2 + fontsize + fontsize / 2,
-		cpymo_color_white, 0.25f,
-		cpymo_backend_image_draw_type_ui_element);
+	if (ui->msg2) {
+		cpymo_backend_text_draw(
+			ui->msg2,
+			(e->gameconfig.imagesize_w - ui->msg2_w) / 2,
+			(e->gameconfig.imagesize_h - fontsize) / 2 + fontsize + fontsize / 2,
+			cpymo_color_white, 0.25f,
+			cpymo_backend_image_draw_type_ui_element);
+	}
 }
 
 static error_t cpymo_game_selector_empty_ui_update(cpymo_engine *e, void *ui_data, float dt)
@@ -224,7 +228,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 	data->items = cpymo_game_selector_item_remove_invalid(NULL, data->items);
 
 	cpymo_game_selector_item *last_selected = data->items;
-	while (last_selected) {
+	while (last_selected && data->last_selected_gamedir) {
 		if (strcmp(last_selected->gamedir, data->last_selected_gamedir) == 0) break;
 		last_selected = last_selected->next;
 	}
@@ -312,6 +316,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			return err;
 		}
 
+#ifndef __PSP__
 		err = cpymo_backend_text_create(&ui->msg2, &ui->msg2_w,
 			cpymo_parser_stream_span_pure(l->game_selector_empty_secondary),
 			font_size / 1.3f);
@@ -320,7 +325,8 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			cpymo_engine_free(e);
 			return err;
 		}
-
+#endif
+		
 		return CPYMO_ERR_SUCC;
 	}
 }

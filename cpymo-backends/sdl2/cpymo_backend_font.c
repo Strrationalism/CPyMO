@@ -37,7 +37,7 @@ void cpymo_backend_font_free()
 	ttf_buffer = NULL;
 }
 
-error_t cpymo_backend_font_init(const char *gamedir)
+error_t cpymo_backend_font_init(const char *gamedir, const char *fallback)
 {
 	char *path = (char *)alloca((gamedir ? strlen(gamedir) : 0) + 24);
 	error_t err = CPYMO_ERR_SUCC;
@@ -130,5 +130,6 @@ error_t cpymo_backend_font_init(const char *gamedir)
 #endif
 
 
-	return CPYMO_ERR_NOT_FOUND;
+	if (fallback) return cpymo_backend_font_try_load_font(fallback);
+	else return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 }

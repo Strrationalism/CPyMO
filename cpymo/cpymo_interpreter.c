@@ -126,7 +126,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 #define CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED 2
 
 error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_engine *engine)
-{
+{	
 	jmp_buf cont;
 
 	switch (setjmp(cont)) {

@@ -38,6 +38,15 @@
 #define GAME_SELECTOR_FONTSIZE 32
 #define GAME_SELECTOR_EMPTY_MSG_FONTSIZE (GAME_SELECTOR_FONTSIZE * 2.0f)
 #define GAME_SELECTOR_COUNT_PER_SCREEN 8
+#define GAME_SELECTOR_DIR "/pymogames/"
+#elif __PSP__
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 272
+#define USE_GAME_SELECTOR
+#define GAME_SELECTOR_FONTSIZE 28
+#define GAME_SELECTOR_EMPTY_MSG_FONTSIZE (GAME_SELECTOR_FONTSIZE * 2.0f)
+#define GAME_SELECTOR_COUNT_PER_SCREEN 3
+#define GAME_SELECTOR_DIR "ms0:/pymogames/"
 #endif
 
 #if _WIN32 && !NDEBUG
@@ -59,7 +68,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
 
-extern error_t cpymo_backend_font_init(const char *gamedir);
+extern error_t cpymo_backend_font_init(const char *gamedir, const char *fallback);
 extern void cpymo_backend_font_free();
 
 extern void cpymo_backend_audio_init();
@@ -105,7 +114,7 @@ static char *get_last_selected_game_dir()
 #ifdef __SWITCH__
 	char *str = NULL;
 	size_t len;
-	error_t err = cpymo_utils_loadfile("/pymogames/last_game.txt", &str, &len);
+	error_t err = cpymo_utils_loadfile(GAME_SELECTOR_DIR "/last_game.txt", &str, &len);
 
 	if (err != CPYMO_ERR_SUCC) return NULL;
 
@@ -127,7 +136,7 @@ static void save_last_selected_game_dir(const char *gamedir)
 {
 #ifdef __SWITCH__
 	size_t len = strlen(gamedir);
-	FILE *f = fopen("/pymogames/last_game.txt", "wb");
+	FILE *f = fopen(GAME_SELECTOR_DIR "/last_game.txt", "wb");
 	if (f == NULL) return;
 
 	fwrite(gamedir, len, 1, f);
@@ -147,7 +156,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 	}
 
 	cpymo_backend_font_free();
-	error_t err = cpymo_backend_font_init(gamedir);
+	error_t err = cpymo_backend_font_init(gamedir, GAME_SELECTOR_DIR "/default.ttf");
 	CPYMO_THROW(err);
 
 	ensure_save_dir(gamedir);
@@ -160,8 +169,8 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 #endif
 
 
-#ifdef __SWITCH__
-#define GAME_SELECTOR_DIR "/pymogames/"
+#if (defined __SWITCH__ || defined __PSP__)
+
 #include <dirent.h>
 cpymo_game_selector_item *get_game_list(void)
 {
@@ -312,9 +321,9 @@ int main(int argc, char **argv)
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 #ifndef USE_GAME_SELECTOR
-	if (cpymo_backend_font_init(gamedir) != CPYMO_ERR_SUCC) {
+	if (cpymo_backend_font_init(gamedir, NULL) != CPYMO_ERR_SUCC) {
 #else
-	if (cpymo_backend_font_init(NULL) != CPYMO_ERR_SUCC) {
+	if (cpymo_backend_font_init(NULL, GAME_SELECTOR_DIR "/default.ttf") != CPYMO_ERR_SUCC) {
 #endif
 		SDL_Log("[Error] Can not find font file, try put default.ttf into <gamedir>/system/.");
 		SDL_DestroyRenderer(renderer);
@@ -383,7 +392,7 @@ int main(int argc, char **argv)
 				}
 			}
 #endif
-		}
+		}		
 
 		bool need_to_redraw = false;
 
@@ -420,7 +429,7 @@ int main(int argc, char **argv)
 		} else SDL_Delay(16);
 	}
 
-	EXIT:
+EXIT:
 	cpymo_engine_free(&engine);
 
 	extern void cpymo_input_free_joysticks();

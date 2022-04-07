@@ -14,6 +14,9 @@ $device_specs = @(
 
     @{ Name = "switch"; Width = 1920; Height = 1080; UseMask = $false;
        BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame" }
+
+    @{ Name = "psp"; Width = 480; Height = 272; UseMask = $false; 
+       BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame" }
 )
 
 function Write-Help() {

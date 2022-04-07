@@ -21,6 +21,14 @@ static void *vo_data = NULL;
 static SDL_RWops *se_rwops = NULL;
 static SDL_RWops *vo_rwops = NULL;
 
+#ifdef __PSP__
+#define SDL2_MIXER_AUDIO_BACKEND_FREQ 22050
+#endif
+
+#ifndef SDL2_MIXER_AUDIO_BACKEND_FREQ
+#define SDL2_MIXER_AUDIO_BACKEND_FREQ 44100
+#endif
+
 void cpymo_audio_init(cpymo_audio_system *s)
 {
 	enabled = false;
@@ -52,7 +60,7 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		return;
 	}
 
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 8192) == -1) {
+	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, MIX_DEFAULT_FORMAT, 2, 8192) == -1) {
 		printf("[Error] SDL2_Mixer open audio failed: %s\n", Mix_GetError());
 		Mix_Quit();
 		return;

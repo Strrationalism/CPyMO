@@ -188,8 +188,10 @@ void cpymo_engine_free(cpymo_engine *engine)
 	cpymo_select_img_free(&engine->select_img);
 	cpymo_anime_free(&engine->anime);
 	cpymo_bg_free(&engine->bg);
-	if(engine->interpreter) cpymo_interpreter_free(engine->interpreter);
-	free(engine->interpreter);
+	if (engine->interpreter) {
+		cpymo_interpreter_free(engine->interpreter);
+		free(engine->interpreter);
+	}
 	cpymo_vars_free(&engine->vars);
 	cpymo_assetloader_free(&engine->assetloader);
 	if (engine->title) free(engine->title);
@@ -242,7 +244,9 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	CPYMO_THROW(err);
 
 	if (!cpymo_wait_is_wating(&engine->wait)) {
-		err = cpymo_interpreter_execute_step(engine->interpreter, engine);
+		if (engine->interpreter)
+			err = cpymo_interpreter_execute_step(engine->interpreter, engine);
+		else return CPYMO_ERR_NO_MORE_CONTENT;
 
 		if (cpymo_wait_is_wating(&engine->wait)) {
 			if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_NO_MORE_CONTENT) return err;
