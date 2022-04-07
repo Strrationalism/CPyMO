@@ -5,9 +5,14 @@
 #include <stdlib.h>
 #include <endianness.h>
 #include <stb_image.h>
+#include <assert.h>
 
 error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 {
+#ifndef NDEBUG
+	out_package->has_stream_reader = false;
+#endif
+	
 	if (out_package == NULL) return CPYMO_ERR_INVALID_ARG;
 
 	out_package->stream = fopen(path, "rb");
@@ -72,6 +77,7 @@ error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package 
 
 error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package * package, const cpymo_package_index * index)
 {
+	assert(package->has_stream_reader == false);
 	fseek(package->stream, index->file_offset, SEEK_SET);
 	const size_t count = fread(out_buffer, index->file_length, 1, package->stream);
 
@@ -80,37 +86,25 @@ error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package
 	return CPYMO_ERR_SUCC;
 }
 
-static int cpymo_package_read_image_callbacks_read(void *u, char *d, int s)
-{
-	return cpymo_package_stream_reader_read(d, (size_t)s, (cpymo_package_stream_reader *)u);
-}
-
-static void cpymo_package_read_image_callbacks_skip(void *u, int n)
-{
-	cpymo_package_stream_reader_seek_cur(n, (cpymo_package_stream_reader *)u);
-}
-
-static int cpymo_package_reader_image_callback_eof(void *u)
-{
-	return cpymo_package_stream_reader_eof((cpymo_package_stream_reader *)u);
-}
-
 error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, const cpymo_package_index * index)
-{
-	const stbi_io_callbacks cb = {
-		&cpymo_package_read_image_callbacks_read,
-		&cpymo_package_read_image_callbacks_skip,
-		&cpymo_package_reader_image_callback_eof
-	};
+{	
+	stbi_uc *file_data = (stbi_uc *)malloc(index->file_length);
+	if (file_data == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	
-	cpymo_package_stream_reader reader = cpymo_package_stream_reader_create(pkg, index);
-	stbi_uc *px = stbi_load_from_callbacks(&cb, &reader, w, h, NULL, channels);
+	error_t err = cpymo_package_read_file_from_index((char *)file_data, pkg, index);
+	if (err != CPYMO_ERR_SUCC) {
+		free(file_data);
+		return err;
+	}
 
-	if (px == NULL) {
+	// Why this method is faster than stream loading in package ???
+	*pixels = stbi_load_from_memory(file_data, index->file_length, w, h, NULL, channels);
+	free(file_data);
+	
+	if (*pixels == NULL) {
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
-	
-	*pixels = px;
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -124,7 +118,7 @@ error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels,
 }
 
 error_t cpymo_package_stream_reader_find_create(cpymo_package_stream_reader * r, const cpymo_package * package, cpymo_parser_stream_span filename)
-{
+{	
 	cpymo_package_index index;
 	error_t err = cpymo_package_find(&index, package, filename);
 	CPYMO_THROW(err);
@@ -141,6 +135,8 @@ error_t cpymo_package_stream_reader_seek(size_t seek, cpymo_package_stream_reade
 	}
 
 	r->current = seek;
+	fseek(r->stream, (long)(r->file_offset + r->current), SEEK_SET);
+	
 	return CPYMO_ERR_SUCC;
 }
 
@@ -151,10 +147,16 @@ size_t cpymo_package_stream_reader_read(char *dst_buf, size_t dst_buf_size, cpym
 
 	if (read_size <= 0) return 0;
 
-	fseek(r->stream, (long)(r->file_offset + r->current), SEEK_SET);
 	r->current += read_size;
 
 	return fread(dst_buf, read_size, 1, r->stream) * read_size;
+}
+
+void cpymo_package_stream_reader_close(cpymo_package_stream_reader * r)
+{
+#ifndef NDEBUG
+	r->package->has_stream_reader = false;
+#endif
 }
 
 cpymo_package_stream_reader cpymo_package_stream_reader_create(
@@ -166,5 +168,10 @@ cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	reader.file_length = index->file_length;
 	reader.current = 0;
 	reader.stream = package->stream;
+#ifndef NDEBUG
+	assert(package->has_stream_reader == false);
+	reader.package = (cpymo_package *)package;
+#endif
+	cpymo_package_stream_reader_seek(0, &reader);
 	return reader;
 }

@@ -17,6 +17,10 @@ typedef struct {
 	uint32_t file_count;
 	cpymo_package_index *files;
 	FILE *stream;
+
+#ifndef NDEBUG
+	bool has_stream_reader;
+#endif
 } cpymo_package;
 
 error_t cpymo_package_open(cpymo_package *out_package, const char *path);
@@ -37,6 +41,10 @@ typedef struct {
 	size_t file_length;
 	size_t current;
 	FILE *stream;
+
+#ifndef NDEBUG
+	cpymo_package *package;
+#endif
 } cpymo_package_stream_reader;
 
 cpymo_package_stream_reader cpymo_package_stream_reader_create(
@@ -63,6 +71,10 @@ static inline bool cpymo_package_stream_reader_eof(cpymo_package_stream_reader *
 static inline void cpymo_package_stream_reader_seek_cur(
 	intptr_t seek,
 	cpymo_package_stream_reader *r)
-{ r->current += seek; }
+{ 
+	cpymo_package_stream_reader_seek(r->current + seek, r);
+}
+
+void cpymo_package_stream_reader_close(cpymo_package_stream_reader *r);
 
 #endif

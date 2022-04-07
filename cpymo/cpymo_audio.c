@@ -24,6 +24,7 @@ static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 		void *buf = c->io_context->buffer;
 		avio_context_free(&c->io_context);
 		if (buf) av_free(buf);
+		cpymo_package_stream_reader_close(&c->package_reader);
 	}
 
 	cpymo_audio_channel_init(c);
@@ -319,7 +320,7 @@ static error_t cpymo_audio_channel_play_file(
 	if (package_reader) {
 		c->package_reader = *package_reader;
 
-		const size_t avio_buf_size = 4096 * 4;
+		const size_t avio_buf_size = 1024 * 1024;
 		void *io_buffer = av_malloc(avio_buf_size);
 		if (io_buffer == NULL) {
 			cpymo_audio_channel_reset_unsafe(c);
@@ -566,11 +567,15 @@ static error_t cpymo_audio_high_level_play(
 				&r, package, filename);
 			CPYMO_THROW(err);
 
-			return cpymo_audio_channel_play_file(
+			err = cpymo_audio_channel_play_file(
 				&e->audio.channels[channel],
 				NULL,
 				&r,
 				loop);
+			if (err != CPYMO_ERR_SUCC) {
+				cpymo_package_stream_reader_close(&r);
+				return err;
+			}
 		}
 		else {
 			char *path = NULL;
