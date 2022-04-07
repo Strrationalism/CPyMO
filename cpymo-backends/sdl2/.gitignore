@@ -2,3 +2,5 @@
 *.nacp
 *.nro
 build.*/
+PARAM.SFO
+EBOOT.PBP

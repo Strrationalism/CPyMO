@@ -11,3 +11,4 @@
 /cpymo-backends/3ds/cpymo.3dsx
 /cpymo-backends/3ds/cpymo.cia
 /cpymo-backends/3ds/cpymo-strip.elf
+*.o

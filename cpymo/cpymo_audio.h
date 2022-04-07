@@ -22,7 +22,7 @@ typedef struct {
 } cpymo_audio_system;
 #endif
 
-#ifndef DISABLE_FFMPEG_AUDIO
+#if (!defined DISABLE_FFMPEG_AUDIO)
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -57,7 +57,7 @@ typedef struct {
 	char *bgm_name, *se_name;
 } cpymo_audio_system;
 
-#else
+#elif (!defined DISABLE_AUDIO)
 typedef void *cpymo_audio_system;
 #endif
 
