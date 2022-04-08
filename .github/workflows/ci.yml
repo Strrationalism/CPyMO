@@ -8,7 +8,7 @@ on:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: MinSizeRel
+  BUILD_TYPE: Release
 
 jobs:
   build-switch:
@@ -110,9 +110,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ win-x64, win-x86, mac-x64, linux-x64]
-          #- win-arm
-          #- win-arm64
+        tuple: [ win-x64, win-x86, win-arm64, win-arm mac-x64, linux-x64]
 
         include:
           - tuple: win-x64
@@ -120,24 +118,25 @@ jobs:
             triplet: x64-windows-static
             arch: x64
             package-name: "Windows x64"
-            cmake-flags: "-A x64"
+            cmake-flags: "-A x64 -DCMAKE_GENERATOR_PLATFORM=x64"
           - tuple: win-x86
             os: windows-latest
             triplet: x86-windows-static
             arch: x86
             package-name: "Windows x86"
-            cmake-flags: "-A x86"
-          #- tuple: win-arm
-          #  os: windows-latest
-          #  triplet: arm-windows-static
-          #  arch: amd64_arm
-          #  package-name: "Windows arm"
+            cmake-flags: "-A x86 -DCMAKE_GENERATOR_PLATFORM=x86"
+          - tuple: win-arm
+            os: windows-latest
+            triplet: arm-windows-static
+            arch: amd64_arm
+            package-name: "Windows arm"
+            cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
           - tuple: win-arm64
             os: windows-latest
             triplet: arm64-windows-static
             arch: amd64_arm64
             package-name: "Windows arm64"
-            cmake-flags: "-A arm64"
+            cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
           - tuple: linux-x64
             os: ubuntu-latest
             triplet: x64-linux
