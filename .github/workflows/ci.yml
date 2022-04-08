@@ -180,7 +180,7 @@ jobs:
             os: macos-latest
             triplet: x64-osx
             package-name: "macOS x64"
-            cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=x64"
+            cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64"
           - tuple: mac-arm64
             os: macos-latest
             triplet: arm64-osx
