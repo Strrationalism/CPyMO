@@ -1026,12 +1026,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			if (!(IS_EMPTY(hint_pic))) {
 				uint32_t first_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
 
-				if (first_char == L'○') hint_mode = cpymo_select_img_selection_hint01;
-				else if (first_char == L'×') hint_mode = cpymo_select_img_selection_hint23;
+				if (first_char == 0x25cb) hint_mode = cpymo_select_img_selection_hint01;
+				else if (first_char == 0x00D7) hint_mode = cpymo_select_img_selection_hint23;
 			}
-#ifdef _WIN32
-#pragma warning (disable: 4066)
-#endif
+			
 			err = cpymo_select_img_configuare_select_text(
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags, 
 				text, true, hint_mode, sel_hash, cpymo_gameconfig_font_size(&engine->gameconfig));
