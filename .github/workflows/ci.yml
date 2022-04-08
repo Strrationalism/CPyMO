@@ -92,6 +92,8 @@ jobs:
 
     - name: Build
       run: |
+        export VITASDK=~/vitasdk
+        export PATH=$VITASDK/bin:$PATH
         cd cpymo-backends/sdl2
         chmod +x ./build-psv.sh
         ./build-psv.sh
