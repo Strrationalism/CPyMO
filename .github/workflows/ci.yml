@@ -79,18 +79,7 @@ jobs:
       with:
         submodules: true
     
-    - name: Install VitaSDK
-      run: |
-        sudo apt-get install find curl tar
-        git clone https://github.com/vitasdk/vdpm.git --depth 1
-        cd vdpm
-        chmod +x ./bootstrap-vitasdk.sh
-        ./bootstrap-vitasdk.sh
-        export VITASDK=~/usr/local/vitasdk
-        export PATH=$VITASDK/bin
-        ./vdpm sdl2
-        ./vdpm ffmpeg
-        cd ..
+
 
     - name: Build
       run: |
