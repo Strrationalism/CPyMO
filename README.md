@@ -312,9 +312,9 @@ pymo-converter目前支持将游戏适配到以下设备：
 
 * s60v3
 * s60v5
-* PyMO Android
-* Nintendo 3DS
-* Nintendo Switch
+* pymo-android
+* 3ds
+* psp
 
 ## mo2pymo
 
