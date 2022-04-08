@@ -44,18 +44,23 @@ bool enhanced_3ds_display_mode_touch_ui_enabled(void)
 float enhanced_3ds_bottom_yoffset()
 {
 	if (enhanced_3ds_display_mode_touch_ui_enabled()) return 0;
-	else if(engine.say.msgbox && engine.say.namebox) {
-		float ratio = (float)engine.gameconfig.imagesize_w / (float)engine.say.msgbox_w;
-		float msg_h = (float)engine.say.msgbox_h * ratio;
+	else {
+		float msg_h = 0;
+		
+		if (engine.say.msgbox && engine.say.namebox) {
+			float ratio = (float)engine.gameconfig.imagesize_w / (float)engine.say.msgbox_w;
+			msg_h = (float)engine.say.msgbox_h * ratio;
+		}
+		else {
+			msg_h = e->gameconfig.imagesize_h * 0.25f;
+		}
+		
 		float y = (float)engine.gameconfig.imagesize_h - msg_h;
 		float fontsize = cpymo_gameconfig_font_size(&engine.gameconfig);
 		float namebox_h = fontsize * 1.4f;
 		float namebox_y = y - namebox_h;
-		
-		return -namebox_y + 16;
-	}
-	else {
-		return 0;
+
+		return -namebox_y + 16;		
 	}
 }
 
