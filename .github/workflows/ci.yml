@@ -81,7 +81,7 @@ jobs:
     
     - name: Install VitaSDK
       run: |
-        sudo apt-install find curl tar
+        sudo apt-get install find curl tar
         git clone https://github.com/vitasdk/vdpm.git --depth 1
         cd vdpm
         chmod +x ./bootstrap-vitasdk.sh
