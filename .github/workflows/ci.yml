@@ -120,11 +120,13 @@ jobs:
             triplet: x64-windows-static
             arch: x64
             package-name: "Windows x64"
+            cmake-flags: "-A x64"
           - tuple: win-x86
             os: windows-latest
             triplet: x86-windows-static
             arch: x86
             package-name: "Windows x86"
+            cmake-flags: "-A x86"
           #- tuple: win-arm
           #  os: windows-latest
           #  triplet: arm-windows-static
