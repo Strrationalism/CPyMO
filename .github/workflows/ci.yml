@@ -110,8 +110,9 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ win-x64, win-x86, win-arm64, mac-x64, linux-x64]
+        tuple: [ win-x64, win-x86, mac-x64, linux-x64]
           #- win-arm
+          #- win-arm64
 
         include:
           - tuple: win-x64
@@ -129,11 +130,11 @@ jobs:
           #  triplet: arm-windows-static
           #  arch: amd64_arm
           #  package-name: "Windows arm"
-          - tuple: win-arm64
-            os: windows-latest
-            triplet: arm64-windows-static
-            arch: amd64_arm64
-            package-name: "Windows arm64"
+          # - tuple: win-arm64
+          #  os: windows-latest
+          #  triplet: arm64-windows-static
+          #  arch: amd64_arm64
+          #  package-name: "Windows arm64"
           - tuple: linux-x64
             os: ubuntu-latest
             triplet: x64-linux
