@@ -134,7 +134,7 @@ static char *get_last_selected_game_dir()
 
 static void save_last_selected_game_dir(const char *gamedir)
 {
-#ifdef __SWITCH__
+#if (defined __SWITCH__ || defined __PSP__)
 	size_t len = strlen(gamedir);
 	FILE *f = fopen(GAME_SELECTOR_DIR "/last_game.txt", "wb");
 	if (f == NULL) return;
