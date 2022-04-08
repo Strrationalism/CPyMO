@@ -451,6 +451,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		return CPYMO_ERR_SUCC;
 	}
 
+#ifndef __3DS__
 	if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
 		float percent = album->mouse_x_sum / (float)e->gameconfig.imagesize_w;
 		if (percent >= 0.25f) {
@@ -480,6 +481,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 	}
 	else
 		album->mouse_x_sum = 0;
+#endif
 
 	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) return cpymo_album_select_ok(e, album);
 	if (cpymo_key_pluse_output(&album->key_left)) return cpymo_album_prev_page(e, album);
@@ -517,6 +519,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		return cpymo_album_next_page(e, album);
 	}
 
+#ifndef __3DS__
 	if (e->prev_input.mouse_position_useable && e->input.mouse_position_useable) {
 		if (e->prev_input.mouse_x != e->input.mouse_x || e->prev_input.mouse_y != e->input.mouse_y) {
 			for (size_t i = 0; i < album->cg_count; ++i) {
@@ -528,6 +531,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 			}
 		}
 	}
+#endif
 
 	return CPYMO_ERR_SUCC;
 }
