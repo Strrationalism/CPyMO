@@ -2,6 +2,7 @@
 *.nacp
 *.nro
 build.*/
+CPyMO.vpk
 PARAM.SFO
 EBOOT.PBP
 SDL_Log.txt

@@ -70,6 +70,40 @@ jobs:
           ./cpymo-backends/3ds/cpymo.3dsx
           ./cpymo-backends/3ds/cpymo.cia
 
+  build-psv:
+    name: 'PSV'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    
+    - name: Install VitaSDK
+      run: |
+        git clone https://github.com/vitasdk/vdpm.git --depth 1
+        cd vdpm
+        chmod +x ./bootstrap-vitasdk.sh
+        ./bootstrap-vitasdk.sh
+        export VITASDK=~/usr/local/vitasdk
+        export PATH=$VITASDK/bin
+        ./vdpm sdl2
+        ./vdpm ffmpeg
+        cd ..
+
+    - name: Build
+      run: |
+        cd cpymo-backends/sdl2
+        chmod +x ./build-psv.sh
+        ./build-psv.sh
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for PSV
+        path: |
+          ./cpymo-backends/sdl2/CPyMO.vpk
+
   build-psp:
     name: 'PSP'
     runs-on: ubuntu-latest
@@ -129,13 +163,13 @@ jobs:
             os: windows-latest
             triplet: arm-windows-static
             arch: amd64_arm
-            package-name: "Windows arm"
+            package-name: "Windows ARM"
             cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
           - tuple: win-arm64
             os: windows-latest
             triplet: arm64-windows-static
             arch: amd64_arm64
-            package-name: "Windows arm64"
+            package-name: "Windows ARM64"
             cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
           - tuple: linux-x64
             os: ubuntu-latest
@@ -145,6 +179,11 @@ jobs:
             os: macos-10.15
             triplet: x64-osx
             package-name: "macOS x64"
+          - tuple: mac-arm
+            os: macos-latest
+            triplet: arm64-osx
+            package-name: "macOS ARM64"
+            cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
             
     steps:
     - uses: actions/checkout@v2

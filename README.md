@@ -202,6 +202,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
     - 目前仅可在PPSSPP在关闭“快速内存访问”时可以正常启动
 * stb_image可能不能在PSP上正常工作
     - 目前仅可在PPSSPP“忽略读写错误”时启动
+* 由于本人不会编写makefile :(
+	- Makefile.PSP将会把.o文件弄得到处都是
 
 ## 为PSP适配游戏
 
@@ -223,6 +225,30 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 3. 使用命令行pymo-converter.ps1 psp <PyMO Android版本数据包路径> <输出的PSP版本的数据包路径>。
 4. 手动转换BGM音频为ogg格式，并修改gameconfig.txt中bgmformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
 5. 手动转换VO音频为ogg格式，并修改gameconfig.txt中的voformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
+
+# 编译到索尼PSV平台
+
+目前尚不能证实CPyMO可以在索尼PSV平台正常运行。
+
+## 额外依赖
+
+- VitaSDK
+- ffmpeg (通过VitaSDK中的vdpm安装)
+- SDL2 (通过VitaSDK中的vdpm安装)
+
+## 编译
+
+在`cpymo-backends/sdl2`下执行`./build-psv.sh`.
+
+如果您愿意帮助编写`Makefile.PSV`，请提供Pull Request。
+
+## 尝试启动
+
+你需要将`default.ttf`和游戏文件夹放到`ux0:/pymogames/`中，之后启动CPyMO for PSV。
+
+如果你可以成功启动，请向我报告。
+
+目前未能通过Vita3K的测试，也没有实机可用于测试。
 
 # CPyMO移植提示
 

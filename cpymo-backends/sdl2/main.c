@@ -39,14 +39,6 @@
 #define GAME_SELECTOR_EMPTY_MSG_FONTSIZE (GAME_SELECTOR_FONTSIZE * 2.0f)
 #define GAME_SELECTOR_COUNT_PER_SCREEN 8
 #define GAME_SELECTOR_DIR "/pymogames/"
-#elif __PSP__
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 272
-#define USE_GAME_SELECTOR
-#define GAME_SELECTOR_FONTSIZE 28
-#define GAME_SELECTOR_EMPTY_MSG_FONTSIZE (GAME_SELECTOR_FONTSIZE * 2.0f)
-#define GAME_SELECTOR_COUNT_PER_SCREEN 3
-#define GAME_SELECTOR_DIR "/"
 #endif
 
 #if _WIN32 && !NDEBUG
@@ -171,7 +163,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 #endif
 
 
-#if (defined __SWITCH__ || defined __PSP__)
+#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__) && defined USE_GAME_SELECTOR)
 
 #include <dirent.h>
 cpymo_game_selector_item *get_game_list(void)
@@ -289,7 +281,7 @@ int main(int argc, char **argv)
 	const uint16_t window_size_w = engine.gameconfig.imagesize_w;
 	const uint16_t window_size_h = engine.gameconfig.imagesize_h;
 #endif
-
+	
 	if (SDL_CreateWindowAndRenderer(
 		window_size_w,
 		window_size_h,
@@ -309,7 +301,7 @@ int main(int argc, char **argv)
 #else
 	SDL_SetWindowTitle(window, "CPyMO");
 #endif
-	
+
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
 		SDL_Log("[Error] Can not set logical size: %s", SDL_GetError());
 		SDL_DestroyRenderer(renderer);
