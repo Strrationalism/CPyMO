@@ -94,7 +94,7 @@ jobs:
       run: |
         cd cpymo-backends/sdl2
         chmod +x ./build-psv.sh
-        sudo ./build-psv.sh
+        ./build-psv.sh
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
