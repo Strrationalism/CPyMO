@@ -124,7 +124,7 @@ jobs:
             triplet: x86-windows-static
             arch: x86
             package-name: "Windows x86"
-            cmake-flags: "-A x86 -DCMAKE_GENERATOR_PLATFORM=x86"
+            cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=x86"
           - tuple: win-arm
             os: windows-latest
             triplet: arm-windows-static
