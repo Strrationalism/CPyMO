@@ -177,7 +177,7 @@ jobs:
             triplet: x64-linux
             package-name: "Linux x64"
           - tuple: mac-x64
-            os: macos-10.15
+            os: macos-latest
             triplet: x64-osx
             package-name: "macOS x64"
           - tuple: mac-arm64
