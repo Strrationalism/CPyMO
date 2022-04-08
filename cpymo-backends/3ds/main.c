@@ -52,7 +52,7 @@ float enhanced_3ds_bottom_yoffset()
 			msg_h = (float)engine.say.msgbox_h * ratio;
 		}
 		else {
-			msg_h = e->gameconfig.imagesize_h * 0.25f;
+			msg_h = engine.gameconfig.imagesize_h * 0.25f;
 		}
 		
 		float y = (float)engine.gameconfig.imagesize_h - msg_h;
