@@ -89,6 +89,13 @@ jobs:
         ./vdpm sdl2
         ./vdpm ffmpeg
         ./vdpm zlib
+        ./vdpm sdl2_mixer
+        ./vdpm mpg123
+        ./vdpm flac
+        ./vdpm libmikmod
+        ./vdpm libmodplug
+        ./vdpm libogg
+        ./vdpm libvorbis
         cd ..
 
     - name: Build

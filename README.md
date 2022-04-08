@@ -33,6 +33,7 @@ pymo原版参见：https://github.com/pymo/pymo
     - Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
     - Nintendo Switch
     - Sony Playstation Portable
+    - Sony Playstation Vita
 
 # 编译到Windows、Linux或macOS
 
@@ -228,27 +229,54 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 # 编译到索尼PSV平台
 
-目前尚不能证实CPyMO可以在索尼PSV平台正常运行。
-
 ## 额外依赖
 
 - VitaSDK
-- ffmpeg (通过VitaSDK中的vdpm安装)
-- SDL2 (通过VitaSDK中的vdpm安装)
+
+以下软件包可通过VitaSDK中的vdpm安装：
+
+- sdl2
+- ffmpeg
+- zlib
+- sdl2_mixer
+- mpg123
+- flac
+- libmikmod
+- libmodplug
+- libogg
+- libvorbis
 
 ## 编译
 
 在`cpymo-backends/sdl2`下执行`./build-psv.sh`.
 
-如果您愿意帮助编写`Makefile.PSV`，请提供Pull Request。
+如果您愿意帮助编写`Makefile.PSV`，请提供Pull Request。    
 
-## 尝试启动
+## 安装
 
-你需要将`default.ttf`和游戏文件夹放到`ux0:/pymogames/`中，之后启动CPyMO for PSV。
+你需要首先安装一个PSV软件，然后将CPyMO的EBOOT.BIN拷贝进去，将该软件替换掉。    
+之后，你需要在`ux0:/pymogames`目录下放置`default.ttf`和游戏文件。    
 
-如果你可以成功启动，请向我报告。
+目前已知使用[vitasdk/samples](https://github.com/vitasdk/samples)中`sdl2/redrectangle`编译出的vpk文件用作替换可以正常运行CPyMO for PSV.
 
-目前未能通过Vita3K的测试，也没有实机可用于测试。
+## 启动
+
+启动那个被你替换掉的应用即可。    
+
+## 缺陷
+
+- 由于PSV上未知原因不能使用FFmpeg
+    * 使用SDL2_mixer作为音频后端
+	    - 不能在语音和音效通道上播放MP3格式
+		- 不能播放视频
+		
+## 为PSV适配游戏
+
+如果你需要为PSV适配游戏，那么建议你使用以下参数：
+
+* 分辨率：960×544
+* 图像：带透明通道的png，不要使用mask灰阶图片
+* 声音：ogg，16bit signed，little endian，44100Hz
 
 # CPyMO移植提示
 

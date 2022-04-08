@@ -22,6 +22,9 @@ CompileC()
         -I$VITASDK/arm-vita-eabi/include \
         -I$VITASDK/arm-vita-eabi/include/SDL2 \
         -D__PSV__ \
+        -DDISABLE_MOVIE \
+		-DDISABLE_FFMPEG_AUDIO \
+		-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
 		-DUSE_GAME_SELECTOR \
         -DGAME_SELECTOR_DIR="\"ux0:/pymogames/\"" \
         -DGAME_SELECTOR_FONTSIZE=24\
@@ -70,6 +73,13 @@ LinkCPyMO()
         -lSceHid_stub \
         -lSceMotion_stub \
         -lpthread \
+        -lSDL2_mixer \
+        -lmikmod \
+		-lFLAC \
+		-logg \
+		-lmpg123 \
+        -lvorbis \
+        -lvorbisfile \
 		-lz \
         -lm \
         -Xlinker "-)" \
