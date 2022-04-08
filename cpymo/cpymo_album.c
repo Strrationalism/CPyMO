@@ -353,6 +353,7 @@ static error_t cpymo_album_prev_page(cpymo_engine *e, cpymo_album *a)
 	}
 }
 
+#ifndef __3DS__
 static bool cpymo_album_check_mouse_in_box(cpymo_engine *e, size_t i) {
 	size_t row = i / 5;
 	size_t col = i % 5;
@@ -367,6 +368,7 @@ static bool cpymo_album_check_mouse_in_box(cpymo_engine *e, size_t i) {
 	float x2 = x + w, y2 = y + h;
 	return mx >= x && mx <= x2 && my >= y && my <= y2;
 }
+#endif
 
 static void cpymo_album_exit_showing_cg(cpymo_album *a) {
 	if (a->showing_cg_image != NULL) {

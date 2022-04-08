@@ -20,7 +20,7 @@ static error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *fi
 	
     assert(filename_without_ext_len >= 0);
 
-    strncpy(*out_mask_filename, filename, (size_t)filename_without_ext_len);
+    strcpy(*out_mask_filename, filename);
 	strcpy(*out_mask_filename + filename_without_ext_len, "_mask");
 	if (ext) strcpy(*out_mask_filename + filename_without_ext_len + 5, ext);
 
@@ -57,7 +57,7 @@ static error_t cpymo_tool_resize_image_internal(
 
 	stbir_resize_uint8(
         image->main_image, image->main_width, image->main_height, 0,
-        new_image, new_width, new_height, 0, 4);
+        new_image, (int)new_width, (int)new_height, 0, 4);
 	
     free(image->main_image);
     image->main_image = new_image;

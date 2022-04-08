@@ -253,5 +253,5 @@ jobs:
       with:
         name: CPyMO for ${{ matrix.package-name }}
         path: |
-            ./build/build/MinSizeRel/cpymo.exe
-            ./build/build/MinSizeRel/cpymo-tool.exe
+            ./build/build/Release/cpymo.exe
+            ./build/build/Release/cpymo-tool.exe
