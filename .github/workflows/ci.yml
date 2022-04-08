@@ -70,29 +70,7 @@ jobs:
           ./cpymo-backends/3ds/cpymo.3dsx
           ./cpymo-backends/3ds/cpymo.cia
 
-  build-psv:
-    name: 'PSV'
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: true
-    
 
-
-    - name: Build
-      run: |
-        cd cpymo-backends/sdl2
-        chmod +x ./build-psv.sh
-        ./build-psv.sh
-
-    - name: Upload
-      uses: actions/upload-artifact@v2.3.0
-      with:
-        name: CPyMO for PSV
-        path: |
-          ./cpymo-backends/sdl2/CPyMO.vpk
 
   build-psp:
     name: 'PSP'
@@ -169,7 +147,7 @@ jobs:
             os: macos-10.15
             triplet: x64-osx
             package-name: "macOS x64"
-          - tuple: mac-arm
+          - tuple: mac-arm64
             os: macos-latest
             triplet: arm64-osx
             package-name: "macOS ARM64"
