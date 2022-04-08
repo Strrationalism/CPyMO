@@ -176,9 +176,10 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 ## 启动
 
-在PSP记忆棒根目录创建`pymogames`目录，在此目录下放置一个字体文件`default.ttf`和游戏文件夹。  
+将EBOOT.PBP、游戏文件夹和default.ttf放在一起。    
+你需要自己准备可以使用的default.ttf，CPyMO将会加载这个文件作为字体使用。    
 
-在使用PPSSPP模拟器的情况下，你可能需要关闭`系统设置 - 快速内存访问`。
+在使用PPSSPP模拟器的情况下，你需要关闭“系统设置 - 快速内存访问”。    
 
 ## 缺陷
 
@@ -197,6 +198,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
     - 某些情况下使用icon.png会导致崩溃，如果出现了这种情况请删除icon.png
 * 由于SDL2 for PSP存在问题
     - 游戏将会在屏幕左上角显示，而不是居中显示
+* 由于缺乏PSP实体机进行调试
+    - 目前仅可在PPSSPP在关闭“快速内存访问”时可以正常启动
 
 ## 为PSP适配游戏
 
