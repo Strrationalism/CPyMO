@@ -103,7 +103,7 @@ jobs:
       with:
         name: CPyMO for PSV
         path: |
-          ./cpymo-backends/sdl2/CPyMO.vpk
+          ./cpymo-backends/sdl2/cpymo.vpk
 
   build-psp:
     name: 'PSP'
@@ -145,7 +145,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ win-x64, win-x86, win-arm64, win-arm, mac-x64, linux-x64, mac-arm64 ]
+        tuple: [ win-x64, win-x86, win-arm64, win-arm, mac-x64, mac-arm64, linux-x64 ]
 
         include:
           - tuple: win-x64
@@ -180,11 +180,12 @@ jobs:
             os: macos-latest
             triplet: x64-osx
             package-name: "macOS x64"
+            cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=x64"
           - tuple: mac-arm64
             os: macos-latest
             triplet: arm64-osx
-            package-name: "macOS ARM64"
-            cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
+            package-name: "macOS Apple Silicon"
+            cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=arm64"
             
     steps:
     - uses: actions/checkout@v2
