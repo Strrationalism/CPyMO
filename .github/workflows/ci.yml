@@ -110,7 +110,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ win-x64, win-x86, mac-x64, linux-x64 ]
+        tuple: [ win-x64, win-x86, win-arm, win-arm64, mac-x64, linux-x64 ]
         include:
           - tuple: win-x64
             os: windows-latest
@@ -135,9 +135,11 @@ jobs:
           - tuple: linux-x64
             os: ubuntu-latest
             triplet: x64-linux
+            package-name: "Linux x64"
           - tuple: mac-x64
             os: macos-10.15
             triplet: x64-osx
+            package-name: "macOS x64"
             
     steps:
     - uses: actions/checkout@v2
