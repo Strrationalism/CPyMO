@@ -52,6 +52,7 @@ INCLUDES	:=	../include ../../cpymo ../../stb ../../endianness.h
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
+NO_NACP := 1
 CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
 			-DNON_VISUALLY_IMPAIRED_HELP -DNDEBUG \
 			$(ARCH) $(DEFINES) \
@@ -61,9 +62,9 @@ CFLAGS	+=	$(INCLUDE) -D__SWITCH__ \
 			-DSCREEN_WIDTH=1920 \
 			-DSCREEN_HEIGHT=1080 \
 			-DUSE_GAME_SELECTOR \
-			-DGAME_SELECTOR_FONTSIZE=32 \
+			-DGAME_SELECTOR_FONTSIZE=80 \
 			-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE="(GAME_SELECTOR_FONTSIZE * 2.0f)" \
-			-DGAME_SELECTOR_COUNT_PER_SCREEN=8 \
+			-DGAME_SELECTOR_COUNT_PER_SCREEN=4 \
 			-DGAME_SELECTOR_DIR="\"/pymogames/\"" \
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
