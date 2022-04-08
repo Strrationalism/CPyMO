@@ -15,6 +15,13 @@ static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 	c->io_context = NULL;
 }
 
+#ifdef __PSV__
+void avio_context_free(AVIOContext **ps)
+{
+	av_freep(ps);
+}
+#endif
+
 static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 {
 	if (c->swr_context) swr_free(&c->swr_context);

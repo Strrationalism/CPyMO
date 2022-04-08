@@ -88,6 +88,7 @@ jobs:
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
         ./vdpm ffmpeg
+        ./vdpm zlib
         cd ..
 
     - name: Build
@@ -103,7 +104,7 @@ jobs:
       with:
         name: CPyMO for PSV
         path: |
-          ./cpymo-backends/sdl2/cpymo.vpk
+          ./cpymo-backends/sdl2/eboot.bin
 
   build-psp:
     name: 'PSP'

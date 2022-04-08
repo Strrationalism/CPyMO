@@ -27,14 +27,10 @@ CompileC()
         -DGAME_SELECTOR_FONTSIZE=24\
         -DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=28 \
         -DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
-        -DDISABLE_AUDIO \
-        -DDISABLE_MOVIE \
         -DSCREEN_WIDTH=960 \
         -DSCREEN_HEIGHT=544 \
         -O3 \
-        -Wall \
-        -DDISABLE_AUDIO \
-        -DDISABLE_MOVIE
+        -Wall
 }
 
 CompileCPyMO()
@@ -73,6 +69,8 @@ LinkCPyMO()
         -lSceTouch_stub \
         -lSceHid_stub \
         -lSceMotion_stub \
+        -lpthread \
+		-lz \
         -lm \
         -Xlinker "-)" \
         -L$VITASDK/arm-vita-eabi/lib \
@@ -83,12 +81,12 @@ CompileCPyMO
 LinkCPyMO
 arm-vita-eabi-strip -g $BUILD_DIR/CPyMO.elf
 vita-elf-create $BUILD_DIR/CPyMO.elf $BUILD_DIR/CPyMO.velf
-vita-make-fself $BUILD_DIR/CPyMO.velf $BUILD_DIR/eboot.bin
-vita-mksfoex -s TITLE_ID="VSDK03098" "CPyMO" $BUILD_DIR/param.sfo
+vita-make-fself -s -ss $BUILD_DIR/CPyMO.velf eboot.bin
+#vita-mksfoex -s TITLE_ID="VSDK03098" "CPyMO" $BUILD_DIR/param.sfo
 
-vita-pack-vpk -s $BUILD_DIR/param.sfo -b $BUILD_DIR/eboot.bin \
-    --add sce_sys/icon0.png=sce_sys/icon0.png \
-    --add sce_sys/livearea/contents/bg.png=sce_sys/livearea/contents/bg.png \
-    --add sce_sys/livearea/contents/startup.png=sce_sys/livearea/contents/startup.png \
-    --add sce_sys/livearea/contents/template.xml=sce_sys/livearea/contents/template.xml \
-    cpymo.vpk
+#vita-pack-vpk -s $BUILD_DIR/param.sfo -b $BUILD_DIR/eboot.bin \
+#    --add sce_sys/icon0.png=sce_sys/icon0.png \
+#    --add sce_sys/livearea/contents/bg.png=sce_sys/livearea/contents/bg.png \
+#    --add sce_sys/livearea/contents/startup.png=sce_sys/livearea/contents/startup.png \
+#    --add sce_sys/livearea/contents/template.xml=sce_sys/livearea/contents/template.xml \
+#    cpymo.vpk
