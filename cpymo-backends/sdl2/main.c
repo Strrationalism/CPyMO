@@ -31,14 +31,6 @@
 
 #ifdef __SWITCH__
 #include <switch.h>
-
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
-#define USE_GAME_SELECTOR
-#define GAME_SELECTOR_FONTSIZE 32
-#define GAME_SELECTOR_EMPTY_MSG_FONTSIZE (GAME_SELECTOR_FONTSIZE * 2.0f)
-#define GAME_SELECTOR_COUNT_PER_SCREEN 8
-#define GAME_SELECTOR_DIR "/pymogames/"
 #endif
 
 #if _WIN32 && !NDEBUG
@@ -103,7 +95,7 @@ static void ensure_save_dir(const char *gamedir)
 #ifdef USE_GAME_SELECTOR
 static char *get_last_selected_game_dir()
 {
-#ifdef __SWITCH__
+#if (defined __SWITCH__ || defined __PSP__)
 	char *str = NULL;
 	size_t len;
 	error_t err = cpymo_utils_loadfile(GAME_SELECTOR_DIR "/last_game.txt", &str, &len);

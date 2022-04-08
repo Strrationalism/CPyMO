@@ -2,7 +2,21 @@ TARGET = CPyMO_PSP
 OBJS   = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.c,%.o,$(wildcard ../../cpymo/*.c))
 
 INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h $(PSPDEV)/psp/include/SDL2
-CFLAGS   = -G0 -Wall -O2 -DDISABLE_FFMPEG_AUDIO -DDISABLE_MOVIE -DNON_VISUALLY_IMPAIRED_HELP -DNDEBUG -D__PSP__ -DENABLE_SDL2_MIXER_AUDIO_BACKEND
+CFLAGS   = -G0 -Wall -O2 \
+           -DDISABLE_FFMPEG_AUDIO \
+           -DDISABLE_MOVIE \
+           -DNON_VISUALLY_IMPAIRED_HELP \
+           -DNDEBUG \
+           -D__PSP__ \
+           -DENABLE_SDL2_MIXER_AUDIO_BACKEND \
+		   -DSCREEN_WIDTH=480 \
+           -DSCREEN_HEIGHT=272 \
+           -DUSE_GAME_SELECTOR \
+           -DGAME_SELECTOR_FONTSIZE=28 \
+           -DGAME_SELECTOR_EMPTY_MSG_FONTSIZE="(GAME_SELECTOR_FONTSIZE * 2.0f)" \
+           -DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
+           -DGAME_SELECTOR_DIR="\"/\""
+		
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS  = $(CFLAGS)
 
