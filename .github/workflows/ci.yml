@@ -70,7 +70,40 @@ jobs:
           ./cpymo-backends/3ds/cpymo.3dsx
           ./cpymo-backends/3ds/cpymo.cia
 
+  build-psv:
+    name: 'PSV'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    
+    - name: Install VitaSDK
+      run: |
+        sudo apt-install find curl tar
+        git clone https://github.com/vitasdk/vdpm.git --depth 1
+        cd vdpm
+        chmod +x ./bootstrap-vitasdk.sh
+        ./bootstrap-vitasdk.sh
+        export VITASDK=~/usr/local/vitasdk
+        export PATH=$VITASDK/bin
+        ./vdpm sdl2
+        ./vdpm ffmpeg
+        cd ..
 
+    - name: Build
+      run: |
+        cd cpymo-backends/sdl2
+        chmod +x ./build-psv.sh
+        ./build-psv.sh
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for PSV
+        path: |
+          ./cpymo-backends/sdl2/CPyMO.vpk
 
   build-psp:
     name: 'PSP'
