@@ -115,6 +115,9 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 		cpymo_backend_text_create(&item->gametitle, &item->gametitle_w,
 			cpymo_parser_stream_span_pure(game_config.gametitle), fontsize);
 
+#ifdef __PSP__
+		item->icon = NULL;
+#else
 		sprintf(path, "%s/icon.png", item->gamedir);
 		stbi_uc *pixels = stbi_load(path, &item->icon_w, &item->icon_h, NULL, 4);
 		if (pixels) {
@@ -124,6 +127,7 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 				item->icon = NULL;
 			}
 		}
+#endif
 
 		prev = item;
 		item = item->next;
