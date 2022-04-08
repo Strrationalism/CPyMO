@@ -110,13 +110,33 @@ jobs:
     
     strategy:
       matrix:
-        os: [ windows-latest, macos-10.15, ubuntu-latest ]
+        tuple: [ win-x64, win-x86, mac-x64, linux-x64 ]
         include:
-          - os: windows-latest
+          - tuple: win-x64
+            os: windows-latest
             triplet: x64-windows-static
-          - os: ubuntu-latest
+            arch: x64
+            package-name: "Windows x64"
+          - tuple: win-x86
+            os: windows-latest
+            triplet: x86-windows-static
+            arch: x86
+            package-name: "Windows x86"
+          - tuple: win-arm
+            os: windows-latest
+            triplet: arm-windows-static
+            arch: amd64_arm
+            package-name: "Windows arm"
+          - tuple: win-arm64
+            os: windows-latest
+            triplet: arm64-windows-static
+            arch: amd64_arm64
+            package-name: "Windows arm64"
+          - tuple: linux-x64
+            os: ubuntu-latest
             triplet: x64-linux
-          - os: macos-10.15
+          - tuple: mac-x64
+            os: macos-10.15
             triplet: x64-osx
             
     steps:
@@ -126,6 +146,8 @@ jobs:
         
     - uses: ilammy/msvc-dev-cmd@v1
       if: ${{ runner.os == 'Windows' }}
+      with:
+        arch: ${{ matrix.arch }}
         
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
@@ -160,11 +182,17 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      
+
+    - name: Strip
+      if: ${{ runner.os != 'Windows' }}
+      run: |
+        strip ./build/build/cpymo
+        strip ./build/build/cpymo-tool
+
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for ${{ runner.os }}
+        name: CPyMO for ${{ matrix.package-name }}
         path: |
             ./build/build/cpymo
             ./build/build/cpymo-tool
