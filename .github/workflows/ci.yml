@@ -58,7 +58,7 @@ jobs:
     - name: Build
       run: |
         cd ./cpymo-backends/3ds
-        make 3dsx -j
+        make -j
         ./makerom -f cia -o cpymo.cia -elf cpymo-strip.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
     
     - name: Upload
@@ -144,15 +144,19 @@ jobs:
           ./cpymo-backends/sdl2/EBOOT.PBP
 
   build-wasm:
-    name: 'Web Assembly'
+    name: 'Emscripten'
     runs-on: ubuntu-latest
     container: emscripten/emsdk:latest
 
     steps:
-      - name: Build
-        run: |
-          cd cpymo-backends/sdl2
-          make -f Makefile.Emscripten -j
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Build
+      run: |
+        cd cpymo-backends/sdl2
+        make -f Makefile.Emscripten -j
 
   build-desktop:
     name: 'Desktop'

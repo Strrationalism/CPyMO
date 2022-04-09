@@ -11,10 +11,11 @@ OBJS_CPYMO := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SRC_CPYMO)))
 OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND)))
 
 BUILD_GAME_DIR := # Game dir here, you need put default.ttf to /system/default.ttf.
+WASM := 0
 
 CC := emcc
 
-SDL_FLAGS := \
+EM_FLAGS := \
 	-s USE_SDL=2 \
 	-s SDL2_MIXER_FORMATS=["wav","mp3","ogg","flac","mod","mid"] \
 	-s USE_SDL_MIXER=2 \
@@ -32,11 +33,15 @@ CFLAGS := \
 	-DDISABLE_FFMPEG_AUDIO \
 	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
 	-DDISABLE_MOVIE \
-	$(SDL_FLAGS) \
+	$(EM_FLAGS) \
 	-O3
 
 ifeq ($(BUILD_GAME_DIR), )
+ifeq ($(WASM), 0)
+	BUILD_SUFFIX := js
+else
 	BUILD_SUFFIX := wasm
+endif
 else
 	BUILD_SUFFIX := html
 endif
@@ -55,7 +60,7 @@ cpymo.$(BUILD_SUFFIX): $(OBJS_BACKEND) $(OBJS_CPYMO)
 	@echo "Linking..."
 ifeq ($(BUILD_GAME_DIR), )
 	@$(CC) $^ -o $@ \
-		$(SDL_FLAGS) \
+		$(EM_FLAGS) \
 		-lidbfs.js \
 		-lSDL2 \
 		-lSDL2_mixer \
@@ -64,12 +69,13 @@ ifeq ($(BUILD_GAME_DIR), )
 		-lmpg123 \
 		-lmodplug \
 		-s ASYNCIFY \
-		-s FORCE_FILESYSTEM=1
+		-s FORCE_FILESYSTEM=1 \
+		-s WASM=$(WASM)
 else
 	@$(CC) $^ -o $@ \
-		$(SDL_FLAGS) \
+		$(EM_FLAGS) \
 		-lidbfs.js \
-		--preload-file $(BUILD_GAME_DIR)@/ \
+		--preload-file $(strip $(BUILD_GAME_DIR))@/ \
 		-lSDL2 \
 		-lSDL2_mixer \
 		-logg \
@@ -77,11 +83,13 @@ else
 		-lmpg123 \
 		-lmodplug \
 		-s ASYNCIFY \
-		-s FORCE_FILESYSTEM=1
+		-s FORCE_FILESYSTEM=1 \
+		-s WASM=$(WASM)
 endif
+	@echo "=> $@"
 
 clean:
-	@rm -rf $(BUILD_DIR) cpymo.data cpymo.html cpymo.js cpymo.wasm
+	@rm -rf $(BUILD_DIR) cpymo.data cpymo.html cpymo.js cpymo.wasm cpymo.asm.js
 
 define compile
 	@echo "$(notdir $1)"
