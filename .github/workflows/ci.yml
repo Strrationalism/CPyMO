@@ -58,7 +58,7 @@ jobs:
     - name: Build
       run: |
         cd ./cpymo-backends/3ds
-        make cia -j
+        make 3dsx -j
         ./makerom -f cia -o cpymo.cia -elf cpymo-strip.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
     
     - name: Upload
@@ -146,20 +146,13 @@ jobs:
   build-wasm:
     name: 'Web Assembly'
     runs-on: ubuntu-latest
-    containter: emscripten/emsdk
+    container: emscripten/emsdk:latest
 
     steps:
       - name: Build
         run: |
           cd cpymo-backends/sdl2
           make -f Makefile.Emscripten -j
-
-      - name: Upload
-        uses: actions/upload-artifact@v2.3.0
-        with:
-          name: CPyMO Web Assembly
-          path: |
-            ./cpymo-backends/sdl2/cpymo.wasm
 
   build-desktop:
     name: 'Desktop'
