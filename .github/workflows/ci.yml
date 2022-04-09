@@ -142,7 +142,25 @@ jobs:
         name: CPyMO for PSP
         path: |
           ./cpymo-backends/sdl2/EBOOT.PBP
-        
+
+  build-wasm:
+    name: 'Web Assembly'
+    runs-on: ubuntu-latest
+    containter: emscripten/emsdk
+
+    steps:
+      - name: Build
+        run: |
+          cd cpymo-backends/sdl2
+          make -f Makefile.Emscripten -j
+
+      - name: Upload
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: CPyMO Web Assembly
+          path: |
+            ./cpymo-backends/sdl2/cpymo.wasm
+
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}

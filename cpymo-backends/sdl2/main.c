@@ -29,8 +29,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-#ifdef __SWITCH__
+#if defined __SWITCH__
 #include <switch.h>
+#elif defined __EMSCRIPTEN__
+#include <emscripten.h> 
+#define SDL_Delay emscripten_sleep
 #endif
 
 #if _WIN32 && !NDEBUG
@@ -89,6 +92,13 @@ static void ensure_save_dir(const char *gamedir)
 {
 	char *save_dir = (char *)alloca(strlen(gamedir) + 8);
 	sprintf(save_dir, "%s/save", gamedir);
+#ifdef __EMSCRIPTEN__
+	EM_ASM(
+		FS.mount(IDBFS, {}, '/save');
+
+	FS.syncfs(true, function(err) {});
+	);
+#endif
 	mkdir(save_dir, 0777);
 }
 
@@ -212,9 +222,11 @@ int main(int argc, char **argv)
 #ifndef USE_GAME_SELECTOR
 	const char *gamedir = "./";
 
+#ifndef __EMSCRIPTEN__
 	if (argc == 2) {
 		gamedir = argv[1];
 	}
+#endif
 
 	ensure_save_dir(gamedir);
 #endif

@@ -8,6 +8,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 static inline void cpymo_save_get_filename(char *dst, unsigned short save_id)
 {
 	sprintf(dst, "save-%02d.csav", save_id);
@@ -212,6 +216,11 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	#undef WRITE_STR
 
 	fclose(save);
+
+#ifdef __EMSCRIPTEN__
+	EM_ASM(FS.syncfs(function(err) {}););
+#endif
+
 	return CPYMO_ERR_SUCC;
 }
 

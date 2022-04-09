@@ -1,0 +1,97 @@
+.PHONY: build clean run
+
+BUILD_DIR := $(shell mkdir -p build.Emscripten)build.Emscripten
+BUILD_DIR_BACKEND := $(shell mkdir -p $(BUILD_DIR)/backend)$(BUILD_DIR)/backend
+
+INC := $(wildcard *.h) $(wildcard ../include/*.h) $(wildcard ../../cpymo/*.h)
+
+SRC_CPYMO := $(wildcard ../../cpymo/*.c)
+SRC_BACKEND := $(wildcard *.c) 
+OBJS_CPYMO := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SRC_CPYMO)))
+OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND)))
+
+BUILD_GAME_DIR := # Game dir here, you need put default.ttf to /system/default.ttf.
+
+CC := emcc
+
+SDL_FLAGS := \
+	-s USE_SDL=2 \
+	-s SDL2_MIXER_FORMATS=["wav","mp3","ogg","flac","mod","mid"] \
+	-s USE_SDL_MIXER=2 \
+	-s USE_MPG123=1 \
+	-s USE_MODPLUG=1 \
+	-s USE_VORBIS=1 \
+	-s USE_OGG=1
+
+CFLAGS := \
+	-I$(CURDIR)/../include \
+	-I$(CURDIR)/../../cpymo \
+	-I$(CURDIR)/../../stb \
+	-I$(CURDIR)/../../endianness.h \
+	-D__EMSCRIPTEN__ \
+	-DDISABLE_FFMPEG_AUDIO \
+	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
+	-DDISABLE_MOVIE \
+	$(SDL_FLAGS) \
+	-O3
+
+ifeq ($(BUILD_GAME_DIR), )
+	BUILD_SUFFIX := wasm
+else
+	BUILD_SUFFIX := html
+endif
+
+build: cpymo.$(BUILD_SUFFIX)
+
+run: build
+ifeq ($(BUILD_GAME_DIR), )
+		@echo "Nothing to run."
+else
+		@emrun cpymo.html --no_browser
+endif
+
+
+cpymo.$(BUILD_SUFFIX): $(OBJS_BACKEND) $(OBJS_CPYMO)
+	@echo "Linking..."
+ifeq ($(BUILD_GAME_DIR), )
+	@$(CC) $^ -o $@ \
+		$(SDL_FLAGS) \
+		-lidbfs.js \
+		-lSDL2 \
+		-lSDL2_mixer \
+		-logg \
+		-lvorbis \
+		-lmpg123 \
+		-lmodplug \
+		-s ASYNCIFY \
+		-s FORCE_FILESYSTEM=1
+else
+	@$(CC) $^ -o $@ \
+		$(SDL_FLAGS) \
+		-lidbfs.js \
+		--preload-file $(BUILD_GAME_DIR)@/ \
+		-lSDL2 \
+		-lSDL2_mixer \
+		-logg \
+		-lvorbis \
+		-lmpg123 \
+		-lmodplug \
+		-s ASYNCIFY \
+		-s FORCE_FILESYSTEM=1
+endif
+
+clean:
+	@rm -rf $(BUILD_DIR) cpymo.data cpymo.html cpymo.js cpymo.wasm
+
+define compile
+	@echo "$(notdir $1)"
+	@$(CC) -c $1 -o $2 $(CFLAGS)
+endef
+
+$(BUILD_DIR_BACKEND)/%.o: %.c $(INC)
+	$(call compile,$<,$@)
+
+$(BUILD_DIR)/%.o: ../../cpymo/%.c $(INC)
+	$(call compile,$<,$@)
+
+

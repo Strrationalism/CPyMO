@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 error_t cpymo_save_global_load(cpymo_engine *e)
 {
 	FILE *file = cpymo_backend_read_save(e->assetloader.gamedir, "global.csav");
@@ -175,6 +179,10 @@ error_t cpymo_save_config_save(const cpymo_engine *e)
 	const size_t written = fwrite(config, sizeof(config), 1, config_file);
 	fclose(config_file);
 	if (written != 1) return CPYMO_ERR_UNKNOWN;
+
+#ifdef __EMSCRIPTEN__
+	EM_ASM(FS.syncfs(function(err) {}););
+#endif
 		
 	return CPYMO_ERR_SUCC;
 }
