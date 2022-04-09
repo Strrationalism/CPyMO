@@ -23,17 +23,16 @@ pymo原版参见：https://github.com/pymo/pymo
 感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。    
 感谢守望、heiyu04为cpymo的开发提供协助。
 
-主要目标：
 
-* 提供与原版pymo兼容的pymo开发工具
-* 在带有硬件加速的情况下跨平台
-    - Windows
-    - Linux
-    - macOS
-    - Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
-    - Nintendo Switch
-    - Sony Playstation Portable
-    - Sony Playstation Vita
+已经支持的平台：    
+- Windows
+- Linux
+- macOS
+- Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
+- Nintendo Switch
+- Sony Playstation Portable
+- Sony Playstation Vita
+- Emscripten
 
 # 编译到Windows、Linux或macOS
 
@@ -275,6 +274,26 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 * 分辨率：960×544
 * 图像：带透明通道的png，不要使用mask灰阶图片
 * 声音：ogg，16bit signed，little endian，44100Hz
+
+# 使用Emscripten编译到Web平台
+
+你可以使用Emscripten将CPyMO编译到Web Assembly或者JavsScript。
+
+## 编译
+
+在`cpymo-backends/sdl2`下修改`Makefile.Emscripten`.
+
+变量WASM设置为1时编译到 Web Assembly 二进制文件，为0时编译到 JavaScript。    
+变量BUILD_GAME_DIR指定要集成的游戏目录，留空则不集成游戏。    
+以上两个变量可通过环境传入。    
+
+游戏目录中必须存在`/system/default.ttf`作为游戏字体使用。    
+
+之后使用`make -j`即可构建。
+
+## 启动
+
+仅当集成了游戏时，可通过`make run -j`来使用emrun启动CPyMO。
 
 # CPyMO移植提示
 

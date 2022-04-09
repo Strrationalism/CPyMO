@@ -10,8 +10,13 @@ SRC_BACKEND := $(wildcard *.c)
 OBJS_CPYMO := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SRC_CPYMO)))
 OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND)))
 
+ifeq ($(BUILD_GAME_DIR), )
 BUILD_GAME_DIR := # Game dir here, you need put default.ttf to /system/default.ttf.
+endif
+
+ifeq ($(WASM), )
 WASM := 0
+endif
 
 CC := emcc
 
