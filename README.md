@@ -255,6 +255,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 目前已知使用[vitasdk/samples](https://github.com/vitasdk/samples)中`sdl2/redrectangle`编译出的vpk文件用作替换可以正常运行CPyMO for PSV.
 
+另外一种方案是根据这里的文档：https://gist.github.com/xyzz/8902bfc152940e0bd97199cc72609fd8 使用EBOOT.BIN文件创建VPK文件进行安装。
+
 ## 启动
 
 启动那个被你替换掉的应用即可。    
