@@ -87,8 +87,6 @@ jobs:
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
-        ./vdpm ffmpeg
-        ./vdpm zlib
         ./vdpm sdl2_mixer
         ./vdpm mpg123
         ./vdpm flac
@@ -103,8 +101,7 @@ jobs:
         export VITASDK=~/vitasdk
         export PATH=$VITASDK/bin:$PATH
         cd cpymo-backends/sdl2
-        chmod +x ./build-psv.sh
-        ./build-psv.sh
+        make -f Makefile.PSV -j
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0

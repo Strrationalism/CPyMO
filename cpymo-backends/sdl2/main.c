@@ -95,7 +95,7 @@ static void ensure_save_dir(const char *gamedir)
 #ifdef USE_GAME_SELECTOR
 static char *get_last_selected_game_dir()
 {
-#if (defined __SWITCH__ || defined __PSP__)
+#if (defined __SWITCH__ || defined __PSP__ || defined __PSV__)
 	char *str = NULL;
 	size_t len;
 	error_t err = cpymo_utils_loadfile(GAME_SELECTOR_DIR "/last_game.txt", &str, &len);
@@ -118,7 +118,7 @@ static char *get_last_selected_game_dir()
 
 static void save_last_selected_game_dir(const char *gamedir)
 {
-#if (defined __SWITCH__ || defined __PSP__)
+#if (defined __SWITCH__ || defined __PSP__ || defined __PSV__)
 	size_t len = strlen(gamedir);
 	FILE *f = fopen(GAME_SELECTOR_DIR "/last_game.txt", "wb");
 	if (f == NULL) return;

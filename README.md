@@ -236,8 +236,6 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 以下软件包可通过VitaSDK中的vdpm安装：
 
 - sdl2
-- ffmpeg
-- zlib
 - sdl2_mixer
 - mpg123
 - flac
@@ -248,9 +246,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 ## 编译
 
-在`cpymo-backends/sdl2`下执行`./build-psv.sh`.
-
-如果您愿意帮助编写`Makefile.PSV`，请提供Pull Request。    
+在`cpymo-backends/sdl2`下执行`make -f Makefile.PSV`.
 
 ## 安装
 
