@@ -58,8 +58,7 @@ jobs:
     - name: Build
       run: |
         cd ./cpymo-backends/3ds
-        make -j
-        make cpymo-strip.elf -j
+        make cia -j
         ./makerom -f cia -o cpymo.cia -elf cpymo-strip.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
     
     - name: Upload
