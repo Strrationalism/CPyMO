@@ -81,7 +81,7 @@ endif
 cpymo.$(BUILD_SUFFIX): $(OBJS_BACKEND) $(OBJS_CPYMO)
 	@echo "Linking..."
 ifeq ($(BUILD_GAME_DIR), )
-	@$(CC) $^ -o $@ $(LD_FLAGS)
+	@$(CC) $^ -o $@ $(LDFLAGS)
 else
 	@$(CC) $^ -o $@ $(LDFLAGS) --preload-file $(strip $(BUILD_GAME_DIR))
 endif
