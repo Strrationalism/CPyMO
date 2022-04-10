@@ -26,7 +26,7 @@ EM_FLAGS := \
 	-s USE_SDL_MIXER=2 \
 	-s USE_OGG=1 \
 	-s USE_VORBIS=1 \
-	-s USE_MPG123=1 \	
+	-s USE_MPG123=1
 	#-s USE_MODPLUG=1
 	
 	
