@@ -43,16 +43,18 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		volumes[i] = 1;
 	}
 	
+#ifdef __EMSCRIPTEN__
+	int err = Mix_Init(MIX_INIT_OGG);
+#else
 	int err = Mix_Init(
 		MIX_INIT_FLAC
 		| MIX_INIT_MOD 
 		| MIX_INIT_MP3 
 		| MIX_INIT_OGG
-#ifndef __EMSCRIPTEN__
 		| MIX_INIT_MID
 		| MIX_INIT_OPUS
-#endif
 	);
+#endif
 
 	if (err == 0) {
 		printf("[Error] SDL2_Mixer init failed: %s\n", Mix_GetError());
