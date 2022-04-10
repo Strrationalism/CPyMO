@@ -22,12 +22,12 @@ CC := emcc
 
 EM_FLAGS := \
 	-s USE_SDL=2 \
-	-s SDL2_MIXER_FORMATS=["wav","mp3","ogg","flac","mod","mid"] \
-	-s USE_SDL_MIXER=2 \
-	-s USE_MPG123=1 \
-	-s USE_MODPLUG=1 \
-	-s USE_VORBIS=1 \
-	-s USE_OGG=1
+	-s SDL2_MIXER_FORMATS=[ogg,mp3,flac,mid,mod] \
+	#-s USE_SDL_MIXER=2 \
+	#-s USE_MPG123=1 \
+	#-s USE_MODPLUG=1 \
+	#-s USE_VORBIS=1 \
+	#-s USE_OGG=1
 
 CFLAGS := \
 	-I$(CURDIR)/../include \
@@ -35,11 +35,26 @@ CFLAGS := \
 	-I$(CURDIR)/../../stb \
 	-I$(CURDIR)/../../endianness.h \
 	-D__EMSCRIPTEN__ \
+	-DEMSCRIPTEN_GAMEDIR="\"$(BUILD_GAME_DIR)\"" \
 	-DDISABLE_FFMPEG_AUDIO \
 	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
 	-DDISABLE_MOVIE \
 	$(EM_FLAGS) \
 	-O3
+
+LDFLAGS := \
+	$(EM_FLAGS) \
+	-lidbfs.js \
+	-lSDL2 \
+	-lSDL2_mixer \
+	-logg \
+	-lvorbis \
+	-lmpg123 \
+	-lmodplug \
+	-s ASYNCIFY \
+	-s FORCE_FILESYSTEM=1 \
+	-s WASM=$(WASM) \
+	-s EXPORTED_RUNTIME_METHODS=['ccall'] 
 
 ifeq ($(BUILD_GAME_DIR), )
 ifeq ($(WASM), 0)
@@ -64,32 +79,9 @@ endif
 cpymo.$(BUILD_SUFFIX): $(OBJS_BACKEND) $(OBJS_CPYMO)
 	@echo "Linking..."
 ifeq ($(BUILD_GAME_DIR), )
-	@$(CC) $^ -o $@ \
-		$(EM_FLAGS) \
-		-lidbfs.js \
-		-lSDL2 \
-		-lSDL2_mixer \
-		-logg \
-		-lvorbis \
-		-lmpg123 \
-		-lmodplug \
-		-s ASYNCIFY \
-		-s FORCE_FILESYSTEM=1 \
-		-s WASM=$(WASM)
+	@$(CC) $^ -o $@ $(LD_FLAGS)
 else
-	@$(CC) $^ -o $@ \
-		$(EM_FLAGS) \
-		-lidbfs.js \
-		--preload-file $(strip $(BUILD_GAME_DIR))@/ \
-		-lSDL2 \
-		-lSDL2_mixer \
-		-logg \
-		-lvorbis \
-		-lmpg123 \
-		-lmodplug \
-		-s ASYNCIFY \
-		-s FORCE_FILESYSTEM=1 \
-		-s WASM=$(WASM)
+	@$(CC) $^ -o $@ $(LDFLAGS) --preload-file $(strip $(BUILD_GAME_DIR))
 endif
 	@echo "=> $@"
 

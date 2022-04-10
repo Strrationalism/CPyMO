@@ -88,18 +88,37 @@ static void set_window_icon(const char *gamedir)
 #endif
 }
 
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+const char *get_emscripten_game_dir(void) {
+	return EMSCRIPTEN_GAMEDIR;
+}
+
+#include <cpymo_save_global.h>
+
+EMSCRIPTEN_KEEPALIVE
+void reload_global_save(void) {
+	cpymo_save_config_load(&engine);
+	cpymo_save_global_load(&engine);
+}
+
+#endif
+
 static void ensure_save_dir(const char *gamedir)
 {
 	char *save_dir = (char *)alloca(strlen(gamedir) + 8);
 	sprintf(save_dir, "%s/save", gamedir);
+	mkdir(save_dir, 0777);
 #ifdef __EMSCRIPTEN__
 	EM_ASM(
-		FS.mount(IDBFS, {}, '/save');
+		var gamedir = Module.ccall('get_emscripten_game_dir', 'string');
+		FS.mount(IDBFS, {}, gamedir + '/save');
 
-	FS.syncfs(true, function(err) {});
+		FS.syncfs(true, function(err) {
+			Module.ccall('reload_global_save');
+		});
 	);
 #endif
-	mkdir(save_dir, 0777);
 }
 
 #ifdef USE_GAME_SELECTOR
@@ -226,6 +245,8 @@ int main(int argc, char **argv)
 	if (argc == 2) {
 		gamedir = argv[1];
 	}
+#else
+	gamedir = EMSCRIPTEN_GAMEDIR;
 #endif
 
 	ensure_save_dir(gamedir);

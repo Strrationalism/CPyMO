@@ -218,7 +218,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	fclose(save);
 
 #ifdef __EMSCRIPTEN__
-	EM_ASM(FS.syncfs(function(err) {}););
+	EM_ASM(FS.syncfs(false, function(err) {}););
 #endif
 
 	return CPYMO_ERR_SUCC;

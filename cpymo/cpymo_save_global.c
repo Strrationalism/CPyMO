@@ -155,6 +155,10 @@ error_t cpymo_save_global_save(const cpymo_engine *e)
 
 	fclose(file);
 
+#ifdef __EMSCRIPTEN__
+	EM_ASM(FS.syncfs(false, function(err) {}););
+#endif
+
 	return CPYMO_ERR_SUCC;
 
 	#undef WRITE
@@ -181,7 +185,7 @@ error_t cpymo_save_config_save(const cpymo_engine *e)
 	if (written != 1) return CPYMO_ERR_UNKNOWN;
 
 #ifdef __EMSCRIPTEN__
-	EM_ASM(FS.syncfs(function(err) {}););
+	EM_ASM(FS.syncfs(false, function(err) {}););
 #endif
 		
 	return CPYMO_ERR_SUCC;

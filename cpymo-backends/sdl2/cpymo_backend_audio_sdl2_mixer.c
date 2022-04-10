@@ -48,8 +48,8 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		| MIX_INIT_MOD 
 		| MIX_INIT_MP3 
 		| MIX_INIT_OGG
-		| MIX_INIT_MID
 #ifndef __EMSCRIPTEN__
+		| MIX_INIT_MID
 		| MIX_INIT_OPUS
 #endif
 	);
