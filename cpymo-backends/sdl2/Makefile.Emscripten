@@ -22,14 +22,8 @@ CC := emcc
 
 EM_FLAGS := \
 	-s USE_SDL=2 \
-	-s SDL2_MIXER_FORMATS=[ogg,mp3] \
-	-s USE_SDL_MIXER=2 \
-	-s USE_OGG=1 \
-	-s USE_VORBIS=1 \
-	-s USE_MPG123=1 \
-	-s USE_MODPLUG=1
-	
-	
+	-s SDL2_MIXER_FORMATS=[ogg,mp3,flac,mid,mod,wav] \
+	-s USE_SDL_MIXER=2
 
 CFLAGS := \
 	-I$(CURDIR)/../include \
@@ -49,10 +43,6 @@ LDFLAGS := \
 	-lidbfs.js \
 	-lSDL2 \
 	-lSDL2_mixer \
-	-logg \
-	-lvorbis \
-	-lmpg123 \
-	-lmodplug \
 	-s ASYNCIFY \
 	-s FORCE_FILESYSTEM=1 \
 	-s WASM=$(WASM) \

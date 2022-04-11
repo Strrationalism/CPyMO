@@ -43,23 +43,7 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		volumes[i] = 1;
 	}
 	
-#ifdef __EMSCRIPTEN__
-	int err = Mix_Init(MIX_INIT_OGG);
-#else
-	int err = Mix_Init(
-		MIX_INIT_FLAC
-		| MIX_INIT_MOD 
-		| MIX_INIT_MP3 
-		| MIX_INIT_OGG
-		| MIX_INIT_MID
-		| MIX_INIT_OPUS
-	);
-#endif
-
-	if (err == 0) {
-		printf("[Error] SDL2_Mixer init failed: %s\n", Mix_GetError());
-		return;
-	}
+	Mix_Init(0xFFFFFFFF);
 
 	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, MIX_DEFAULT_FORMAT, 2, 8192) == -1) {
 		printf("[Error] SDL2_Mixer open audio failed: %s\n", Mix_GetError());
@@ -107,6 +91,7 @@ bool cpymo_audio_enabled(struct cpymo_engine *e)
 
 bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 {
+	if (!enabled) return false;
 	if (Mix_Playing(CPYMO_AUDIO_CHANNEL_SE - 1)) {
 		if (se_looping) {
 			printf("[Error] Can not wait for a looping SE.\n");
@@ -119,6 +104,7 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 
 error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
 {
+	if (!enabled) return CPYMO_ERR_SUCC;
 	cpymo_audio_bgm_stop(e);
 
 	char *path = NULL;
@@ -150,6 +136,7 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
 
 void cpymo_audio_bgm_stop(struct cpymo_engine *e)
 {
+	if (!enabled) return;
 	Mix_HaltMusic();
 	if (bgm) Mix_FreeMusic(bgm);
 	bgm = NULL;
@@ -159,6 +146,7 @@ void cpymo_audio_bgm_stop(struct cpymo_engine *e)
 
 error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sename, bool loop)
 {
+	if (!enabled) return CPYMO_ERR_SUCC;
 #ifdef __PSP__
 	return CPYMO_ERR_SUCC;
 #endif
@@ -223,6 +211,7 @@ error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sen
 
 void cpymo_audio_se_stop(struct cpymo_engine *e)
 {
+	if (!enabled) return;
 	Mix_HaltChannel(CPYMO_AUDIO_CHANNEL_SE - 1);
 	if (se) Mix_FreeChunk(se);
 	se = NULL;
@@ -236,6 +225,7 @@ void cpymo_audio_se_stop(struct cpymo_engine *e)
 
 error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname)
 {
+	if (!enabled) return CPYMO_ERR_SUCC;
 	cpymo_audio_vo_stop(e);
 
 	if (e->assetloader.use_pkg_voice) {
@@ -292,6 +282,7 @@ error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span von
 
 void cpymo_audio_vo_stop(struct cpymo_engine *e)
 {
+	if (!enabled) return;
 	Mix_HaltChannel(CPYMO_AUDIO_CHANNEL_VO - 1);
 	if (vo) Mix_FreeChunk(vo);
 	vo = NULL;
@@ -303,11 +294,13 @@ void cpymo_audio_vo_stop(struct cpymo_engine *e)
 
 const char *cpymo_audio_get_bgm_name(struct cpymo_engine *e)
 {
+	if (!enabled) return "";
 	return bgm_name;
 }
 
 const char *cpymo_audio_get_se_name(struct cpymo_engine *e)
 {
+	if (!enabled) return "";
 	return se_name;
 }
 
