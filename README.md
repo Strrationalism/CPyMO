@@ -410,6 +410,7 @@ pymo-converter目前支持将游戏适配到以下设备：
 * pymo-android
 * 3ds
 * psp
+* psv
 
 ## mo2pymo
 

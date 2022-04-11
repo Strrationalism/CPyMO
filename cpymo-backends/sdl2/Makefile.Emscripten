@@ -48,7 +48,8 @@ LDFLAGS := \
 	-s ASYNCIFY \
 	-s FORCE_FILESYSTEM=1 \
 	-s WASM=$(WASM) \
-	-s EXPORTED_RUNTIME_METHODS=['ccall'] 
+	-s EXPORTED_RUNTIME_METHODS=['ccall'] \
+	-s ALLOW_MEMORY_GROWTH=1
 
 ifeq ($(BUILD_GAME_DIR), )
 ifeq ($(WASM), 0)
