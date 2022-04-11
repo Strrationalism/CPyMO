@@ -184,7 +184,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 #endif
 
 
-#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__) && defined USE_GAME_SELECTOR)
+#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__) && defined USE_GAME_SELECTOR)
 
 #include <dirent.h>
 cpymo_game_selector_item *get_game_list(void)
@@ -197,7 +197,7 @@ cpymo_game_selector_item *get_game_list(void)
 	if (dir) {
 		struct dirent* ent;
 		while ((ent = readdir(dir))) {
-			char *path = (char *)malloc(strlen(ent->d_name) + 16);
+			char *path = (char *)malloc(strlen(ent->d_name) + strlen(GAME_SELECTOR_DIR) + 4);
 			sprintf(path, GAME_SELECTOR_DIR "/%s", ent->d_name);
 
 			cpymo_game_selector_item *cur = NULL;
@@ -300,8 +300,23 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
 #if (defined SCREEN_WIDTH && defined SCREEN_HEIGHT)
+#ifdef ADAPT_SCREEN_SIZE
+	uint16_t window_size_w, window_size_h;
+	{
+		SDL_Rect r;
+		if (SDL_GetDisplayBounds(0, &r) == 0) {
+			window_size_w = (uint16_t)r.w;
+			window_size_h = (uint16_t)r.h;
+		}
+		else {
+			window_size_w = SCREEN_WIDTH;
+			window_size_h = SCREEN_HEIGHT;
+		}
+	}
+#else
 	const uint16_t window_size_w = SCREEN_WIDTH;
 	const uint16_t window_size_h = SCREEN_HEIGHT;
+#endif
 #else
 	const uint16_t window_size_w = engine.gameconfig.imagesize_w;
 	const uint16_t window_size_h = engine.gameconfig.imagesize_h;
