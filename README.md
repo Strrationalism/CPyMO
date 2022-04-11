@@ -279,6 +279,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 你可以使用Emscripten将CPyMO编译到Web Assembly或者JavsScript。
 
+[在这里你可以找到部署在Github Pages上的Demo](https://strrationalism.github.io/CPyMO-Web-Demo/)。
+
 ## 编译
 
 在`cpymo-backends/sdl2`下修改`Makefile.Emscripten`.
@@ -295,7 +297,24 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 仅当集成了游戏时，可通过`make run -j`来使用emrun启动CPyMO。
 
-# CPyMO移植提示
+# 使用CPyMO开发新游戏
+
+我们推荐你使用[YukimiScript](https://github.com/Strrationalism/YukimiScript)作为开发语言，当然也可以使用传统PyMO游戏的开发方式。    
+
+[CPyMO-YukimiScript-Template](https://github.com/Strrationalism/CPyMO-YukimiScript-Template)是一套使用YukimiScript语言和Pipe构建系统的CPyMO项目模板，我们建议你基于它来开发游戏。    
+
+除此之外，我们建议你使用以下格式：
+
+* 分辨率：CPyMO没有分辨率限制，你可以根据自己的需要选择分辨率
+* 音频：ogg，48000Hz，16bit signed
+    - 注：CPyMO仅保证wav和ogg两种格式在所有平台上都可识别。
+* 视频：mp4
+    - 注：CPyMO不保证所有平台都可以播放视频。
+* 图片：png
+
+如果你需要生成特定于平台的包，你可以先创建发布包，然后再使用pymo-converter工具将其转换为各个平台上通用的包。
+
+# 将CPyMO移植到其他平台
 
 CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”组成。
 
