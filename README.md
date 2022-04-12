@@ -322,7 +322,7 @@ Android 工程目录在`cpymo-backends/android`。
 ## 启动
 
 1. 安装CPyMO，并在“设置 - 应用 - CPyMO”中允许其一切权限。
-1. 在绝对路径`/sdcard/pymogames/`中放置`default.ttf`和游戏文件夹。
+1. 在绝对路径`/sdcard/pymogames/`或`/storage/emulated/0/pymogames/`中放置`default.ttf`和游戏文件夹。
 1. 启动CPyMO。
 
 ## 缺陷

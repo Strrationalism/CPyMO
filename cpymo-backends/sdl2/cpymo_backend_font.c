@@ -37,7 +37,7 @@ void cpymo_backend_font_free()
 	ttf_buffer = NULL;
 }
 
-error_t cpymo_backend_font_init(const char *gamedir, const char *custom)
+error_t cpymo_backend_font_init(const char *gamedir)
 {
 	char *path = (char *)alloca((gamedir ? strlen(gamedir) : 0) + 24);
 	error_t err = CPYMO_ERR_SUCC;
@@ -47,12 +47,27 @@ error_t cpymo_backend_font_init(const char *gamedir, const char *custom)
 		sprintf(path, "%s/system/default.ttf", gamedir);
 		err = cpymo_backend_font_try_load_font(path);
 		if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
+
+		sprintf(path, "%s/system/default.otf", gamedir);
+		err = cpymo_backend_font_try_load_font(path);
+		if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
 	}
 
-	if (custom) {
-		err = cpymo_backend_font_try_load_font(custom);
-		if (err == CPYMO_ERR_SUCC) return err;
-	}
+#ifdef GAME_SELECTOR_DIR
+	err = cpymo_backend_font_try_load_font(GAME_SELECTOR_DIR "/default.ttf");
+	if (err == CPYMO_ERR_SUCC) return err;
+
+	err = cpymo_backend_font_try_load_font(GAME_SELECTOR_DIR "/default.otf");
+	if (err == CPYMO_ERR_SUCC) return err;
+#endif
+	
+#ifdef GAME_SELECTOR_DIR_2
+	err = cpymo_backend_font_try_load_font(GAME_SELECTOR_DIR_2 "/default.ttf");
+	if (err == CPYMO_ERR_SUCC) return err;
+
+	err = cpymo_backend_font_try_load_font(GAME_SELECTOR_DIR_2 "/default.otf");
+	if (err == CPYMO_ERR_SUCC) return err;
+#endif
 
 #ifdef _WIN32
 	const char *windir = getenv("windir");

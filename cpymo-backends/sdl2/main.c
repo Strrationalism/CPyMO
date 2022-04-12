@@ -55,7 +55,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 cpymo_engine engine;
 
-extern error_t cpymo_backend_font_init(const char *gamedir, const char *fallback);
+extern error_t cpymo_backend_font_init(const char *gamedir);
 extern void cpymo_backend_font_free();
 
 extern void cpymo_backend_audio_init();
@@ -170,7 +170,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 
 #ifndef __PSP__
 	cpymo_backend_font_free();
-	error_t err = cpymo_backend_font_init(gamedir, GAME_SELECTOR_DIR "/default.ttf");
+	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
 #endif
 
@@ -187,18 +187,18 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 #if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__) && defined USE_GAME_SELECTOR)
 
 #include <dirent.h>
-cpymo_game_selector_item *get_game_list(void)
+cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 {
 	cpymo_game_selector_item *item = NULL;
 	cpymo_game_selector_item *item_tail = NULL;
 
-	DIR *dir = opendir(GAME_SELECTOR_DIR);
+	DIR *dir = opendir(game_selector_dir);
 
 	if (dir) {
 		struct dirent* ent;
 		while ((ent = readdir(dir))) {
-			char *path = (char *)malloc(strlen(ent->d_name) + strlen(GAME_SELECTOR_DIR) + 4);
-			sprintf(path, GAME_SELECTOR_DIR "/%s", ent->d_name);
+			char *path = (char *)malloc(strlen(ent->d_name) + strlen(game_selector_dir) + 4);
+			sprintf(path, "%s/%s", game_selector_dir, ent->d_name);
 
 			cpymo_game_selector_item *cur = NULL;
 			error_t err = cpymo_game_selector_item_create(&cur, &path);
@@ -271,7 +271,19 @@ int main(int argc, char **argv)
 	error_t err = cpymo_engine_init(&engine, gamedir);
 #else
 	char *last_selected_game_dir = get_last_selected_game_dir();
-	cpymo_game_selector_item *item = get_game_list();
+	cpymo_game_selector_item *item = get_game_list(GAME_SELECTOR_DIR);
+
+#ifdef GAME_SELECTOR_DIR_2
+	{
+		cpymo_game_selector_item *item2 = get_game_list(GAME_SELECTOR_DIR_2);
+		if (item == NULL) item = item2;
+		else {
+			while (item->next != NULL) item = item->next;
+			item->next = item2;
+		}
+	}
+#endif
+	
 	error_t err = cpymo_engine_init_with_game_selector(
 		&engine, SCREEN_WIDTH, SCREEN_HEIGHT,
 		GAME_SELECTOR_FONTSIZE,
@@ -355,9 +367,9 @@ int main(int argc, char **argv)
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 #ifndef USE_GAME_SELECTOR
-	if (cpymo_backend_font_init(gamedir, NULL) != CPYMO_ERR_SUCC) {
+	if (cpymo_backend_font_init(gamedir) != CPYMO_ERR_SUCC) {
 #else
-	if (cpymo_backend_font_init(NULL, GAME_SELECTOR_DIR "/default.ttf") != CPYMO_ERR_SUCC) {
+	if (cpymo_backend_font_init(NULL) != CPYMO_ERR_SUCC) {
 #endif
 		SDL_Log("[Error] Can not find font file, try put default.ttf into <gamedir>/system/.");
 		SDL_DestroyRenderer(renderer);
