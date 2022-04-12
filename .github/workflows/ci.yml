@@ -170,6 +170,8 @@ jobs:
 
     - name: Setup JDK
       uses: actions/setup-java@v1
+      with:
+        - java-version: 1.8
 
     - name: Build APK
       uses: sparkfabrik/android-build-action@v1.0.0
