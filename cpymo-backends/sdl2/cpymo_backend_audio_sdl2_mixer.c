@@ -1,4 +1,5 @@
 #ifdef ENABLE_SDL2_MIXER_AUDIO_BACKEND
+#include <SDL.h>
 #include <SDL_mixer.h>
 #include <cpymo_audio.h>
 #include <cpymo_engine.h>
@@ -43,7 +44,19 @@ void cpymo_audio_init(cpymo_audio_system *s)
 		volumes[i] = 1;
 	}
 	
-	Mix_Init(0xFFFFFFFF);
+	int supported = Mix_Init(
+			MIX_INIT_FLAC |
+			MIX_INIT_MP3 |
+			MIX_INIT_OGG |
+			MIX_INIT_MID |
+			MIX_INIT_MOD |
+			MIX_INIT_OPUS);
+
+	if ((supported & MIX_INIT_MP3) == 0)
+		SDL_Log("[Warning] MP3 not supported.\n");
+
+	if ((supported & MIX_INIT_OGG) == 0)
+		SDL_Log("[Warning] OGG not supported.\n");
 
 	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, MIX_DEFAULT_FORMAT, 2, 8192) == -1) {
 		printf("[Error] SDL2_Mixer open audio failed: %s\n", Mix_GetError());
@@ -53,6 +66,8 @@ void cpymo_audio_init(cpymo_audio_system *s)
 
 	Mix_AllocateChannels(CPYMO_AUDIO_MAX_CHANNELS - 1);
 	enabled = true;
+
+	SDL_Log("[Info] SDL_Mixer init success.\n");
 }
 
 void cpymo_audio_free(cpymo_audio_system *s)
@@ -115,13 +130,13 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
 	free(path);
 
 	if (bgm == NULL) {
-		printf("[Error] Can not load music: %s\n", Mix_GetError());
+		SDL_Log("[Error] Can not load music: %s\n", Mix_GetError());
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}		
 
 	int err2 = Mix_PlayMusic(bgm, loop ? -1 : 1);
 	if (err2 == -1) {
-		printf("[Error] Can not play music: %s\n", Mix_GetError());
+		SDL_Log("[Error] Can not play music: %s\n", Mix_GetError());
 		return CPYMO_ERR_UNKNOWN;
 	}
 	
@@ -131,6 +146,7 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
 			cpymo_parser_stream_span_copy(bgm_name, bgmname.len + 1, bgmname);
 	}
 
+	SDL_Log("[Info] Start play bgm.\n");
 	return CPYMO_ERR_SUCC;
 }
 
@@ -195,6 +211,7 @@ error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sen
 		se_rwops = NULL;
 		if (se_data) free(se_data);
 		se_data = NULL;
+		SDL_Log("[Error] Can not load SE: %s\n", Mix_GetError());
 		return CPYMO_ERR_BAD_FILE_FORMAT;
 	}
 
@@ -267,7 +284,7 @@ error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span von
 
 	vo = Mix_LoadWAV_RW(vo_rwops, 0);
 	if (vo == NULL) {
-		printf("[Error] Can not load vo chunk: %s\n", Mix_GetError());
+		SDL_Log("[Error] Can not load vo chunk: %s\n", Mix_GetError());
 		SDL_RWclose(vo_rwops);
 		vo_rwops = NULL;
 		if (vo_data) free(vo_data);
@@ -276,6 +293,8 @@ error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span von
 	}
 	
 	Mix_PlayChannel(CPYMO_AUDIO_CHANNEL_VO - 1, vo, 0);
+
+	SDL_Log("[Info] VO Play!\n");
 	
 	return CPYMO_ERR_SUCC;
 }

@@ -33,8 +33,9 @@ pymo原版参见：https://github.com/pymo/pymo
 - Sony Playstation Portable
 - Sony Playstation Vita
 - Emscripten
+- Android
 
-# 编译到Windows、Linux或macOS
+# 桌面平台 (Windows、Linux与macOS)
 
 ## 额外依赖
 
@@ -57,7 +58,7 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 按下Alt + Enter键可在全屏/窗口模式中切换。
 
-# 编译到任天堂3DS平台
+# Nintendo 3DS 平台
 
 ## 额外依赖
 
@@ -123,7 +124,7 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 
 如果自带的字体不能满足你的需求，那么你可以将bcfnt格式的字体放入SD卡中的`/pymogames/font.bcfnt`路径处，CPyMO将会优先加载这个字体。
 
-# 编译到任天堂Switch平台
+# Nintendo Switch 平台
 
 ## 额外依赖
 
@@ -158,7 +159,7 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 * platform参数：pygame
 * 视频格式：H264 MP4
 
-# 编译到索尼PSP平台
+# Sony Playstation Portable 平台
 
 PSP平台的CPyMO仅能运行s60v3数据包或下述“适配”的包。
 
@@ -226,7 +227,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 4. 手动转换BGM音频为ogg格式，并修改gameconfig.txt中bgmformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
 5. 手动转换VO音频为ogg格式，并修改gameconfig.txt中的voformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
 
-# 编译到索尼PSV平台
+# Sony Playstation Vita 平台
 
 ## 额外依赖
 
@@ -275,11 +276,18 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 * 图像：带透明通道的png，不要使用mask灰阶图片
 * 声音：ogg，16bit signed，little endian，44100Hz
 
-# 使用Emscripten编译到Web平台
+# Emscripten 平台
 
 你可以使用Emscripten将CPyMO编译到Web Assembly或者JavsScript。
 
 [在这里你可以找到部署在Github Pages上的Demo](https://strrationalism.github.io/CPyMO-Web-Demo/)。
+
+## 缺陷
+
+- 由于在Emscripten上部署ffmpeg较为困难
+    * 使用SDL2_mixer作为音频后端
+	    - 不能在语音和音效通道上播放MP3格式
+		- 不能播放视频
 
 ## 编译
 
@@ -296,6 +304,30 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 ## 启动
 
 仅当集成了游戏时，可通过`make run -j`来使用emrun启动CPyMO。
+
+# Android 平台
+
+仅支持 Android 4.1 及以上的系统。
+
+## 编译
+
+Android 工程目录在`cpymo-backends/android`。
+
+## 启动
+
+1. 安装CPyMO，并在“设置 - 应用 - CPyMO”中允许其一切权限。
+1. 在绝对路径`/sdcard/pymogames/`中放置`default.ttf`和游戏文件夹。
+1. 启动CPyMO。
+
+## 缺陷
+
+- 由于在Android平台上部署ffmpeg较为困难
+    * 使用SDL2_mixer作为音频后端
+        - 不能播放视频
+    * 由于SDL2_mixer中mpg123库缺少CMake支持
+        - 不能播放MP3音频
+- Android 12的权限管理系统较为复杂
+    * 可能不能在Android 12上运行
 
 # 使用CPyMO开发新游戏
 

@@ -4,3 +4,9 @@
 [submodule "stb"]
 	path = stb
 	url = https://github.com/nothings/stb.git
+[submodule "cpymo-backends/sdl2/SDL"]
+	path = cpymo-backends/sdl2/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "cpymo-backends/sdl2/SDL_mixer"]
+	path = cpymo-backends/sdl2/SDL_mixer
+	url = https://github.com/libsdl-org/SDL_mixer.git

@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.18.1)
 project("cpymo")
 
 find_package(SDL2 CONFIG REQUIRED)
-find_package(sdl2-mixer CONFIG REQUIRED)
+#find_package(sdl2-mixer CONFIG REQUIRED)
 
 find_library( # Sets the name of the path variable.
         log-lib
@@ -26,8 +26,8 @@ find_library( # Sets the name of the path variable.
 
 
 add_definitions(
-        -DENABLE_SDL2_MIXER_AUDIO_BACKEND
-        -DDISABLE_FFMPEG_AUDIO
+        #-DENABLE_SDL2_MIXER_AUDIO_BACKEND
+        #-DDISABLE_FFMPEG_AUDIO
         -DDISABLE_AUDIO
         -DDISABLE_MOVIE
         -DUSE_GAME_SELECTOR
@@ -70,4 +70,4 @@ add_library( # Sets the name of the library.
         "../../../../../sdl2/cpymo_backend_movie.c"
         "../../../../../sdl2/cpymo_backend_audio_sdl2_mixer.c")
 
-target_link_libraries(cpymo PUBLIC SDL2::SDL2main SDL2::SDL2 SDL2::SDL2_mixer cpymolib ${log-lib})
+target_link_libraries(cpymo PUBLIC SDL2::SDL2main SDL2::SDL2 cpymolib ${log-lib})
