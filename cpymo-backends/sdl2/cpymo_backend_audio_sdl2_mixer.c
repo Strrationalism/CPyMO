@@ -49,8 +49,7 @@ void cpymo_audio_init(cpymo_audio_system *s)
 			MIX_INIT_MP3 |
 			MIX_INIT_OGG |
 			MIX_INIT_MID |
-			MIX_INIT_MOD |
-			MIX_INIT_OPUS);
+			MIX_INIT_MOD);
 
 	if ((supported & MIX_INIT_MP3) == 0)
 		SDL_Log("[Warning] MP3 not supported.\n");
