@@ -35,6 +35,18 @@ pymo原版参见：https://github.com/pymo/pymo
 - Emscripten
 - Android
 
+平台                       | 支持等级 | 后端  | 视频播放器 | 音频支持                                | 字体支持          | 额外功能
+========================= | ======= | ==== | ======== | ====================================== | =============== | =======
+Windows                   | 重要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
+Linux                     | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
+macOS                     | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
+Nintendo 3DS              | 重要     | 3DS  | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 自带默认字体      | 游戏选择器
+Nintendo Switch           | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 游戏选择器
+Sony Playstation Portable | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG, WAV；不支持SE通道       | 手动外置字体      | 游戏选择器
+Sony Playstation Vita     | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM通道), OGG, WAV    | 手动外置字体      | 游戏选择器
+Emscripten                | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM通道), OGG, WAV    | 手动外置字体      | 
+Android                   | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG(仅BGM通道), WAV         | 手动外置字体      | 游戏选择器，视障帮助
+
 # 桌面平台 (Windows、Linux与macOS)
 
 ## 额外依赖
@@ -57,8 +69,6 @@ brew install libxcb
 github action及release上的版本默认会开启视障帮助功能，如果你需要禁用视障帮助功能，可在编译时定义宏NON_VISUALLY_IMPAIRED_HELP.
 
 视障帮助功能将会把游戏中的文本复制到剪切板供读屏软件读取。    
-
-仅Windows、macOS和Linux版本支持视障帮助功能。
 
 ## 全屏
 
@@ -266,13 +276,6 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 ## 启动
 
 启动那个被你替换掉的应用即可。    
-
-## 缺陷
-
-- 由于PSV上未知原因不能使用FFmpeg
-    * 使用SDL2_mixer作为音频后端
-	    - 不能在语音和音效通道上播放MP3格式
-		- 不能播放视频
 		
 ## 为PSV适配游戏
 
@@ -287,13 +290,6 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 你可以使用Emscripten将CPyMO编译到Web Assembly或者JavsScript。
 
 [在这里你可以找到部署在Github Pages上的Demo](https://strrationalism.github.io/CPyMO-Web-Demo/)。
-
-## 缺陷
-
-- 由于在Emscripten上部署ffmpeg较为困难
-    * 使用SDL2_mixer作为音频后端
-	    - 不能在语音和音效通道上播放MP3格式
-		- 不能播放视频
 
 ## 编译
 
@@ -324,14 +320,6 @@ Android 工程目录在`cpymo-backends/android`。
 1. 安装CPyMO，并在“设置 - 应用 - CPyMO”中允许其一切权限。
 1. 在绝对路径`/sdcard/pymogames/`或`/storage/emulated/0/pymogames/`中放置`default.ttf`和游戏文件夹。
 1. 启动CPyMO。
-
-## 缺陷
-
-- 由于在Android平台上部署ffmpeg较为困难
-    * 使用SDL2_mixer作为音频后端
-        - 不能播放视频
-    * 由于SDL2_mixer中mpg123库缺少CMake支持
-        - 不能播放MP3音频
 
 # 使用CPyMO开发新游戏
 
