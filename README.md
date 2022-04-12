@@ -454,6 +454,7 @@ pymo-converter目前支持将游戏适配到以下设备：
   - benhonjen
   - 镜面倾斜
   - 七月缘
+  - __
 
 # 赞助
 
