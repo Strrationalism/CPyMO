@@ -7,9 +7,21 @@ cmake_minimum_required(VERSION 3.18.1)
 
 # Declares and names the project.
 
+
+#set(WITH_OGG OFF CACHE STRING "FLAC WITH OGG")   # WTF in FLAC???
+set(SUPPORT_WAV ON CACHE STRING "SUPPORT_WAV")
+#set(SUPPORT_FLAC OFF CACHE STRING "SUPPORT_FLAC" FORCE)
+set(SUPPORT_OGG ON CACHE STRING "SUPPORT_OGG")
+set(SUPPORT_MP3_MPG123 ON CACHE STRING "SUPPORT_MP3_MPG123")
+set(SUPPORT_MOD_MODPLUG ON CACHE STRING "SUPPORT_MOD_MODPLUG")
+#set(SUPPORT_MID_TIMIDITY ON CACHE STRING "SUPPORT_MID_TIMIDITY")
+
 project("cpymo")
 
-find_package(SDL2 CONFIG REQUIRED)
+add_subdirectory(../../../../../sdl2/SDL SDL)
+add_subdirectory(../../../../../sdl2/SDL_mixer SDL_mixer)
+
+#find_package(SDL2 CONFIG REQUIRED)
 #find_package(sdl2-mixer CONFIG REQUIRED)
 
 find_library( # Sets the name of the path variable.
@@ -26,9 +38,9 @@ find_library( # Sets the name of the path variable.
 
 
 add_definitions(
-        #-DENABLE_SDL2_MIXER_AUDIO_BACKEND
-        #-DDISABLE_FFMPEG_AUDIO
-        -DDISABLE_AUDIO
+        -DENABLE_SDL2_MIXER_AUDIO_BACKEND
+        -DDISABLE_FFMPEG_AUDIO
+        #-DDISABLE_AUDIO
         -DDISABLE_MOVIE
         -DUSE_GAME_SELECTOR
         -DADAPT_SCREEN_SIZE
@@ -70,4 +82,4 @@ add_library( # Sets the name of the library.
         "../../../../../sdl2/cpymo_backend_movie.c"
         "../../../../../sdl2/cpymo_backend_audio_sdl2_mixer.c")
 
-target_link_libraries(cpymo PUBLIC SDL2::SDL2main SDL2::SDL2 cpymolib ${log-lib})
+target_link_libraries(cpymo PUBLIC SDL2main SDL2 SDL2_mixer cpymolib ${log-lib})
