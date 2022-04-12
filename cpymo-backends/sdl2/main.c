@@ -396,20 +396,20 @@ int main(int argc, char **argv)
 		SDL_UnlockAudio();
 	}
 
+	size_t redraw_by_event = 30;
 	while (
 		1
 #ifdef __SWITCH
 		&& appletMainLoop()
 #endif
 		) {
-		bool redraw_by_event = false;
 
 		extern float mouse_wheel;
 		mouse_wheel = 0;
 
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_WINDOWEVENT || event.type == SDL_RENDER_TARGETS_RESET)
-				redraw_by_event = true;
+				redraw_by_event++;
 			else if (event.type == SDL_MOUSEWHEEL) {
 				mouse_wheel = (float)event.wheel.y;
 				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
@@ -430,6 +430,11 @@ int main(int argc, char **argv)
 				extern void cpymo_input_refresh_joysticks();
 				cpymo_input_refresh_joysticks();
 			}
+			else if (event.type == SDL_APP_WILLENTERFOREGROUND || event.type == SDL_APP_DIDENTERFOREGROUND) {
+				redraw_by_event++;
+			}
+			else if (event.type == SDL_APP_TERMINATING || event.type == SDL_APP_LOWMEMORY)
+				goto EXIT;
 #ifndef __ANDROID__
 			else if (event.type == SDL_QUIT)
                 goto EXIT;
@@ -479,6 +484,7 @@ int main(int argc, char **argv)
 			SDL_RenderClear(renderer);
 			cpymo_engine_draw(&engine);
 			SDL_RenderPresent(renderer);
+			if (redraw_by_event) redraw_by_event--;
 			//fps_counter++;
 		} else SDL_Delay(16);
 	}
