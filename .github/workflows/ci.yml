@@ -175,11 +175,27 @@ jobs:
       with:
         java-version: '17'
         distribution: 'microsoft'
+
     - name: Build APK
       uses: sparkfabrik/android-build-action@v1.0.0
       with:
         project-path: ./cpymo-backends/android
         output-path: cpymo.apk
+
+    - name: Sign APK
+      uses: r0adkll/sign-android-release@v1
+      # ID used to access action output
+      id: sign_app
+      with:
+        releaseDirectory: app/build/outputs/apk/release
+        signingKeyBase64: ${{ secrets.ANDROID_SIGN_KEYSTORE }}
+        alias: 'key0'
+        keyStorePassword: '123456'
+        keyPassword: '123456'
+      env:
+        # override default build-tools version (29.0.3) -- optional
+        BUILD_TOOLS_VERSION: "30.0.2"
+
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
