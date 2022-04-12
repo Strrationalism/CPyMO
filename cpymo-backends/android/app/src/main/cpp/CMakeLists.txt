@@ -16,10 +16,10 @@ set(SUPPORT_MP3_MPG123 ON CACHE STRING "SUPPORT_MP3_MPG123")
 set(SUPPORT_MOD_MODPLUG ON CACHE STRING "SUPPORT_MOD_MODPLUG")
 #set(SUPPORT_MID_TIMIDITY ON CACHE STRING "SUPPORT_MID_TIMIDITY")
 
-project("cpymo")
-
 add_subdirectory(../../../../../sdl2/SDL SDL)
 add_subdirectory(../../../../../sdl2/SDL_mixer SDL_mixer)
+
+project("cpymo")
 
 #find_package(SDL2 CONFIG REQUIRED)
 #find_package(sdl2-mixer CONFIG REQUIRED)
