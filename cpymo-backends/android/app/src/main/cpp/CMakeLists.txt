@@ -13,7 +13,7 @@ set(SUPPORT_WAV ON CACHE STRING "SUPPORT_WAV")
 #set(SUPPORT_FLAC OFF CACHE STRING "SUPPORT_FLAC" FORCE)
 set(SUPPORT_OGG ON CACHE STRING "SUPPORT_OGG")
 set(SUPPORT_MP3_MPG123 ON CACHE STRING "SUPPORT_MP3_MPG123")
-set(SUPPORT_MOD_MODPLUG ON CACHE STRING "SUPPORT_MOD_MODPLUG")
+set(SUPPORT_MOD_MODPLUG OFF CACHE STRING "SUPPORT_MOD_MODPLUG" FORCE)
 #set(SUPPORT_MID_TIMIDITY ON CACHE STRING "SUPPORT_MID_TIMIDITY")
 
 add_subdirectory(../../../../../sdl2/SDL SDL)
@@ -82,4 +82,4 @@ add_library( # Sets the name of the library.
         "../../../../../sdl2/cpymo_backend_movie.c"
         "../../../../../sdl2/cpymo_backend_audio_sdl2_mixer.c")
 
-target_link_libraries(cpymo PUBLIC SDL2main SDL2 SDL2_mixer cpymolib ${log-lib})
+target_link_libraries(cpymo PUBLIC SDL2main SDL2 SDL2_mixer cpymolib ${log-lib} c++_static)
