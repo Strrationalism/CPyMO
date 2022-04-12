@@ -11,7 +11,7 @@
         android:theme="@style/Theme.CPyMO">
         <activity
             android:name="org.libsdl.app.SDLActivity"
-            android:screenOrientation="landscape"
+            android:screenOrientation="sensorLandscape"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
