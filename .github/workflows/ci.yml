@@ -181,6 +181,7 @@ jobs:
       with:
         project-path: ./cpymo-backends/android
         output-path: cpymo.apk
+        gradle-task: assembleRelease
 
     - name: Sign APK
       uses: r0adkll/sign-android-release@v1
