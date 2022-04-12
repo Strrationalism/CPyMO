@@ -16,12 +16,20 @@ typedef struct {
 	cpymo_select_img menu;
 	cpymo_wait menu_waiter;
 
+	cpymo_key_hold touch;
+
 	bool alive;
 } cpymo_rmenu;
 
 static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 {
 	cpymo_rmenu *r = (cpymo_rmenu *)ui_data;
+
+	enum cpymo_key_hold_result result = cpymo_key_hold_update(&r->touch, dt, e->input.mouse_button);
+	if (result == cpymo_key_hold_result_hold_released) {
+		cpymo_ui_exit(e);
+		return CPYMO_ERR_SUCC;
+	}
 
 	if (r->alive) {
 		error_t err = cpymo_wait_update(&r->menu_waiter, e, dt);
@@ -149,6 +157,8 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 	CPYMO_THROW(err);
 
 	rmenu->alive = true;
+
+	cpymo_key_hold_init(&rmenu->touch, e->input.mouse_button);
 
 	cpymo_select_img_init(&rmenu->menu);
 	cpymo_wait_reset(&rmenu->menu_waiter);
