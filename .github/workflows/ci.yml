@@ -203,7 +203,7 @@ jobs:
       with:
         name: CPyMO for Android
         path: |
-          ./cpymo.apk
+          ./cpymo-signed.apk
 
   build-desktop:
     name: 'Desktop'
