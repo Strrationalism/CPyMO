@@ -231,9 +231,6 @@ jobs:
     - name: Bootstrap vcpkg (Windows)
       run: ./vcpkg/bootstrap-vcpkg.bat
       if: ${{ runner.os == 'Windows' }}
-
-    - name: Install SDL2
-      run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
       
     - name: Install X11 for Linux
       run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
