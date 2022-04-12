@@ -1,6 +1,7 @@
 #include <cpymo_error.h>
 #include <cpymo_utils.h>
 #include <stdio.h>
+#include <SDL.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
@@ -147,6 +148,10 @@ error_t cpymo_backend_font_init(const char *gamedir)
 		return CPYMO_ERR_SUCC;
 	}
 	plExit();
+#endif
+
+#ifdef __ANDROID__
+	SDL_AndroidShowToast("Can not find /sdcard/pymogames/default.ttf", 1, -1, 0, 0);
 #endif
 
 	return CPYMO_ERR_CAN_NOT_OPEN_FILE;

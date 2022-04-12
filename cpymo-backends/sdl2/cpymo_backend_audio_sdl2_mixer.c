@@ -26,6 +26,14 @@ static SDL_RWops *vo_rwops = NULL;
 #define SDL2_MIXER_AUDIO_BACKEND_FREQ 44100
 #endif
 
+#ifdef __ANDROID__
+#define CHUNK_SIZE (1024 * 1024 * 8)
+#endif
+
+#ifndef CHUNK_SIZE
+#define CHUNK_SIZE (1024 * 256)
+#endif
+
 void cpymo_audio_init(cpymo_audio_system *s)
 {
 	enabled = false;
@@ -57,7 +65,7 @@ void cpymo_audio_init(cpymo_audio_system *s)
 	if ((supported & MIX_INIT_OGG) == 0)
 		SDL_Log("[Warning] OGG not supported.\n");
 
-	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, MIX_DEFAULT_FORMAT, 2, 1024 * 1024) == -1) {
+	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, MIX_DEFAULT_FORMAT, 2, CHUNK_SIZE) == -1) {
 		printf("[Error] SDL2_Mixer open audio failed: %s\n", Mix_GetError());
 		Mix_Quit();
 		return;
