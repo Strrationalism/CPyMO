@@ -46,6 +46,12 @@ pymo原版参见：https://github.com/pymo/pymo
 
 如果你使用Microsoft Visual Studio，默认的CMakeSettings.json中指示的依赖版本为x64-windows-static。
 
+如果你需要在macOS上运行，那么你需要首先安装libxcb:
+
+```bash
+brew install libxcb
+```
+
 ## 视障帮助功能
 
 github action及release上的版本默认会开启视障帮助功能，如果你需要禁用视障帮助功能，可在编译时定义宏NON_VISUALLY_IMPAIRED_HELP.
