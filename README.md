@@ -23,10 +23,10 @@ pymo原版参见：https://github.com/pymo/pymo
 
 平台                       | 支持等级 | 后端  | 视频播放器 | 音频支持                              | 字体支持          | 额外功能
 -------------------------- | ------- | ---- | --------- | ------------------------------------- | ------------------- | -------
-Windows                   | 重要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
+Windows                   | 主要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
 Linux                     | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
 macOS                     | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
-Nintendo 3DS              | 重要     | 3DS  | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 自带字体        | 游戏选择器
+Nintendo 3DS              | 主要     | 3DS  | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 自带字体        | 游戏选择器
 Nintendo Switch           | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 游戏选择器
 Sony PSP                  | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG, WAV; 不支持SE通道       | 外置字体       | 游戏选择器
 Sony PSV                  | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG, WAV    | 外置字体        | 游戏选择器
