@@ -17,7 +17,6 @@ android {
             cmake {
                 cppFlags ''
                 arguments "-DANDROID_STL=c++_shared"
-                abiFilters 'x86_64'
             }
         }
     }
