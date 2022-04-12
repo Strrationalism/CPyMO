@@ -168,6 +168,8 @@ jobs:
       with:
         submodules: true
 
+    - run: chmod +x ./cpymo-backends/android/gradlew
+
     - name: Setup JDK
       uses: actions/setup-java@v3
       with:
