@@ -232,6 +232,12 @@ int main(int argc, char **argv)
 	av_log_set_level(AV_LOG_ERROR);
 #endif
 
+#ifdef __ANDROID__
+	SDL_AndroidRequestPermission("android.permission.MANAGE_EXTERNAL_STORAGE");
+	SDL_AndroidRequestPermission("android.permission.WRITE_EXTERNAL_STORAGE");
+	SDL_AndroidRequestPermission("android.permission.READ_EXTERNAL_STORAGE");
+#endif
+
 #ifndef DISABLE_FFMPEG_AUDIO
 	engine.audio.enabled = false;
 #endif
@@ -251,7 +257,6 @@ int main(int argc, char **argv)
 
 	ensure_save_dir(gamedir);
 #endif
-
 	// SDL2 has 2 memory leaks!
 	if (SDL_Init(
 		SDL_INIT_EVENTS |
@@ -306,10 +311,11 @@ int main(int argc, char **argv)
 	}
 
 	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+	//SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+
 
 #if (defined SCREEN_WIDTH && defined SCREEN_HEIGHT)
 #ifdef ADAPT_SCREEN_SIZE
@@ -402,9 +408,7 @@ int main(int argc, char **argv)
 		mouse_wheel = 0;
 
 		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT)
-				goto EXIT;
-			else if (event.type == SDL_WINDOWEVENT || event.type == SDL_RENDER_TARGETS_RESET)
+			if (event.type == SDL_WINDOWEVENT || event.type == SDL_RENDER_TARGETS_RESET)
 				redraw_by_event = true;
 			else if (event.type == SDL_MOUSEWHEEL) {
 				mouse_wheel = (float)event.wheel.y;
@@ -426,6 +430,10 @@ int main(int argc, char **argv)
 				extern void cpymo_input_refresh_joysticks();
 				cpymo_input_refresh_joysticks();
 			}
+#ifndef __ANDROID__
+			else if (event.type == SDL_QUIT)
+                goto EXIT;
+#endif
 #ifdef ENABLE_ALT_ENTER_FULLSCREEN
 			else if (event.type == SDL_KEYDOWN) {
 				if (event.key.keysym.sym == SDLK_RETURN && (event.key.keysym.mod & KMOD_ALT)) {

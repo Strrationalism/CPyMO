@@ -52,7 +52,6 @@ add_definitions(
         "-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=56"
         -DGAME_SELECTOR_COUNT_PER_SCREEN=4
         -DGAME_SELECTOR_DIR="/sdcard/pymogames"
-        -DGAME_SELECTOR_DIR_2="/storage/emulated/0/pymogames"
 )
 
 include_directories(
