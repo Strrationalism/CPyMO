@@ -159,6 +159,31 @@ jobs:
         cd cpymo-backends/sdl2
         make -f Makefile.Emscripten -j
 
+  build-android:
+    name: 'Android'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Setup JDK
+      uses: actions/setup-java@v1
+
+    - name: Build APK
+      uses: sparkfabrik/android-build-action@v1.0.0
+      with:
+        project-path: ./cpymo-backends/android
+        output-path: cpymo.apk
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Android
+        path: |
+          ./cpymo.apk
+
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
