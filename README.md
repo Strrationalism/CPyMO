@@ -326,8 +326,6 @@ Android 工程目录在`cpymo-backends/android`。
         - 不能播放视频
     * 由于SDL2_mixer中mpg123库缺少CMake支持
         - 不能播放MP3音频
-- Android 12的权限管理系统较为复杂
-    * 可能不能在Android 12上运行
 
 # 使用CPyMO开发新游戏
 
