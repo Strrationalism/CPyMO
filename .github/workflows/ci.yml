@@ -187,7 +187,7 @@ jobs:
       # ID used to access action output
       id: sign_app
       with:
-        releaseDirectory: app/build/outputs/apk/release
+        releaseDirectory: ./
         signingKeyBase64: ${{ secrets.ANDROID_SIGN_KEYSTORE }}
         alias: 'key0'
         keyStorePassword: '123456'
