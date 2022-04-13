@@ -6,3 +6,5 @@
 /Win32
 /x64
 /packages
+/AppPackages
+/BundleArtifacts

@@ -205,6 +205,36 @@ jobs:
         path: |
           ./cpymo-signed.apk
 
+  build-uwp:
+    name: 'Universal Windows Platform'
+    runs-on: 'windows-latest'
+
+    steps:
+    - uses: ilammy/msvc-dev-cmd@v1
+        
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
+        
+    - name: Donwload vcpkg
+      run: git clone https://github.com/microsoft/vcpkg --depth 1
+
+    - name: Bootstrap vcpkg
+      run: |
+        ./vcpkg/bootstrap-vcpkg.bat
+        ./vcpkg/vcpkg integrate install
+
+    - name: Install FFmpeg
+      run: |
+        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp
+
+    - name: Build
+      run: msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release ./cpymo-backends/uwp/CPyMO.vcxproj
+
+    - name: Upload
+      with:
+        name: CPyMO for Universal Windows Platform
+        path: ./cpymo-backends/uwp/AppPackages/CPyMO/
+
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
