@@ -5,8 +5,7 @@
 
 cmake_minimum_required(VERSION 3.18.1)
 
-# Declares and names the project.
-
+set(CMAKE_C_FLAGS "-O3 -DNDEBUG ${CMAKE_C_FLAGS}")
 
 #set(WITH_OGG OFF CACHE STRING "FLAC WITH OGG")   # WTF in FLAC???
 set(SUPPORT_WAV ON CACHE STRING "SUPPORT_WAV")
@@ -46,7 +45,6 @@ add_definitions(
         -DADAPT_SCREEN_SIZE
         -DSCREEN_WIDTH=800
         -DSCREEN_HEIGHT=600
-        -DNDEBUG
         -D__ANDROID__
         -DGAME_SELECTOR_FONTSIZE=46
         "-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=56"
