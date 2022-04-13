@@ -42,9 +42,6 @@
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="cpymo_backend_uwp.cpp" />
     <ClCompile Include="../sdl2/SDL/src/main/winrt/SDL_winrt_main_NonXAML.cpp" />
     <ClCompile Include="..\..\cpymo\cpymo_album.c">

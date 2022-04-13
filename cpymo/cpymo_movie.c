@@ -13,8 +13,17 @@
 #ifndef DISABLE_FFMPEG_MOVIE
 #include <assert.h>
 #include <cpymo_backend_movie.h>
+
+#ifdef __CXX
+extern "C" {
+#endif
+
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
+
+#ifdef __CXX
+}
+#endif
 
 typedef struct {
 	AVFormatContext *format_context;

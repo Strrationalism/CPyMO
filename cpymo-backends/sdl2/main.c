@@ -183,6 +183,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 }
 #endif
 
+cpymo_game_selector_item *get_game_list(const char *game_selector_dir);
 
 #if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__) && defined USE_GAME_SELECTOR)
 

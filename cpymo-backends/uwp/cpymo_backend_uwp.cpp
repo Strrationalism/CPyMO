@@ -1,11 +1,14 @@
 #include <string>
+#include <cvt/wstring>
+#include <codecvt>
 #include <assert.h>
 #include <SDL.h>
+#include <cpymo_game_selector.h>
+
 using namespace Windows::Storage;
 
 template <typename T>
-class maybe final
-{
+class maybe final {
 private:
 	bool is_just_;
 	T value_;
@@ -37,8 +40,46 @@ maybe<T> wait_async(Windows::Foundation::IAsyncOperation<T> ^async) {
 	return maybe<T>{ async->GetResults() };
 }
 
-void enum_games() {
-	auto x = wait_async(wait_async(KnownFolders::DocumentsLibrary->GetFolderAsync("pymogames")).get()->GetFileAsync("default.ttf")).get();
-	std::wstring font_path = x->Path->Data();
+std::string w2c(Platform::String ^s) {
+	stdext::cvt::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+	return convert.to_bytes(s->Data());
 }
 
+
+cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
+{
+	cpymo_game_selector_item *head = NULL, *tail = NULL;
+	auto local_folder = ApplicationData::Current->LocalFolder;
+
+	auto sub_folders = wait_async(local_folder->GetFoldersAsync());
+	if (sub_folders.is_just()) {
+		for (unsigned i = 0; i < sub_folders.get()->Size; ++i) {
+			std::string path = w2c(sub_folders.get()->GetAt(i)->Path);
+			path = path;
+
+			cpymo_game_selector_item *cur = (cpymo_game_selector_item *)malloc(sizeof(cpymo_game_selector_item));
+			if (cur == NULL) continue;
+
+			memset(cur, 0, sizeof(cpymo_game_selector_item));
+
+			char *path_c = (char *)malloc(path.size() + 1);
+			if (path_c == NULL) {
+				free(cur); 
+				continue;
+			}
+
+			strcpy(path_c, path.c_str());
+			cur->gamedir = path_c;
+			cur->next = NULL;
+
+			if (head == NULL) head = cur;
+			if (tail != NULL) tail->next = cur;
+			tail = cur;
+		}
+
+			
+	}
+	
+
+	return head;
+}

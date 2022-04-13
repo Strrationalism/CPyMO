@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{c29a5fc6-bd31-4292-9851-27cc92418aab}</ProjectGuid>
     <RootNamespace>CPyMO</RootNamespace>
-    <DefaultLanguage>en-US</DefaultLanguage>
+    <DefaultLanguage>zh-CN</DefaultLanguage>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
@@ -149,7 +149,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -159,7 +159,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -169,7 +169,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -179,7 +179,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -189,7 +189,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -199,7 +199,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -209,7 +209,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -219,7 +219,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -235,9 +235,6 @@
     <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Image Include="Assets\StoreLogo.png" />
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\cpymo\cpymo_album.c" />
@@ -340,13 +337,5 @@
     <ClInclude Include="..\..\cpymo\cpymo_wait.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets" Condition="Exists('packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

@@ -24,9 +24,17 @@ typedef struct {
 
 #if (!defined DISABLE_FFMPEG_AUDIO)
 
+#ifdef __CXX
+extern "C" {
+#endif
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
+
+#ifdef __CXX
+}
+#endif
 
 typedef struct {
 	bool enabled, loop;

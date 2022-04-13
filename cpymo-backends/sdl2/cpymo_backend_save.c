@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "posix_win32.h"
+#include <SDL.h>
 
-#ifdef __UWP__
 
-#else
 FILE *cpymo_backend_read_save(const char * gamedir, const char * name)
 {
 	char *path = (char *)alloca(strlen(gamedir) + strlen(name) + 8);
@@ -19,4 +18,3 @@ FILE *cpymo_backend_write_save(const char * gamedir, const char * name)
 	sprintf(path, "%s/save/%s", gamedir, name);
 	return fopen(path, "wb");
 }
-#endif
