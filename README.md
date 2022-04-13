@@ -18,36 +18,21 @@
 如果你需要使用CPyMO制作游戏，可以参见[CPyMO + YukimiScript开发模板](https://github.com/Strrationalism/CPyMO-YukimiScript-Template)。
 
 pymo原版参见：https://github.com/pymo/pymo    
-原作者：chen_xin_ming    
-
-感谢幻世为cpymo提供测试样例以使得cpymo与pymo的运行结果尽可能一致。    
-感谢守望、heiyu04为cpymo的开发提供协助。
-
 
 已经支持的平台：    
-- Windows
-- Linux
-- macOS
-- Nintendo 3DS（[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)）
-- Nintendo Switch
-- Sony Playstation Portable
-- Sony Playstation Vita
-- Emscripten
-- Android
-- Universal Windows Platform
 
-平台                        | 支持等级 | 后端  | 视频播放器 | 音频支持                                | 字体支持          | 额外功能
--------------------------- | -------- | ---- | -------- | -------------------------------------- | --------------- | -------
-Windows                    | 主要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
-Linux                      | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
-macOS                      | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
-Nintendo 3DS               | 主要     | 3DS  | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 自带默认字体      | 游戏选择器
-Nintendo Switch            | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 游戏选择器
-Sony Playstation Portable  | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG, WAV；不支持SE通道       | 手动外置字体      | 游戏选择器
-Sony Playstation Vita      | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM通道), OGG, WAV    | 手动外置字体      | 游戏选择器
-Emscripten                 | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM通道), OGG, WAV    | 手动外置字体      | 
-Android                    | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG(仅BGM通道), WAV         | 手动外置字体      | 游戏选择器，视障帮助 
-Universal Windows Platform | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 游戏选择器 
+平台                       | 支持等级 | 后端  | 视频播放器 | 音频支持                              | 字体支持          | 额外功能
+-------------------------- | ------- | ---- | --------- | ------------------------------------- | ------------------- | -------
+Windows                   | 主要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
+Linux                     | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
+macOS                     | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 视障帮助
+Nintendo 3DS              | 主要     | 3DS  | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 自带字体        | 游戏选择器
+Nintendo Switch           | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体        | 游戏选择器
+Sony PSP                  | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG, WAV; 不支持SE通道       | 外置字体       | 游戏选择器
+Sony PSV                  | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG, WAV    | 外置字体        | 游戏选择器
+Emscripten                | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG, WAV    | 外置字体        | 
+Android                   | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG, WAV                    | 外置字体        | 游戏选择器，视障帮助
+Universal Windows Platform | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 游戏选择器
 
 # 桌面平台 (Windows、Linux与macOS)
 
@@ -77,6 +62,8 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 按下Alt + Enter键可在全屏/窗口模式中切换。
 
 # Nintendo 3DS 平台
+
+[在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)
 
 ## 额外依赖
 
@@ -323,6 +310,7 @@ Android 工程目录在`cpymo-backends/android`。
 1. 在绝对路径`/sdcard/pymogames/`或`/storage/emulated/0/pymogames/`中放置`default.ttf`和游戏文件夹。
 1. 启动CPyMO。
 
+
 # Universal Windows Platform 平台
 
 最低支持Windows 10 (10.0.10240.0)。
@@ -475,6 +463,24 @@ pymo-converter目前支持将游戏适配到以下设备：
 该工具用于将PyMO API公开到[YukimiScript](github.com/Strrationalism/YukimiScript)语言中，    
 使得YukimiScript语言可以访问PyMO/CPyMO引擎的各项功能。    
 
+# 贡献者
+
+* PyMO原作者
+  - chen_xin_ming    
+* CPyMO主要作者
+  - 许兴逸
+* 协助
+  - 守望
+  - heiyu04
+* 测试
+  - 幻世
+  - °SARTINCE。
+  - 白若秋
+  - 卢毅
+  - benhonjen
+  - 镜面倾斜
+  - 七月缘
+  - __
 
 # 赞助
 
