@@ -210,7 +210,12 @@ jobs:
     runs-on: 'windows-latest'
 
     steps:
-    - uses: ilammy/msvc-dev-cmd@v1
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Find Visual Studio
+      uses: ilammy/msvc-dev-cmd@v1
         
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
@@ -231,6 +236,7 @@ jobs:
       run: msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release ./cpymo-backends/uwp/CPyMO.vcxproj
 
     - name: Upload
+      uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
