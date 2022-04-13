@@ -122,8 +122,6 @@ static void ensure_save_dir(const char *gamedir)
 }
 
 #ifdef USE_GAME_SELECTOR
-cpymo_game_selector_item *get_game_list(const char *game_selector_dir);
-
 static char *get_last_selected_game_dir()
 {
 #if (defined __SWITCH__ || defined __PSP__ || defined __PSV__)
@@ -162,6 +160,9 @@ static void save_last_selected_game_dir(const char *gamedir)
 
 #ifdef USE_GAME_SELECTOR
 #include <cpymo_game_selector.h>
+
+cpymo_game_selector_item *get_game_list(const char *game_selector_dir);
+
 static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
 	save_last_selected_game_dir(gamedir);
