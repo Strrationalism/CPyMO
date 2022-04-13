@@ -37,7 +37,7 @@ pymo原版参见：https://github.com/pymo/pymo
 - Universal Windows Platform
 
 平台                        | 支持等级 | 后端  | 视频播放器 | 音频支持                                | 字体支持          | 额外功能
-========================== | ======= | ==== | ======== | ====================================== | =============== | =======
+-------------------------- | -------- | ---- | -------- | -------------------------------------- | --------------- | -------
 Windows                    | 主要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
 Linux                      | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
 macOS                      | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 视障帮助
@@ -46,8 +46,8 @@ Nintendo Switch            | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WA
 Sony Playstation Portable  | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG, WAV；不支持SE通道       | 手动外置字体      | 游戏选择器
 Sony Playstation Vita      | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM通道), OGG, WAV    | 手动外置字体      | 游戏选择器
 Emscripten                 | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM通道), OGG, WAV    | 手动外置字体      | 
-Android                    | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG(仅BGM通道), WAV         | 手动外置字体      | 游戏选择器，视障帮助
-Universal Windows Platform | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 游戏选择器
+Android                    | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG(仅BGM通道), WAV         | 手动外置字体      | 游戏选择器，视障帮助 
+Universal Windows Platform | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG, WAV                  | 加载系统字体      | 游戏选择器 
 
 # 桌面平台 (Windows、Linux与macOS)
 
