@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "posix_win32.h"
-#include <malloc.h>
 
+#ifdef __UWP__
+#include <malloc.h>
+#endif
 
 FILE *cpymo_backend_read_save(const char * gamedir, const char * name)
 {
