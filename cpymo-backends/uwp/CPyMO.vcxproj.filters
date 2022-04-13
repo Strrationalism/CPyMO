@@ -314,4 +314,7 @@
       <Filter>cpymo</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CPyMO_TemporaryKey.pfx" />
+  </ItemGroup>
 </Project>

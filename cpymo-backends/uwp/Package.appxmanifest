@@ -9,8 +9,8 @@
 
   <Identity
     Name="7062935b-c643-4df5-97d1-2744bf120181"
-    Publisher="CN=85397"
-    Version="1.0.0.0" />
+    Publisher="CN=CPyMO"
+    Version="1.0.5.0" />
 
   <mp:PhoneIdentity PhoneProductId="7062935b-c643-4df5-97d1-2744bf120181" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
