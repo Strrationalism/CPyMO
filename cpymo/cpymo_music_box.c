@@ -156,7 +156,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	box->font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
 
 #ifndef NON_VISUALLY_IMPAIRED_HELP
-	box->music_title_text = malloc(sizeof(char *) * box->music_count);
+	box->music_title_text = (char **)malloc(sizeof(char *) * box->music_count);
 	cpymo_list_ui_set_selection_changed_callback(
 		e, &cpymo_musicbox_visual_help_selection_change);
 #endif

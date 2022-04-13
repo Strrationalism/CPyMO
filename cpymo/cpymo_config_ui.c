@@ -202,7 +202,7 @@ static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_e
 {
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
 	const cpymo_localization *l = cpymo_localization_get(e);
-	const char *p;
+	const char *p = NULL;
 	switch (i) {
 	case ITEM_BGM_VOL: p = l->config_bgmvol; break;
 	case ITEM_SE_VOL: p = l->config_sevol; break;

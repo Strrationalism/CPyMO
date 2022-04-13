@@ -28,13 +28,13 @@ static void cpymo_backend_audio_sdl_callback(void *userdata, Uint8 * stream, int
 	memset(stream, 0, (size_t)len);
 	
 	for (size_t cid = 0; cid < CPYMO_AUDIO_MAX_CHANNELS; ++cid) {
-		void *samples;
+		void *samples = NULL;
 		size_t szlen = (size_t)len;
 		size_t written = 0;
 		float volume = cpymo_audio_get_channel_volume(cid, &engine.audio);
 
 		while (cpymo_audio_channel_get_samples(&samples, &szlen, cid, &engine.audio) && szlen) {
-			SDL_MixAudio(stream + written, samples, (Uint32)szlen, (int)(volume * SDL_MIX_MAXVOLUME));
+			SDL_MixAudio(stream + written, (Uint8 *)samples, (Uint32)szlen, (int)(volume * SDL_MIX_MAXVOLUME));
 			written += szlen;
 			szlen = (size_t)len - written;
 		}

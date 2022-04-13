@@ -1,0 +1,8 @@
+/ARM
+/ARM64
+/.vs
+/Debug
+/Release
+/Win32
+/x64
+/packages

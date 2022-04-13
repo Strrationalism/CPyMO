@@ -1022,7 +1022,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 			uint64_t sel_hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
 
-			int hint_mode = cpymo_select_img_selection_nohint;
+			enum cpymo_select_img_selection_hint_state hint_mode = cpymo_select_img_selection_nohint;
 			if (!(IS_EMPTY(hint_pic))) {
 				uint32_t first_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
 

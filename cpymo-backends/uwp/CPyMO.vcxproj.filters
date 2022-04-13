@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>c29a5fc6-bd31-4292-9851-27cc92418aab</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>6d66391e-eac1-4444-8372-3fa220a8c82e</UniqueIdentifier>
+      <Extensions>bmp;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
+    </Filter>
+    <Filter Include="cpymo">
+      <UniqueIdentifier>{e43f6a28-c09c-4802-8bb4-227e31cda115}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cpymo_backend_sdl2">
+      <UniqueIdentifier>{cefa7081-eedf-4c8f-ab57-7554a691f933}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\LockScreenLogo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square150x150Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Wide310x150Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cpymo_backend_uwp.cpp" />
+    <ClCompile Include="../sdl2/SDL/src/main/winrt/SDL_winrt_main_NonXAML.cpp" />
+    <ClCompile Include="..\..\cpymo\cpymo_album.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_anime.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_assetloader.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_audio.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_backlog.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_bg.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_charas.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_color.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_config_ui.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_engine.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_error.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_fade.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_flash.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_floating_hint.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_game_selector.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_gameconfig.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_hash_flags.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_interpreter.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_list_ui.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_localization.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_movie.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_msgbox_ui.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_music_box.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_package.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_parser.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_rmenu.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_save.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_save_global.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_save_ui.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_say.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_scroll.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_select_img.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_text.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_textbox.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_ui.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_utils.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_vars.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_wait.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_audio.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_audio_sdl2_mixer.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_font.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_image.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_input.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_masktrans.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_movie.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_save.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\cpymo_backend_text.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\main.c">
+      <Filter>cpymo_backend_sdl2</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\cpymo\cpymo_album.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_anime.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_assetloader.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_audio.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_backlog.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_bg.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_charas.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_color.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_config_ui.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_engine.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_error.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_fade.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_flash.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_floating_hint.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_game_selector.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_gameconfig.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_hash_flags.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_interpreter.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_key_hold.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_key_pulse.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_list_ui.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_localization.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_movie.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_msgbox_ui.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_music_box.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_package.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_parser.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_rmenu.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_save.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_save_global.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_save_ui.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_say.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_scroll.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_select_img.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_text.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_textbox.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_tween.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_ui.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_utils.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_vars.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_wait.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{c29a5fc6-bd31-4292-9851-27cc92418aab}</ProjectGuid>
+    <RootNamespace>CPyMO</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+    <ApplicationType>Windows Store</ApplicationType>
+    <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.10240.0</WindowsTargetPlatformMinVersion>
+    <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>../sdl2/SDL/include;../../cpymo;../sdl2;../include;../../endianness.h;../../stb;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=56;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\LockScreenLogo.scale-200.png" />
+    <Image Include="Assets\SplashScreen.scale-200.png" />
+    <Image Include="Assets\Square150x150Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Image Include="Assets\StoreLogo.png" />
+    <Image Include="Assets\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\cpymo\cpymo_album.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_anime.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_assetloader.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_audio.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_backlog.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_bg.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_charas.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_color.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_config_ui.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_engine.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_error.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_fade.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_flash.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_floating_hint.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_gameconfig.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_game_selector.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_hash_flags.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_interpreter.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_list_ui.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_localization.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_movie.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_msgbox_ui.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_music_box.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_package.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_parser.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_rmenu.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_save.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_save_global.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_save_ui.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_say.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_scroll.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_select_img.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_text.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_textbox.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_ui.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_utils.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_vars.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_wait.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_audio.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_audio_sdl2_mixer.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_font.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_image.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_input.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_masktrans.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_movie.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_save.c" />
+    <ClCompile Include="..\sdl2\cpymo_backend_text.c" />
+    <ClCompile Include="..\sdl2\main.c" />
+    <ClCompile Include="cpymo_backend_uwp.cpp" />
+    <ClCompile Include="../sdl2/SDL/src/main/winrt/SDL_winrt_main_NonXAML.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="SDL-UWP.vcxproj">
+      <Project>{89e9b32e-a86a-47c3-a948-d2b1622925ce}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\cpymo\cpymo_album.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_anime.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_assetloader.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_audio.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_backlog.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_bg.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_charas.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_color.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_config_ui.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_engine.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_error.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_fade.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_flash.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_floating_hint.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_gameconfig.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_game_selector.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_hash_flags.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_interpreter.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_key_hold.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_key_pulse.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_list_ui.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_localization.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_movie.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_msgbox_ui.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_music_box.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_package.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_parser.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_rmenu.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_save.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_save_global.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_save_ui.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_say.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_scroll.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_select_img.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_text.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_textbox.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_tween.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_ui.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_utils.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_vars.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_wait.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets" Condition="Exists('packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\FFmpeg.UWP.4.1.3\build\native\FFmpeg.UWP.targets'))" />
+  </Target>
+</Project>

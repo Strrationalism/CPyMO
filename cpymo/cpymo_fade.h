@@ -5,15 +5,17 @@
 #include "cpymo_tween.h"
 #include <stdbool.h>
 
+typedef enum {
+	cpymo_fade_in,
+	cpymo_fade_out,
+	cpymo_fade_disabled,
+	cpymo_fade_keep
+} cpymo_fade_state;
+
 typedef struct {
 	cpymo_color col;
 	cpymo_tween alpha;
-	enum {
-		cpymo_fade_in,
-		cpymo_fade_out,
-		cpymo_fade_disabled,
-		cpymo_fade_keep
-	} state;
+	cpymo_fade_state state;
 } cpymo_fade;
 
 struct cpymo_engine;

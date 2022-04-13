@@ -1,6 +1,11 @@
 #include "cpymo_movie.h"
 #include "cpymo_engine.h"
 
+#ifdef __CXX
+#undef av_err2str
+#define av_err2str(X) ""
+#endif
+
 #ifdef DISABLE_MOVIE
 #define DISABLE_FFMPEG_MOVIE
 #endif

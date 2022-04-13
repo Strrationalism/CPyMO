@@ -3,6 +3,11 @@
 #include <cpymo_backend_audio.h>
 #include "cpymo_engine.h"
 
+#ifdef __CXX
+#undef av_err2str
+#define av_err2str(X) ""
+#endif
+
 #ifndef DISABLE_FFMPEG_AUDIO
 static inline void cpymo_audio_channel_init(cpymo_audio_channel *c)
 {
@@ -39,7 +44,7 @@ static void cpymo_audio_channel_reset(cpymo_audio_channel *c)
 	cpymo_audio_channel_reset_unsafe(c);
 }
 
-static int cpymo_audio_fmt2ffmpeg(
+static enum AVSampleFormat cpymo_audio_fmt2ffmpeg(
 	int f) {
 	switch (f) {
 	case cpymo_backend_audio_s16: return AV_SAMPLE_FMT_S16;
@@ -48,7 +53,7 @@ static int cpymo_audio_fmt2ffmpeg(
 	}
 
 	assert(false);
-	return -1;
+	return (enum AVSampleFormat)-1;
 }
 
 static error_t cpymo_audio_channel_grow_convert_buffer(
@@ -328,7 +333,7 @@ static error_t cpymo_audio_channel_play_file(
 		}
 
 		c->io_context = avio_alloc_context(
-			io_buffer, (int)avio_buf_size, 0, &c->package_reader,
+			(unsigned char *)io_buffer, (int)avio_buf_size, 0, &c->package_reader,
 			&cpymo_audio_packaged_audio_ffmpeg_read_packet,
 			NULL,
 			&cpymo_audio_packaged_audio_ffmpeg_seek);
@@ -413,7 +418,7 @@ static error_t cpymo_audio_channel_play_file(
 			(stream->codecpar->channel_layout == 0 ?
 				av_get_default_channel_layout(stream->codecpar->channels) :
 				stream->codecpar->channel_layout),
-		stream->codecpar->format,
+		(enum AVSampleFormat)stream->codecpar->format,
 		stream->codecpar->sample_rate,
 		0, NULL);
 	if (c->swr_context == NULL) {
@@ -528,7 +533,7 @@ void cpymo_audio_copy_mixed_samples(void * dst, size_t len, cpymo_audio_system *
 
 	for (size_t i = 0; i < CPYMO_AUDIO_MAX_CHANNELS; ++i) {
 		if (s->channels[i].enabled) {
-			cpymo_audio_channel_mix_samples(dst, len, s->channels + i);
+			cpymo_audio_channel_mix_samples((uint8_t *)dst, len, s->channels + i);
 		}
 	}
 }
