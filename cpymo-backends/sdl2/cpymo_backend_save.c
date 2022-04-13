@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "posix_win32.h"
-#include <SDL.h>
+#include <malloc.h>
 
 
 FILE *cpymo_backend_read_save(const char * gamedir, const char * name)
