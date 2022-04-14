@@ -207,6 +207,18 @@ jobs:
   build-uwp:
     name: 'Universal Windows Platform'
     runs-on: 'windows-latest'
+    strategy:
+      matrix:
+        arch: [ x86, x64, arm ]
+        include:
+        - arch: x86
+          name: x86
+
+        - arch: x64
+          name: x64
+
+        - arch: arm
+          name: ARM
 
     steps:
     - uses: actions/checkout@v1
@@ -229,18 +241,18 @@ jobs:
 
     - name: Install FFmpeg
       run: |
-        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp
+        ./vcpkg/vcpkg install ffmpeg:${{ matrix.arch }}-uwp
 
     - name: Build
       run: |
         pushd cpymo-backends/uwp
-        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
+        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="${{ matrix.arch }}" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
         popd
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for Universal Windows Platform
+        name: CPyMO for Universal Windows Platform (${{ matrix.name }})
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
 
   build-desktop:
