@@ -28,7 +28,6 @@ cpymo_input cpymo_input_snapshot()
     out.skip = (keys & KEY_R) > 0;
     out.cancel = (keys & KEY_B) > 0 || (keys & KEY_X) > 0;
     out.hide_window = (keys & KEY_L) > 0;
-    out.auto_mode = (keys & KEY_Y) > 0;
     out.down = (keys & KEY_DOWN) > 0;
     out.up = (keys & KEY_UP) > 0;
     out.left = (keys & KEY_LEFT) > 0;

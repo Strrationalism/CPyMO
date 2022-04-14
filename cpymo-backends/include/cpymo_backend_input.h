@@ -20,7 +20,6 @@ typedef struct {
 	bool cancel : 1;
 	bool skip : 1;
 	bool hide_window : 1;
-	bool auto_mode : 1;
 } cpymo_input;
 
 /* Mouse Coord
