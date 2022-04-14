@@ -330,9 +330,11 @@ Android 工程目录在`cpymo-backends/android`。
 
 ## 启动
 
-你的游戏需要放置在文件夹`%LOCALAPPDATA%\Packages\7062935b-c643-4df5-97d1-2744bf120181_rmamffszhp062\LocalState`中。
+你的游戏需要放置在文件夹`%LOCALAPPDATA%\Packages\7062935b-c643-4df5-97d1-2744bf120181_*\LocalState`中。
 
-之后启动即可。
+其中\*的部分可能会不同，找到符合这个模式的目录即可。
+
+之后从开始菜单启动CPyMO。
 
 
 # 使用CPyMO开发新游戏
