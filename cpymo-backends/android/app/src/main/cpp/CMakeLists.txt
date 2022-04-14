@@ -38,7 +38,6 @@ find_library( # Sets the name of the path variable.
 
 add_definitions(
         -DENABLE_SDL2_MIXER_AUDIO_BACKEND
-        -DDISABLE_SDL2_MIXER_MUSIC
         -DDISABLE_FFMPEG_AUDIO
         -DDISABLE_MOVIE
         -DUSE_GAME_SELECTOR
