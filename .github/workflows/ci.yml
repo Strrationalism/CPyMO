@@ -112,8 +112,8 @@ jobs:
 
   build-psp:
     name: 'PSP'
-    runs-on: macos-latest
-    container: fjtrujy/pspdev:latest
+    runs-on: ubuntu-latest
+    container: haydenkow/pspdev:latest
 
     steps:
     - uses: actions/checkout@v1
