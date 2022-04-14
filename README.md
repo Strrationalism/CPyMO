@@ -403,6 +403,8 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 1. 定义`DISABLE_FFMPEG_AUDIO`关闭FFmpeg音频依赖
 2. 定义`ENABLE_SDL2_MIXER_AUDIO_BACKEND`启用SDL2_Mixer音频后端。
 
+如果你的设备上SDL_mixer中`Mix_Music`不能正常工作，则可以使用`DISABLE_SDL2_MIXER_MUSIC`宏将其替换为使用`Mix_Chunk`来播放BGM。
+
 ### 全屏切换
 
 定义宏`ENABLE_ALT_ENTER_FULLSCREEN`可启用按下Alt+Enter键切换全屏的功能。
