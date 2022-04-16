@@ -204,10 +204,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
     - 某些情况下使用icon.png会导致崩溃，如果出现了这种情况请删除icon.png
 * 由于SDL2 for PSP存在问题
     - 游戏将会在屏幕左上角显示，而不是居中显示
-* 由于缺乏PSP实体机进行调试
-    - 目前仅可在PPSSPP在关闭“快速内存访问”时可以正常启动
-* stb_image可能不能在PSP上正常工作
-    - 目前仅可在PPSSPP“忽略读写错误”时启动
+* PPSSPP的“快速内存访问”可能存在问题
+    - 目前仅可在PPSSPP在关闭“快速内存访问”时才可以正常启动
 * 由于本人不会编写makefile :(
 	- Makefile.PSP将会把.o文件弄得到处都是
 
