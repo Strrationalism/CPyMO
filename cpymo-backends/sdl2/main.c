@@ -267,7 +267,6 @@ int main(int argc, char **argv)
 	gamedir = EMSCRIPTEN_GAMEDIR;
 #endif
 
-	ensure_save_dir(gamedir);
 #endif
 	// SDL2 has 2 memory leaks!
 	if (SDL_Init(
@@ -351,6 +350,8 @@ int main(int argc, char **argv)
 	const uint16_t window_size_w = engine.gameconfig.imagesize_w;
 	const uint16_t window_size_h = engine.gameconfig.imagesize_h;
 #endif
+	
+	ensure_save_dir(gamedir);
 	
 	if (SDL_CreateWindowAndRenderer(
 		window_size_w,
