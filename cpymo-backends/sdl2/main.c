@@ -1,4 +1,4 @@
-﻿#include <stdlib.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <cpymo_error.h>
 #include <SDL.h>
@@ -351,8 +351,6 @@ int main(int argc, char **argv)
 	const uint16_t window_size_h = engine.gameconfig.imagesize_h;
 #endif
 	
-	ensure_save_dir(gamedir);
-	
 	if (SDL_CreateWindowAndRenderer(
 		window_size_w,
 		window_size_h,
@@ -367,6 +365,7 @@ int main(int argc, char **argv)
 	}
 
 #ifndef USE_GAME_SELECTOR
+	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);
 	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
 #else
