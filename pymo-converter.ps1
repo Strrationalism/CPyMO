@@ -1,4 +1,4 @@
-﻿
+
 $device_specs = @(
     @{ Name = "s60v3"; Width = 320; Height = 240; UseMask = $true; 
        BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3" },
@@ -153,12 +153,12 @@ function Unpack-Convert-Pack($asstype, $src_format, $dst_format, $src_dir, $dst_
     }
 
     Out-File `
-        -FilePath "$convert_dir/list.txt" `
+        -FilePath "list.txt" `
         -Force `
         -InputObject $files `
         -Encoding utf8
 
-    cpymo-tool pack "$dst_dir_full/$asstype.pak" --file-list "$convert_dir/list.txt"
+    cpymo-tool pack "$dst_dir_full/$asstype.pak" --file-list "./list.txt"
     popd
     Remove-Item $convert_dir -Recurse -Force
 }
