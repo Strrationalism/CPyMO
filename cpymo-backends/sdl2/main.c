@@ -72,18 +72,17 @@ extern void cpymo_backend_audio_free();
 static void set_window_icon(const char *gamedir) 
 {
 #if (defined _WIN32) || (defined __LINUX__) || (defined __APPLE__)
-	int w, h, channel;
+	int w, h;
 	char *icon_path = (char *)alloca(strlen(gamedir) + 10);
 	if (icon_path == NULL) return;
 
 	sprintf(icon_path, "%s/icon.png", gamedir);
 
-	stbi_uc *icon = stbi_load(icon_path, &w, &h, &channel, 4);
-	//free(icon_path);
+	stbi_uc *icon = stbi_load(icon_path, &w, &h, NULL, 4);
 	if (icon == NULL) return;
 
 	SDL_Surface *surface =
-		SDL_CreateRGBSurfaceFrom(icon, w, h, channel * 8, channel * w, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+		SDL_CreateRGBSurfaceFrom(icon, w, h, 4 * 8, 4 * w, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
 	if (surface == NULL) {
 		stbi_image_free(icon);
