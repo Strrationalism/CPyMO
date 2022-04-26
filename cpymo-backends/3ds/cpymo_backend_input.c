@@ -42,11 +42,11 @@ cpymo_input cpymo_input_snapshot()
     circlePosition cpos;
     hidCstickRead(&cpos);
 
-    if(pos.dy > 170 || cpos.dy > 32) out.up = true;
-    else if(pos.dy < -170 || cpos.dy < -32) out.down = true;
+    if(pos.dy > 170 || cpos.dy > 64) out.up = true;
+    else if(pos.dy < -170 || cpos.dy < -64) out.down = true;
 
-    if(pos.dx > 170 || cpos.dx > 32) out.right = true;
-    else if(pos.dx < -170 || cpos.dx < -32) out.left = true;
+    if(pos.dx > 170 || cpos.dx > 64) out.right = true;
+    else if(pos.dx < -170 || cpos.dx < -64) out.left = true;
 
     if (out.mouse_position_useable) {
         touchPosition touch_pos;
