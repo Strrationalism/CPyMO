@@ -243,64 +243,6 @@ jobs:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
 
-  build-windows:
-    name: 'Windows'
-    runs-on: windows-latest
-
-    strategy:
-      matrix:
-        arch: [ 'x64', 'x86', 'ARM', 'ARM64' ]
-        include:
-        - arch: x64
-          triplet: x64-windows-static
-          vsdev-arch: x64
-        - arch: x86
-          triplet: x86-windows-static
-          vsdev-arch: x86
-        - arch: ARM
-          triplet: arm-windows-static
-          vsdev-arch: amd64_arm
-        - arch: ARM64
-          triplet: arm64-windows-static
-          vsdev-arch: amd64_arm64
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-        
-    - uses: ilammy/msvc-dev-cmd@v1
-      if: ${{ runner.os == 'Windows' }}
-      with:
-        arch: ${{ matrix.vsdev-arch }}
-
-    - name: Donwload vcpkg
-      run: git clone https://github.com/microsoft/vcpkg --depth 1
-
-    - name: Bootstrap vcpkg
-      run: ./vcpkg/bootstrap-vcpkg.bat
-
-    - name: Install SDL2
-      run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
-
-    - name: Install FFMPEG
-      run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
-
-    - name: Build
-      run: |
-        cd cpymo-backends/sdl2
-        nmake -f Makefile.Win32 -a NO_CONSOLE=1 -a SDL2=../../vcpkg/packages/sdl2_${{ matrix.triplet }} -a FFMPEG=../../vcpkg/packages/ffmpeg_${{ matrix.triplet }} -a TARGET=../../cpymo.exe
-        cd ../../cpymo-tool
-        nmake -f Makefile.Win32 -a TARGET=../cpymo-tool.exe
-
-    - name: Upload
-      uses: actions/upload-artifact@v2.3.0
-      with:
-        name: CPyMO for Windows (NMake) ${{ matrix.arch }}
-        path: |
-          cpymo.exe
-          cpymo-tool.exe
-
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
