@@ -433,7 +433,7 @@ SDL2后端在目录`cpymo-backends/sdl2`中。
 
 某些平台上FFmpeg难以编译，同时定义`DISABLE_FFMPEG_AUDIO`和`DISABLE_FFMPEG_MOVIE`即可彻底对解除FFmpeg的依赖，并替换为你的音频视频后端。
 
-如果你只想接触FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
+如果你只想解除FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
 
 ### SDL2_mixer音频后端
 
