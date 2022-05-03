@@ -289,13 +289,17 @@ jobs:
     - name: Build
       run: |
         cd cpymo-backends/sdl2
-        nmake -f Makefile.Win32 -a NO_CONSOLE=1 -a SDL2=../../vcpkg/packages/sdl2_${{ matrix.triplet }} -a FFMPEG=../../vcpkg/packages/ffmpeg_${{ matrix.triplet }}
+        nmake -f Makefile.Win32 -a NO_CONSOLE=1 -a SDL2=../../vcpkg/packages/sdl2_${{ matrix.triplet }} -a FFMPEG=../../vcpkg/packages/ffmpeg_${{ matrix.triplet }} -a TARGET=../../cpymo.exe
+        cd ../../cpymo-tool
+        nmake -f Makefile.Win32 -a TARGET=../cpymo-tool.exe
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Windows (NMake) ${{ matrix.arch }}
-        path: cpymo-backends/sdl2/cpymo.exe
+        path: |
+          cpymo.exe
+          cpymo-tool.exe
 
   build-desktop:
     name: 'Desktop'
