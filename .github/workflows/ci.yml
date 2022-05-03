@@ -273,10 +273,6 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       with:
         arch: ${{ matrix.vsdev-arch }}
- 
-    - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
-      if: ${{ runner.os != 'Windows' }}
 
     - name: Donwload vcpkg
       run: git clone https://github.com/microsoft/vcpkg --depth 1
@@ -296,6 +292,7 @@ jobs:
         nmake -f Makefile.Win32 -a NO_CONSOLE=1 -a SDL2=../../vcpkg/packages/sdl2_${{ matrix.triplet }} -a FFMPEG=../../vcpkg/packages/ffmpeg_${{ matrix.triplet }}
 
     - name: Upload
+      uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Windows (NMake) ${{ matrix.arch }}
         path: cpymo-backends/sdl2/cpymo.exe
