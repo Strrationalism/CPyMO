@@ -20,59 +20,8 @@ typedef struct {
     cpymo_backend_image img;
 } cpymo_backend_text_internal;
 
-#ifdef __SWITCH__
-#define TEXT_LINE_Y_OFFSET 12
-#else
-#define TEXT_LINE_Y_OFFSET 0
-#endif
 
-static void cpymo_backend_text_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline) {
-    float xpos = 0;
-
-    int width = 0, height = 0;
-    float y_base = 0;
-    while (text.len > 0) {
-        uint32_t codepoint = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
-        int x0, y0, x1, y1;
-
-        int advance_width, lsb;
-        float x_shift = xpos - (float)floor(xpos);
-        stbtt_GetCodepointHMetrics(&font, (int)codepoint, &advance_width, &lsb);
-
-        if (codepoint == '\n') {
-            xpos = 0;
-
-            y_base += baseline + TEXT_LINE_Y_OFFSET;
-
-            continue;
-        }
-
-        stbtt_GetCodepointBitmapBoxSubpixel(&font, (int)codepoint, scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
-        if(out_or_null)
-            stbtt_MakeCodepointBitmapSubpixel(
-                &font, 
-                (unsigned char *)out_or_null + (int)xpos + x0 + (int)(baseline + y0 + y_base) * *w, 
-                x1 - x0, y1 - y0, *w, scale, scale, x_shift, 0, (int)codepoint);
-
-        xpos += (advance_width * scale);
-
-        cpymo_parser_stream_span text2 = text;
-        uint32_t next_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text2);
-        if (next_char) {
-            xpos += scale * stbtt_GetCodepointKernAdvance(&font, codepoint, next_char);
-        }
-
-        int new_width = (int)ceil(xpos);
-        if (new_width > width) width = new_width;
-
-        int new_height = (int)((y1 - y0) + baseline + y_base);
-        if (new_height > height) height = new_height;
-    }
-
-    *w = width;
-    *h = height;
-}
-
+void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline);
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out,
@@ -91,7 +40,7 @@ error_t cpymo_backend_text_create(
     stbtt_GetFontVMetrics(&font, &t->ascent, NULL, NULL);
     t->baseline = t->scale * t->ascent;
 
-    cpymo_backend_text_render(NULL, &t->width, &t->height, text, t->scale, t->baseline);
+    cpymo_backend_font_render(NULL, &t->width, &t->height, text, t->scale, t->baseline);
     
     assert(t->width > 0 && t->height > 0);
     
@@ -104,7 +53,7 @@ error_t cpymo_backend_text_create(
     memset(screen, 0, t->width * t->height);
 
     int w = t->width, h = t->height;
-    cpymo_backend_text_render(screen, &w, &h, text, t->scale, t->baseline);
+    cpymo_backend_font_render(screen, &w, &h, text, t->scale, t->baseline);
 
     assert(w == t->width && h == t->height);
 
@@ -185,7 +134,7 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
     float baseline = scale * ascent;
 
     int w, h;
-    cpymo_backend_text_render(NULL, &w, &h, t, scale, baseline);
+    cpymo_backend_font_render(NULL, &w, &h, t, scale, baseline);
 
     return (float)w;
 }

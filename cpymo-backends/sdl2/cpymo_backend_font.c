@@ -1,7 +1,11 @@
 #include <cpymo_error.h>
 #include <cpymo_utils.h>
+#include <cpymo_parser.h>
 #include <stdio.h>
+
+#ifdef __ANDROID__
 #include <SDL.h>
+#endif
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
@@ -155,4 +159,58 @@ error_t cpymo_backend_font_init(const char *gamedir)
 #endif
 
 	return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+}
+
+#ifdef __SWITCH__
+#define TEXT_LINE_Y_OFFSET 12
+#else
+#define TEXT_LINE_Y_OFFSET 0
+#endif
+
+
+void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline) {
+	float xpos = 0;
+
+	int width = 0, height = 0;
+	float y_base = 0;
+	while (text.len > 0) {
+		uint32_t codepoint = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text);
+		int x0, y0, x1, y1;
+
+		int advance_width, lsb;
+		float x_shift = xpos - (float)floor(xpos);
+		stbtt_GetCodepointHMetrics(&font, (int)codepoint, &advance_width, &lsb);
+
+		if (codepoint == '\n') {
+			xpos = 0;
+
+			y_base += baseline + TEXT_LINE_Y_OFFSET;
+
+			continue;
+		}
+
+		stbtt_GetCodepointBitmapBoxSubpixel(&font, (int)codepoint, scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
+		if (out_or_null)
+			stbtt_MakeCodepointBitmapSubpixel(
+				&font,
+				(unsigned char *)out_or_null + (int)xpos + x0 + (int)(baseline + y0 + y_base) * *w,
+				x1 - x0, y1 - y0, *w, scale, scale, x_shift, 0, (int)codepoint);
+
+		xpos += (advance_width * scale);
+
+		cpymo_parser_stream_span text2 = text;
+		uint32_t next_char = cpymo_parser_stream_span_utf8_try_head_to_utf32(&text2);
+		if (next_char) {
+			xpos += scale * stbtt_GetCodepointKernAdvance(&font, codepoint, next_char);
+		}
+
+		int new_width = (int)ceil(xpos);
+		if (new_width > width) width = new_width;
+
+		int new_height = (int)((y1 - y0) + baseline + y_base);
+		if (new_height > height) height = new_height;
+	}
+
+	*w = width;
+	*h = height;
 }
