@@ -31,7 +31,7 @@ Nintendo Switch           | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG     
 Sony PSP                  | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG; 不支持SE通道       | 外置字体         | 游戏选择器
 Sony PSV                  | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG       | 外置字体          | 游戏选择器
 Emscripten                | 次要     | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG       | 外置字体          | 
-Android                   | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG                   | 外置字体          | 游戏选择器，视障帮助
+Android                   | 次要     | SDL2 | 不支持    | SDL2_mixer: OGG                   | 外置字体          | 游戏选择器
 UWP                       | 次要     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG                  | 加载系统字体      | 游戏选择器
 
 # 桌面平台 (Windows、Linux与macOS)

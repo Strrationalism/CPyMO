@@ -46,6 +46,7 @@ add_definitions(
         -DSCREEN_HEIGHT=600
         -D__ANDROID__
         -DGAME_SELECTOR_FONTSIZE=46
+        -DNON_VISUALLY_IMPAIRED_HELP
         "-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=56"
         -DGAME_SELECTOR_COUNT_PER_SCREEN=4
         -DGAME_SELECTOR_DIR="/sdcard/pymogames"
