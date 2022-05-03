@@ -19,24 +19,46 @@
 
 pymo原版参见：https://github.com/pymo/pymo    
 
-已经支持的平台：    
+# 平台支持列表
 
-平台                       | 支持等级 | 后端  | 视频播放器 | 音频支持                          | 字体支持          | 额外功能
--------------------------- | ------- | ---- | --------- | ------------------------------- | ---------------- | -------
-Windows                   | ⭐⭐⭐    | SDL2 | FFmpeg   | FFmpeg: MP3, OGG                  | 加载系统字体      | 视障帮助
-Linux                     | ⭐⭐      | SDL2 | FFmpeg   | FFmpeg: MP3, OGG                  | 加载系统字体      | 视障帮助
-macOS                     | ⭐⭐      | SDL2 | FFmpeg   | FFmpeg: MP3, OGG                  | 加载系统字体      | 视障帮助
-Nintendo 3DS              | ⭐⭐⭐    | 3DS  | FFmpeg   | FFmpeg: MP3, OGG                  | 自带字体         | 游戏选择器
-Nintendo Switch           | ⭐⭐     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG                  | 加载系统字体      | 游戏选择器
-Sony PSP                  | ⭐       | SDL2 | 不支持    | SDL2_mixer: OGG; 不支持SE通道       | 外置字体         | 游戏选择器
-Sony PSV                  | ⭐       | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG       | 外置字体          | 游戏选择器
-Emscripten                | ⭐       | SDL2 | 不支持    | SDL2_mixer: MP3(仅BGM), OGG       | 外置字体          | 
-Android                   | ⭐       | SDL2 | 不支持    | SDL2_mixer: OGG                   | 外置字体          | 游戏选择器
-UWP                       | ⭐⭐     | SDL2 | FFmpeg   | FFmpeg: MP3, OGG                  | 加载系统字体      | 游戏选择器
+### 第一梯队
+##### CPyMO主要在这些平台上开发，并将主要在这些平台上进行测试和除错。
 
-* 支持等级⭐⭐⭐：CPyMO主要在这些平台上开发，并将主要在这些平台上进行测试和除错。
-* 支持等级⭐⭐：CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，同时也没有进行全面的测试。
-* 支持等级⭐：CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
+平台          | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
+------------ | ---- | -------- | ------------------ | ---------------- | -------
+Windows      | SDL2 | FFmpeg   | FFmpeg: MP3, OGG   | 加载系统字体       | 视障帮助
+Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg: MP3, OGG   | 自带字体          | 游戏选择器
+
+### 第二梯队
+##### CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。
+
+
+平台            | 后端  | 视频播放器 | 音频支持          | 字体支持     | 额外功能
+--------------- | ---- | -------- | ---------------- | ----------- | ---------------
+Linux           | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 视障帮助
+macOS           | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 视障帮助
+Nintendo Switch | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 游戏选择器
+UWP             | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 游戏选择器
+
+### 第三梯队
+##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
+
+平台          | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
+------------ | ---- | --------- | ---------------------------- | ------- | ----------
+Sony PSP     | SDL2 | 不支持     | SDL2_mixer: OGG; 不支持SE通道 | 外置字体  | 游戏选择器
+Sony PSV     | SDL2 | 不支持     | SDL2_mixer: MP3(仅BGM), OGG  | 外置字体  | 游戏选择器
+Emscripten   | SDL2 | 不支持     | SDL2_mixer: MP3(仅BGM), OGG  | 外置字体  | 
+Android      | SDL2 | 不支持     | SDL2_mixer: OGG              | 外置字体  | 游戏选择器
+
+# 与pymo行为差异
+
+* CPyMO的存档位置和存档格式与pymo不同，不能与之互换。
+* CPyMO最小音频支持仅包含OGG格式，而pymo没有规定最小音频支持格式。
+* CPyMO的蒙版渐变动画效果与PyMO不同。
+* CPyMO的菜单和UI与PyMO不同。
+* CPyMO和PyMO对视频支持不同。
+* CPyMO不支持预载，预载选项会被CPyMO直接忽略。
+* CPyMO忽略除字体大小以外所有的字体设置，将自动启用字体阴影和字体反锯齿。
 
 # 桌面平台 (Windows、Linux与macOS)
 
