@@ -30,7 +30,7 @@ if ($args.Length -ne 1) {
 
 $gamedir = $args[0]
 
-workflow Convert-Asset($gamedir, $asstype, $ext) {
+function Convert-Asset($gamedir, $asstype, $ext) {
     if ($ext.ToUpper().Trim() -eq ".OGG") {
         return $false
     }
@@ -58,7 +58,8 @@ workflow Convert-Asset($gamedir, $asstype, $ext) {
     mkdir $convert_dir
 
     $files = (ls "$unpack_dir/*$ext").Name
-    foreach -Parallel ($i in $files) {
+    foreach ($i in $files) {
+        Write-Host "$asstype/$i"
         ffmpeg -i "$unpack_dir/$i" "$convert_dir/$([System.IO.Path]::GetFileNameWithoutExtension($i)).ogg" -v quiet
     }
 
