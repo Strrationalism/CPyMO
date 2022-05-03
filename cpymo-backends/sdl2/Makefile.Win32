@@ -64,10 +64,6 @@ SRC = \
 	../../cpymo/cpymo_vars.c \
 	../../cpymo/cpymo_wait.c
 
-
-OBJ_BACKEND = $(patsubst %.c,$(BUILD_DIR)\\%.obj,$(SRC_BACKEND))
-
-
 build: $(TARGET)
 
 clean:
