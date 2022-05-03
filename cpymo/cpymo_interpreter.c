@@ -140,7 +140,7 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 		cpymo_parser_curline_pop_command(&interpreter->script_parser);
 
 	error_t err = cpymo_interpreter_dispatch(command, interpreter, engine, cont);
-	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_INVALID_ARG) {		
+	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_INVALID_ARG && err != CPYMO_ERR_NO_MORE_CONTENT) {		
 		printf("[Error] In script \'%s\'(%d): %s\n",
 			interpreter->script_name,
 			(int)interpreter->script_parser.cur_line,
