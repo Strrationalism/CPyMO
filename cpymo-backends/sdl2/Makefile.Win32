@@ -84,6 +84,7 @@ $(TARGET): $(SRC) dirs $(BUILD_DIR)/cpymo.res
 		-I../../endianness.h \
 		-I$(SDL2)/include/SDL2 \
 		-I$(FFMPEG)/include \
+		-DENABLE_ALT_ENTER_FULLSCREEN \
 		/utf-8 \
 		/O2 /Os /MP /nologo \
 		/link /LIBPATH:$(SDL2)/lib /LIBPATH:$(SDL2)/lib/manual-link /LIBPATH:$(FFMPEG)/lib \
