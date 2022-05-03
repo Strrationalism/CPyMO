@@ -10,11 +10,16 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
+#ifdef __UWP__
+#include <malloc.h>
+#endif
+
 #include "posix_win32.h"
 
 #ifdef __SWITCH__
 #include <switch.h>
 #endif
+
 
 stbtt_fontinfo font;
 static unsigned char *ttf_buffer = NULL;
