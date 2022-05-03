@@ -25,7 +25,7 @@ $device_specs = @(
 function Write-Help() {
     Write-Host "PyMO Game Converter"
     Write-Host ""
-    Write-Host "You must ensure cpymo-tool is installed!"
+    Write-Host "You must ensure cpymo-tool has installed!"
     Write-Host ""
     Write-Host "Usage:"
 	Write-Host "    ./pymo-convert.ps1 <device-spec> <src-game> <dst-dir>"
