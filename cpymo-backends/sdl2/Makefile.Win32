@@ -1,0 +1,97 @@
+BUILD_DIR = build.Win32
+
+!ifndef TARGET
+TARGET = cpymo.exe
+!endif
+
+!ifndef RC_FILE
+RC_FILE = pymo-icon-windows.rc
+!endif
+
+!ifdef NO_CONSOLE
+LD_FLAGS = /SUBSYSTEM:WINDOWS
+!else
+LD_FLAGS = /SUBSYSTEM:CONSOLE
+!endif
+
+SRC = \
+	cpymo_backend_audio.c \
+	cpymo_backend_audio_sdl2_mixer.c \
+	cpymo_backend_font.c \
+	cpymo_backend_image.c \
+	cpymo_backend_input.c \
+	cpymo_backend_masktrans.c \
+	cpymo_backend_movie.c \
+	cpymo_backend_save.c \
+	cpymo_backend_text.c \
+	main.c \
+	../../cpymo/cpymo_album.c \
+	../../cpymo/cpymo_anime.c \
+	../../cpymo/cpymo_assetloader.c \
+	../../cpymo/cpymo_audio.c \
+	../../cpymo/cpymo_backlog.c \
+	../../cpymo/cpymo_bg.c \
+	../../cpymo/cpymo_charas.c \
+	../../cpymo/cpymo_color.c \
+	../../cpymo/cpymo_config_ui.c \
+	../../cpymo/cpymo_engine.c \
+	../../cpymo/cpymo_error.c \
+	../../cpymo/cpymo_fade.c \
+	../../cpymo/cpymo_flash.c \
+	../../cpymo/cpymo_floating_hint.c \
+	../../cpymo/cpymo_gameconfig.c \
+	../../cpymo/cpymo_game_selector.c \
+	../../cpymo/cpymo_hash_flags.c \
+	../../cpymo/cpymo_interpreter.c \
+	../../cpymo/cpymo_list_ui.c \
+	../../cpymo/cpymo_localization.c \
+	../../cpymo/cpymo_movie.c \
+	../../cpymo/cpymo_msgbox_ui.c \
+	../../cpymo/cpymo_music_box.c \
+	../../cpymo/cpymo_package.c \
+	../../cpymo/cpymo_parser.c \
+	../../cpymo/cpymo_rmenu.c \
+	../../cpymo/cpymo_save.c \
+	../../cpymo/cpymo_save_global.c \
+	../../cpymo/cpymo_save_ui.c \
+	../../cpymo/cpymo_say.c \
+	../../cpymo/cpymo_scroll.c \
+	../../cpymo/cpymo_select_img.c \
+	../../cpymo/cpymo_text.c \
+	../../cpymo/cpymo_textbox.c \
+	../../cpymo/cpymo_ui.c \
+	../../cpymo/cpymo_utils.c \
+	../../cpymo/cpymo_vars.c \
+	../../cpymo/cpymo_wait.c
+
+
+OBJ_BACKEND = $(patsubst %.c,$(BUILD_DIR)\\%.obj,$(SRC_BACKEND))
+
+
+build: $(TARGET)
+
+clean:
+	@rd /S /Q $(BUILD_DIR)
+	@del /f /s /q $(TARGET)
+
+dirs:
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+$(BUILD_DIR)/cpymo.res: dirs $(RC_FILE)
+	$(RC) /r /fo $@ $(RC_FILE)
+
+$(TARGET): $(SRC) dirs $(BUILD_DIR)/cpymo.res
+	@$(CC) $(SRC) $(BUILD_DIR)/cpymo.res /Fe$(TARGET) /Fo$(BUILD_DIR)/ \
+		-I../../cpymo \
+		-I../include \
+		-I../../stb \
+		-I../../endianness.h \
+		-I$(SDL2)/include/SDL2 \
+		-I$(FFMPEG)/include \
+		/utf-8 \
+		/O2 /Os /MP /nologo \
+		/link /LIBPATH:$(SDL2)/lib /LIBPATH:$(SDL2)/lib/manual-link /LIBPATH:$(FFMPEG)/lib \
+		SDL2main.lib SDL2.lib avcodec.lib avformat.lib swresample.lib avutil.lib \
+		Gdi32.lib User32.lib Imm32.lib Ole32.lib Shell32.lib Winmm.lib Secur32.lib Setupapi.lib Advapi32.lib Ws2_32.lib \
+		Version.lib Mfplat.lib OleAut32.lib Bcrypt.lib strmiids.lib Mfuuid.lib \
+		$(LD_FLAGS) /RELEASE

@@ -61,6 +61,25 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 按下Alt + Enter键可在全屏/窗口模式中切换。
 
+## 在Windows下使用nmake进行构建
+
+如果你不希望使用CMake，那么你可以使用Visual Studio开发人员命令提示符中的nmake工具进行构建。
+
+首先你需要确保：
+
+* 你已经构建了当前平台的SDL2库，并将二进制目录（含有include和lib文件夹）设置为环境变量%SDL2%（或通过nmake的-a参数传入）。
+* 你已经构建了当前平台的FFmpeg库，并将二进制目录（含有include和lib文件夹）设置为环境变量%FFMPEG%（或通过nmake的-a参数传入）。
+* 已经安装了某一版本的Windows SDK和MSVC编译器工具链。
+
+除此之外，你还可以使用以下编译开关：
+
+* 若`NO_CONSOLE`环境变量存在或通过-a传入，则禁用命令行窗口，使得CPyMO仅创建一个游戏窗口。
+* 若`RC_FILE`环境变量存在或通过-a传入，则允许传入用户指定的资源文件（主要用于修改图标）。
+* 若`TARGET`环境变量存在或通过-a传入，则允许用户通过TARGET指定输出的可执行文件名称。
+
+之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
+
+
 # Nintendo 3DS 平台
 
 [在Universal Updater应用商店中查看](https://db.universal-team.net/3ds/cpymo)
