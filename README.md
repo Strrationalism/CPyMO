@@ -79,6 +79,8 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
 
+另外，你还可以在`cpymo-tool`目录下使用`nmake -f Makefile.Win32`构建`cpymo-tool`。
+
 
 # Nintendo 3DS 平台
 

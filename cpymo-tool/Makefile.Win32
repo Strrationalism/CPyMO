@@ -1,0 +1,33 @@
+BUILD_DIR = build.Win32
+
+!ifndef TARGET
+TARGET = cpymo-tool.exe
+!endif
+
+SRC = \
+	main.c \
+	cpymo_tool_resize.c \
+	cpymo_tool_package.c \
+	../cpymo/cpymo_error.c \
+	../cpymo/cpymo_package.c \
+	../cpymo/cpymo_parser.c \
+	../cpymo/cpymo_utils.c \
+	../cpymo/cpymo_color.c
+
+build: $(TARGET)
+clean:
+	@rd /S /Q $(BUILD_DIR)
+	@del /f /s /q $(TARGET)
+	
+dirs:
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+$(TARGET): $(SRC) dirs
+	@$(CC) $(SRC) /Fe$(TARGET) /Fo$(BUILD_DIR)/ \
+		-I../cpymo \
+		-I../stb \
+		-I../endianness.h \
+		/utf-8 \
+		/O2 /Os /MP /nologo \
+		/link /RELEASE
+
