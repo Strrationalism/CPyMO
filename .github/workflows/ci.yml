@@ -88,8 +88,8 @@ jobs:
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
         cd ../cpymo-backends/sdl2
-        chmod +x ./cpymo-backends/sdl2/build-psv-ffmpeg.sh
-        ./cpymo-backends/sdl2/build-psv-ffmpeg.sh
+        chmod +x ./build-psv-ffmpeg.sh
+        ./build-psv-ffmpeg.sh
         cd ../../
 
     - name: Build
