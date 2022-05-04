@@ -79,7 +79,7 @@ jobs:
       with:
         submodules: true
     
-    - name: Install VitaSDK
+    - name: Install Dependents
       run: |
         git clone https://github.com/vitasdk/vdpm.git --depth 1
         cd vdpm
@@ -88,9 +88,6 @@ jobs:
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
         cd ..
-
-    - name: Install FFmpeg
-      run: |
         chmod +x ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
         ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
 
