@@ -88,6 +88,7 @@ SRC = \
 	../../cpymo/cpymo_wait.c
 
 build: $(TARGET)
+	@echo Built $(TARGET)
 
 clean:
 	@rd /S /Q $(BUILD_DIR)
@@ -106,6 +107,7 @@ $(TARGET): $(SRC) dirs $(BUILD_DIR)/cpymo.res
 		-I../../stb \
 		-I../../endianness.h \
 		-I$(SDL2)/include/SDL2 \
+		-DNDEBUG \
 		/utf-8 \
 		/O2 /Os /MP /nologo \
 		/link /LIBPATH:$(SDL2)/lib /LIBPATH:$(SDL2)/lib/manual-link \

@@ -111,8 +111,6 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
 
-另外，你还可以在`cpymo-tool`目录下使用`nmake -f Makefile.Win32`构建`cpymo-tool`。
-
 
 # Nintendo 3DS 平台
 
@@ -490,6 +488,14 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 * 游戏图片缩放
 
 启动此程序即可看到详细用法。
+
+### 构建cpymo-tool
+
+你可以选择以下三种方式之一来构建cpymo-tool：
+
+1. 直接使用CMake构建整个项目。
+2. 使用GNU Make在`cpymo-tool`目录中执行`make`命令，如果为Windows构建则需要先定义环境变量`SUFFIX`为`.exe`。
+2. 使用Microsoft NMake在`cpymo-tool`目录中执行`nmake -f Makefile.Win32`命令构建。
 
 ## pymo-converter
 

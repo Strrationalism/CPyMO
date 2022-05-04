@@ -15,6 +15,8 @@ SRC = \
 	../cpymo/cpymo_color.c
 
 build: $(TARGET)
+	@echo Built $(TARGET)
+
 clean:
 	@rd /S /Q $(BUILD_DIR)
 	@del /f /s /q $(TARGET)
@@ -27,6 +29,7 @@ $(TARGET): $(SRC) dirs
 		-I../cpymo \
 		-I../stb \
 		-I../endianness.h \
+		/DNDEBUG \
 		/utf-8 \
 		/O2 /Os /MP /nologo \
 		/link /RELEASE
