@@ -49,11 +49,11 @@ jobs:
         unzip makerom-v0.17-ubuntu_x86_64.zip -d .
         chmod +x makerom
 
-    - name: Install FFmpeg
+    - name: Build FFmpeg
       run: |
         cd ./cpymo-backends/3ds
-        chmod +x ./install-3ds-ffmpeg.sh
-        ./install-3ds-ffmpeg.sh
+        chmod +x ./build-3ds-ffmpeg.sh
+        ./build-3ds-ffmpeg.sh
 
     - name: Build
       run: |
@@ -88,8 +88,8 @@ jobs:
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
         cd ..
-        chmod +x ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
-        ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
+        chmod +x ./cpymo-backends/sdl2/build-psv-ffmpeg.sh
+        ./cpymo-backends/sdl2/build-psv-ffmpeg.sh
 
     - name: Build
       run: |

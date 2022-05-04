@@ -136,9 +136,9 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 * devkitPro + 3ds dev
 * FFmpeg 5.0
 
-### 安装3DS用的FFmpeg依赖
+### 编译3DS用的FFmpeg依赖
 
-在终端或devkitPro的MSYS2控制台（如果你使用Windows的话），cd到`cpymo-backends/3ds/`目录下，执行`./install-3ds-ffmpeg.sh`。
+在终端或devkitPro的MSYS2控制台（如果你使用Windows的话），cd到`cpymo-backends/3ds/`目录下，执行`./build-3ds-ffmpeg.sh`，这将为3DS编译FFmpeg。
 
 ## 产生cia文件
 于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。    
@@ -302,7 +302,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
 2. 通过命令行`vdpm sdl2`安装SDL2。
-3. 执行`cpymo-backends/sdl2/install-psv-ffmpeg.sh`安装FFmpeg，注意这个版本和vdpm中的ffmpeg使用的剪裁参数不同，不要使用vdpm中的ffmpeg。
+3. 执行`cpymo-backends/sdl2/build-psv-ffmpeg.sh`编译FFmpeg，注意这个版本和vdpm中的ffmpeg使用的剪裁参数不同，不要使用vdpm中的ffmpeg。
 
 ## 编译
 

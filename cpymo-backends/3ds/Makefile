@@ -35,7 +35,7 @@ TARGET		:=	cpymo
 BUILD		:=	$(shell mkdir -p build)build
 SOURCES		:=	../../cpymo ./ ../include
 DATA		:=	data
-INCLUDES	:=	../../endianness.h ../../stb ../../cpymo ../include
+INCLUDES	:=	../../endianness.h ../../stb ../../cpymo ../include build.FFmpeg.3DS/include
 ROMFS		:=	romfs
 APP_TITLE   := CPyMO
 APP_AUTHOR  := Strrationalism Studio
@@ -56,7 +56,7 @@ CFLAGS	+=	$(INCLUDE) -D__3DS__ -DNON_VISUALLY_IMPAIRED_HELP -DNDEBUG
 CXXFLAGS	:= $(CFLAGS) -O3 -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -Lbuild.FFmpeg.3DS/lib
 
 LIBS	:= -lswscale -lavformat -lavcodec -lavutil -lswresample -lcitro2d -lcitro3d -lctru -lm 
 

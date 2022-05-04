@@ -15,6 +15,7 @@ CFLAGS := \
 	-I$(CURDIR)/../include \
 	-I$(CURDIR)/../../cpymo \
 	-I$(CURDIR)/../../stb \
+	-I$(CURDIR)/build.FFmpeg.PSV/include \
 	-I$(CURDIR)/../../endianness.h \
 	-I$(VITASDK)/arm-vita-eabi/include \
 	-I$(VITASDK)/arm-vita-eabi/include/SDL2 \
@@ -54,6 +55,7 @@ $(BUILD_DIR)/%.o: ../../cpymo/%.c $(INC)
 $(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
 	@echo "Linking..."
 	@$(CC) -Wl,-q $^ -o $@ \
+		-L$(CURDIR)/build.FFmpeg.PSV/lib \
 		-Xlinker "-(" \
 		-lSDL2 \
 		-lSDL2main \
