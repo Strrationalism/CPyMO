@@ -17,6 +17,7 @@ chmod +x ./configure
 --disable-runtime-cpudetect \
 --disable-armv5te \
 --disable-programs \
+--disable-network \
 --disable-doc \
 --disable-encoders \
 --disable-filters \
