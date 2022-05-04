@@ -91,8 +91,6 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 ## 在Windows下使用nmake进行构建
 
-如果你不希望使用CMake，那么你可以使用Visual Studio开发人员命令提示符中的nmake工具进行构建。
-
 首先你需要确保：
 
 * 你已经构建了当前平台的SDL2库，并将二进制目录（含有include和lib文件夹）设置为环境变量%SDL2%（或通过nmake的-a参数传入）。
@@ -112,6 +110,21 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 * 若`TARGET`环境变量存在或通过-a传入，则允许用户通过TARGET指定输出的可执行文件名称。
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
+
+## 使用GNU Make进行构建
+
+1. 你需要安装SDL2，可以选择直接安装`libsdl2-dev`，或者将SDL2的预编译二进制库存入环境变量`SDL2`中。
+2. 如果你需要使用FFmpeg播放音频和视频，可以选择安装以下库，或者将其预编译的二进制库存入环境变量`FFmpeg`中：
+    * libavformat-dev
+    * libavutil-dev
+    * libavcodec-dev
+    * libswscale-dev
+    * libswresample-dev
+3. 如果你需要使用SDL2_mixer播放音频，则可以选择安装`libsdl2-mixer-dev`，或者将SDL2_mixer的预编译二进制库存入环境变量`SDL2_mixer`中，并定义环境变量`export USE_SDL2_MIXER=1`.
+4. 如果你不想播放音视频，可直接定义`export DISABLE_AUDIO=1`。
+5. 如果你不想使用视障帮助功能，则可以定义`export NON_VISUALLY_IMPAIRED_HELP=1`。
+6. 通过定义`SUFFIX`环境变量来指定输出文件名的后缀名，或者直接通过定义`TARGET`环境变量来指定输出文件名的名称（这时`SUFFIX`将会失效）。
+7. 执行`make -j`即可产生可执行文件。
 
 
 # Nintendo 3DS 平台
