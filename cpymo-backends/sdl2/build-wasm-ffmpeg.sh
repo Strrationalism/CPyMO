@@ -1,5 +1,5 @@
-#curl https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz --output ffmpeg-5.0.tar.gz
-#tar -xf ffmpeg-5.0.tar.gz
+curl https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz --output ffmpeg-5.0.tar.gz
+tar -xf ffmpeg-5.0.tar.gz
 
 cd ffmpeg-5.0
 
@@ -47,6 +47,6 @@ emconfigure ./configure \
 make install -j
 
 cd ..
-#rm ffmpeg-5.0.tar.gz -f
-#rm ffmpeg-5.0 -rf
+rm ffmpeg-5.0.tar.gz -f
+rm ffmpeg-5.0 -rf
 
