@@ -39,6 +39,7 @@ Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | �
 macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | 视障帮助
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
+Emscripten      | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 
 
 ### 第三梯队
 ##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
@@ -47,7 +48,6 @@ UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | �
 ------------ | ---- | --------- | ---------------------------- | ------- | ----------
 Sony PSP     | SDL2 | 不支持     | SDL2_mixer(不支持SE通道)      | 外置字体  | 游戏选择器
 Sony PSV     | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
-Emscripten   | SDL2 | 不支持     | SDL2_mixer                   | 外置字体  | 
 Android      | SDL2 | 不支持     | SDL2_mixer(仅支持OGG)         | 外置字体  | 游戏选择器
 
 ##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
@@ -302,7 +302,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
 2. 通过命令行`vdpm sdl2`安装SDL2。
-3. 执行`cpymo-backends/sdl2/build-psv-ffmpeg.sh`编译FFmpeg，注意这个版本和vdpm中的ffmpeg使用的剪裁参数不同，不要使用vdpm中的ffmpeg。
+3. cd到`cpymo-backends/sdl2`下执行`./build-psv-ffmpeg.sh`编译FFmpeg，注意这个版本和vdpm中的ffmpeg使用的剪裁参数不同，不要使用vdpm中的ffmpeg。
 
 ## 编译
 
@@ -330,9 +330,15 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 在`cpymo-backends/sdl2`下修改`Makefile.Emscripten`.
 
-变量WASM设置为1时编译到 Web Assembly 二进制文件，为0时编译到 JavaScript。    
-变量BUILD_GAME_DIR指定要集成的游戏目录，留空则不集成游戏。    
+变量`WASM`设置为1时编译到 Web Assembly 二进制文件，为0时编译到 JavaScript。    
+变量`BUILD_GAME_DIR`指定要集成的游戏目录，留空则不集成游戏。    
 以上两个变量可通过环境传入。    
+
+默认编译出的结果将不支持视频播放，并且采用SDL2_mixer作为音频后端（只能在BGM通道播放mp3，其他通道不支持mp3），默认采用这种方式是出于编译结果大小的考虑。    
+* 如果你需要播放MP3格式的语音或音效，或者需要播放视频，那么你需要在编译前执行：
+    1. 在`cpymo-backends/sdl2`目录下执行`build-emscripten-ffmpeg.sh`。
+    2. 执行`export AUDIO_BACKEND=ffmpeg`启动FFmpeg音视频后端。    
+* 如果你完全不需要音视频功能，可以执行`export AUDIO_BACKEND=none`关闭音视频功能以降低编译结果大小。    
 
 游戏目录中必须存在`/system/default.ttf`作为游戏字体使用。    
 

@@ -149,11 +149,20 @@ jobs:
       with:
         submodules: true
 
+    - name: Build FFmpeg
+      run: |
+        cd cpymo-backends/sdl2
+        chmod +x ./build-emscripten-ffmpeg.sh
+        ./build-emscripten-ffmpeg.sh
+
     - name: Build
       run: |
         cd cpymo-backends/sdl2
         make -f Makefile.Emscripten -j
-
+        make clean -f Makefile.Emscripten -j
+        export AUDIO_BACKEND=ffmpeg
+        make -f Makefile.Emscripten -j
+        
   build-android:
     name: 'Android'
     runs-on: ubuntu-latest

@@ -20,10 +20,7 @@ endif
 
 CC := emcc
 
-EM_FLAGS := \
-	-s USE_SDL=2 \
-	-s SDL2_MIXER_FORMATS=[ogg,mp3,flac,mid,mod,wav] \
-	-s USE_SDL_MIXER=2
+EM_FLAGS := -s USE_SDL=2 
 
 CFLAGS := \
 	-I$(CURDIR)/../include \
@@ -32,9 +29,6 @@ CFLAGS := \
 	-I$(CURDIR)/../../endianness.h \
 	-D__EMSCRIPTEN__ \
 	-DEMSCRIPTEN_GAMEDIR="\"$(BUILD_GAME_DIR)\"" \
-	-DDISABLE_FFMPEG_AUDIO \
-	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
-	-DDISABLE_MOVIE \
 	-DNON_VISUALLY_IMPAIRED_HELP \
 	-DNDEBUG \
 	$(EM_FLAGS) \
@@ -44,12 +38,37 @@ LDFLAGS := \
 	$(EM_FLAGS) \
 	-lidbfs.js \
 	-lSDL2 \
-	-lSDL2_mixer \
 	-s ASYNCIFY \
 	-s FORCE_FILESYSTEM=1 \
 	-s WASM=$(WASM) \
 	-s EXPORTED_RUNTIME_METHODS=['ccall'] \
 	-s ALLOW_MEMORY_GROWTH=1
+
+ifeq ($(AUDIO_BACKEND), ffmpeg)
+
+# Use FFmpeg
+CFLAGS += -Ibuild.FFmpeg.Emscripten/include -DSDL2_AUDIO_DEFAULT_SAMPLES=16384
+LDFLAGS += -Lbuild.FFmpeg.Emscripten/lib -lswscale -lavformat -lavcodec -lavutil -lswresample
+	
+else
+
+CFLAGS += -DDISABLE_FFMPEG_AUDIO -DDISABLE_MOVIE
+
+ifeq ($(AUDIO_BACKEND), none)
+
+# Disable Audio and Movie
+CFLAGS += -DDISABLE_AUDIO
+
+else
+
+# Use SDL2_Mixer by default
+CFLAGS += -DENABLE_SDL2_MIXER_AUDIO_BACKEND
+LDFLAGS += -lSDL2_mixer
+EM_FLAGS += -s SDL2_MIXER_FORMATS=[ogg,mp3,flac,mid,mod,wav] -s USE_SDL_MIXER=2
+
+endif
+endif
+
 
 ifeq ($(BUILD_GAME_DIR), )
 ifeq ($(WASM), 0)
