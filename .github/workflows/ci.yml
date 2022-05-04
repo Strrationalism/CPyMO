@@ -87,9 +87,10 @@ jobs:
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
-        cd ..
+        cd ../cpymo-backends/sdl2
         chmod +x ./cpymo-backends/sdl2/build-psv-ffmpeg.sh
         ./cpymo-backends/sdl2/build-psv-ffmpeg.sh
+        cd ../../
 
     - name: Build
       run: |
