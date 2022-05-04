@@ -90,7 +90,9 @@ jobs:
         cd ..
 
     - name: Install FFmpeg
-      run: ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
+      run: |
+        chmod +x ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
+        ./cpymo-backends/sdl2/install-psv-ffmpeg.sh
 
     - name: Build
       run: |
