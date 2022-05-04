@@ -56,7 +56,7 @@ CFLAGS	+=	$(INCLUDE) -D__3DS__ -DNON_VISUALLY_IMPAIRED_HELP -DNDEBUG
 CXXFLAGS	:= $(CFLAGS) -O3 -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -L$(CURDIR)/build.FFmpeg.3DS/lib
+LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) 
 
 LIBS	:= -lswscale -lavformat -lavcodec -lavutil -lswresample -lcitro2d -lcitro3d -lctru -lm 
 
@@ -64,7 +64,7 @@ LIBS	:= -lswscale -lavformat -lavcodec -lavutil -lswresample -lcitro2d -lcitro3d
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
+LIBDIRS	:= $(CTRULIB) $(PORTLIBS) $(CURDIR)/build.FFmpeg.3DS/lib
 
 
 #---------------------------------------------------------------------------------
