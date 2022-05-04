@@ -35,7 +35,7 @@ TARGET		:=	cpymo
 BUILD		:=	$(shell mkdir -p build)build
 SOURCES		:=	../../cpymo ./ ../include
 DATA		:=	data
-INCLUDES	:=	../../endianness.h ../../stb ../../cpymo ../include build.FFmpeg.3DS/include
+INCLUDES	:=	../../endianness.h ../../stb ../../cpymo ../include
 ROMFS		:=	romfs
 APP_TITLE   := CPyMO
 APP_AUTHOR  := Strrationalism Studio
@@ -64,7 +64,7 @@ LIBS	:= -lswscale -lavformat -lavcodec -lavutil -lswresample -lcitro2d -lcitro3d
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(CTRULIB) $(PORTLIBS) $(CURDIR)/build.FFmpeg.3DS/lib
+LIBDIRS	:= $(CTRULIB) $(PORTLIBS) $(CURDIR)/build.FFmpeg.3DS
 
 
 #---------------------------------------------------------------------------------
