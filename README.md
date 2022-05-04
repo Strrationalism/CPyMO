@@ -39,7 +39,7 @@ Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | �
 macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | 视障帮助
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
-Emscripten      | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 
+Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 外置字体     | 
 
 ### 第三梯队
 ##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
