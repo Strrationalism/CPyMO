@@ -13,7 +13,9 @@
 #define CPYMO_AUDIO_CHANNEL_VO 2
 
 #ifdef DISABLE_AUDIO
+#ifndef DISABLE_FFMPEG_AUDIO
 #define DISABLE_FFMPEG_AUDIO
+#endif
 #endif
 
 #ifdef DISABLE_AUDIO

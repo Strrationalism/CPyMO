@@ -1,5 +1,6 @@
 BUILD_DIR = build.Win32
 
+
 !ifndef TARGET
 TARGET = cpymo.exe
 !endif
@@ -8,11 +9,33 @@ TARGET = cpymo.exe
 RC_FILE = pymo-icon-windows.rc
 !endif
 
-!ifdef NO_CONSOLE
-LD_FLAGS = /SUBSYSTEM:WINDOWS
+!if "$(NO_CONSOLE)" == "1"
+LD_FLAGS = $(LD_FLAGS) /SUBSYSTEM:WINDOWS
 !else
-LD_FLAGS = /SUBSYSTEM:CONSOLE
+LD_FLAGS = $(LD_FLAGS) /SUBSYSTEM:CONSOLE
 !endif
+
+!if "$(NON_VISUALLY_IMPAIRED_HELP)" == "1"
+CFLAGS = $(CFLAGS) -DNON_VISUALLY_IMPAIRED_HELP
+!endif
+
+!ifdef FFMPEG
+CFLAGS = $(CFLAGS) -I$(FFMPEG)/include
+LD_FLAGS = $(LD_FLAGS) /LIBPATH:$(FFMPEG)/lib avcodec.lib avformat.lib swresample.lib avutil.lib
+!else
+
+CFLAGS = $(CFLAGS) -DDISABLE_MOVIE -DDISABLE_FFMPEG_AUDIO
+
+!ifdef SDL2_MIXER
+CFLAGS = $(CFLAGS) -DENABLE_SDL2_MIXER_AUDIO_BACKEND -I$(SDL2_MIXER)/include/SDL2
+LD_FLAGS = $(LD_FLAGS) /LIBPATH:$(SDL2_MIXER)/lib SDL2_mixer.lib
+!else
+CFLAGS = $(CFLAGS) -DDISABLE_AUDIO
+!endif
+
+!endif
+
+
 
 SRC = \
 	cpymo_backend_audio.c \
@@ -77,18 +100,16 @@ $(BUILD_DIR)/cpymo.res: dirs $(RC_FILE)
 	$(RC) /r /fo $@ $(RC_FILE)
 
 $(TARGET): $(SRC) dirs $(BUILD_DIR)/cpymo.res
-	@$(CC) $(SRC) $(BUILD_DIR)/cpymo.res /Fe$(TARGET) /Fo$(BUILD_DIR)/ \
+	@$(CC) $(SRC) $(BUILD_DIR)/cpymo.res /Fe$(TARGET) /Fo$(BUILD_DIR)/ $(CFLAGS) \
 		-I../../cpymo \
 		-I../include \
 		-I../../stb \
 		-I../../endianness.h \
 		-I$(SDL2)/include/SDL2 \
-		-I$(FFMPEG)/include \
-		-DENABLE_ALT_ENTER_FULLSCREEN \
 		/utf-8 \
 		/O2 /Os /MP /nologo \
-		/link /LIBPATH:$(SDL2)/lib /LIBPATH:$(SDL2)/lib/manual-link /LIBPATH:$(FFMPEG)/lib \
-		SDL2main.lib SDL2.lib avcodec.lib avformat.lib swresample.lib avutil.lib \
+		/link /LIBPATH:$(SDL2)/lib /LIBPATH:$(SDL2)/lib/manual-link \
+		SDL2main.lib SDL2.lib \
 		Gdi32.lib User32.lib Imm32.lib Ole32.lib Shell32.lib Winmm.lib Secur32.lib Setupapi.lib Advapi32.lib Ws2_32.lib \
 		Version.lib Mfplat.lib OleAut32.lib Bcrypt.lib strmiids.lib Mfuuid.lib \
 		$(LD_FLAGS) /RELEASE
