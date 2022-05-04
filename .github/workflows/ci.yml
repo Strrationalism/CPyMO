@@ -158,8 +158,6 @@ jobs:
     - name: Build
       run: |
         cd cpymo-backends/sdl2
-        make -f Makefile.Emscripten -j
-        make clean -f Makefile.Emscripten -j
         export AUDIO_BACKEND=ffmpeg
         make -f Makefile.Emscripten -j
         
