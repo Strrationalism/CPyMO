@@ -38,10 +38,13 @@ chmod +x ./configure
 		--disable-lzma \
 		--disable-securetransport \
 		--disable-xlib \
-		--enable-pthreads
+		--disable-pthreads \
+		--enable-gpl \
+		--enable-version3 
 
 make install -j
 
 cd ..
 rm ffmpeg-5.0.tar.gz -f
 rm ffmpeg-5.0 -rf
+

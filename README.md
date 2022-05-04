@@ -26,34 +26,36 @@ pymo原版参见：https://github.com/pymo/pymo
 
 平台          | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
 ------------ | ---- | -------- | ------------------ | ---------------- | -------
-Windows      | SDL2 | FFmpeg   | FFmpeg: MP3, OGG   | 加载系统字体       | 视障帮助
-Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg: MP3, OGG   | 自带字体          | 游戏选择器
+Windows      | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体       | 视障帮助
+Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
 
 ### 第二梯队
 ##### CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。
 
 
-平台            | 后端  | 视频播放器 | 音频支持          | 字体支持     | 额外功能
---------------- | ---- | -------- | ---------------- | ----------- | ---------------
-Linux           | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 视障帮助
-macOS           | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 视障帮助
-Nintendo Switch | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 游戏选择器
-UWP             | SDL2 | FFmpeg   | FFmpeg: MP3, OGG | 加载系统字体  | 游戏选择器
+平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
+--------------- | ---- | -------- | ------------------ | ----------- | ---------------
+Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | 视障帮助
+macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | 视障帮助
+Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
+UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 
 ### 第三梯队
 ##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
 
 平台          | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
 ------------ | ---- | --------- | ---------------------------- | ------- | ----------
-Sony PSP     | SDL2 | 不支持     | SDL2_mixer: OGG; 不支持SE通道 | 外置字体  | 游戏选择器
-Sony PSV     | SDL2 | 不支持     | SDL2_mixer: MP3(仅BGM), OGG  | 外置字体  | 游戏选择器
-Emscripten   | SDL2 | 不支持     | SDL2_mixer: MP3(仅BGM), OGG  | 外置字体  | 
-Android      | SDL2 | 不支持     | SDL2_mixer: OGG              | 外置字体  | 游戏选择器
+Sony PSP     | SDL2 | 不支持     | SDL2_mixer(不支持SE通道)      | 外置字体  | 游戏选择器
+Sony PSV     | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
+Emscripten   | SDL2 | 不支持     | SDL2_mixer                   | 外置字体  | 
+Android      | SDL2 | 不支持     | SDL2_mixer(仅支持OGG)         | 外置字体  | 游戏选择器
+
+##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
 
 # 与pymo行为差异
 
 * CPyMO的存档位置和存档格式与pymo不同，不能与之互换。
-* CPyMO最小音频支持仅包含OGG格式，而pymo没有规定最小音频支持格式。
+* CPyMO最小音频支持仅包含OGG格式，且CPyMO不会考虑MID格式的音频播放。
 * CPyMO的蒙版渐变动画效果与PyMO不同。
 * CPyMO的菜单和UI与PyMO不同。
 * CPyMO和PyMO对视频支持不同。
@@ -285,35 +287,17 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 ## 额外依赖
 
-- VitaSDK
-
-以下软件包可通过VitaSDK中的vdpm安装：
-
-- sdl2
-- sdl2_mixer
-- mpg123
-- flac
-- libmikmod
-- libmodplug
-- libogg
-- libvorbis
+1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
+2. 通过命令行`vdpm sdl2`安装SDL2。
+3. 执行`cpymo-backends/sdl2/install-psv-ffmpeg.sh`安装FFmpeg，注意这个版本和vdpm中的ffmpeg使用的剪裁参数不同，不要使用vdpm中的ffmpeg。
 
 ## 编译
 
-在`cpymo-backends/sdl2`下执行`make -f Makefile.PSV`.
+在`cpymo-backends/sdl2`下执行`make -f Makefile.PSV`即可得到CPyMO.vpk。
 
 ## 安装
 
-你需要首先安装一个PSV软件，然后将CPyMO的EBOOT.BIN拷贝进去，将该软件替换掉。    
-之后，你需要在`ux0:/pymogames`目录下放置`default.ttf`和游戏文件。    
-
-目前已知使用[vitasdk/samples](https://github.com/vitasdk/samples)中`sdl2/redrectangle`编译出的vpk文件用作替换可以正常运行CPyMO for PSV.
-
-另外一种方案是根据这里的文档：https://gist.github.com/xyzz/8902bfc152940e0bd97199cc72609fd8 使用EBOOT.BIN文件创建VPK文件进行安装。
-
-## 启动
-
-启动那个被你替换掉的应用即可。    
+安装CPyMO.vpk之后，你还需要在`ux0:/pymogames`目录下放置`default.ttf`和游戏文件。    
 		
 ## 为PSV适配游戏
 

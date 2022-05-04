@@ -19,10 +19,10 @@ CFLAGS := \
 	-I$(VITASDK)/arm-vita-eabi/include \
 	-I$(VITASDK)/arm-vita-eabi/include/SDL2 \
 	-D__PSV__ \
-	-DDISABLE_MOVIE \
-	-DDISABLE_FFMPEG_AUDIO \
-	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
 	-DUSE_GAME_SELECTOR \
+	-DSDL2_AUDIO_DEFAULT_FREQ=44100 \
+	-DSDL2_AUDIO_DEFAULT_FORMAT_SDL=AUDIO_S16 \
+	-DSDL2_AUDIO_DEFAULT_FORMAT_CPYMO=cpymo_backend_audio_s16 \
 	-DGAME_SELECTOR_DIR="\"ux0:/pymogames/\"" \
 	-DGAME_SELECTOR_FONTSIZE=24 \
 	-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=28 \
@@ -39,11 +39,11 @@ define compile
 	@$(CC) -c -Wl,-q $1 -o $2 $(CFLAGS)
 endef
 
-build: eboot.bin
+build: cpymo.vpk
 
 clean:
 	@rm -fr $(BUILD_DIR)
-	@rm -fr eboot.bin
+	@rm -fr cpymo.vpk
 
 $(BUILD_DIR_BACKEND)/%.o: %.c $(INC)
 	$(call compile,$<,$@)
@@ -68,13 +68,7 @@ $(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
 		-lSceTouch_stub \
 		-lSceHid_stub \
 		-lSceMotion_stub \
-		-lSDL2_mixer \
-		-lmikmod \
-		-lFLAC \
-		-logg \
-		-lmpg123 \
-		-lvorbis \
-		-lvorbisfile \
+		-lswscale -lavformat -lavcodec -lavutil -lswresample \
 		-lm \
 		-Xlinker "-)" \
 		-L$(VITASDK)/arm-vita-eabi/lib \
@@ -84,6 +78,13 @@ $(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
 $(BUILD_DIR)/cpymo.velf: $(BUILD_DIR)/cpymo.elf
 	@vita-elf-create $< $@
 
-eboot.bin: $(BUILD_DIR)/cpymo.velf
+$(BUILD_DIR)/param.sfo: 
+	vita-mksfoex -s TITLE_ID="FHOMM0002" "CPyMO" $@
+
+$(BUILD_DIR)/eboot.bin: $(BUILD_DIR)/cpymo.velf
 	@vita-make-fself -s -ss $< $@
-	@echo "==> eboot.bin"
+
+cpymo.vpk: $(BUILD_DIR)/param.sfo $(BUILD_DIR)/eboot.bin
+	@vita-pack-vpk -s $(BUILD_DIR)/param.sfo -b $(BUILD_DIR)/eboot.bin $@
+	@echo "=> $@"
+
