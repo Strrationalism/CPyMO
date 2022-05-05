@@ -477,6 +477,7 @@ int main(int argc, char **argv)
 		case CPYMO_ERR_NO_MORE_CONTENT: goto EXIT;
 		default: {
 			SDL_Log("[Error] %s.", cpymo_error_message(err));
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "CPyMO Error", cpymo_error_message(err), window);
 			ret = -1;
 			goto EXIT;
 		}
