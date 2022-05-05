@@ -9,7 +9,7 @@ $device_specs = @(
     @{ Name = "3ds"; Width = 400; Height = 240; UseMask = $false; Movie = $true;
        BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("mp3", "ogg", "wav") },
 
-    @{ Name = "pymo-android"; Width = 800; Height = 600; UseMask = $false; Movie = $false;
+    @{ Name = "pymo-android"; Width = 800; Height = 600; UseMask = $false; Movie = $true;
        BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") },
 
     @{ Name = "switch"; Width = 1920; Height = 1080; UseMask = $false; Movie = $true;
