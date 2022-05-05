@@ -19,7 +19,7 @@ function Write-Help() {
     Write-Host ""
     Write-Host "You must ensure cpymo-tool and ffmpeg has installed."
     Write-Host "Usage:"
-    Write-Host "    ./pymo-convert-audio-to-ogg.ps1 <gamedir>"
+    Write-Host "    pymo-convert-audio-to-ogg.ps1 <gamedir>"
     Write-Host ""
 }
 
@@ -31,8 +31,8 @@ if ($args.Length -ne 1) {
 $gamedir = $args[0]
 
 function Convert-Asset($gamedir, $asstype, $ext) {
-    if (-not (Test-Path "$gamedir/$asstype")) { return }
-    if ((ls "$gamedir/$asstype/*$ext").Count -eq 0) { return }
+    if (-not (Test-Path "$gamedir/$asstype")) { return $false }
+    if (((ls "$gamedir/$asstype/*$ext").Count -eq 0) -and (-not (Test-Path "$gamedir/$asstype/$asstype.pak"))) { return $false }
 
     if ($ext.ToUpper().Trim() -eq ".OGG") {
         return $false
@@ -67,7 +67,7 @@ function Convert-Asset($gamedir, $asstype, $ext) {
     }
 
     if ($pack) {
-        Rename-Item "$gamedir/$asstype" "$gamedir/$asstype-backup"
+        Rename-Item "$gamedir/$asstype" "$asstype-backup"
         mkdir "$gamedir/$asstype"
 
         $filelist_file = "$convert_dir/$asstype.txt"
@@ -86,8 +86,8 @@ function Convert-Asset($gamedir, $asstype, $ext) {
             Remove-Item "$gamedir/$asstype" -Recurse
         }
 
-        Rename-Item $unpack_dir "$gamedir/$asstype-backup"
-        Rename-Item $convert_dir "$gamedir/$asstype"
+        Rename-Item $unpack_dir "$asstype-backup"
+        Rename-Item $convert_dir "$asstype"
     }
 
     return $true

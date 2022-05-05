@@ -28,7 +28,7 @@ function Write-Help() {
     Write-Host "You must ensure cpymo-tool has installed!"
     Write-Host ""
     Write-Host "Usage:"
-	Write-Host "    ./pymo-convert.ps1 <device-spec> <src-game> <dst-dir>"
+	Write-Host "    pymo-convert.ps1 <device-spec> <src-game> <dst-dir>"
     Write-Host ""
     Write-Host "Avaliable device specs:"
     foreach ($i in $device_specs) {
@@ -224,3 +224,16 @@ Out-File `
     -Force `
     -InputObject $gameconfig_lines `
     -Encoding utf8
+
+$bgmformat_supported = $spec.Audio.Contains($gameconfig["bgmformat"].Trim().TrimStart('.').Trim())
+$seformat_supported = $spec.Audio.Contains($gameconfig["seformat"].Trim().TrimStart('.').Trim())
+$voformat_supported = $spec.Audio.Contains($gameconfig["voiceformat"].Trim().TrimStart('.').Trim())
+
+if ((-not $bgmformat_supported) -or (-not $seformat_supported) -or (-not $voformat_supported)) {
+    pymo-convert-audio-to-ogg.ps1 $outdir
+    
+    if (Test-Path "$outdir/bgm-backup") { Delete-Item -Recurse -Force "$outdir/bgm-backup" }
+    if (Test-Path "$outdir/se-backup") { Delete-Item -Recurse -Force "$outdir/se-backup" }
+    if (Test-Path "$outdir/voice-backup") { Delete-Item -Recurse -Force "$outdir/voice-backup" }
+    if (Test-Path "$outdir/gameconfig-backup.txt") { Delete-Item -Force "$outdir/gameconfig-backup.txt" }
+}

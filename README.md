@@ -503,7 +503,7 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 ## pymo-converter
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包。    
-要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将cpymo-tool安装到命令行中。    
+要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
 
 pymo-converter目前支持将游戏适配到以下设备：
 
