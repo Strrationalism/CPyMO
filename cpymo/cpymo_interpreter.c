@@ -109,10 +109,11 @@ RETRY:
 					char label_name[32];
 					cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
 					printf("[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
-					return CPYMO_ERR_NOT_FOUND;
+					return CPYMO_ERR_SCRIPT_LABEL_NOT_FOUND;
 				}
 				else {
 					cpymo_parser_reset(&interpreter->script_parser);
+					retring = true;
 					goto RETRY;
 				}
 			}
@@ -126,7 +127,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 #define CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED 2
 
 error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_engine *engine)
-{	
+{
 	jmp_buf cont;
 
 	switch (setjmp(cont)) {
@@ -140,12 +141,19 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 		cpymo_parser_curline_pop_command(&interpreter->script_parser);
 
 	error_t err = cpymo_interpreter_dispatch(command, interpreter, engine, cont);
-	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_INVALID_ARG && err != CPYMO_ERR_NO_MORE_CONTENT) {		
+	switch (err) {
+	case CPYMO_ERR_NOT_FOUND:
+	case CPYMO_ERR_CAN_NOT_OPEN_FILE:
+	case CPYMO_ERR_BAD_FILE_FORMAT:
+	case CPYMO_ERR_UNSUPPORTED:
+	case CPYMO_ERR_UNKNOWN:
 		printf("[Error] In script \'%s\'(%d): %s\n",
 			interpreter->script_name,
 			(int)interpreter->script_parser.cur_line,
 			cpymo_error_message(err));
-	}
+		break;
+	default: return err;
+	};
 
 	if (!cpymo_parser_next_line(&interpreter->script_parser)) {
 		if (interpreter->no_more_content)
