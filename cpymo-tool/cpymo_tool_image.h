@@ -13,14 +13,13 @@ void cpymo_tool_image_free(cpymo_tool_image img);
 
 void cpymo_tool_image_fill(cpymo_tool_image *img, uint8_t val);
 
-error_t cpymo_tool_image_create_mask(cpymo_tool_image *out_mask, const cpymo_tool_image *img);
-error_t cpymo_tool_image_copy_without_mask(cpymo_tool_image *out_rgb_img, const cpymo_tool_image *img);
 error_t cpymo_tool_image_resize(cpymo_tool_image *out, const cpymo_tool_image *image, size_t w, size_t h);
 void cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, int x, int y);
 
-error_t cpymo_tool_image_save_to_file(
-	const cpymo_tool_image *img, 
-	const char *filename, 
-	cpymo_parser_stream_span format);
+error_t cpymo_tool_image_save_to_file_with_mask(
+	const cpymo_tool_image *img,
+	const char *filename,
+	cpymo_parser_stream_span format,
+	bool create_mask);
 
 error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename);

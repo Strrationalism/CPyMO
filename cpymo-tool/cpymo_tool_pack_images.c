@@ -1,4 +1,5 @@
 #include "cpymo_tool_pack_images.h"
+#include "cpymo_tool_image.h"
 #include <cpymo_parser.h>
 #include <cpymo_error.h>
 #include <stdlib.h>
@@ -17,16 +18,51 @@ static error_t cpymo_tool_pack_images(
 	const char **input_files,
 	size_t input_file_count) 
 {
-	printf("== Test Arguments Parsing ==\n");
-	printf("load-mask: %d\ncreate-mask: %d\n", (int)load_mask, (int)create_mask);
-	printf("output-file: %s\noutput-format: %s\ncols: %d\n", output_file, output_format.begin, (int)cols);
-	printf("input-files:\n");
+	cpymo_tool_image image;
+	image.pixels = NULL;
+
+	cpymo_tool_image *imgs = (cpymo_tool_image *)malloc(sizeof(cpymo_tool_image) * input_file_count);
+	if (imgs == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	memset(imgs, 0, sizeof(cpymo_tool_image) * input_file_count);
+
+	error_t err = CPYMO_ERR_SUCC;
+
+	size_t max_width = 0, max_height = 0;
+	for (size_t i = 0; i < input_file_count; ++i) {
+		err = cpymo_tool_image_load_from_file(&imgs[i], input_files[i], load_mask);
+		if (err != CPYMO_ERR_SUCC) {
+			printf("[Error] Can not load image: %s(%s).\n", input_files[i], cpymo_error_message(err));
+			goto CLEAN;
+		}
+
+		if (imgs[i].width > max_width) max_width = imgs[i].width;
+		if (imgs[i].height > max_height) max_height = imgs[i].height;
+	}
+
+	size_t rows = input_file_count / cols;
+	if (input_file_count % cols) rows++;
+	
+	err = cpymo_tool_image_create(&image, cols * max_width, rows * max_height, 4);
+	if (err != CPYMO_ERR_SUCC) goto CLEAN;
+	
+	cpymo_tool_image_fill(&image, 0);
+
+	for (size_t i = 0; i < input_file_count; ++i) {
+		size_t x = (i % cols) * max_width;
+		size_t y = (i / cols) * max_height;
+
+		cpymo_tool_image_blit(&image, imgs + i, (int)x, (int)y);
+	}
+
+	err = cpymo_tool_image_save_to_file_with_mask(&image, output_file, output_format, create_mask);
+
+CLEAN:
 	for (size_t i = 0; i < input_file_count; ++i)
-		printf("\t%s\n", input_files[i]);
+		if (imgs[i].pixels) cpymo_tool_image_free(imgs[i]);
+	free(imgs);
+	if (image.pixels) cpymo_tool_image_free(image);
 
-	// pack images!!!
-
-	return CPYMO_ERR_SUCC;
+	return err;
 }
 
 int cpymo_tool_invoke_pack_images(int argc, const char ** argv)

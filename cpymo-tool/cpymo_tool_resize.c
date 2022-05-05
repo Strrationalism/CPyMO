@@ -21,61 +21,22 @@ static error_t cpymo_tool_resize_image(
     bool create_mask, 
     const char * out_format)
 {
-    cpymo_tool_image input;
-    error_t err = cpymo_tool_image_load_from_file(&input, input_file, load_mask);
+    cpymo_tool_image img;
+    error_t err = cpymo_tool_image_load_from_file(&img, input_file, load_mask);
 
     {
         cpymo_tool_image resized;
-        err = cpymo_tool_image_resize(&resized, &input, (size_t)(ratio_w * input.width), (size_t)(ratio_h * input.height));
-        cpymo_tool_image_free(input);
-        input = resized;
+        err = cpymo_tool_image_resize(&resized, &img, (size_t)(ratio_w * img.width), (size_t)(ratio_h * img.height));
+        cpymo_tool_image_free(img);
+        img = resized;
 
         if (err != CPYMO_ERR_SUCC) {
-            cpymo_tool_image_free(input);
+            cpymo_tool_image_free(img);
             return err;
         }
     }
 
-    if (create_mask) {
-        {
-            cpymo_tool_image mask;
-            err = cpymo_tool_image_create_mask(&mask, &input);
-            if (err != CPYMO_ERR_SUCC) {
-                printf("[Warning] Can not create mask: %s(%s).\n", output_file, cpymo_error_message(err));
-                goto MASK_FAILED;
-            }
-
-            char *mask_name = NULL;
-            err = cpymo_tool_get_mask_name(&mask_name, output_file);
-            if (err != CPYMO_ERR_SUCC) {
-                cpymo_tool_image_free(mask);
-                printf("[Warning] Can not get mask name: %s(%s).\n", output_file, cpymo_error_message(err));
-                goto MASK_FAILED;
-            }
-
-            err = cpymo_tool_image_save_to_file(&mask, mask_name, cpymo_parser_stream_span_pure(out_format));
-            free(mask_name);
-            cpymo_tool_image_free(mask);
-
-            if (err != CPYMO_ERR_SUCC) {
-                printf("[Warning] Failed to save mask image: %s(%s).\n", output_file, cpymo_error_message(err));
-                goto MASK_FAILED;
-            }
-        }
-
-        cpymo_tool_image rgb;
-        err = cpymo_tool_image_copy_without_mask(&rgb, &input);
-        if (err == CPYMO_ERR_SUCC) {
-            cpymo_tool_image_free(input);
-            input = rgb;
-        }
-    }
-
-MASK_FAILED:
-    err = cpymo_tool_image_save_to_file(&input, output_file, cpymo_parser_stream_span_pure(out_format));
-    cpymo_tool_image_free(input);
-
-    return err;
+    return cpymo_tool_image_save_to_file_with_mask(&img, output_file, cpymo_parser_stream_span_pure(out_format), create_mask);
 }
 
 extern int help();
