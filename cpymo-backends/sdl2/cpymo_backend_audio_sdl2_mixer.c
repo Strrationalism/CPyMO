@@ -275,6 +275,9 @@ void cpymo_audio_se_stop(struct cpymo_engine *e)
 error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname)
 {
 	if (!enabled) return CPYMO_ERR_SUCC;
+#ifdef __PSP__
+	return CPYMO_ERR_SUCC;
+#endif
 	cpymo_audio_vo_stop(e);
 
 	if (e->assetloader.use_pkg_voice) {

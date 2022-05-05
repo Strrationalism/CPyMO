@@ -46,7 +46,7 @@ Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 外置字体     |
 
 平台          | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
 ------------ | ---- | --------- | ---------------------------- | ------- | ----------
-Sony PSP     | SDL2 | 不支持     | SDL2_mixer(不支持SE通道)      | 外置字体  | 游戏选择器
+Sony PSP     | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)     | 外置字体  | 游戏选择器
 Sony PSV     | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
 Android      | SDL2 | 不支持     | SDL2_mixer(仅支持OGG)         | 外置字体  | 游戏选择器
 
@@ -264,7 +264,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 * 由于PSP机能有限
     - 仅能加载s60v3数据包或下述推荐的PSP数据包
 	- 在放入太多游戏时将无法加载游戏列表
-	- 加载音效会导致严重卡顿，故禁用音效
+	- 加载音效和语音可能会导致内存占用过高，故禁用音效和语音
 	- 将不会在启动游戏时加载游戏目录下的`system/default.ttf`字体
 * 由于stb_image会在PSP中崩溃
     - 某些情况下使用icon.png会导致崩溃，如果出现了这种情况请删除icon.png
