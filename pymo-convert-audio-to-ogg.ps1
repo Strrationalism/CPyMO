@@ -19,7 +19,7 @@ function Write-Help() {
     Write-Host ""
     Write-Host "You must ensure cpymo-tool and ffmpeg has installed."
     Write-Host "Usage:"
-    Write-Host "    ./convert-audio-to-ogg.ps1 <gamedir>"
+    Write-Host "    ./pymo-convert-audio-to-ogg.ps1 <gamedir>"
     Write-Host ""
 }
 
@@ -31,6 +31,9 @@ if ($args.Length -ne 1) {
 $gamedir = $args[0]
 
 function Convert-Asset($gamedir, $asstype, $ext) {
+    if (-not (Test-Path "$gamedir/$asstype")) { return }
+    if ((ls "$gamedir/$asstype/*$ext").Count -eq 0) { return }
+
     if ($ext.ToUpper().Trim() -eq ".OGG") {
         return $false
     }

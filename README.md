@@ -514,7 +514,7 @@ pymo-converter目前支持将游戏适配到以下设备：
 * psp
 * psv
 
-## convert-audio-to-ogg
+## pymo-convert-audio-to-ogg
 
 由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为ogg格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
 
