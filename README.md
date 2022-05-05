@@ -26,7 +26,7 @@ pymo原版参见：https://github.com/pymo/pymo
 
 平台          | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
 ------------ | ---- | -------- | ------------------ | ---------------- | -------
-Windows      | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体       | 视障帮助
+Windows      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
 Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
 
 ### 第二梯队
@@ -35,11 +35,11 @@ Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | �
 
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
-Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | 视障帮助
-macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 加载系统字体  | 视障帮助
+Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
+macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
-Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_Mixer | 外置字体     | 
+Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
 
 ### 第三梯队
 ##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
