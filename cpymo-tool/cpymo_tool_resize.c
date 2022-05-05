@@ -8,24 +8,7 @@
 #include <cpymo_utils.h>
 #include <stdint.h>
 #include <cpymo_parser.h>
-
-static error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename)
-{
-    *out_mask_filename = (char *)malloc(strlen(filename) + 1 + strlen("_mask"));
-    if (*out_mask_filename == NULL) return CPYMO_ERR_OUT_OF_MEM;
-	
-    const char *ext = strrchr(filename, '.');
-    intptr_t filename_without_ext_len = ext - filename;
-	if (ext == NULL) filename_without_ext_len = strlen(filename);
-	
-    assert(filename_without_ext_len >= 0);
-
-    strcpy(*out_mask_filename, filename);
-	strcpy(*out_mask_filename + filename_without_ext_len, "_mask");
-	if (ext) strcpy(*out_mask_filename + filename_without_ext_len + 5, ext);
-
-    return CPYMO_ERR_SUCC;
-}
+#include "cpymo_tool_image.h"
 
 typedef struct {
     stbi_uc *main_image;
@@ -42,13 +25,7 @@ static error_t cpymo_tool_resize_image_internal(
     double ratio_w, double ratio_h, 
     bool create_mask_image)
 {
-    if (image->mask_image) {
-        cpymo_utils_attach_mask_to_rgba_ex(
-            image->main_image, image->main_width, image->main_height,
-            image->mask_image, image->mask_width, image->mask_height);
-        free(image->mask_image);
-        image->mask_image = NULL;
-    }
+    assert(image->mask_image == NULL);
 
 	size_t new_width = (int)(image->main_width * ratio_w);
 	size_t new_height = (int)(image->main_height * ratio_h);
@@ -103,43 +80,32 @@ error_t cpymo_tool_resize_image(
     const char * out_format)
 {
     cpymo_tool_resize_image_obj image;
+    cpymo_tool_image img;
+
+    error_t err = cpymo_tool_image_load_from_file(&img, input_file, load_mask);
+    CPYMO_THROW(err);
+
+    image.main_image = img.pixels;
     image.mask_image = NULL;
-	image.main_image = stbi_load(input_file, &image.main_width, &image.main_height, NULL, 4);
-    if (image.main_image == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
-
-    error_t err = CPYMO_ERR_SUCC;
-
-    if (load_mask) {
-        char *mask_filename;
-        err = cpymo_tool_get_mask_name(&mask_filename, input_file);
-        if (err != CPYMO_ERR_SUCC) goto CLEAN;
-		
-		image.mask_image = stbi_load(mask_filename, &image.mask_width, &image.mask_height, NULL, 1);
-        if (image.mask_image == NULL) {
-            printf("[Warning] Can not open mask image file %s for %s.\n", mask_filename, input_file);
-        }
-
-		free(mask_filename);
-    }
+    image.main_height = img.height;
+    image.main_width = img.width;
 
     err = cpymo_tool_resize_image_internal(&image, ratio_w, ratio_h, create_mask);
     if (err != CPYMO_ERR_SUCC) goto CLEAN;
 	
     cpymo_parser_stream_span out_format_span = cpymo_parser_stream_span_pure(out_format);
-    if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "jpg")) {
-        stbi_write_jpg(output_file, image.main_width, image.main_height, image.main_out_channels, image.main_image, 100);			
-    }
-    else if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "bmp")) {
-        stbi_write_bmp(output_file, image.main_width, image.main_height, image.main_out_channels, image.main_image);
-    }
-    else if(cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "png")) {
-		stbi_write_png(output_file, image.main_width, image.main_height, image.main_out_channels, image.main_image, 0);
-	}
-	else {
-		printf("[Error] Unsupported output format %s.\n", out_format);
-		err = CPYMO_ERR_UNSUPPORTED;
+    img.channels = image.main_out_channels;
+    img.width = image.main_width;
+    img.height = image.main_height;
+    img.pixels = image.main_image;
+    image.main_image = NULL;
+    err = cpymo_tool_image_save_to_file(&img, output_file, out_format_span);
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] Can not save image: %s(%s).\n", output_file, cpymo_error_message(err));
         goto CLEAN;
-	}
+    }
+
+    cpymo_tool_image_free(img);
 
     if (image.mask_image) {
         char *out_mask;
@@ -149,34 +115,23 @@ error_t cpymo_tool_resize_image(
 			goto CLEAN;
         }
 
-		if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "jpg")) {
-			stbi_write_jpg(out_mask, image.mask_width, image.mask_height, 1, image.mask_image, 100);			
-		}
-		else if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "bmp")) {
-			stbi_write_bmp(out_mask, image.mask_width, image.mask_height, 1, image.mask_image);
-		}
-        else if (cpymo_parser_stream_span_equals_str_ignore_case(out_format_span, "png")) {
-            stbi_write_png(out_mask, image.mask_width, image.mask_height, 1, image.mask_image, 0);
-        }
-        else {
-			printf("[Error] Unsupported output format %s.\n", out_format);
-			err = CPYMO_ERR_UNSUPPORTED;
-        }
-		
+        img.channels = 1;
+        img.width = image.mask_width;
+        img.height = image.mask_height;
+        img.pixels = image.mask_image;
+        image.mask_image = NULL;
+
+        err = cpymo_tool_image_save_to_file(&img, out_mask, out_format_span);
         free(out_mask);
+        cpymo_tool_image_free(img);
+
+        if (err != CPYMO_ERR_SUCC) {
+            printf("[Warning] Can not save mask image: %s(%s).\n", output_file, cpymo_error_message(err));
+        }
     }
 	
 CLEAN:
     if (image.mask_image) free(image.mask_image);
     if (image.main_image) free(image.main_image);
     return err;
-}
-
-error_t cpymo_tool_resize_image_package(
-    const char *input_file, const char *output_file,
-    double ratio_w, double ratio_h,
-    bool load_mask, bool create_mask,
-    const char *out_format)
-{
-    return CPYMO_ERR_NOT_FOUND;
 }

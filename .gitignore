@@ -12,3 +12,4 @@
 /cpymo-backends/3ds/cpymo.cia
 /cpymo-backends/3ds/cpymo-strip.elf
 *.o
+/cpymo-tool/build*
