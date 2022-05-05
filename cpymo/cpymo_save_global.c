@@ -109,6 +109,9 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 	if (buf) free(buf);
 	fclose(file);
 
+	e->flags.dirty = false;
+	e->vars.globals_dirty = false;
+
 	return CPYMO_ERR_SUCC;
 
 	#undef READ
