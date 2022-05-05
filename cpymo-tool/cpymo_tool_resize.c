@@ -12,7 +12,7 @@
 #include <cpymo_parser.h>
 #include "cpymo_tool_image.h"
 
-error_t cpymo_tool_resize_image(
+static error_t cpymo_tool_resize_image(
     const char *input_file, 
     const char *output_file, 
     double ratio_w, 
@@ -81,7 +81,7 @@ MASK_FAILED:
 extern int help();
 extern int process_err(error_t);
 
-int cpymo_tool_resize_invoke(int argc, const char ** argv)
+int cpymo_tool_invoke_resize(int argc, const char ** argv)
 {
 	const char *src_file = NULL;
 	const char *dst_file = NULL;
@@ -133,12 +133,14 @@ int cpymo_tool_resize_invoke(int argc, const char ** argv)
 		help();
 		return -1;
 	}
-	else if (dst_file == NULL) {
+
+	if (dst_file == NULL) {
 		printf("[Error] No destination file specified.\n");
 		help();
 		return -1;
 	}
-	else if (resize_ratio_w == NULL || resize_ratio_h == NULL) {
+
+	if (resize_ratio_w == NULL || resize_ratio_h == NULL) {
 		printf("[Error] No resize ratio specified.\n");
 		help();
 		return -1;

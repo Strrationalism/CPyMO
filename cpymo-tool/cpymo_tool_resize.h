@@ -1,2 +1,2 @@
 
-int cpymo_tool_resize_invoke(int argc, const char **argv);
+int cpymo_tool_invoke_resize(int argc, const char **argv);

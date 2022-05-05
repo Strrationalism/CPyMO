@@ -6,6 +6,7 @@
 #include <cpymo_parser.h>
 #include "cpymo_tool_package.h"
 #include "cpymo_tool_resize.h"
+#include "cpymo_tool_pack_images.h"
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -57,15 +58,14 @@ int main(int argc, const char **argv) {
 		return help();
 	}
 	else {
-		if (strcmp(argv[1], "unpack") == 0) {
+		if (strcmp(argv[1], "unpack") == 0)
 			return cpymo_tool_invoke_unpack(argc, argv);
-		}
-		else if (strcmp(argv[1], "pack") == 0) {
+		else if (strcmp(argv[1], "pack") == 0)
 			return cpymo_tool_invoke_pack(argc, argv);
-		}
-		else if (strcmp(argv[1], "resize") == 0) {
-			return cpymo_tool_resize_invoke(argc, argv);
-		}
+		else if (strcmp(argv[1], "resize") == 0)
+			return cpymo_tool_invoke_resize(argc, argv);
+		else if (strcmp(argv[1], "pack-images") == 0)
+			return cpymo_tool_invoke_pack_images(argc, argv);
 		else return help();
 	}
 }

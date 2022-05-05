@@ -102,7 +102,7 @@ error_t cpymo_tool_image_resize(cpymo_tool_image *out, const cpymo_tool_image *i
 
     stbir_resize_uint8(
         image->pixels, (int)image->width, (int)image->height, 0,
-        out->pixels, (int)w, (int)h, 0, image->channels);
+        out->pixels, (int)w, (int)h, 0, (int)image->channels);
 
     return CPYMO_ERR_SUCC;
 }
@@ -133,13 +133,13 @@ error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const char *f
 {
     int e = 0;
     if (cpymo_parser_stream_span_equals_str_ignore_case(format, "jpg")) {
-        e = stbi_write_jpg(filename, img->width, img->height, img->channels, img->pixels, 100);
+        e = stbi_write_jpg(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels, 100);
     }
     else if (cpymo_parser_stream_span_equals_str_ignore_case(format, "bmp")) {
-        e = stbi_write_bmp(filename, img->width, img->height, img->channels, img->pixels);
+        e = stbi_write_bmp(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels);
     }
     else if (cpymo_parser_stream_span_equals_str_ignore_case(format, "png")) {
-        e = stbi_write_png(filename, img->width, img->height, img->channels, img->pixels, 0);
+        e = stbi_write_png(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels, 0);
     }
     else {
         return CPYMO_ERR_UNSUPPORTED;

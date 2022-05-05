@@ -7,7 +7,7 @@
 #include <cpymo_utils.h>
 #include "cpymo_tool_package.h"
 
-error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const char *out_path) {
+static error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const char *out_path) {
 	cpymo_package pkg;
 
 	error_t err = cpymo_package_open(&pkg, pak_path);
@@ -72,7 +72,7 @@ error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const cha
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, uint32_t file_count)
+static error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, uint32_t file_count)
 {
 	cpymo_package_index *index = malloc(sizeof(cpymo_package_index) * file_count);
 	if (index == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -199,7 +199,7 @@ error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, u
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_tool_get_file_list(char *** files, size_t * count, const char * list_file)
+static error_t cpymo_tool_get_file_list(char *** files, size_t * count, const char * list_file)
 {
 	char *ls_buf = NULL;
 	size_t ls_len;
