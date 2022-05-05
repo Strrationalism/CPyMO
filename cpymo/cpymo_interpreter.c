@@ -1316,9 +1316,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	D("vo") {
 		POP_ARG(filename); ENSURE(filename);
-		error_t err = cpymo_audio_vo_play(engine, filename);
+
+		if (!cpymo_engine_skipping(engine)) {
+			error_t err = cpymo_audio_vo_play(engine, filename);
+			CPYMO_THROW(err);
+		}
+		else {
+			cpymo_audio_vo_stop(engine);
+		}
+
 		cpymo_backlog_record_write_vo(&engine->backlog, filename);
-		CPYMO_THROW(err);
+
 		CONT_NEXTLINE;
 	}
 

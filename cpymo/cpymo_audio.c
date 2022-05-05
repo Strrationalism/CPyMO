@@ -37,11 +37,13 @@ static void cpymo_audio_channel_reset_unsafe(cpymo_audio_channel *c)
 
 static void cpymo_audio_channel_reset(cpymo_audio_channel *c)
 {
-	cpymo_backend_audio_lock();
-	c->enabled = false;
-	cpymo_backend_audio_unlock();
+	if (c->enabled) {
+		cpymo_backend_audio_lock();
+		c->enabled = false;
+		cpymo_backend_audio_unlock();
 
-	cpymo_audio_channel_reset_unsafe(c);
+		cpymo_audio_channel_reset_unsafe(c);
+	}
 }
 
 static enum AVSampleFormat cpymo_audio_fmt2ffmpeg(
