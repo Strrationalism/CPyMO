@@ -1303,8 +1303,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		if (cpymo_parser_stream_span_equals_str(isloop_s, "1"))
 			isloop = true;
 
-		error_t err = cpymo_audio_se_play(engine, filename, isloop);
-		CPYMO_THROW(err);
+		if (isloop || !cpymo_engine_skipping(engine)) {
+			error_t err = cpymo_audio_se_play(engine, filename, isloop);
+			CPYMO_THROW(err);
+		}
 
 		CONT_NEXTLINE;
 	}
