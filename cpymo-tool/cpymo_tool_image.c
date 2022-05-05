@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stb_image_write.h>
+#include <stb_image_resize.h>
 
 error_t cpymo_tool_image_load_from_file(cpymo_tool_image *out, const char *filename, bool load_mask)
 {
@@ -40,9 +41,70 @@ error_t cpymo_tool_image_load_from_file(cpymo_tool_image *out, const char *filen
     return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_tool_image_create(cpymo_tool_image * out, size_t w, size_t h, size_t channels)
+{
+    stbi_uc *px = (stbi_uc *)malloc(w * h * channels);
+    if (px == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    out->width = w;
+    out->height = h;
+    out->channels = channels;
+    out->pixels = px;
+    return CPYMO_ERR_SUCC;
+}
+
 void cpymo_tool_image_free(cpymo_tool_image out)
 {
     free(out.pixels);
+}
+
+void cpymo_tool_image_fill(cpymo_tool_image *img, uint8_t val)
+{
+    memset(img->pixels, (int)val, img->width * img->height * img->channels);
+}
+
+error_t cpymo_tool_image_create_mask(cpymo_tool_image *out_mask, const cpymo_tool_image *img)
+{
+    error_t err = cpymo_tool_image_create(out_mask, img->width, img->height, 1);
+    CPYMO_THROW(err);
+
+    if (img->channels != 4) {
+        cpymo_tool_image_fill(out_mask, 255);
+        return CPYMO_ERR_SUCC;
+    }
+
+    for (size_t i = 0; i < img->height * img->width; ++i)
+        out_mask->pixels[i] = img->pixels[i * 4 + 3];
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_image_copy_without_mask(cpymo_tool_image * out_rgb_img, const cpymo_tool_image * img)
+{
+    if (img->channels != 4 && img->channels != 3) return CPYMO_ERR_UNSUPPORTED;
+
+    error_t err = cpymo_tool_image_create(out_rgb_img, img->width, img->height, 3);
+    CPYMO_THROW(err);
+
+    for (size_t i = 0; i < img->height * img->width; ++i) {
+        out_rgb_img->pixels[i * 3 + 0] = img->pixels[i * img->channels + 0];
+        out_rgb_img->pixels[i * 3 + 1] = img->pixels[i * img->channels + 1];
+        out_rgb_img->pixels[i * 3 + 2] = img->pixels[i * img->channels + 2];
+    }
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_image_resize(cpymo_tool_image *out, const cpymo_tool_image *image, size_t w, size_t h)
+{
+    error_t err = cpymo_tool_image_create(out, w, h, image->channels);
+    CPYMO_THROW(err);
+
+    stbir_resize_uint8(
+        image->pixels, (int)image->width, (int)image->height, 0,
+        out->pixels, (int)w, (int)h, 0, image->channels);
+
+    return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const char *filename, cpymo_parser_stream_span format)

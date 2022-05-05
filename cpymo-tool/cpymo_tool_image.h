@@ -9,10 +9,12 @@ typedef struct {
 
 error_t cpymo_tool_image_load_from_file(cpymo_tool_image *out, const char *filename, bool load_mask);
 error_t cpymo_tool_image_create(cpymo_tool_image *out, size_t w, size_t h, size_t channels);
-void cpymo_tool_image_free(cpymo_tool_image out);
+void cpymo_tool_image_free(cpymo_tool_image img);
+
+void cpymo_tool_image_fill(cpymo_tool_image *img, uint8_t val);
 
 error_t cpymo_tool_image_create_mask(cpymo_tool_image *out_mask, const cpymo_tool_image *img);
-error_t cpymo_tool_image_remove_alpha(cpymo_tool_image *out_rgb_img, const cpymo_tool_image *img);
+error_t cpymo_tool_image_copy_without_mask(cpymo_tool_image *out_rgb_img, const cpymo_tool_image *img);
 error_t cpymo_tool_image_resize(cpymo_tool_image *out, const cpymo_tool_image *image, size_t w, size_t h);
 error_t cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, size_t x, size_t y);
 

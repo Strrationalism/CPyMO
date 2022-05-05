@@ -237,3 +237,47 @@ error_t cpymo_tool_get_file_list(char *** files, size_t * count, const char * li
 	return CPYMO_ERR_SUCC;
 }
 
+extern int help();
+extern int process_err(error_t);
+
+int cpymo_tool_invoke_pack(int argc, const char ** argv)
+{
+	if (argc == 5) {
+		if (strcmp(argv[3], "--file-list") == 0) {
+			char **files = NULL;
+			size_t filecount;
+			error_t err = cpymo_tool_get_file_list(&files, &filecount, argv[4]);
+			if (err == CPYMO_ERR_SUCC) {
+				err = cpymo_tool_pack(argv[2], (const char **)files, (uint32_t)filecount);
+
+				for (size_t i = 0; i < filecount; ++i)
+					if (files[i]) free(files[i]);
+				free(files);
+
+				return process_err(err);
+			}
+			return process_err(err);
+		}
+		else goto NORMAL_PACK;
+	}
+	if (argc >= 4) {
+	NORMAL_PACK: {
+		const char *out_pak = argv[2];
+		const char **files_to_pack = argv + 3;
+		return process_err(cpymo_tool_pack(out_pak, files_to_pack, (uint32_t)argc - 3));
+		}
+	}
+	else return help();
+}
+
+int cpymo_tool_invoke_unpack(int argc, const char ** argv)
+{
+	if (argc == 5) {
+		const char *pak = argv[2];
+		const char *ext = argv[3];
+		const char *out = argv[4];
+		return process_err(cpymo_tool_unpack(pak, ext, out));
+	}
+	else return help();
+}
+

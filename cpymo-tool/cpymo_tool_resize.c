@@ -1,4 +1,6 @@
 #include "cpymo_tool_resize.h"
+#include <stdbool.h>
+#include <cpymo_error.h>
 #include <stb_image.h>
 #include <stb_image_resize.h>
 #include <stb_image_write.h>
@@ -10,66 +12,6 @@
 #include <cpymo_parser.h>
 #include "cpymo_tool_image.h"
 
-typedef struct {
-    stbi_uc *main_image;
-    stbi_uc *mask_image;
-    int main_width;
-    int main_height;
-    int main_out_channels;
-    int mask_width;
-    int mask_height;
-} cpymo_tool_resize_image_obj;
-
-static error_t cpymo_tool_resize_image_internal(
-    cpymo_tool_resize_image_obj *image, 
-    double ratio_w, double ratio_h, 
-    bool create_mask_image)
-{
-    assert(image->mask_image == NULL);
-
-	size_t new_width = (int)(image->main_width * ratio_w);
-	size_t new_height = (int)(image->main_height * ratio_h);
-	stbi_uc *new_image = (stbi_uc *)malloc(new_width * new_height * 4);
-	if (new_image == NULL) return CPYMO_ERR_OUT_OF_MEM;
-
-	stbir_resize_uint8(
-        image->main_image, image->main_width, image->main_height, 0,
-        new_image, (int)new_width, (int)new_height, 0, 4);
-	
-    free(image->main_image);
-    image->main_image = new_image;
-
-    image->main_width = (int)new_width;
-    image->main_height = (int)new_height;
-    image->main_out_channels = 4;
-	
-    if (create_mask_image) {
-		image->mask_width = (int)new_width;
-		image->mask_height = (int)new_height;
-		image->mask_image = (stbi_uc *)malloc(new_width * new_height);
-		if (image->mask_image == NULL) return CPYMO_ERR_OUT_OF_MEM;
-
-        for (size_t i = 0; i < new_width * new_height; i++) {
-            image->mask_image[i] = image->main_image[i * 4 + 3];
-        }
-
-        new_image = (stbi_uc *)malloc(new_width * new_height * 3);
-        if (new_image) {
-            for (size_t i = 0; i < new_width * new_height; i++) {
-				new_image[i * 3 + 0] = image->main_image[i * 4 + 0];
-                new_image[i * 3 + 1] = image->main_image[i * 4 + 1];
-                new_image[i * 3 + 2] = image->main_image[i * 4 + 2];
-            }
-			
-            image->main_out_channels = 3;			
-			free(image->main_image);
-            image->main_image = new_image;
-        }
-    }
-
-    return CPYMO_ERR_SUCC;
-}
-
 error_t cpymo_tool_resize_image(
     const char *input_file, 
     const char *output_file, 
@@ -79,59 +21,143 @@ error_t cpymo_tool_resize_image(
     bool create_mask, 
     const char * out_format)
 {
-    cpymo_tool_resize_image_obj image;
-    cpymo_tool_image img;
+    cpymo_tool_image input;
+    error_t err = cpymo_tool_image_load_from_file(&input, input_file, load_mask);
 
-    error_t err = cpymo_tool_image_load_from_file(&img, input_file, load_mask);
-    CPYMO_THROW(err);
-
-    image.main_image = img.pixels;
-    image.mask_image = NULL;
-    image.main_height = img.height;
-    image.main_width = img.width;
-
-    err = cpymo_tool_resize_image_internal(&image, ratio_w, ratio_h, create_mask);
-    if (err != CPYMO_ERR_SUCC) goto CLEAN;
-	
-    cpymo_parser_stream_span out_format_span = cpymo_parser_stream_span_pure(out_format);
-    img.channels = image.main_out_channels;
-    img.width = image.main_width;
-    img.height = image.main_height;
-    img.pixels = image.main_image;
-    image.main_image = NULL;
-    err = cpymo_tool_image_save_to_file(&img, output_file, out_format_span);
-    if (err != CPYMO_ERR_SUCC) {
-        printf("[Error] Can not save image: %s(%s).\n", output_file, cpymo_error_message(err));
-        goto CLEAN;
-    }
-
-    cpymo_tool_image_free(img);
-
-    if (image.mask_image) {
-        char *out_mask;
-        err = cpymo_tool_get_mask_name(&out_mask, output_file);
-        if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] No memory for create mask file.\n");
-			goto CLEAN;
-        }
-
-        img.channels = 1;
-        img.width = image.mask_width;
-        img.height = image.mask_height;
-        img.pixels = image.mask_image;
-        image.mask_image = NULL;
-
-        err = cpymo_tool_image_save_to_file(&img, out_mask, out_format_span);
-        free(out_mask);
-        cpymo_tool_image_free(img);
+    {
+        cpymo_tool_image resized;
+        err = cpymo_tool_image_resize(&resized, &input, (size_t)(ratio_w * input.width), (size_t)(ratio_h * input.height));
+        cpymo_tool_image_free(input);
+        input = resized;
 
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Warning] Can not save mask image: %s(%s).\n", output_file, cpymo_error_message(err));
+            cpymo_tool_image_free(input);
+            return err;
         }
     }
-	
-CLEAN:
-    if (image.mask_image) free(image.mask_image);
-    if (image.main_image) free(image.main_image);
+
+    if (create_mask) {
+        {
+            cpymo_tool_image mask;
+            err = cpymo_tool_image_create_mask(&mask, &input);
+            if (err != CPYMO_ERR_SUCC) {
+                printf("[Warning] Can not create mask: %s(%s).\n", output_file, cpymo_error_message(err));
+                goto MASK_FAILED;
+            }
+
+            char *mask_name = NULL;
+            err = cpymo_tool_get_mask_name(&mask_name, output_file);
+            if (err != CPYMO_ERR_SUCC) {
+                cpymo_tool_image_free(mask);
+                printf("[Warning] Can not get mask name: %s(%s).\n", output_file, cpymo_error_message(err));
+                goto MASK_FAILED;
+            }
+
+            err = cpymo_tool_image_save_to_file(&mask, mask_name, cpymo_parser_stream_span_pure(out_format));
+            free(mask_name);
+            cpymo_tool_image_free(mask);
+
+            if (err != CPYMO_ERR_SUCC) {
+                printf("[Warning] Failed to save mask image: %s(%s).\n", output_file, cpymo_error_message(err));
+                goto MASK_FAILED;
+            }
+        }
+
+        cpymo_tool_image rgb;
+        err = cpymo_tool_image_copy_without_mask(&rgb, &input);
+        if (err == CPYMO_ERR_SUCC) {
+            cpymo_tool_image_free(input);
+            input = rgb;
+        }
+    }
+
+MASK_FAILED:
+    err = cpymo_tool_image_save_to_file(&input, output_file, cpymo_parser_stream_span_pure(out_format));
+    cpymo_tool_image_free(input);
+
     return err;
+}
+
+extern int help();
+extern int process_err(error_t);
+
+int cpymo_tool_resize_invoke(int argc, const char ** argv)
+{
+	const char *src_file = NULL;
+	const char *dst_file = NULL;
+	const char *resize_ratio_w = NULL;
+	const char *resize_ratio_h = NULL;
+	bool load_mask = false, create_mask = false;
+	const char *out_format = NULL;
+
+	for (int i = 2; i < argc; ++i) {
+		cpymo_parser_stream_span a = cpymo_parser_stream_span_pure(argv[i]);
+		cpymo_parser_stream_span_trim(&a);
+
+		if (cpymo_parser_stream_span_equals_str(a, "")) continue;
+		else if (cpymo_parser_stream_span_starts_with_str_ignore_case(a, "--")) {
+			if (cpymo_parser_stream_span_equals_str(a, "--load-mask"))
+				load_mask = true;
+			else if (cpymo_parser_stream_span_equals_str(a, "--create-mask"))
+				create_mask = true;
+			else if (cpymo_parser_stream_span_equals_str(a, "--out-format")) {
+				++i;
+
+				if (argc <= i) {
+					printf("[Error] --out-format requires an argument.\n");
+					help();
+					return -1;
+				}
+
+				out_format = argv[i];
+			}
+			else {
+				printf("[Error] Unknown option: %s\n", argv[i]);
+				help();
+				return -1;
+			}
+		}
+		else if (src_file == NULL) src_file = argv[i];
+		else if (dst_file == NULL) dst_file = argv[i];
+		else if (resize_ratio_w == NULL) resize_ratio_w = argv[i];
+		else if (resize_ratio_h == NULL) resize_ratio_h = argv[i];
+		else {
+			printf("[Error] Unknown argument: %s\n", argv[i]);
+			help();
+			return -1;
+		}
+	}
+
+	if (src_file == NULL) {
+		printf("[Error] No source file specified.\n");
+		help();
+		return -1;
+	}
+	else if (dst_file == NULL) {
+		printf("[Error] No destination file specified.\n");
+		help();
+		return -1;
+	}
+	else if (resize_ratio_w == NULL || resize_ratio_h == NULL) {
+		printf("[Error] No resize ratio specified.\n");
+		help();
+		return -1;
+	}
+
+	double ratio_w = atof(resize_ratio_w);
+	double ratio_h = atof(resize_ratio_h);
+
+	if (out_format == NULL) {
+		out_format = strrchr(dst_file, '.');
+		if (out_format) out_format++;
+	}
+
+	if (out_format == NULL) {
+		printf("[Error] Can not get image format, please specify it with --out-format.\n");
+		return -1;
+	}
+
+	error_t err =
+		cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
+	return process_err(err);
 }
