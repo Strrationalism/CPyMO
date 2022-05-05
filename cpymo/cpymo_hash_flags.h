@@ -12,6 +12,7 @@ typedef struct {
 	cpymo_hash_flag *flags;
 	size_t flag_count;
 	size_t flag_buf_size;
+	bool dirty;
 } cpymo_hash_flags;
 
 void cpymo_hash_flags_init(cpymo_hash_flags *);

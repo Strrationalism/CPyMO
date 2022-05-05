@@ -7,6 +7,7 @@ void cpymo_hash_flags_init(cpymo_hash_flags *f)
 	f->flags = NULL;
 	f->flag_count = 0;
 	f->flag_buf_size = 0;
+	f->dirty = false;
 }
 
 void cpymo_hash_flags_free(cpymo_hash_flags *f)
@@ -46,6 +47,7 @@ error_t cpymo_hash_flags_add(cpymo_hash_flags *flags, cpymo_hash_flag f)
 	CPYMO_THROW(err);
 
 	flags->flags[flags->flag_count++] = f;
+	flags->dirty = true;
 	return CPYMO_ERR_SUCC;
 }
 

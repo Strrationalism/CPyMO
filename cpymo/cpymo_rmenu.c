@@ -145,7 +145,6 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 
 error_t cpymo_rmenu_enter(cpymo_engine *e)
 {
-	cpymo_save_autosave(e);
 	cpymo_rmenu *rmenu = NULL;
 	error_t err = cpymo_ui_enter(
 		(void **)&rmenu,

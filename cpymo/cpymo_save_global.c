@@ -115,8 +115,14 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 	#undef ENSURE_BUF
 }
 
-error_t cpymo_save_global_save(const cpymo_engine *e)
+error_t cpymo_save_global_save(cpymo_engine *e)
 {
+	if (e->vars.globals_dirty == false && e->flags.dirty == false)
+		return CPYMO_ERR_SUCC;
+
+	e->vars.globals_dirty = false;
+	e->flags.dirty = false;
+
 	FILE *file = cpymo_backend_write_save(e->assetloader.gamedir, "global.csav");
 	if (file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 

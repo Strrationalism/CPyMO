@@ -13,6 +13,7 @@ struct cpymo_var {
 typedef struct {
 	struct cpymo_var *locals;
 	struct cpymo_var *globals;
+	bool globals_dirty;
 } cpymo_vars;
 
 void cpymo_vars_init(cpymo_vars *out);
@@ -20,11 +21,11 @@ void cpymo_vars_free(cpymo_vars *to_free);
 
 void cpymo_vars_clear_locals(cpymo_vars *vars);
 
-int *cpymo_vars_access(cpymo_vars *vars, cpymo_parser_stream_span name);
+int *cpymo_vars_access(cpymo_vars *vars, cpymo_parser_stream_span name, bool modify);
 
 static inline int cpymo_vars_get(cpymo_vars * vars, cpymo_parser_stream_span name)
 {
-	int *v = cpymo_vars_access(vars, name);
+	int *v = cpymo_vars_access(vars, name, false);
 	return v == NULL ? 0 : *v;
 }
 

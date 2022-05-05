@@ -7,6 +7,7 @@ void cpymo_vars_init(cpymo_vars * out)
 {
 	out->locals = NULL;
 	out->globals = NULL;
+	out->globals_dirty = false;
 }
 
 static void cpymo_vars_free_var(struct cpymo_var * to_free)
@@ -32,10 +33,13 @@ void cpymo_vars_clear_locals(cpymo_vars * vars)
 	vars->locals = NULL;
 }
 
-int *cpymo_vars_access(cpymo_vars * vars, cpymo_parser_stream_span name)
+int *cpymo_vars_access(cpymo_vars * vars, cpymo_parser_stream_span name, bool modify)
 {
 	assert(name.len >= 1);
-	struct cpymo_var *var = name.begin[0] == 'S' ? vars->globals : vars->locals;
+	bool is_global_var = name.begin[0] == 'S';
+	struct cpymo_var *var = is_global_var ? vars->globals : vars->locals;
+
+	vars->globals_dirty |= is_global_var && modify;
 
 	while (var) {
 		if (cpymo_parser_stream_span_equals_str(name, var->name))
@@ -50,7 +54,7 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_parser_stream_span nam
 {
 	assert(*ptr_to_val == NULL);
 
-	*ptr_to_val = cpymo_vars_access(vars, name);
+	*ptr_to_val = cpymo_vars_access(vars, name, true);
 	if (*ptr_to_val != NULL) return CPYMO_ERR_SUCC;
 	else {
 		struct cpymo_var *var = (struct cpymo_var *)malloc(sizeof(struct cpymo_var));
