@@ -1,8 +1,10 @@
 #include "cpymo_backend_movie.h"
 #include <SDL.h>
+#include <cpymo_engine.h>
 
 static SDL_Texture *tex = NULL;
 extern SDL_Renderer *renderer;
+extern cpymo_engine engine;
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
 	return cpymo_backend_movie_how_to_play_send_surface;
@@ -27,6 +29,8 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	tex = SDL_CreateTexture(renderer, sdlfmt, SDL_TEXTUREACCESS_STREAMING, (int)width, (int)height);
 	if (tex == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
+	SDL_RenderSetLogicalSize(renderer, (int)width, (int)height);
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -40,6 +44,7 @@ void cpymo_backend_movie_free_surface()
 	SDL_assert(tex);
 	SDL_DestroyTexture(tex);
 	tex = NULL;
+	SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
 }
 
 void cpymo_backend_movie_update_yuv_surface(
