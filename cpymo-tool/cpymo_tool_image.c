@@ -107,6 +107,28 @@ error_t cpymo_tool_image_resize(cpymo_tool_image *out, const cpymo_tool_image *i
     return CPYMO_ERR_SUCC;
 }
 
+void cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, int x, int y)
+{
+    for (size_t srcy = 0; srcy < src->height; ++srcy) {
+        for (size_t srcx = 0; srcx < src->width; ++srcx) {
+            int dstx = x + (int)srcx;
+            int dsty = y + (int)srcy;
+
+            if (dstx < 0 || dstx >= dst->width || dsty < 0 || dsty >= dst->height)
+                break;
+
+            for (size_t channel = 0; channel < dst->channels; ++channel) {
+                uint8_t val = 255;
+
+                if (channel < src->channels)
+                    val = src->pixels[srcy * src->width * src->channels + srcx * src->channels + channel];
+
+                dst->pixels[dsty * dst->width * dst->channels + dstx * dst->channels + channel] = val;
+            }
+        }
+    }
+}
+
 error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const char *filename, cpymo_parser_stream_span format)
 {
     int e = 0;

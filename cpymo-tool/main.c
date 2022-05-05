@@ -23,18 +23,23 @@
 
 int help() {
 	printf("cpymo-tool\n");
-	printf("Development tool for pymo and cpymo.\n");
+	printf("Development tool for PyMO and CPyMO.\n");
 	printf("\n");
-	printf("Unpack a pymo package:\n");
+	printf("Unpack a PyMO package:\n");
 	printf("    cpymo-tool unpack <pak-file> <extension-with \".\"> <output-dir>\n");
-	printf("Pack a pymo package:\n");
+	printf("Pack a PyMO package:\n");
 	printf("    cpymo-tool pack <out-pak-file> <files-to-pack...>\n");
 	printf("    cpymo-tool pack <out-pak-file> --file-list <file-list.txt>\n");
 	printf("Resize image:\n");
 	printf(
 		"    cpymo-tool resize \n"
 		"        <src-image-file> <dst-image-file> <resize-ratio-w> <resize-ratio-h>\n"
-		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]");
+		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
+	printf("Pack images to single image:\n");
+	printf(
+		"    cpymo-tool pack-images\n"
+		"        <output-file> <num-of-cols> <input-files...>\n"
+		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
 	printf("\n");
 	return 0;
 }

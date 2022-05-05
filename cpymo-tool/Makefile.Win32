@@ -18,6 +18,9 @@ SRC = \
 build: $(TARGET)
 	@echo Built $(TARGET)
 
+run: build
+	cpymo-tool.exe
+
 clean:
 	@rd /S /Q $(BUILD_DIR)
 	@del /f /s /q $(TARGET)
