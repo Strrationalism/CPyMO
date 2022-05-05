@@ -232,8 +232,8 @@ $voformat_supported = $spec.Audio.Contains($gameconfig["voiceformat"].Trim().Tri
 if ((-not $bgmformat_supported) -or (-not $seformat_supported) -or (-not $voformat_supported)) {
     pymo-convert-audio-to-ogg.ps1 $outdir
     
-    if (Test-Path "$outdir/bgm-backup") { Delete-Item -Recurse -Force "$outdir/bgm-backup" }
-    if (Test-Path "$outdir/se-backup") { Delete-Item -Recurse -Force "$outdir/se-backup" }
-    if (Test-Path "$outdir/voice-backup") { Delete-Item -Recurse -Force "$outdir/voice-backup" }
-    if (Test-Path "$outdir/gameconfig-backup.txt") { Delete-Item -Force "$outdir/gameconfig-backup.txt" }
+    if (Test-Path "$outdir/bgm-backup") { rm -Recurse -Force "$outdir/bgm-backup" }
+    if (Test-Path "$outdir/se-backup") { rm -Recurse -Force "$outdir/se-backup" }
+    if (Test-Path "$outdir/voice-backup") { rm -Recurse -Force "$outdir/voice-backup" }
+    if (Test-Path "$outdir/gameconfig-backup.txt") { rm -Force "$outdir/gameconfig-backup.txt" }
 }
