@@ -182,7 +182,7 @@ jobs:
       uses: nttld/setup-ndk@v1
       id: setup-ndk
       with:
-        ndk-version: r23b
+        ndk-version: r21e
 
     - name: Build FFmpeg
       env:

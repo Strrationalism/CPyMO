@@ -349,7 +349,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 # Android 平台
 
-仅支持 Android 4.1 及以上的系统。
+仅支持 Android 4.3 及以上的系统。
 
 ## 编译
 
