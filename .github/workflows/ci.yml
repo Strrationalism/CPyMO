@@ -71,7 +71,7 @@ jobs:
           ./cpymo-backends/3ds/cpymo.cia
 
   build-psv:
-    name: 'PSV'
+    name: 'Sony PSV'
     runs-on: ubuntu-latest
     
     steps:
@@ -107,7 +107,7 @@ jobs:
           ./cpymo-backends/sdl2/cpymo.vpk
 
   build-psp:
-    name: 'PSP'
+    name: 'Sony PSP'
     runs-on: ubuntu-latest
     container: haydenkow/pspdev:latest
 
@@ -188,6 +188,7 @@ jobs:
       env:
         ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       run: |
+        export ANDROID_SDK_HOME=$ANDROID_HOME
         cd cpymo-backends/android/
         chmod +x ./build-android-ffmpeg.sh
         ./build-android-ffmpeg.sh
