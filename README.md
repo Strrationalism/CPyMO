@@ -32,7 +32,6 @@ Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | �
 ### 第二梯队
 ##### CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。
 
-
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
 Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
@@ -40,6 +39,7 @@ macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | �
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
+Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
 
 ### 第三梯队
 ##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
@@ -48,7 +48,6 @@ Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     |
 ------------ | ---- | --------- | ---------------------------- | ------- | ----------
 Sony PSP     | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)     | 外置字体  | 游戏选择器
 Sony PSV     | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
-Android      | SDL2 | 不支持     | SDL2_mixer(仅支持OGG)         | 外置字体  | 游戏选择器
 
 ##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
 
@@ -354,7 +353,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 ## 编译
 
-Android 工程目录在`cpymo-backends/android`。
+1. cd到`cpymo-backends/android`后执行`./build-android-ffmpeg.sh`以构建FFmpeg。
+2. 使用Android Studio打开`cpymo-backends/android`即可构建APK。
 
 ## 启动
 

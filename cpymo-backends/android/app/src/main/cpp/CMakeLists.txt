@@ -7,21 +7,9 @@ cmake_minimum_required(VERSION 3.18.1)
 
 set(CMAKE_C_FLAGS "-O3 -DNDEBUG ${CMAKE_C_FLAGS}")
 
-#set(WITH_OGG OFF CACHE STRING "FLAC WITH OGG")   # WTF in FLAC???
-set(SUPPORT_WAV ON CACHE STRING "SUPPORT_WAV")
-#set(SUPPORT_FLAC OFF CACHE STRING "SUPPORT_FLAC" FORCE)
-set(SUPPORT_OGG ON CACHE STRING "SUPPORT_OGG")
-set(SUPPORT_MP3_MPG123 ON CACHE STRING "SUPPORT_MP3_MPG123")
-set(SUPPORT_MOD_MODPLUG OFF CACHE STRING "SUPPORT_MOD_MODPLUG" FORCE)
-#set(SUPPORT_MID_TIMIDITY ON CACHE STRING "SUPPORT_MID_TIMIDITY")
-
 add_subdirectory(../../../../../sdl2/SDL SDL)
-add_subdirectory(../../../../../sdl2/SDL_mixer SDL_mixer)
 
 project("cpymo")
-
-#find_package(SDL2 CONFIG REQUIRED)
-#find_package(sdl2-mixer CONFIG REQUIRED)
 
 find_library( # Sets the name of the path variable.
         log-lib
@@ -37,9 +25,6 @@ find_library( # Sets the name of the path variable.
 
 
 add_definitions(
-        -DENABLE_SDL2_MIXER_AUDIO_BACKEND
-        -DDISABLE_FFMPEG_AUDIO
-        -DDISABLE_MOVIE
         -DUSE_GAME_SELECTOR
         -DADAPT_SCREEN_SIZE
         -DSCREEN_WIDTH=800
@@ -56,7 +41,8 @@ include_directories(
         "../../../../../include"
         "../../../../../../cpymo"
         "../../../../../../stb"
-        "../../../../../../endianness.h")
+        "../../../../../../endianness.h"
+        "../../../../ffmpeg-android-maker/output/include/${ANDROID_ABI}/")
 
 add_subdirectory("../../../../../../cpymo" cpymolib)
 
@@ -80,4 +66,25 @@ add_library( # Sets the name of the library.
         "../../../../../sdl2/cpymo_backend_movie.c"
         "../../../../../sdl2/cpymo_backend_audio_sdl2_mixer.c")
 
-target_link_libraries(cpymo PUBLIC SDL2main SDL2 SDL2_mixer cpymolib ${log-lib} c++_static)
+link_directories("../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/")
+
+add_library(avformat SHARED IMPORTED)
+set_target_properties(avformat PROPERTIES IMPORTED_LOCATION
+        "${CMAKE_SOURCE_DIR}/../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/libavformat.so")
+
+add_library(avcodec SHARED IMPORTED)
+set_target_properties(avcodec PROPERTIES IMPORTED_LOCATION
+        "${CMAKE_SOURCE_DIR}/../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/libavcodec.so")
+
+add_library(avutil SHARED IMPORTED)
+set_target_properties(avutil PROPERTIES IMPORTED_LOCATION
+        "${CMAKE_SOURCE_DIR}/../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/libavutil.so")
+
+add_library(swresample SHARED IMPORTED)
+set_target_properties(swresample PROPERTIES IMPORTED_LOCATION
+        "${CMAKE_SOURCE_DIR}/../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/libswresample.so")
+
+target_link_libraries(cpymo PUBLIC
+        SDL2main SDL2 cpymolib
+        avformat avcodec avutil swresample
+        ${log-lib} c++_static)

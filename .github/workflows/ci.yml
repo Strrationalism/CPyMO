@@ -178,6 +178,20 @@ jobs:
         java-version: '17'
         distribution: 'microsoft'
 
+    - name: Setup NDK
+      uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r23b
+
+    - name: Build FFmpeg
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      run: |
+        cd cpymo-backends/android/
+        chmod +x ./build-android-ffmpeg.sh
+        ./build-android-ffmpeg.sh
+
     - name: Build APK
       uses: sparkfabrik/android-build-action@v1.0.0
       with:
