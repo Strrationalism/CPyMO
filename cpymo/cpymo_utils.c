@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 
 error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 {
@@ -29,6 +30,12 @@ error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 
 	fclose(f);
 	return CPYMO_ERR_SUCC;
+}
+
+float cpymo_utils_lerp(float a, float b, float x)
+{
+	float t = (float)(x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2);
+	return (b - a) * t + a;
 }
 
 void cpymo_utils_replace_str_newline_n(char *str)

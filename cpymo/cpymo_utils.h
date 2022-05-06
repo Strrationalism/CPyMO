@@ -21,8 +21,7 @@ static inline float cpymo_utils_clampf(float v, float minv, float maxv)
 	else return v;
 }
 
-static inline float cpymo_utils_lerp(float a, float b, float t) 
-{ return (b - a) * t + a; }
+float cpymo_utils_lerp(float a, float b, float t);
 
 void cpymo_utils_replace_str_newline_n(char *str);
 
