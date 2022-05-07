@@ -56,8 +56,9 @@ Sony PSV     | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  |
 * CPyMO的存档位置和存档格式与pymo不同，不能与之互换。
 * CPyMO最小音频支持仅包含OGG格式，且CPyMO不会考虑MID格式的音频播放。
 * CPyMO的蒙版渐变动画效果与PyMO不同。
+* 涉及动画时间曲线的部分CPyMO均做了缓动效果，而pymo则使用线性效果。
 * CPyMO的菜单和UI与PyMO不同。
-* CPyMO和PyMO对视频支持不同。
+* CPyMO在可以播放视频的情况下比pymo支持更多编码格式的视频。
 * CPyMO不支持预载，预载选项会被CPyMO直接忽略。
 * CPyMO忽略除字体大小以外所有的字体设置，将自动启用字体阴影和字体反锯齿。
 
@@ -139,14 +140,15 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 
 在终端或devkitPro的MSYS2控制台（如果你使用Windows的话），cd到`cpymo-backends/3ds/`目录下，执行`./build-3ds-ffmpeg.sh`，这将为3DS编译FFmpeg。
 
-## 产生cia文件
-于`./cpymo-backends/3ds/`目录下执行`make`即可生成3DSX程序。    
-你需要确保已经安装了`makerom`命令，之后在`./cpymo-backends/3ds/`下使用`make cia`来创建cia文件。    
+## 产生3dsx与cia文件
+于`./cpymo-backends/3ds/`目录下执行`make`即可生成3dsx程序。    
+
+如果你需要创建cia文件，首先需要确保已经安装了`makerom`命令，之后在`./cpymo-backends/3ds/`下执行`make cia`即可。    
 
 你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
 ## 启动
-你需要将你的游戏放置于`SDMC:/pymogames/`下，保证路径中只有半角英文、数字和下划线，之后该游戏便会被CPyMO for 3DS检测到。   
+你需要将你的游戏放置于SD卡的`/pymogames/`下，保证路径中只有半角英文、数字和下划线，之后该游戏便会被CPyMO for 3DS检测到。   
 如果你已经安装了Citra且citra命令可用，你可以直接使用`make run`来调用Citra模拟器来启动CPyMO。    
 
 CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。    
