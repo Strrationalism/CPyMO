@@ -353,7 +353,12 @@ int main(int argc, char **argv)
 	if (SDL_CreateWindowAndRenderer(
 		window_size_w,
 		window_size_h,
-		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE,
+		SDL_WINDOW_ALLOW_HIGHDPI
+		| SDL_WINDOW_RESIZABLE
+#ifdef __ANDROID__
+		| SDL_WINDOW_FULLSCREEN
+#endif
+		,
 		&window,
 		&renderer) != 0) {
 		cpymo_engine_free(&engine);
