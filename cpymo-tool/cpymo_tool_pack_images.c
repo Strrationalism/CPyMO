@@ -76,7 +76,7 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 	output_format.len = 0;
 
 	size_t input_file_count = 0;
-	const char **input_files = (char **)malloc(argc * sizeof(char *));
+	const char **input_files = (const char **)malloc(argc * sizeof(char **));
 	if (input_files == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	for (int i = 2; i < argc; ++i) {
@@ -153,7 +153,7 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 		input_files,
 		input_file_count);
 
-	free((char *)input_files);
+	free((void *)input_files);
 	
 	return process_err(err);
 }

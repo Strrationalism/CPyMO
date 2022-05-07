@@ -27,7 +27,7 @@ build: cpymo-tool$(SUFFIX)
 
 define compile
 	@echo "$(notdir $1)"
-	@$(CC) -Wl,-q $1 -o $2 $(CFLAGS)
+	@$(CC) $1 -o $2 $(CFLAGS)
 endef
 
 cpymo-tool$(SUFFIX): $(OBJS)
