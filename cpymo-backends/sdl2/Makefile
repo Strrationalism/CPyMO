@@ -4,7 +4,7 @@ BUILD_DIR := $(shell mkdir -p build)build
 BUILD_DIR_CPYMO := $(shell mkdir -p $(BUILD_DIR)/cpymo)$(BUILD_DIR)/cpymo
 
 OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(wildcard *.c)) $(patsubst %.c, $(BUILD_DIR_CPYMO)/%.o, $(notdir $(wildcard ../../cpymo/*.c)))
-INC := $(wildcard *.h) $(wildcard ../../cpymo.h)
+INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
 
 CC := cc -c
 LD := cc

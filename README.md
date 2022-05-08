@@ -44,10 +44,12 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 ### 第三梯队
 ##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
 
-平台          | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
------------- | ---- | --------- | ---------------------------- | ------- | ----------
-Sony PSP     | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)     | 外置字体  | 游戏选择器
-Sony PSV     | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
+平台             | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
+--------------- | ---- | --------- | ---------------------------- | ------- | ----------
+Sony PSP        | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)     | 外置字体  | 游戏选择器
+Sony PSV        | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
+CPyMO ASCII ART (Windows) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使用控制台输出画面
+CPyMO ASCII ART (Unix) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使用控制台输出画面
 
 ##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
 
@@ -389,6 +391,32 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 其中\*的部分可能会不同，找到符合这个模式的目录即可。
 
 之后从开始菜单启动CPyMO。
+
+
+# CPyMO ASCII ART
+
+这是一个CPyMO变种，没有音频和视频播放器支持，它将会在控制台上输出画面，Just for fun!
+
+## 编译
+
+如果你需要编译到Windows，那么你应该使用`MinGW`和`MSYS2`来构建它。
+
+cd到`cpymo-backends/ascii-art`，执行`make`或`mingw32-make`即可生成可执行文件。
+
+## 启动
+
+参见CPyMO Desktop的启动方式。
+
+注意：**光敏性癫痫患者请不要使用该版本。**    
+注意：Windows上控制台输出效率较低，帧率可能会很差，建议使用Linux来执行该程序。
+
+CPyMO ASCII ART仅支持键盘操作：
+
+* 方向键可正常使用。
+* Z/Enter/空格键用于“确认”。
+* X/双击ESC键用于“取消/菜单”。
+* C键用于快进。
+* V键用于隐藏对话框。
 
 
 # 使用CPyMO开发新游戏

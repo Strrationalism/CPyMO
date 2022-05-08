@@ -5,6 +5,9 @@
 /out
 /.vs
 /cpymo-backends/3ds/.vscode
+/cpymo-backends/ascii-art/.vscode/
+/cpymo-backends/ascii-art/cpymo-ascii-art.exe
+/cpymo-backends/ascii-art/cpymo-ascii-art
 /cpymo-backends/3ds/build
 /cpymo-backends/3ds/cpymo.smdh
 /cpymo-backends/3ds/cpymo.elf
