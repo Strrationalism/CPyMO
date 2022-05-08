@@ -43,12 +43,8 @@ ifeq ($(NON_VISUALLY_IMPAIRED_HELP), 1)
 CFLAGS += -DNON_VISUALLY_IMPAIRED_HELP
 endif
 
-ifndef SUFFIX
-SUFFIX := 
-endif
-
 ifndef TARGET
-TARGET := cpymo$(SUFFIX)
+TARGET := cpymo
 endif
 
 ifeq ($(USE_SDL2_MIXER), 1)

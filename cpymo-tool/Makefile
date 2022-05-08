@@ -22,7 +22,7 @@ CFLAGS := -O3 -DNDEBUG -I../cpymo -I../stb -I../endianness.h
 CC = cc -c
 LD = cc
 
-build: cpymo-tool$(SUFFIX)
+build: cpymo-tool
 	@echo "=> $<"
 
 define compile
@@ -30,7 +30,7 @@ define compile
 	@$(CC) $1 -o $2 $(CFLAGS)
 endef
 
-cpymo-tool$(SUFFIX): $(OBJS)
+cpymo-tool: $(OBJS)
 	@echo "linking..."
 	@$(LD) $^ -o $@ -lm -O3
 
@@ -41,4 +41,4 @@ $(BUILD_DIR_CPYMO_TOOL)/%.o: %.c $(INC)
 	$(call compile,$<,$@)
 
 clean:
-	@rm -rf $(BUILD_DIR) cpymo-tool$(SUFFIX)
+	@rm -rf $(BUILD_DIR) cpymo-tool

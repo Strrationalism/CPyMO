@@ -123,7 +123,7 @@ github action及release上的版本默认会开启视障帮助功能，如果你
 3. 如果你需要使用SDL2_mixer播放音频，则可以选择安装`libsdl2-mixer-dev`，或者将SDL2_mixer的预编译二进制库存入环境变量`SDL2_mixer`中，并定义环境变量`export USE_SDL2_MIXER=1`.
 4. 如果你不想播放音视频，可直接定义`export DISABLE_AUDIO=1`。
 5. 如果你不想使用视障帮助功能，则可以定义`export NON_VISUALLY_IMPAIRED_HELP=1`。
-6. 通过定义`SUFFIX`环境变量来指定输出文件名的后缀名，或者直接通过定义`TARGET`环境变量来指定输出文件名的名称（这时`SUFFIX`将会失效）。
+6. 通过定义`TARGET`环境变量来指定输出文件名的名称。
 7. 执行`make -j`即可产生可执行文件。
 
 
@@ -499,7 +499,7 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 你可以选择以下三种方式之一来构建cpymo-tool：
 
 1. 直接使用CMake构建整个项目。
-2. 使用GNU Make在`cpymo-tool`目录中执行`make`命令，如果为Windows构建则需要先定义环境变量`SUFFIX`为`.exe`。
+2. 使用GNU Make在`cpymo-tool`目录中执行`make`命令。
 2. 使用Microsoft NMake在`cpymo-tool`目录中执行`nmake -f Makefile.Win32`命令构建。
 
 ## pymo-converter
