@@ -19,6 +19,10 @@ static inline void cpymo_tween_assign(cpymo_tween *tween, float value)
 
 static inline cpymo_tween cpymo_tween_create_value(float all_time, float begin_value, float end_value)
 {
+#ifdef LOW_FRAME_RATE
+	all_time = 0;
+#endif
+
 	cpymo_tween t;
 	if (all_time <= 0.0f) {
 		cpymo_tween_assign(&t, end_value);
@@ -29,6 +33,7 @@ static inline cpymo_tween cpymo_tween_create_value(float all_time, float begin_v
 	t.current_time = 0;
 	t.begin_value = begin_value;
 	t.end_value = end_value;
+
 	return t;
 }
 
@@ -45,7 +50,10 @@ static inline float cpymo_tween_value(const cpymo_tween *tween)
 { return cpymo_utils_lerp(tween->begin_value, tween->end_value, cpymo_tween_progress(tween)); }
 
 static inline void cpymo_tween_to(cpymo_tween *tween, float target, float time)
-{ *tween = cpymo_tween_create_value(time, cpymo_tween_value(tween), target); }
+{ 
+
+	*tween = cpymo_tween_create_value(time, cpymo_tween_value(tween), target); 
+}
 
 static inline bool cpymo_tween_finished(const cpymo_tween *tween)
 { return tween->current_time >= tween->all_time; }

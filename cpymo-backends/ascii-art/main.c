@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         bool redraw = false;
 
         clock_t cur_time = clock();
-        float dur = (float)(cur_time - prev_time) / CLOCKS_PER_SEC;
+        float dur = (float)(cur_time - prev_time) / (float)CLOCKS_PER_SEC;
         error_t err = cpymo_engine_update(&engine, dur, &redraw);
         if (err != CPYMO_ERR_SUCC) {
             printf("[Error] cpymo_engine_update: %s.\n", cpymo_error_message(err));

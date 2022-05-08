@@ -193,7 +193,12 @@ error_t cpymo_charas_new_chara(
 	cpymo_tween_assign(&ch->pos_x, x);
 	cpymo_tween_assign(&ch->pos_y, y);
 	cpymo_tween_assign(&ch->alpha, begin_alpha);
+#ifdef LOW_FRAME_RATE
+	cpymo_tween_assign(&ch->alpha, 1.0f);
+#else
 	cpymo_tween_to(&ch->alpha, 1.0f, time);
+#endif
+
 
 	if (e->charas.chara == NULL) {
 		e->charas.chara = ch;
@@ -305,6 +310,10 @@ error_t cpymo_charas_pos(cpymo_engine *e, int chara_id, int coord_mode, float x,
 
 static void cpymo_charas_stop_all_anime(cpymo_engine *e)
 {
+#ifdef LOW_FRAME_RATE
+	return;
+#endif
+
 	cpymo_charas *c = &e->charas;
 	struct cpymo_chara *ch = c->chara;
 	
@@ -332,6 +341,9 @@ static void cpymo_charas_stop_all_anime(cpymo_engine *e)
 
 void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
 {
+#ifdef LOW_FRAME_RATE
+	return;
+#endif
 	struct cpymo_chara *ch = NULL;
 	if (cpymo_charas_find(c, &ch, id) == CPYMO_ERR_SUCC)
 		ch->play_anime = true;
@@ -339,6 +351,9 @@ void cpymo_charas_set_play_anime(cpymo_charas * c, int id)
 
 void cpymo_charas_set_all_chara_play_anime(cpymo_charas *c)
 {
+#ifdef LOW_FRAME_RATE
+	return;
+#endif
 	struct cpymo_chara *ch = c->chara;
 	while (ch) {
 		ch->play_anime = true;
@@ -355,6 +370,10 @@ static error_t cpymo_charas_anime_finished_callback(cpymo_engine *e)
 
 static bool cpymo_charas_wait_for_anime(cpymo_engine *e, float delta_time)
 {
+#ifdef LOW_FRAME_RATE
+	return true;
+#endif
+
 	if (cpymo_input_foward_key_just_pressed(e)) 
 		return true;
 
@@ -384,6 +403,10 @@ void cpymo_charas_play_anime(
 	size_t offsets_xy_count,
 	bool offsets_owned)
 {
+#ifdef LOW_FRAME_RATE
+	return;
+#endif
+
 	cpymo_charas *c = &e->charas;
 	assert(c->anime_pos == NULL);
 

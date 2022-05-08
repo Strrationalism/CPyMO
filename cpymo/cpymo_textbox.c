@@ -213,6 +213,7 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb
         return true;
     }
 
+#ifndef LOW_FRAME_RATE
     float speed = 0.05f;
     switch (e->gameconfig.textspeed) {
     case 0: speed = 0.1f; break;
@@ -222,6 +223,9 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *tb
     case 4: speed = 0.0125f; break;
     default: speed = 0.0f; break;
     };
+#else
+    const float speed = 0;
+#endif
 
     while (tb->timer >= speed) {
         if (cpymo_textbox_page_full(tb) || cpymo_textbox_all_finished(tb)) {
@@ -255,11 +259,13 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
         || CPYMO_INPUT_JUST_RELEASED(e, down)
         || e->input.mouse_wheel_delta < 0;
 
+#ifndef LOW_FRAME_RATE
     if (tb->timer >= 0.5f) {
         tb->timer -= 0.5f;
         tb->msg_cursor_visible = !tb->msg_cursor_visible;
         cpymo_engine_request_redraw(e);
     }
+#endif
 
     return go;
 }

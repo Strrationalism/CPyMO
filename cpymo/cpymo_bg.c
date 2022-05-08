@@ -222,6 +222,10 @@ error_t cpymo_bg_command(
 		bg->transform_next_bg_y = -(y / 100.0f) * (float)h;
 	}
 
+#ifdef LOW_FRAME_RATE
+	transition = cpymo_parser_stream_span_pure("BG_NOFADE");
+#endif
+
 	if (cpymo_parser_stream_span_equals_str(transition, "BG_NOFADE")) {
 		cpymo_bg_transfer(engine);
 	}

@@ -268,22 +268,25 @@ void cpymo_backend_image_fill_rects(
 	cpymo_color color, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
 {
+	const float game_w = (float)engine.gameconfig.imagesize_w;
+	const float game_h = (float)engine.gameconfig.imagesize_h;
+
 	for (size_t i = 0; i < count; i++) {
 		float x = xywh[4 * i + 0];
 		float y = xywh[4 * i + 1];
 		float w = xywh[4 * i + 2];
 		float h = xywh[4 * i + 3];
 
-		size_t draw_w = (size_t)(w * window_size_w);
-		size_t draw_h = (size_t)(h * window_size_h);
-		size_t draw_x = (size_t)(x * window_size_w);
-		size_t draw_y = (size_t)(y * window_size_h);
+		size_t draw_w = (size_t)(w * window_size_w / game_w);
+		size_t draw_h = (size_t)(h * window_size_h / game_h);
+		size_t draw_x = (size_t)(x * window_size_w / game_w);
+		size_t draw_y = (size_t)(y * window_size_h / game_h);
 
 		for (size_t draw_rect_y = 0; draw_rect_y < draw_h; draw_rect_y++) {
 			for (size_t draw_rect_x = 0; draw_rect_x < draw_w; draw_rect_x++) {
-				float r = (float)color.r / 255;
-				float g = (float)color.g / 255;
-				float b = (float)color.b / 255;
+				float r = (float)color.r / 255.0f;
+				float g = (float)color.g / 255.0f;
+				float b = (float)color.b / 255.0f;
 
 				size_t px_x = draw_x + draw_rect_x;
 				size_t px_y = draw_y + draw_rect_y;

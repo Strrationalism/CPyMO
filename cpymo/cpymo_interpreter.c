@@ -742,6 +742,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("anime_on") {
+#ifdef LOW_FRAME_RATE
+		CONT_NEXTLINE;
+#endif
 		POP_ARG(frames_str); ENSURE(frames_str);
 		POP_ARG(filename); ENSURE(filename);
 		POP_ARG(x_str); ENSURE(x_str);
@@ -768,6 +771,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 	
 	D("anime_off") {
+#ifdef LOW_FRAME_RATE
+		CONT_NEXTLINE;
+#endif
 		cpymo_anime_off(&engine->anime);
 		CONT_NEXTLINE;
 	}
