@@ -21,12 +21,25 @@
 #include <time.h>
 #include <unistd.h>
 
-uint64_t millis()
+#ifdef _WIN32
+#include <windows.h>
+static uint64_t millis()
+{
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    return st.wMilliseconds + st.wSecond * 1000 + st.wMinute * 1000 * 60 + st.wHour * 1000 * 60 * 60;
+}
+
+#else
+
+static uint64_t millis()
 {
     struct timespec now;
     timespec_get(&now, TIME_UTC);
     return ((uint64_t) now.tv_sec) * 1000 + ((uint64_t) now.tv_nsec) / 1000000;
 }
+
+#endif
 
 static uint64_t prev;
 static float get_delta_time() {
