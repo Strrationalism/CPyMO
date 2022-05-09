@@ -98,7 +98,7 @@ void cpymo_backend_image_subsys_clear_framebuffer(void)
 void cpymo_backend_image_subsys_submit_framebuffer(void) 
 {
 	framebuffer_ascii_cur = 0;
-	cpymo_backend_image_write_string("\033c");
+	printf("\033[%dA\033[%dD", (int)window_size_h, (int)window_size_w);
 	for (size_t y = 0; y < window_size_h; y++) {
 		for (size_t x = 0; x < window_size_w; x++) {
 			put_pixel(

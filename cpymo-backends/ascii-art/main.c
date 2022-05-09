@@ -21,10 +21,27 @@
 #include <time.h>
 #include <unistd.h>
 
+uint64_t millis()
+{
+    struct timespec now;
+    timespec_get(&now, TIME_UTC);
+    return ((uint64_t) now.tv_sec) * 1000 + ((uint64_t) now.tv_nsec) / 1000000;
+}
+
+static uint64_t prev;
+static float get_delta_time() {
+    uint64_t now = millis();
+    float delta = (now - prev) / 1000.0f;
+    prev = now;
+    return delta;
+}
+
 cpymo_engine engine;
 
 int main(int argc, char **argv) 
 {
+    prev = millis();
+
     extern error_t cpymo_backend_image_subsys_init(void);
     extern void cpymo_backend_image_subsys_free(void);
     error_t err = cpymo_backend_image_subsys_init();
@@ -57,14 +74,10 @@ int main(int argc, char **argv)
 
     printf("\033]0;%s\007", engine.gameconfig.gametitle);
 
-    clock_t prev_time = clock();
-
     while (1) {
         bool redraw = false;
 
-        clock_t cur_time = clock();
-        float dur = (float)(cur_time - prev_time) / (float)CLOCKS_PER_SEC;
-        error_t err = cpymo_engine_update(&engine, dur, &redraw);
+        error_t err = cpymo_engine_update(&engine, get_delta_time(), &redraw);
         if (err != CPYMO_ERR_SUCC) {
             printf("[Error] cpymo_engine_update: %s.\n", cpymo_error_message(err));
             cpymo_engine_free(&engine);
@@ -82,10 +95,8 @@ int main(int argc, char **argv)
             cpymo_backend_image_subsys_submit_framebuffer(); 
         }
         else {
-            usleep(16);
+            usleep(16000);
         }
-
-        prev_time = cur_time;
     }
 
     cpymo_engine_free(&engine);

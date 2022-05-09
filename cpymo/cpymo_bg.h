@@ -65,6 +65,10 @@ error_t cpymo_bg_command(
 	float time);
 
 static inline void cpymo_bg_follow_chara_quake(cpymo_bg *bg, bool enabled)
-{ bg->follow_chara_quake = enabled; }
+{ 
+#ifndef LOW_FRAME_RATE
+	bg->follow_chara_quake = enabled;
+#endif
+}
 
 #endif

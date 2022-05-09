@@ -62,8 +62,7 @@ cpymo_input cpymo_input_snapshot()
         case ' ':
         case 'J': ret.ok = true; break;
         case 'K': ret.cancel = true; break;
-        case 'L': ret.hide_window = true; break;
-        case ';': ret.skip = true; break;
+        case 'L': ret.skip = true; break;
         };
     }
 

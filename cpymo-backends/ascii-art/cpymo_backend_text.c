@@ -61,13 +61,13 @@ static void cpymo_backend_text_draw_internal(cpymo_color col, float x, float y, 
     y *= window_size_h;
 
     for (uint16_t draw_rect_y = 0; draw_rect_y < t->h; ++draw_rect_y) {
-        for (uint16_t draw_rect_x = 0; draw_rect_x < t->w; ++draw_rect_x) {
+        for (uint16_t draw_rect_x = 0; draw_rect_x < t->w * 2; ++draw_rect_x) {
             size_t draw_x = draw_rect_x + (size_t)x;
             size_t draw_y = draw_rect_y + (size_t)y;
 
             if (draw_x >= window_size_w || draw_y >= window_size_h) continue;
 
-            float pixel_alpha = alpha * ((float)t->px[draw_rect_y * t->w + draw_rect_x] / 255.0f);
+            float pixel_alpha = alpha * ((float)t->px[draw_rect_y * t->w + draw_rect_x / 2] / 255.0f);
 
             float dst_r = framebuffer[draw_y * window_size_w * 3 + draw_x * 3 + 0] / 255.0f;
             float dst_g = framebuffer[draw_y * window_size_w * 3 + draw_x * 3 + 1] / 255.0f;
@@ -115,7 +115,7 @@ float cpymo_backend_text_width(
     cpymo_backend_font_render(NULL, &w, &h, s, scale, baseline);
 
     
-    return (float)w / window_size_w * engine.gameconfig.imagesize_w;
+    return 2 * (float)w / window_size_w * engine.gameconfig.imagesize_w;
 }
 
 error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_singlechannel_moveinto, int w, int h)
