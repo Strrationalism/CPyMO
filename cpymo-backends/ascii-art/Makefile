@@ -24,7 +24,7 @@ CFLAGS += \
 	-I../../cpymo \
 	-I../../endianness.h \
 	-I../../stb \
-	-I../include \
+	-I../include
 
 LDFLAGS += -lm
 
