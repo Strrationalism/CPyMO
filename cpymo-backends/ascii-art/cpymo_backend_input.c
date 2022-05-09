@@ -1,5 +1,6 @@
 #include <cpymo_backend_input.h>
 #include <string.h>
+#include <ctype.h>
 
 #ifdef _WIN32
 
@@ -53,41 +54,17 @@ cpymo_input cpymo_input_snapshot()
     if (kbhit()) {
         int key = getch();
 
-        if (key == '\033') {
-            key = getch();
-            if (key == '[') {
-                key = getch();
-                switch (key) {
-                    case 'A':
-                        ret.up = true;
-                        break;
-                    case 'B':
-                        ret.down = true;
-                        break;
-                    case 'C':
-                        ret.right = true;
-                        break;
-                    case 'D':
-                        ret.left = true;
-                        break;
-                    case 27:
-                        ret.cancel = true;
-                        break;
-                };
-            }
-        }
-        else if (key == '\n' || key == '\r' || key == ' ' || key == 'z' || key == 'Z') {
-            ret.ok = true;
-        }
-        else if (key == 27 || key == 'x' || key == 'X') {
-            ret.cancel = true;
-        }
-        else if (key == 'c' || key == 'C') {
-            ret.skip = true;
-        }
-        else if (key == 'v' || key == 'V') {
-            ret.hide_window = true;
-        }
+        switch (toupper(key)) {
+        case 'W': ret.up = true; break;
+        case 'S': ret.down = true; break;
+        case 'A': ret.left = true; break;
+        case 'D': ret.right = true; break;
+        case ' ':
+        case 'J': ret.ok = true; break;
+        case 'K': ret.cancel = true; break;
+        case 'L': ret.hide_window = true; break;
+        case ';': ret.skip = true; break;
+        };
     }
 
     return ret;

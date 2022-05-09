@@ -412,11 +412,11 @@ cd到`cpymo-backends/ascii-art`，执行`make`或`mingw32-make`即可生成可�
 
 CPyMO ASCII ART仅支持键盘操作：
 
-* 方向键可正常使用。
-* Z/Enter/空格键用于“确认”。
-* X/双击ESC键用于“取消/菜单”。
-* C键用于快进。
-* V键用于隐藏对话框。
+* WSAD为方向键
+* J或空格为确认
+* K为取消
+* L为隐藏对话框
+* ;为快进
 
 
 # 使用CPyMO开发新游戏
