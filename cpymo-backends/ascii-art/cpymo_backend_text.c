@@ -1,5 +1,4 @@
 #include <cpymo_backend_text.h>
-#include <cpymo_backend_masktrans.h>
 #include <cpymo_engine.h>
 #include <stb_truetype.h>
 #include <stdlib.h>
@@ -118,11 +117,4 @@ float cpymo_backend_text_width(
     return 2 * (float)w / window_size_w * engine.gameconfig.imagesize_w;
 }
 
-error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_singlechannel_moveinto, int w, int h)
-{
-    return CPYMO_ERR_UNSUPPORTED;
-}
 
-void cpymo_backend_masktrans_free(cpymo_backend_masktrans m){}
-
-void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fade_in){}

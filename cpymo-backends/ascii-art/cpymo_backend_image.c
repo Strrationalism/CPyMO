@@ -1,4 +1,5 @@
 #include <cpymo_backend_image.h>
+#include <cpymo_backend_masktrans.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -314,3 +315,12 @@ bool cpymo_backend_image_album_ui_writable()
 {
 	return true;
 }
+
+error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_singlechannel_moveinto, int w, int h)
+{
+    return CPYMO_ERR_UNSUPPORTED;
+}
+
+void cpymo_backend_masktrans_free(cpymo_backend_masktrans m){}
+
+void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fade_in){}
