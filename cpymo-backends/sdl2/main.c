@@ -81,8 +81,22 @@ static void set_window_icon(const char *gamedir)
 	stbi_uc *icon = stbi_load(icon_path, &w, &h, NULL, 4);
 	if (icon == NULL) return;
 
+	Uint32 rmask, gmask, bmask, amask;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+
 	SDL_Surface *surface =
-		SDL_CreateRGBSurfaceFrom(icon, w, h, 4 * 8, 4 * w, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+		SDL_CreateRGBSurfaceFrom(icon, w, h, 4 * 8, 4 * w, rmask, gmask, bmask, amask);
 
 	if (surface == NULL) {
 		stbi_image_free(icon);

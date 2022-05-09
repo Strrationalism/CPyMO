@@ -16,6 +16,19 @@ error_t cpymo_backend_image_load(
 	default: assert(false); return CPYMO_ERR_UNKNOWN;
 	}
 
+	Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+
 	SDL_Surface *surface =
 		SDL_CreateRGBSurfaceFrom(
 			px,
@@ -23,10 +36,10 @@ error_t cpymo_backend_image_load(
 			h, 
 			channels * 8, 
 			channels * w, 
-			0x000000FF, 
-			0x0000FF00, 
-			0x00FF0000, 
-			0xFF000000);
+			rmask, 
+			gmask, 
+			bmask, 
+			amask);
 
 	if (surface == NULL) {
 		SDL_Log("Warning: Can not load image: %s", SDL_GetError());
