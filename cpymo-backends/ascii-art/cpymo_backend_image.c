@@ -50,7 +50,7 @@ static void put_pixel_rgb(uint8_t r, uint8_t g, uint8_t b);
 
 static void (* const put_pixel)(uint8_t r, uint8_t g, uint8_t b) = &put_pixel_rgb;
 
-static uint8_t *framebuffer = NULL;
+uint8_t *framebuffer = NULL;
 static char *framebuffer_ascii = NULL;
 static size_t framebuffer_ascii_cur_size = 0;
 static size_t framebuffer_ascii_cur = 0;

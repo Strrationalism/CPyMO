@@ -38,8 +38,18 @@ int main(int argc, char **argv)
         gamedir = argv[1];
     }
 
+    extern error_t cpymo_backend_font_init(const char *gamedir);
+    extern void cpymo_backend_font_free(void);
+    err = cpymo_backend_font_init(gamedir);
+    if (err != CPYMO_ERR_SUCC) {
+        cpymo_backend_image_subsys_free();
+        printf("[Error] cpymo_backend_font_init: %s.\n", cpymo_error_message(err));
+        return -1;
+    }
+
     err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
+        cpymo_backend_font_free();
         cpymo_backend_image_subsys_free();
         printf("[Error] cpymo_engine_init: %s.\n", cpymo_error_message(err));
         return -1;
@@ -58,6 +68,7 @@ int main(int argc, char **argv)
         if (err != CPYMO_ERR_SUCC) {
             printf("[Error] cpymo_engine_update: %s.\n", cpymo_error_message(err));
             cpymo_engine_free(&engine);
+            cpymo_backend_font_free();
             cpymo_backend_image_subsys_free();
             return -1;
         }
@@ -78,6 +89,7 @@ int main(int argc, char **argv)
     }
 
     cpymo_engine_free(&engine);
+    cpymo_backend_font_free();
     cpymo_backend_image_subsys_free();
 
     return 0;
