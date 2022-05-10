@@ -1,7 +1,7 @@
 TARGET = CPyMO_PSP
 OBJS   = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.c,%.o,$(wildcard ../../cpymo/*.c))
 
-INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h $(PSPDEV)/psp/include/SDL2
+INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h
 CFLAGS   = -G0 -Wall -O2 \
            -DDISABLE_FFMPEG_AUDIO \
            -DDISABLE_MOVIE \

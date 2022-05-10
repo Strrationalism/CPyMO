@@ -6,8 +6,8 @@
 #include <memory.h>
 #include <math.h>
 #include <cpymo_utils.h>
-#include <SDL_render.h>
-#include <SDL_clipboard.h>
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_clipboard.h>
 #include <assert.h>
 
 extern stbtt_fontinfo font;

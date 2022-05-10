@@ -106,7 +106,7 @@ $(TARGET): $(SRC) dirs $(BUILD_DIR)/cpymo.res
 		-I../include \
 		-I../../stb \
 		-I../../endianness.h \
-		-I$(SDL2)/include/SDL2 \
+		-I$(SDL2)/include/ \
 		-DNDEBUG \
 		/utf-8 \
 		/O2 /Os /MP /nologo \

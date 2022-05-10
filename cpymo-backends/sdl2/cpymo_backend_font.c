@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #ifdef __ANDROID__
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #endif
 
 #define STB_TRUETYPE_IMPLEMENTATION

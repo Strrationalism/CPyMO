@@ -53,7 +53,7 @@ $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	windres $< $@
+	@windres $< $@
 
 ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res

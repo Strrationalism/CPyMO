@@ -1,5 +1,5 @@
 #include "cpymo_backend_input.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <cpymo_engine.h>
 
 extern SDL_Renderer *renderer;

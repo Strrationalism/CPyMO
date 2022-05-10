@@ -17,8 +17,6 @@ CFLAGS := \
 	-I$(CURDIR)/../../stb \
 	-I$(CURDIR)/build.FFmpeg.PSV/include \
 	-I$(CURDIR)/../../endianness.h \
-	-I$(VITASDK)/arm-vita-eabi/include \
-	-I$(VITASDK)/arm-vita-eabi/include/SDL2 \
 	-D__PSV__ \
 	-DUSE_GAME_SELECTOR \
 	-DSDL2_AUDIO_DEFAULT_FREQ=44100 \

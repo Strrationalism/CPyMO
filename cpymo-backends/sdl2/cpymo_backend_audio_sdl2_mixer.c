@@ -1,6 +1,6 @@
 #ifdef ENABLE_SDL2_MIXER_AUDIO_BACKEND
-#include <SDL.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <cpymo_audio.h>
 #include <cpymo_engine.h>
 

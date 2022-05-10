@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cpymo_error.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <cpymo_engine.h>
 #include <cpymo_interpreter.h>
 #include <string.h>

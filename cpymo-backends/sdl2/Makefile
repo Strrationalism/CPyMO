@@ -15,7 +15,6 @@ CFLAGS := \
 	-I../../endianness.h \
 	-I../../stb \
 	-I../include \
-	-I/usr/include/SDL2 \
 	-O3 -DNDEBUG
 
 ifeq ($(DISABLE_AUDIO), 1)
@@ -25,17 +24,17 @@ else
 endif
 
 ifneq ($(strip $(SDL2)), )
-CFLAGS += -I$(SDL2)/include/SDL2/
+CFLAGS += -I$(SDL2)/include/
 LDFLAGS += -L$(SDL2)/lib/
 endif
 
 ifneq ($(strip $(SDL2_MIXER)), )
-CFLAGS += -I$(SDL2_MIXER)/include/SDL2/
+CFLAGS += -I$(SDL2_MIXER)/include/
 LDFLAGS += -L$(SDL2_MIXER)/lib/
 endif
 
 ifneq ($(strip $(FFMPEG)), )
-CFLAGS += -I$(FFMPEG)/include/SDL2/
+CFLAGS += -I$(FFMPEG)/include/
 LDFLAGS += -L$(FFMPEG)/lib/
 endif
 
@@ -73,7 +72,7 @@ OBJS += $(BUILD_DIR)/cpymo.res
 endif
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	windres $< $@
+	@windres $< $@
 
 $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c $(INC)
 	$(call compile,$<,$@)
