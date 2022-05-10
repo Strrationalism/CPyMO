@@ -71,8 +71,7 @@ void cpymo_say_free(cpymo_say *say)
 void cpymo_say_draw(const struct cpymo_engine *e)
 {
 	if (e->say.active && !e->input.hide_window && !e->say.hide_window) {
-		float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
-		float msg_h = (float)e->say.msgbox_h * ratio;
+		float msg_h = (float)e->say.msgbox_h;
 		float y = (float)e->gameconfig.imagesize_h - msg_h;
 		float offx = (float)e->gameconfig.nameboxorg_x / 540.0f * (float)e->gameconfig.imagesize_w;
 		float offy = (float)e->gameconfig.nameboxorg_y / 360.0f * (float)e->gameconfig.imagesize_h;
@@ -103,7 +102,8 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 
 		if (e->say.msgbox) {
 			cpymo_backend_image_draw(
-				0, y, (float)e->gameconfig.imagesize_w, msg_h,
+				((float)e->gameconfig.imagesize_w - (float)e->say.msgbox_w) / 2, 
+				y, (float)e->say.msgbox_w, msg_h,
 				e->say.msgbox, 0, 0, e->say.msgbox_w, e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_text_say_textbox);
 		}
@@ -352,16 +352,13 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 	cpymo_backlog_record_write_name(&e->backlog, say->name);
 
 	// Create say message text
-	float msglr_l = (float)e->gameconfig.msglr_l * e->gameconfig.imagesize_w / 540.0f;
-	float msglr_r = (float)e->gameconfig.msglr_r * e->gameconfig.imagesize_w / 540.0f;
 	float msgtb_t = (float)e->gameconfig.msgtb_t * e->gameconfig.imagesize_h / 360.0f;
 	float msgtb_b = (float)e->gameconfig.msgtb_b * e->gameconfig.imagesize_h / 360.0f;
 
-	float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
-	float msg_h = (float)e->say.msgbox_h * ratio;
+	float msg_h = (float)e->say.msgbox_h;
 
-	float x = msglr_l;
-	float w = (float)e->gameconfig.imagesize_w - msglr_l - msglr_r;
+	float x = (e->gameconfig.imagesize_w - e->say.msgbox_w) / 2 + fontsize / 2;
+	float w = e->say.msgbox_w - fontsize;
 	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
 	float h = msg_h - msgtb_t - msgtb_b;
 

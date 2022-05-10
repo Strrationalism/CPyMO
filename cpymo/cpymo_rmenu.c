@@ -46,11 +46,15 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 
 static inline float cpymo_rmenu_zoom(const cpymo_engine *e) 
 {
+#ifdef DISABLE_SCALE
+	return 1.0f;
+#else
 	if (cpymo_gameconfig_is_symbian(&e->gameconfig)) {
 		if (e->gameconfig.platform[4] == '5') return 1.3f;		// s60v5
 		else return 1.6f;	// s60v3
 	}
 	else return 1.0f;	// android
+#endif
 }
 
 static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
