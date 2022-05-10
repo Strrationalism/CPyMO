@@ -1,7 +1,7 @@
 #include <cpymo_backend_input.h>
 #include <cpymo_engine.h>
 #include <string.h>
-#include <SDL_events.h>
+#include <SDL/SDL_events.h>
 
 const extern cpymo_engine engine;
 const extern SDL_Surface *framebuffer;

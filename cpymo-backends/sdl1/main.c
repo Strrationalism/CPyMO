@@ -17,7 +17,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <cpymo_engine.h>
 #include <cpymo_error.h>
 
@@ -26,7 +26,7 @@ SDL_Surface *framebuffer;
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define SCREEN_BPP 32
+#define SCREEN_BPP 24
 
 #ifndef SCREEN_BPP
 #define SCREEN_BPP 0
@@ -44,19 +44,110 @@ SDL_Surface *framebuffer;
 #define SCREEN_FLAGS (SDL_HWSURFACE | SDL_ASYNCBLIT | SDL_ANYFORMAT | SDL_HWPALETTE | SDL_DOUBLEBUF)
 #endif
 
+static bool current_full_screen;
+static error_t set_video_mode(size_t w, size_t h, bool fullscreen) 
+{
+    Uint32 flags = SCREEN_FLAGS;
+    if (fullscreen)
+        flags |= SDL_FULLSCREEN;
+
+#ifdef SCREEN_RESIZABLE
+    flags |= SDL_RESIZABLE;
+#endif
+
+    current_full_screen = fullscreen;
+
+    framebuffer = SDL_SetVideoMode((int)w, (int)h, SCREEN_BPP, flags);
+    if (framebuffer == NULL)
+        return CPYMO_ERR_UNKNOWN;
+    
+    SDL_Rect clip;
+    clip.x = (w - engine.gameconfig.imagesize_w) / 2;
+    clip.y = (h - engine.gameconfig.imagesize_h) / 2;
+    clip.w = engine.gameconfig.imagesize_w;
+    clip.h = engine.gameconfig.imagesize_h;
+
+    SDL_SetClipRect(framebuffer, &clip);
+    return CPYMO_ERR_SUCC;
+}
+
+#ifndef LOAD_GAME_ICON
+#define load_game_icon(...)
+#else 
+static inline void load_game_icon(const char *gamedir) 
+{
+    char *path = alloca(strlen(gamedir) + 10);
+    sprintf(path, "%s/icon.png", gamedir);
+
+    int w, h;
+    stbi_uc *data = stbi_load(path, &w, &h, NULL, 4);
+    if (data == NULL) return;
+
+    void *px = (void *)malloc(32 * 32 * 4);
+    if (px == NULL) {
+        free(data);
+        return;
+    }
+
+    stbir_resize_uint8(data, w, h, 0, px, 32, 32, 0, 4);
+    free(data);
+
+    Uint32 rmask, gmask, bmask, amask;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+
+    SDL_Surface *sur = SDL_CreateRGBSurfaceFrom(
+		px,
+		32,
+		32,
+		32,
+		4 * 32,
+		rmask,
+		gmask,
+		bmask,
+		amask);
+
+    if (sur == NULL) {
+        free(px);
+        return;
+    }
+
+    SDL_WM_SetIcon(sur, NULL);
+    SDL_FreeSurface(sur);
+    free(px);
+}
+#endif
 
 int main(int argc, char **argv) 
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(
+            SDL_INIT_VIDEO
+#ifndef DISABLE_AUDIO
+            | SDL_INIT_AUDIO
+#endif
+        ) < 0) {
         printf("[Error] SDL_Init: %s\n", SDL_GetError());
         return -1;
     }
-
+    
     const char *gamedir = ".";
-    gamedir = ".";
+    
+
     if (argc > 1) {
         gamedir = argv[1];
     }
+
+    load_game_icon(gamedir);
 
     error_t err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
@@ -75,12 +166,14 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    err = set_video_mode(SCREEN_WIDTH, SCREEN_HEIGHT, 
+#ifdef DEFAULT_FULLSCREEN
+    true
+#else
+    false
+#endif
+    );
 
-    framebuffer = SDL_SetVideoMode(
-        SCREEN_WIDTH, 
-        SCREEN_HEIGHT, 
-        SCREEN_BPP, 
-        SCREEN_FLAGS);
     if (framebuffer == NULL) {
         printf("[Error] SDL_SetVideoMode: %s\n", SDL_GetError());
         cpymo_engine_free(&engine);
@@ -102,6 +195,28 @@ int main(int argc, char **argv)
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_QUIT: goto EXIT;
+            case SDL_VIDEOEXPOSE: redraw_system = true; break;
+            case SDL_VIDEORESIZE:
+                err = set_video_mode(event.resize.w, event.resize.h, current_full_screen);
+                if (err != CPYMO_ERR_SUCC) {
+                    printf("[Error] SDL_SetVideoMode: %s\n", SDL_GetError());
+                    ret = -1;
+                    goto EXIT;
+                }
+                redraw_system = true;
+                break;
+#ifdef TOGGLE_FULLSCREEN
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_RETURN && (event.key.keysym.mod & KMOD_ALT)) {
+                    err = set_video_mode(SCREEN_WIDTH, SCREEN_HEIGHT, !current_full_screen);
+                    if (err != CPYMO_ERR_SUCC) {
+                        printf("[Error] SDL_SetVideoMode: %s\n", SDL_GetError());
+                        ret = -1;
+                        goto EXIT;
+                    }
+                }
+                break;
+#endif
             };
         }
 

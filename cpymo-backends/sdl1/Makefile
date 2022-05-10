@@ -19,6 +19,9 @@ CFLAGS += \
 	-DDISABLE_AUDIO \
 	-DDISABLE_MOVIE \
 	-DNON_VISUALLY_IMPAIRED_HELP \
+	-DSCREEN_RESIZABLE \
+	-DLOAD_GAME_ICON \
+	-DTOGGLE_FULLSCREEN \
 	-DNDEBUG \
 	-O0 -g \
 	-I../../cpymo \
@@ -26,11 +29,11 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
-LDFLAGS += -lm
+LDFLAGS += -lm -lSDL -lSDLmain
 
 ifneq ($(strip $(SDL)), "")
-CFLAGS += -I$(SDL)/include/SDL
-LDFLAGS += -L$(SDL)/lib -lSDL -lSDLmain
+CFLAGS += -I$(SDL)/include
+LDFLAGS += -L$(SDL)/lib
 endif
 
 ifeq ($(OS), Windows_NT)

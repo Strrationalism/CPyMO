@@ -256,6 +256,10 @@ void cpymo_backend_image_draw(
 			float blend_g = dst_g * (1.0f - pixel_alpha) + g * pixel_alpha;
 			float blend_b = dst_b * (1.0f - pixel_alpha) + b * pixel_alpha;
 
+			blend_r = cpymo_utils_clampf(blend_r, 0, 1);
+			blend_g = cpymo_utils_clampf(blend_g, 0, 1);
+			blend_b = cpymo_utils_clampf(blend_b, 0, 1);
+
 			dst_px[0] = (uint8_t)(blend_r * 255.0f);
 			dst_px[1] = (uint8_t)(blend_g * 255.0f);
 			dst_px[2] = (uint8_t)(blend_b * 255.0f);
@@ -302,6 +306,10 @@ void cpymo_backend_image_fill_rects(
 				float blend_r = dst_r * (1.0f - alpha) + r * alpha;
 				float blend_g = dst_g * (1.0f - alpha) + g * alpha;
 				float blend_b = dst_b * (1.0f - alpha) + b * alpha;
+
+				blend_r = cpymo_utils_clampf(blend_r, 0, 1);
+				blend_g = cpymo_utils_clampf(blend_g, 0, 1);
+				blend_b = cpymo_utils_clampf(blend_b, 0, 1);
 
 				dst_px[0] = (uint8_t)(blend_r * 255.0f);
 				dst_px[1] = (uint8_t)(blend_g * 255.0f);

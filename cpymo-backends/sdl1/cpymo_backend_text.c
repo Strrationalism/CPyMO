@@ -1,5 +1,5 @@
 #include <cpymo_backend_text.h>
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <stb_truetype.h>
 #include <cpymo_backend_image.h>
 #include <cpymo_utils.h>

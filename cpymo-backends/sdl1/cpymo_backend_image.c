@@ -1,11 +1,83 @@
 #include <cpymo_backend_image.h>
 #include <cpymo_backend_masktrans.h>
 #include <stdlib.h>
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <cpymo_engine.h>
 
 const extern cpymo_engine engine;
 extern SDL_Surface *framebuffer;
+
+cpymo_color getpixel(SDL_Surface *surface, int x, int y)
+{
+    int bpp = surface->format->BytesPerPixel;
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+	Uint32 px;
+
+    switch(bpp) {
+    case 1:
+        px = *p;
+		break;
+
+    case 2:
+        px = *(Uint16 *)p;
+		break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            px = (p[0] << 16 | p[1] << 8 | p[2]);
+        else
+            px = (p[0] | p[1] << 8 | p[2] << 16);
+		break;
+
+    case 4:
+        px = *(Uint32 *)p;
+		break;
+
+    default:
+        px = 0;
+		break;
+
+    }
+
+	cpymo_color col;
+	SDL_GetRGB(px, surface->format, &col.r, &col.g, &col.b);
+	return col;
+}
+
+void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col)
+{
+    int bpp = surface->format->BytesPerPixel;
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+	Uint32 pixel = SDL_MapRGB(surface->format, col.r, col.g, col.b);
+
+    switch(bpp) {
+    case 1:
+        *p = pixel;
+        break;
+
+    case 2:
+        *(Uint16 *)p = pixel;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+            p[0] = (pixel >> 16) & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = pixel & 0xff;
+        } else {
+            p[0] = pixel & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = (pixel >> 16) & 0xff;
+        }
+        break;
+
+    case 4:
+        *(Uint32 *)p = pixel;
+        break;
+    }
+}
 
 error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, 
@@ -122,6 +194,7 @@ void cpymo_backend_image_fill_rects(
 	cpymo_color color, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
 {
+#ifdef FAST_FILL_RECT
 	Uint32 col = SDL_MapRGBA(
 		framebuffer->format, 
 		(Uint8)(color.r * alpha), (Uint8)(color.g * alpha), (Uint8)(color.b * alpha), 255);
@@ -138,6 +211,47 @@ void cpymo_backend_image_fill_rects(
 
 		SDL_FillRect(framebuffer, &rect, col);
 	}
+#else
+	if (SDL_LockSurface(framebuffer) == -1) return;
+
+	SDL_Rect clip;
+	SDL_GetClipRect(framebuffer, &clip);
+
+	float r = color.r / 255.0f * alpha;
+	float g = color.g / 255.0f * alpha;
+	float b = color.b / 255.0f * alpha;
+
+	for (size_t i = 0; i < count; ++i) {
+		float x_ = xywh[i * 4 + 0];
+		float y_ = xywh[i * 4 + 1];
+		int w = (int)xywh[i * 4 + 2];
+		int h = (int)xywh[i * 4 + 3];
+		trans_pos(&x_, &y_);
+
+		for (int y = (int)y_; y < h + (int)y_; ++y) {
+			for (int x = (int)x_; x < w + (int)x_; x++) {
+				if (x < 0 || x >= framebuffer->w || y < 0 || y >= framebuffer->h) continue;
+				if (x < clip.x || x >= clip.x + clip.w || y < clip.y || y >= clip.y + clip.h) continue;
+
+				cpymo_color dst = getpixel(framebuffer, x, y);
+				float dst_r = dst.r / 255.0f * (1 - alpha) + r;
+				float dst_g = dst.g / 255.0f * (1 - alpha) + g;
+				float dst_b = dst.b / 255.0f * (1 - alpha) + b;
+
+				dst_r = cpymo_utils_clampf(dst_r, 0, 1);
+				dst_g = cpymo_utils_clampf(dst_g, 0, 1);
+				dst_b = cpymo_utils_clampf(dst_b, 0, 1);
+
+				dst.r = (Uint8)(dst_r * 255);
+				dst.g = (Uint8)(dst_g * 255);
+				dst.b = (Uint8)(dst_b * 255);
+				putpixel(framebuffer, x, y, dst);
+			}
+		}
+	}
+
+	SDL_UnlockSurface(framebuffer);
+#endif
 }
 
 bool cpymo_backend_image_album_ui_writable()
@@ -147,7 +261,7 @@ bool cpymo_backend_image_album_ui_writable()
 
 error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_singlechannel_moveinto, int w, int h)
 {
-	if (w != framebuffer->w || h != framebuffer->h)
+	if (w != engine.gameconfig.imagesize_w || h != engine.gameconfig.imagesize_h)
     	return CPYMO_ERR_UNSUPPORTED;
 
 	*out = (cpymo_backend_masktrans)mask_singlechannel_moveinto;
@@ -166,13 +280,22 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 	float t_top = t + radius;
 	float t_bottom = t - radius;
 
-	for (size_t y = 0; y < framebuffer->h; ++y) {
-		for (size_t x = 0; x < framebuffer->w; ++x) {
-			size_t px_offset = framebuffer->pitch * y + x * framebuffer->format->BytesPerPixel;
+	SDL_Rect rect;
+	SDL_GetClipRect(framebuffer, &rect);
+
+	for (int y = 0; y < engine.gameconfig.imagesize_h; ++y) {
+		for (int x = 0; x < engine.gameconfig.imagesize_w; ++x) {
+			int px_x = x + rect.x;
+			int px_y = y + rect.y;
+
+			if (px_x < rect.x || px_x >= rect.x + rect.w || px_y < rect.y || px_y >= rect.y + rect.h) continue;
+
+			size_t px_offset = framebuffer->pitch * px_y + px_x * framebuffer->format->BytesPerPixel;
+
 			Uint8 *px = (Uint8 *)framebuffer->pixels + px_offset;
 
 			float mask =
-				(float)(((unsigned char*)m)[y * framebuffer->w + x]) / 255;
+				(float)(((unsigned char*)m)[y * engine.gameconfig.imagesize_w + x]) / 255;
 
 			if (mask > t_top) mask = 1.0f;
 			else if (mask < t_bottom) mask = 0.0f;
@@ -180,36 +303,12 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 
 			if (is_fade_in) mask = 1 - mask;
 
-			Uint32 col;
-			switch (framebuffer->format->BytesPerPixel) {
-			case 1: col = *px; break;
-			case 2: col = *(Uint16 *)px; break;
-			case 3: col = (*(Uint32 *)px) >> 16; break;
-			case 4: col = *(Uint32 *)px; break;
-			default: 
-				SDL_UnlockSurface(framebuffer);
-				return;
-			};
+			cpymo_color col = getpixel(framebuffer, px_x, px_y);
 
-			Uint8 r, g, b;
-			SDL_GetRGB(col, framebuffer->format, &r, &g, &b);
-
-			r = (Uint8)(r * mask);
-			g = (Uint8)(g * mask);
-			b = (Uint8)(b * mask);
-
-			col = SDL_MapRGB(framebuffer->format, r, g, b);
-
-			switch (framebuffer->format->BytesPerPixel) {
-			case 1: *px = (Uint8)col; break;
-			case 2: *(Uint16 *)px = (Uint16)col; break;
-			case 3: 
-				*(Uint8 *)px = (Uint8)(col >> 16);
-				*(Uint8 *)(px + 1) = (Uint8)(col >> 8);
-				*(Uint8 *)(px + 2) = (Uint8)col;
-				break;
-			case 4: *(Uint32 *)px = (Uint32)col; break;
-			}
+			col.r = (uint8_t)(col.r * mask);
+			col.g = (uint8_t)(col.g * mask);
+			col.b = (uint8_t)(col.b * mask);
+			putpixel(framebuffer, px_x, px_y, col);
 		}
 	}
 

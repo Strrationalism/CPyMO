@@ -80,6 +80,10 @@ static void cpymo_backend_text_draw_internal(cpymo_color col, float x, float y, 
             float g = dst_g + (src_g - dst_g) * pixel_alpha;
             float b = dst_b + (src_b - dst_b) * pixel_alpha;
 
+            r = cpymo_utils_clampf(r, 0.0f, 1.0f);
+            g = cpymo_utils_clampf(g, 0.0f, 1.0f);
+            b = cpymo_utils_clampf(b, 0.0f, 1.0f);
+
             framebuffer[draw_y * window_size_w * 3 + draw_x * 3 + 0] = (uint8_t)(r * 255.0f);
             framebuffer[draw_y * window_size_w * 3 + draw_x * 3 + 1] = (uint8_t)(g * 255.0f);
             framebuffer[draw_y * window_size_w * 3 + draw_x * 3 + 2] = (uint8_t)(b * 255.0f);
@@ -113,7 +117,6 @@ float cpymo_backend_text_width(
     int w, h;
     cpymo_backend_font_render(NULL, &w, &h, s, scale, baseline);
 
-    
     return 2 * (float)w / window_size_w * engine.gameconfig.imagesize_w;
 }
 

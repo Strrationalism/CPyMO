@@ -167,6 +167,7 @@ static error_t cpymo_bg_progression_over_callback(cpymo_engine *e)
 	if (e->bg.trans)
 		cpymo_backend_masktrans_free(e->bg.trans);
 	e->bg.trans = NULL;
+	e->bg.transform_draw = NULL;
 
 	return CPYMO_ERR_SUCC;
 }
