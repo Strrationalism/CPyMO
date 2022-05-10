@@ -7,84 +7,94 @@
 
 const extern stbtt_fontinfo font;
 const extern cpymo_engine engine;
+extern SDL_Surface *framebuffer;
+
 extern void cpymo_backend_font_render(
     void *out_or_null, int *w, int *h, 
     cpymo_parser_stream_span text, float scale, float baseline);
 
 typedef struct {
-    cpymo_backend_image img;
     float baseline;
-} cpymo_backend_font_impl;
+    size_t w, h;
+    uint8_t px[0];
+} cpymo_backend_text_impl;
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
     float *out_width,
-    cpymo_parser_stream_span utf8_string, 
-    float single_character_size_in_logical_screen)
+    cpymo_parser_stream_span s, 
+    float height)
 {
-    float scale = 
-        stbtt_ScaleForPixelHeight(&font, single_character_size_in_logical_screen);
+    float scale = stbtt_ScaleForPixelHeight(&font, height);
 
     int ascent;
     stbtt_GetFontVMetrics(&font, &ascent, NULL, NULL);
     float baseline = scale * ascent;
 
     int w, h;
-    cpymo_backend_font_render(NULL, &w, &h, utf8_string, scale, baseline);
+    cpymo_backend_font_render(NULL, &w, &h, s, scale, baseline);
 
-    void *px = malloc(w * h);
-    if (px == NULL) {
-        return CPYMO_ERR_OUT_OF_MEM;
-    }
-
-    memset(px, 0, w * h);
-    cpymo_backend_font_render(px, &w, &h, utf8_string, scale, baseline);
-
-    void *px_rgba = malloc(w * h * 4);
-    if (px_rgba == NULL) {
-        free(px);
-        return CPYMO_ERR_OUT_OF_MEM;
-    }
-
-    for (size_t y = 0; y < h; y++) {
-        for (size_t x = 0; x < w; x++) {
-            uint8_t *px = 4 * y * w + 4 * x + (uint8_t *)px_rgba;
-            px[0] = engine.gameconfig.textcolor.r;
-            px[1] = engine.gameconfig.textcolor.g;
-            px[2] = engine.gameconfig.textcolor.b;
-        }
-    }
-
-    cpymo_backend_image img;
-    error_t err = cpymo_backend_image_load_with_mask(
-        &img, px_rgba, px, w, h, w, h);
-
-    if(err != CPYMO_ERR_SUCC) {
-        free(px);
-        free(px_rgba);
-        return err;
-    }
-
-    cpymo_backend_font_impl *impl = malloc(sizeof(cpymo_backend_font_impl));
-    if (impl == NULL) {
-        cpymo_backend_image_free(impl);
-        return CPYMO_ERR_UNKNOWN;
-    }
+    cpymo_backend_text_impl *impl = malloc(sizeof(cpymo_backend_text_impl) + w * h);
+    if (impl == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
     impl->baseline = baseline;
-    impl->img = img;
+    impl->w = (size_t)w;
+    impl->h = (size_t)h;
 
+    memset(impl->px, 0, w * h);
+    
+    cpymo_backend_font_render(impl->px, &w, &h, s, scale, baseline);
     *out = impl;
     *out_width = (float)w;
-    
-    return CPYMO_ERR_SUCC;   
+    return CPYMO_ERR_SUCC;
 }
 
 void cpymo_backend_text_free(cpymo_backend_text t_)
 {
-    cpymo_backend_font_impl *t = (cpymo_backend_font_impl *)t_;
-    cpymo_backend_image_free(t->img);
-    free(t);
+    free(t_);
+}
+
+static void cpymo_backend_text_draw_internal(
+    cpymo_backend_text_impl *t, 
+    float x_pos, float y_pos, 
+    cpymo_color col, float alpha)
+{
+    extern cpymo_color getpixel(SDL_Surface *surface, int x, int y);
+    extern void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col);
+
+    SDL_Rect clip;
+    SDL_GetClipRect(framebuffer, &clip);
+
+    float src_r = col.r / 255.0f;
+    float src_g = col.g / 255.0f;
+    float src_b = col.b / 255.0f;
+
+    for (int y = 0; y < t->h; ++y) {
+        for (int x = 0; x < t->w; ++x) {
+            int draw_x = clip.x + x + (int)x_pos;
+            int draw_y = clip.y + y + (int)y_pos;
+
+            if (draw_x < 0 || draw_x >= clip.x + clip.w || draw_y < 0 || draw_y >= clip.y + clip.h) continue;
+
+            float fontpx = alpha * (t->px[y * t->w + x] / 255.0f);
+            if (fontpx == 0.0f) continue;
+
+            cpymo_color dst = getpixel(framebuffer, draw_x, draw_y);
+            float dst_r = dst.r / 255.0f;
+            float dst_g = dst.g / 255.0f;
+            float dst_b = dst.b / 255.0f;
+
+            float blend_r = src_r * fontpx + dst_r * (1.0f - fontpx);
+            float blend_g = src_g * fontpx + dst_g * (1.0f - fontpx);
+            float blend_b = src_b * fontpx + dst_b * (1.0f - fontpx);
+
+            dst.r = (uint8_t)cpymo_utils_clampf(blend_r * 255.0f, 0.0f, 255.0f);
+            dst.g = (uint8_t)cpymo_utils_clampf(blend_g * 255.0f, 0.0f, 255.0f);
+            dst.b = (uint8_t)cpymo_utils_clampf(blend_b * 255.0f, 0.0f, 255.0f);
+
+            putpixel(framebuffer, draw_x, draw_y, dst);
+        }
+    }
 }
 
 void cpymo_backend_text_draw(
@@ -93,21 +103,22 @@ void cpymo_backend_text_draw(
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type)
 {
-    cpymo_backend_font_impl *t = (cpymo_backend_font_impl *)t_;
-    SDL_Surface *sur = (SDL_Surface *)t->img;
-    cpymo_backend_image_draw(
-        x, y_baseline - t->baseline,
-        (float)sur->w, (float)sur->h,
-        t->img, 0, 0, sur->w, sur->h,
-        alpha, draw_type);
+    cpymo_backend_text_impl *t = (cpymo_backend_text_impl *)t_;
+    float y = y_baseline - t->baseline;
+
+    if (SDL_LockSurface(framebuffer) == -1) return;
+
+    cpymo_backend_text_draw_internal(t, x + 1, y + 1, cpymo_color_inv(col), alpha);
+    cpymo_backend_text_draw_internal(t, x, y, col, alpha);
+
+    SDL_UnlockSurface(framebuffer);
 }
 
 float cpymo_backend_text_width(
     cpymo_parser_stream_span s,
-    float single_character_size_in_logical_screen)
+    float height)
 { 
-    float scale = 
-        stbtt_ScaleForPixelHeight(&font, single_character_size_in_logical_screen);
+    float scale = stbtt_ScaleForPixelHeight(&font, height);
 
     int ascent;
     stbtt_GetFontVMetrics(&font, &ascent, NULL, NULL);
