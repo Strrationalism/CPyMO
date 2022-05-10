@@ -1,8 +1,3 @@
-// debug
-#ifndef ENABLE_SDL_MIXER_AUDIO_BACKEND
-#define ENABLE_SDL_MIXER_AUDIO_BACKEND
-#endif
-
 #ifdef ENABLE_SDL_MIXER_AUDIO_BACKEND
 #include <cpymo_engine.h>
 #include <SDL/SDL_mixer.h>

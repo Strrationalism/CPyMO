@@ -281,6 +281,11 @@ int main(int argc, char **argv)
     err = cpymo_backend_font_init(NULL);
 #else    
     const char *gamedir = ".";
+#ifdef _WIN32
+    gamedir = "D:/Repos/Mai-no-Yuuwaku-PyMO/build";
+#else
+    gamedir = "/mnt/d/Repos/Mai-no-Yuuwaku-PyMO/build";
+#endif
 
     if (argc > 1) {
         gamedir = argv[1];
