@@ -34,7 +34,7 @@ Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | �
 
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
-Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
+Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体  | 视障帮助
 macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
@@ -50,6 +50,8 @@ Sony PSP        | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)     | �
 Sony PSV        | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
 CPyMO ASCII ART (Windows) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使用控制台输出画面
 CPyMO ASCII ART (Unix) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使用控制台输出画面
+Windows 95/98/Me/2000/XP | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer | 加载系统字体 | 
+Unix (SDL 1.2) | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer | 外置字体 | 
 
 ##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
 
@@ -64,7 +66,7 @@ CPyMO ASCII ART (Unix) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使�
 * CPyMO不支持预载，预载选项会被CPyMO直接忽略。
 * CPyMO忽略除字体大小以外所有的字体设置，将自动启用字体阴影和字体反锯齿。
 
-# 桌面平台 (Windows、Linux与macOS)
+# 由SDL2支持的桌面平台 (Windows、Linux与macOS)
 
 ## 额外依赖
 
@@ -512,6 +514,48 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 ### 加载系统字体
 
 定位到`cpymo_backend_font.c`中的函数`error_t cpymo_backend_font_init(const char *gamedir)`，向此函数添加用于加载系统字体的代码。
+
+## SDL 1.2后端
+
+该后端用于兼容较为老旧的平台。
+
+SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层的Alpha变化，同时也禁用了右键菜单的背景缩放功能。
+
+此外，SDL 1.2后端使用了SDL2后端的`cpymo_backend_font.c`和`cpymo_backend_save.c`。
+
+### 桌面版本 (Windows 95/98/Me/2000/XP, Unix)
+
+这里的产生的版本支持较旧的Windows和Unix-like操作系统。
+
+如果你使用Windows，那么你将只能使用msys2和mingw来编译。
+
+你可以使用以下环境变量来修改开关：
+
+* `USE_FFMPEG`，此变量为1时将会连接到FFmpeg库，并启用FFmpeg音视频支持。
+* 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_MIXER`，仅启动受限的音频支持。
+* 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
+
+之后在`cpymo-backends/sdl1`中执行`make`即可启动。
+
+### 使用宏适配目标系统
+
+* 画面
+    - `FAST_FILL_RECT`定义后，填充矩形时将禁用Alpha混合并提升性能。
+    - `SCREEN_BPP`可以定义为8、16、24、32以选择游戏画面的位深度（可选）。
+    - `SCREEN_WIDTH`将设置游戏起始画面宽度，如果你使用了游戏选择器，则必须定义此项，并且必须和`SCREEN_HEIGHT`一起定义。
+    - `SCREEN_HEIGHT`将设置游戏起始画面高度，如果你使用了游戏选择器，则必须定义此项，并且必须和`SCREEN_WIDTH`一起定义。
+    - `SCREEN_FLAGS`可定义`SDL_SetVideoMode`的`flags`参数。
+    - `SCREEN_RESIZABLE`定义时，将允许调整游戏窗口大小。
+    - `TOGGLE_FULLSCREEN`定义时，将允许用户通过`Alt+Enter`键切换全屏。
+* FFmpeg支持的音频系统
+    - `DEFAULT_CHANNELS`将设置默认音频输出通道数。
+    - `DEFAULT_FREQ`将设置默认音频输出的频率。
+    - `DEFAULT_SAMPLES`将设置默认缓冲区大小（以采样为单位）。
+* `ENABLE_SDL_MIXER_AUDIO_BACKEND`宏将启用SDL_Mixer音频后端，在这之前需要先定义`DISABLE_FFMPEG_AUDIO`。
+    - `SDL_MIXER_FREQ`将设置音频的默认输出频率（可选）。
+    - `SDL_MIXER_CHANNELS`将设置音频默认输出的通道数（可选）。
+    - `SDL_MIXER_CHUNKSIZE`将设置缓冲区大小（可选）。
+* `LOAD_GAME_ICON`定义时，将加载游戏图标，此项目与`USE_GAME_SELECTOR`冲突。
 
 # 工具
 

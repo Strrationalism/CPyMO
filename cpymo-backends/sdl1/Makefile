@@ -51,10 +51,7 @@ OBJS += $(BUILD_DIR)/cpymo.res
 endif
 
 ifeq ($(strip $(USE_FFMPEG)), 1)
-
-CFLAGS += -DDISABLE_MOVIE
 LDFLAGS += -lswscale -lavformat -lavcodec -lavutil -lswresample
-
 else
 
 ifeq ($(strip $(USE_SDL_MIXER)), 1)
