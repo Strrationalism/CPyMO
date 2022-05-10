@@ -21,7 +21,8 @@ CFLAGS += \
 	-DLOAD_GAME_ICON \
 	-DTOGGLE_FULLSCREEN \
 	-DDISABLE_SCALE \
-	-O0 -g \
+	-DNDEBUG \
+	-O3 \
 	-I../../cpymo \
 	-I../../endianness.h \
 	-I../../stb \

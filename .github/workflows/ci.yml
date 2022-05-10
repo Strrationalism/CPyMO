@@ -378,3 +378,31 @@ jobs:
         path: |
             ./build/build/Release/cpymo.exe
             ./build/build/Release/cpymo-tool.exe
+
+  build-ascii-art:
+    name: 'CPyMO ASCII ART'
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix: 
+        os: [ 'macos-latest', 'ubuntu-latest' ]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: 'Build'
+      run: |
+        cd cpymo-backends/ascii-art/
+        make -j
+        strip ./cpymo-ascii-art
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for ${{ matrix.package-name }}
+        path: |
+            ./cpymo-backends/ascii-art/cpymo-ascii-art
+            ./cpymo-backends/ascii-art/cpymo-ascii-art.exe
+            

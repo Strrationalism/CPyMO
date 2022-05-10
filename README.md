@@ -22,7 +22,7 @@ pymo原版参见：https://github.com/pymo/pymo
 # 平台支持列表
 
 ### 第一梯队
-##### CPyMO主要在这些平台上开发，并将主要在这些平台上进行测试和除错。
+**CPyMO主要在这些平台上开发，并将主要在这些平台上进行测试和除错。**
 
 平台          | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
 ------------ | ---- | -------- | ------------------ | ---------------- | -------
@@ -30,7 +30,7 @@ Windows      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       |
 Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
 
 ### 第二梯队
-##### CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。
+**CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。**
 
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
@@ -42,16 +42,16 @@ Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     |
 Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
 
 ### 第三梯队
-##### CPyMO可以编译到这些平台，但可能有部分次要功能不可用。
+**CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
 
-平台             | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
---------------- | ---- | --------- | ---------------------------- | ------- | ----------
-Sony PSP        | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)     | 外置字体  | 游戏选择器
-Sony PSV        | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
-CPyMO ASCII ART (Windows) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使用控制台输出画面
-CPyMO ASCII ART (Unix) | ASCII ART | 不支持 | 不支持 | 外置字体 | 使用控制台输出画面
-Windows 95/98/Me/2000/XP | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer | 加载系统字体 | 
-Unix (SDL 1.2) | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer | 外置字体 | 
+平台              | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
+---------------- | ---- | --------- | ---------------------------- | ------- | ----------
+Sony PSP         | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体  | 游戏选择器
+Sony PSV         | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
+Windows 95       | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer            | 加载系统字体 | 
+macOS (SDL 1.2)  | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer            | 加载系统字体 | 
+Linux (SDL 1.2)  | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer            | 外置字体 | 
+POSIX (ASCII ART)| ASCII ART | 不支持 | 不支持                       | 外置字体 | 在控制台上操作并输出画面
 
 ##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
 
