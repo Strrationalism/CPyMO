@@ -1,5 +1,5 @@
 #ifdef ENABLE_SDL2_MIXER_AUDIO_BACKEND
-#include <SDL2/SDL.h>
+#include "cpymo_import_sdl2.h"
 #include <SDL2/SDL_mixer.h>
 #include <cpymo_audio.h>
 #include <cpymo_engine.h>

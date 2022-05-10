@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #ifdef __ANDROID__
-#include <SDL2/SDL.h>
+#include "cpymo_import_sdl2.h"
 #endif
 
 #define STB_TRUETYPE_IMPLEMENTATION

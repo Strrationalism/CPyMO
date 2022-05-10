@@ -1,5 +1,5 @@
 #include "cpymo_backend_movie.h"
-#include <SDL2/SDL.h>
+#include "cpymo_import_sdl2.h"
 #include <cpymo_engine.h>
 
 static SDL_Texture *tex = NULL;

@@ -1,5 +1,5 @@
 #include "cpymo_backend_image.h"
-#include <SDL2/SDL.h>
+#include "cpymo_import_sdl2.h"
 #include <assert.h>
 #include "cpymo_utils.h"
 

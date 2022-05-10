@@ -64,7 +64,7 @@ add_library( # Sets the name of the library.
         "../../../../../sdl2/cpymo_backend_save.c"
         "../../../../../sdl2/cpymo_backend_audio.c"
         "../../../../../sdl2/cpymo_backend_movie.c"
-        "../../../../../sdl2/cpymo_backend_audio_sdl2_mixer.c")
+        "../../../../../sdl2/cpymo_import_sdl2.h")
 
 link_directories("../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/")
 

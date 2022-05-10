@@ -1,5 +1,5 @@
 #include <cpymo_backend_masktrans.h>
-#include <SDL2/SDL_render.h>
+#include "cpymo_import_sdl2.h"
 #include <cpymo_backend_image.h>
 #include <memory.h>
 #include <assert.h>

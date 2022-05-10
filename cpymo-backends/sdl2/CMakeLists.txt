@@ -7,6 +7,7 @@ find_package (SDL2 CONFIG REQUIRED)
 find_package (FFMPEG REQUIRED)
 
 add_executable (cpymo 
+	"cpymo_import_sdl2.h"
 	"main.c" 
 	"cpymo_backend_image.c" 
 	"cpymo_backend_input.c" 

@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include "cpymo_import_sdl2.h"
 #include <stdbool.h>
 #include <cpymo_error.h>
 #include <cpymo_backend_audio.h>
