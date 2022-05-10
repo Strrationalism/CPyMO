@@ -244,8 +244,16 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 }
 #endif
 
+#if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
+#include <libavutil/log.h>
+#endif
+
 int main(int argc, char **argv) 
 {
+#if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
+	av_log_set_level(AV_LOG_ERROR);
+#endif
+
     if (SDL_Init(
             SDL_INIT_VIDEO
 #ifndef DISABLE_AUDIO

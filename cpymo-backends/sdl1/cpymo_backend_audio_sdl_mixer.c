@@ -18,6 +18,9 @@
 
 static bool enabled = false;
 
+void cpymo_backend_audio_init(void) {}
+void cpymo_backend_audio_free(void) {}
+
 void cpymo_audio_init(cpymo_audio_system *s)
 {
     Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MOD | MIX_INIT_FLAC);
@@ -149,7 +152,7 @@ error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sen
             return CPYMO_ERR_UNKNOWN;
         }
 
-        se = Mix_LoadWAV_RW(se_rwops, 1);
+        se = Mix_LoadWAV_RW(se_rwops, 0);
         if (se == NULL) {
             printf("[Warning] Can not load se: %s\n", Mix_GetError());
             SDL_FreeRW(se_rwops);
