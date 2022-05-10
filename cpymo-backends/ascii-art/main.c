@@ -91,7 +91,8 @@ int main(int argc, char **argv)
         bool redraw = false;
 
         error_t err = cpymo_engine_update(&engine, get_delta_time(), &redraw);
-        if (err != CPYMO_ERR_SUCC) {
+        if (err == CPYMO_ERR_NO_MORE_CONTENT) break;
+        else if (err != CPYMO_ERR_SUCC) {
             printf("[Error] cpymo_engine_update: %s.\n", cpymo_error_message(err));
             cpymo_engine_free(&engine);
             cpymo_backend_font_free();
