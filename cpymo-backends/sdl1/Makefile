@@ -16,14 +16,11 @@ CC := cc -c
 LD := cc
 
 CFLAGS += \
-	-DDISABLE_AUDIO \
-	-DDISABLE_MOVIE \
 	-DNON_VISUALLY_IMPAIRED_HELP \
 	-DSCREEN_RESIZABLE \
 	-DLOAD_GAME_ICON \
 	-DTOGGLE_FULLSCREEN \
 	-DDISABLE_SCALE \
-	-DNDEBUG \
 	-O0 -g \
 	-I../../cpymo \
 	-I../../endianness.h \
@@ -37,9 +34,35 @@ CFLAGS += -I$(SDL)/include
 LDFLAGS += -L$(SDL)/lib
 endif
 
+ifneq ($(strip $(SDL_MIXER)), "")
+CFLAGS += -I$(SDL_MIXER)/include
+LDFLAGS += -L$(SDL_MIXER)/lib
+endif
+
+ifneq ($(strip $(FFMPEG)), "")
+CFLAGS += -I$(SDL_FFMPEG)/include
+LDFLAGS += -L$(FFMPEG)/lib
+endif
+
 ifeq ($(OS), Windows_NT)
 CFLAGS += -m32
 LDFLAGS += -m32
+endif
+
+ifeq ($(strip $(USE_FFMPEG)), 1)
+
+CFLAGS += -DDISABLE_AUDIO -DDISABLE_MOVIE
+LDFLAGS += -lswscale -lavformat -lavcodec -lavutil -lswresample
+
+else
+
+ifeq ($(strip $(USE_SDL_MIXER)), 1)
+CFLAGS += -DDISABLE_MOVIE -DDISABLE_FFMPEG_AUDIO -DENABLE_SDL_MIXER_AUDIO_BACKEND
+LDFLAGS += -lSDL_mixer
+else
+CFLAGS += -DDISABLE_AUDIO -DDISABLE_MOVIE
+endif
+
 endif
 
 TARGET := cpymo

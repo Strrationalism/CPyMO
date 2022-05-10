@@ -23,7 +23,7 @@
 
 cpymo_engine engine;
 SDL_Surface *framebuffer;
-
+extern int mouse_wheel;
 
 #ifndef SCREEN_BPP
 #define SCREEN_BPP 24
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
     err = cpymo_backend_font_init(NULL);
 #else    
     const char *gamedir = ".";
-    
+
     if (argc > 1) {
         gamedir = argv[1];
     }
@@ -357,6 +357,13 @@ int main(int argc, char **argv)
                 }
                 break;
 #endif
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.button == SDL_BUTTON_WHEELDOWN) {
+                    --mouse_wheel;
+                }
+                else if(event.button.button == SDL_BUTTON_WHEELUP) {
+                    ++mouse_wheel;
+                }
             };
         }
 

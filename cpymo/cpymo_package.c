@@ -86,6 +86,20 @@ error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package
 	return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_package_read_file(char **out_buffer, size_t *sz, const cpymo_package *package, cpymo_parser_stream_span filename)
+{
+	assert(*out_buffer == NULL);
+	cpymo_package_index idx;
+	error_t err = cpymo_package_find(&idx, package, filename);
+	CPYMO_THROW(err);
+
+	*sz = idx.file_length;
+	*out_buffer = (char *)malloc(*sz);
+	if (*out_buffer == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	return cpymo_package_read_file_from_index(*out_buffer, package, &idx);
+}
+
 error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, const cpymo_package_index * index)
 {	
 	stbi_uc *file_data = (stbi_uc *)malloc(index->file_length);

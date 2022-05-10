@@ -122,7 +122,7 @@ bool cpymo_audio_enabled(struct cpymo_engine *e)
 
 bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 {
-	if (!enabled) return false;
+	if (!enabled) return true;
 	if (Mix_Playing(CHUNK_ID(CPYMO_AUDIO_CHANNEL_SE))) {
 		if (se_looping) {
 			SDL_Log("[Error] Can not wait for a looping SE.\n");

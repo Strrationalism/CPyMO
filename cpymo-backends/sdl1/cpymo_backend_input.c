@@ -6,6 +6,8 @@
 const extern cpymo_engine engine;
 const extern SDL_Surface *framebuffer;
 
+int mouse_wheel = 0;
+
 cpymo_input cpymo_input_snapshot() 
 { 
     cpymo_input i;
@@ -39,10 +41,8 @@ cpymo_input cpymo_input_snapshot()
     i.mouse_button = (mouse_button_state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     i.cancel |= (mouse_button_state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
 
-    if (mouse_button_state & SDL_BUTTON(SDL_BUTTON_WHEELUP)) 
-        i.mouse_wheel_delta = -1;
-    if (mouse_button_state & SDL_BUTTON(SDL_BUTTON_WHEELDOWN))
-        i.mouse_wheel_delta = 1;
+    i.mouse_wheel_delta = (int)mouse_wheel;
+    mouse_wheel = 0;
 
     if (framebuffer) {
         i.mouse_position_useable = true;

@@ -27,6 +27,7 @@ error_t cpymo_package_open(cpymo_package *out_package, const char *path);
 void cpymo_package_close(cpymo_package *package);
 error_t cpymo_package_find(cpymo_package_index *out_index, const cpymo_package *package, cpymo_parser_stream_span filename);
 error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package *package, const cpymo_package_index *index);
+error_t cpymo_package_read_file(char **out_buffer, size_t *sz, const cpymo_package *package, cpymo_parser_stream_span filename);
 
 error_t cpymo_package_read_image_from_index(
 	void **pixels, int *w, int *h, int channels, 

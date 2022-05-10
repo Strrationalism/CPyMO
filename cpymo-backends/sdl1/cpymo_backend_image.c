@@ -171,6 +171,10 @@ void cpymo_backend_image_draw(
 	int srcx, int srcy, int srcw, int srch, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
 {
+	if (draw_type == cpymo_backend_image_draw_type_chara) {
+		if (alpha < 0.75f) return;
+	}
+
 	SDL_Surface *src = (SDL_Surface *)src_;
 	trans_pos(&dstx, &dsty);
 
