@@ -24,12 +24,9 @@
 cpymo_engine engine;
 SDL_Surface *framebuffer;
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
-#define SCREEN_BPP 24
 
 #ifndef SCREEN_BPP
-#define SCREEN_BPP 0
+#define SCREEN_BPP 24
 #endif
 
 #ifndef SCREEN_WIDTH
@@ -44,7 +41,22 @@ SDL_Surface *framebuffer;
 #define SCREEN_FLAGS (SDL_HWSURFACE | SDL_ASYNCBLIT | SDL_ANYFORMAT | SDL_HWPALETTE | SDL_DOUBLEBUF)
 #endif
 
+extern error_t cpymo_backend_font_init(const char *gamedir);
+extern void cpymo_backend_font_free();
+
 static bool current_full_screen;
+
+static void set_clip_rect(size_t screen_w, size_t screen_h) 
+{
+    SDL_Rect clip;
+    clip.x = (screen_w - engine.gameconfig.imagesize_w) / 2;
+    clip.y = (screen_h - engine.gameconfig.imagesize_h) / 2;
+    clip.w = engine.gameconfig.imagesize_w;
+    clip.h = engine.gameconfig.imagesize_h;
+
+    SDL_SetClipRect(framebuffer, &clip);
+}
+
 static error_t set_video_mode(size_t w, size_t h, bool fullscreen) 
 {
     Uint32 flags = SCREEN_FLAGS;
@@ -61,13 +73,7 @@ static error_t set_video_mode(size_t w, size_t h, bool fullscreen)
     if (framebuffer == NULL)
         return CPYMO_ERR_UNKNOWN;
     
-    SDL_Rect clip;
-    clip.x = (w - engine.gameconfig.imagesize_w) / 2;
-    clip.y = (h - engine.gameconfig.imagesize_h) / 2;
-    clip.w = engine.gameconfig.imagesize_w;
-    clip.h = engine.gameconfig.imagesize_h;
-
-    SDL_SetClipRect(framebuffer, &clip);
+    set_clip_rect(w, h);
     return CPYMO_ERR_SUCC;
 }
 
@@ -128,6 +134,116 @@ static inline void load_game_icon(const char *gamedir)
 }
 #endif
 
+#ifdef _WIN32
+#include <direct.h>
+#define mkdir(x, y) _mkdir(x)
+#else
+#include <sys/stat.h>
+#endif
+
+static void ensure_save_dir(const char *gamedir)
+{
+	char *save_dir = (char *)alloca(strlen(gamedir) + 8);
+	sprintf(save_dir, "%s/save", gamedir);
+	mkdir(save_dir, 0777);
+}
+
+#ifdef USE_GAME_SELECTOR
+#include <cpymo_game_selector.h>
+
+#include <dirent.h>
+
+static char *get_last_selected_game_dir()
+{
+	char *str = NULL;
+	size_t len;
+	error_t err = cpymo_utils_loadfile(GAME_SELECTOR_DIR "/last_game.txt", &str, &len);
+
+	if (err != CPYMO_ERR_SUCC) return NULL;
+
+	char *ret = realloc(str, len + 1);
+	if (ret == NULL) {
+		free(str);
+		return NULL;
+	}
+
+	ret[len] = '\0';
+	return ret;
+}
+
+static void save_last_selected_game_dir(const char *gamedir)
+{
+	size_t len = strlen(gamedir);
+	FILE *f = fopen(GAME_SELECTOR_DIR "/last_game.txt", "wb");
+	if (f == NULL) return;
+
+	fwrite(gamedir, len, 1, f);
+	fclose(f);
+}
+
+static error_t after_start_game(cpymo_engine *e, const char *gamedir)
+{
+	save_last_selected_game_dir(gamedir);
+
+#ifdef GAME_SELECTOR_RESET_SCREEN_SIZE_AFTER_START_GAME
+	set_video_mode(e->gameconfig.imagesize_w, e->gameconfig.imagesize_h, current_full_screen);
+#else
+    SDL_FillRect(framebuffer, NULL, 0);
+    set_clip_rect(SCREEN_WIDTH, SCREEN_HEIGHT);
+#endif
+
+#ifndef __PSP__
+	cpymo_backend_font_free();
+	error_t err = cpymo_backend_font_init(gamedir);
+	CPYMO_THROW(err);
+#endif
+
+	ensure_save_dir(gamedir);
+
+    SDL_WM_SetCaption(
+        engine.gameconfig.gametitle,
+        engine.gameconfig.gametitle);
+
+	return CPYMO_ERR_SUCC;
+}
+
+cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
+{
+	cpymo_game_selector_item *item = NULL;
+	cpymo_game_selector_item *item_tail = NULL;
+
+	DIR *dir = opendir(game_selector_dir);
+
+	if (dir) {
+		struct dirent* ent;
+		while ((ent = readdir(dir))) {
+			char *path = (char *)malloc(strlen(ent->d_name) + strlen(game_selector_dir) + 4);
+			sprintf(path, "%s/%s", game_selector_dir, ent->d_name);
+
+			cpymo_game_selector_item *cur = NULL;
+			error_t err = cpymo_game_selector_item_create(&cur, &path);
+			if (err != CPYMO_ERR_SUCC) {
+				free(path);
+				continue;
+			}
+
+			if (item == NULL) {
+				item = cur;
+				item_tail = cur;
+			}
+			else {
+				item_tail->next = cur;
+				item_tail = cur;
+			}
+
+		}
+		closedir(dir);
+	}
+
+	return item;
+}
+#endif
+
 int main(int argc, char **argv) 
 {
     if (SDL_Init(
@@ -139,10 +255,33 @@ int main(int argc, char **argv)
         printf("[Error] SDL_Init: %s\n", SDL_GetError());
         return -1;
     }
-    
+
+#ifdef USE_GAME_SELECTOR
+    cpymo_game_selector_item *items = get_game_list(GAME_SELECTOR_DIR);
+    char *last_selected = get_last_selected_game_dir();
+    error_t err = cpymo_engine_init_with_game_selector(
+        &engine, 
+        SCREEN_WIDTH, SCREEN_HEIGHT,
+        GAME_SELECTOR_FONTSIZE,
+        GAME_SELECTOR_EMPTY_MSG_FONTSIZE,
+        GAME_SELECTOR_COUNT_PER_SCREEN,
+        &items,
+        NULL,
+        &after_start_game,
+        &last_selected);
+
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] cpymo_engine_init_with_game_selector: %s\n", cpymo_error_message(err));
+        cpymo_game_selector_item_free_all(items);
+        free(last_selected);
+        SDL_Quit();
+        return -1;
+    }
+
+    err = cpymo_backend_font_init(NULL);
+#else    
     const char *gamedir = ".";
     
-
     if (argc > 1) {
         gamedir = argv[1];
     }
@@ -156,9 +295,10 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    extern error_t cpymo_backend_font_init(const char *gamedir);
-    extern void cpymo_backend_font_free();
+    ensure_save_dir(gamedir);
+
     err = cpymo_backend_font_init(gamedir);
+#endif
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_backend_font_init: %s\n", cpymo_error_message(err));
         cpymo_engine_free(&engine);
