@@ -52,7 +52,7 @@ endif
 
 ifeq ($(strip $(USE_FFMPEG)), 1)
 
-CFLAGS += -DDISABLE_AUDIO -DDISABLE_MOVIE
+CFLAGS += -DDISABLE_MOVIE
 LDFLAGS += -lswscale -lavformat -lavcodec -lavutil -lswresample
 
 else

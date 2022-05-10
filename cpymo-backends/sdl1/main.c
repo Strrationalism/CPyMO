@@ -281,11 +281,6 @@ int main(int argc, char **argv)
     err = cpymo_backend_font_init(NULL);
 #else    
     const char *gamedir = ".";
-#ifdef _WIN32
-    gamedir = "D:/Repos/Mai-no-Yuuwaku-PyMO/build";
-#else
-    gamedir = "/mnt/d/Repos/Mai-no-Yuuwaku-PyMO/build";
-#endif
 
     if (argc > 1) {
         gamedir = argv[1];
@@ -293,9 +288,15 @@ int main(int argc, char **argv)
 
     load_game_icon(gamedir);
 
+    extern void cpymo_backend_audio_init(void);
+    extern void cpymo_backend_audio_free(void);
+
+    cpymo_backend_audio_init();
+
     error_t err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_engine_init: %s\n", cpymo_error_message(err));
+        cpymo_backend_audio_free();
         SDL_Quit();
         return -1;
     }
@@ -307,6 +308,7 @@ int main(int argc, char **argv)
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_backend_font_init: %s\n", cpymo_error_message(err));
         cpymo_engine_free(&engine);
+        cpymo_backend_audio_free();
         SDL_Quit();
         return -1;
     }
@@ -322,6 +324,7 @@ int main(int argc, char **argv)
     if (framebuffer == NULL) {
         printf("[Error] SDL_SetVideoMode: %s\n", SDL_GetError());
         cpymo_engine_free(&engine);
+        cpymo_backend_audio_free();
         cpymo_backend_font_free();
         SDL_Quit();
         return -1;
@@ -400,6 +403,7 @@ int main(int argc, char **argv)
 
 EXIT:
     cpymo_engine_free(&engine);
+    cpymo_backend_audio_free();
     cpymo_backend_font_free();
     SDL_Quit();
     return ret;
