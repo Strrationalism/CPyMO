@@ -47,11 +47,13 @@ ifndef TARGET
 TARGET := cpymo
 endif
 
+ifneq ($(DISABLE_AUDIO), 1)
 ifeq ($(USE_SDL2_MIXER), 1)
 CFLAGS += -DDISABLE_MOVIE -DDISABLE_FFMPEG_AUDIO -DENABLE_SDL2_MIXER_AUDIO_BACKEND
 LDFLAGS += -lSDL2_mixer
 else
 LDFLAGS += -lswscale -lavformat -lavcodec -lavutil -lswresample
+endif
 endif
 
 LDFLAGS += -lSDL2main -lSDL2 -lm
@@ -65,6 +67,13 @@ define compile
 	@echo "$(notdir $1)"
 	@$(CC) $1 -o $2 $(CFLAGS)
 endef
+
+ifeq ($(OS), Windows_NT)
+OBJS += $(BUILD_DIR)/cpymo.res
+endif
+
+$(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
+	windres $< $@
 
 $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c $(INC)
 	$(call compile,$<,$@)

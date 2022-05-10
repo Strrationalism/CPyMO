@@ -47,6 +47,7 @@ endif
 ifeq ($(OS), Windows_NT)
 CFLAGS += -m32
 LDFLAGS += -m32
+OBJS += $(BUILD_DIR)/cpymo.res
 endif
 
 ifeq ($(strip $(USE_FFMPEG)), 1)
@@ -88,6 +89,9 @@ $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c
 
 $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
+
+$(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
+	windres $< $@
 
 $(TARGET): $(OBJS)
 	@echo "Linking..."

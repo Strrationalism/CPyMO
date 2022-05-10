@@ -52,7 +52,14 @@ $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c
 $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
 
-$(TARGET): $(OBJS)
+$(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
+	windres $< $@
+
+ifeq ($(OS), Windows_NT)
+OBJS += $(BUILD_DIR)/cpymo.res
+endif
+
+$(TARGET): $(OBJS) $(WINDOWS_RES)
 	@echo "Linking..."
 	@$(LD) $^ -o $@ $(LDFLAGS) 
 	@echo "=> $@"
