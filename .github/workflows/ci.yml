@@ -296,7 +296,7 @@ jobs:
         sudo apt-get install libsdl-dev libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
 
     - name: Build
-      run:
+      run: |
         cd cpymo-backends/sdl1
         export USE_FFMPEG=1
         make -j
