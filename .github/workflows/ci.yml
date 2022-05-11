@@ -282,6 +282,32 @@ jobs:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
 
+  build-SDL1:
+    name: 'Linux (SDL 1.2)'
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Install dependents
+      with: 
+        sudo apt-get install libsdl-dev libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
+
+    - name: Build
+      run:
+        cd cpymo-backends/sdl1
+        export USE_FFMPEG=1
+        make -j
+        strip ./cpymo
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Linux (SDL 1.2)
+        path: ./cpymo-backends/sdl1/cpymo
+
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
