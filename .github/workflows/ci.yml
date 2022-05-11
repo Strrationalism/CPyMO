@@ -298,14 +298,13 @@ jobs:
         with:
           msystem: MINGW32
           update: true
-          install: mingw-w64 mingw-w64-i686-SDL mingw-w64-i686-SDL_mixer
+          install: mingw-w64-i686-toolchain mingw-w64-i686-SDL mingw-w64-i686-SDL_mixer
 
       - name: 'Build'
         run: |
           cd cpymo-backends/sdl1
           export USE_SDL_MIXER=1
-          export IMPORT_WINDOWS_ICON=1
-          mingw32-make make -j
+          mingw32-make -j
           strip cpymo.exe
 
       - name: Upload
