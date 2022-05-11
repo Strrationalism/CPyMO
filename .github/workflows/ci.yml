@@ -292,8 +292,7 @@ jobs:
         submodules: true
 
     - name: Install dependents
-      with: 
-        sudo apt-get install libsdl-dev libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
+      run: sudo apt-get install libsdl-dev libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
 
     - name: Build
       run: |
