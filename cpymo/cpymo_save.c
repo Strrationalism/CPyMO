@@ -412,9 +412,10 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 			&e->bg,
 			cpymo_parser_stream_span_pure(strbuf),
 			cpymo_parser_stream_span_pure("BG_NOFADE"),
-			(float)CAST(int32_t, bg_params[0]),
-			(float)CAST(int32_t, bg_params[1]),
-			0);
+			0, 0, 0);
+
+		e->bg.current_bg_x = (float)CAST(int32_t, bg_params[0]);
+		e->bg.current_bg_y = (float)CAST(int32_t, bg_params[1]);
 	}
 
 	// CHARA

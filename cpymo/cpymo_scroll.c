@@ -28,7 +28,7 @@ static bool cpymo_scroll_wait(cpymo_engine *e, float delta_time)
 	cpymo_engine_request_redraw(e);
 	e->scroll.time += delta_time;
 
-	if (cpymo_input_foward_key_just_pressed(e)) 
+	if (cpymo_input_foward_key_just_released(e)) 
 		e->scroll.time = e->scroll.all_time;
 
 	return e->scroll.time >= e->scroll.all_time;
