@@ -554,8 +554,9 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 * `USE_FFMPEG`，此变量为1时将会连接到FFmpeg库，并启用FFmpeg音视频支持。
 * 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_MIXER`，仅启动受限的音频支持。
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
+* 如果你需要构建Windows版本，设置`IMPORT_WINDOWS_ICON`为1时将会为可执行文件添加图标。
 
-之后在`cpymo-backends/sdl1`中执行`make`即可启动。
+之后在`cpymo-backends/sdl1`中执行`make`即可编译。
 
 ### 使用宏适配目标系统
 
