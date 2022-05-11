@@ -403,7 +403,7 @@ jobs:
       if: ${{ runner.os != 'Windows' }}
       run: |
         cd cpymo-backends/ascii-art/
-        make -j
+        mingw32-make -j
         strip ./cpymo-ascii-art
         
     - name: 'Build'
