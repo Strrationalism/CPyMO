@@ -19,10 +19,7 @@ $device_specs = @(
        BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; Audio = @("ogg", "wav") },
 
     @{ Name = "psv"; Width = 960; Height = 544; UseMask = $false; Movie = $false;
-       BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") },
-
-    @{ Name = "wii"; Width = 640; Height = 480; UseMask = $false; Movie = $false;
-       BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") }
+       BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") }
 )
 
 function Write-Help() {

@@ -215,7 +215,7 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 ## 编译
 
 cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到任天堂Switch平台。    
-使用`make run -j -f Makefile.Swtich`即可使用yuzu模拟器运行。  
+使用`make run -j -f Makefile.Switch`即可使用yuzu模拟器运行。  
 
 ## 启动
 
@@ -295,14 +295,6 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
     * 视频
 	* 音效（se）
 
-### 利用pymo-converter从PyMO Android版本数据包创建psp版本的数据包
-
-1. 你需要安装cpymo-tool到你的系统中（添加到PATH环境变量），确保该命令可用。
-2. 下载pymo-converter.ps1。
-3. 使用命令行pymo-converter.ps1 psp <PyMO Android版本数据包路径> <输出的PSP版本的数据包路径>。
-4. 手动转换BGM音频为ogg格式，并修改gameconfig.txt中bgmformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
-5. 手动转换VO音频为ogg格式，并修改gameconfig.txt中的voformat一栏为`.ogg`，如果原本就是ogg格式则无需修改。
-
 # Sony Playstation Vita 平台
 
 ## 额外依赖
@@ -357,7 +349,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 # Android 平台
 
-仅支持 Android 4.3 及以上的系统。
+仅支持 Android 4.3 及以上的系统，如果你需要在更低版本的Android上运行，则可以使用原版PyMO，而不是使用CPyMO。
 
 ## 编译
 
@@ -413,6 +405,8 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
 ## 启动
 
 将游戏和`default.ttf`放入SD卡的`/pymogames/`目录即可。
+
+注意，Wii平台仅可启动s60v5数据包。
 
 
 # CPyMO ASCII ART
@@ -481,7 +475,7 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 使用宏`DISABLE_FFMPEG_MOVIE`可关闭视频播放器对FFmpeg的依赖，你可以替换为自己的`error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)`函数进行视频播放。
 
-使用宏`DISABLE_MOVIE`可完全播放所有的视频播放功能。
+使用宏`DISABLE_MOVIE`可完全关闭视频播放功能。
 
 ### 低帧率模式
 
@@ -507,7 +501,7 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 * 定义`DISABLE_FFMPEG_MOVIE`来替换为自己的视频播放后端
 * 或者定义`DISABLE_MOVIE`彻底关闭视频播放器功能
 
-之后定义：
+之后：
 
 1. 定义`DISABLE_FFMPEG_AUDIO`关闭FFmpeg音频依赖
 2. 定义`ENABLE_SDL2_MIXER_AUDIO_BACKEND`启用SDL2_Mixer音频后端。
@@ -552,7 +546,7 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 你可以使用以下环境变量来修改开关：
 
 * `USE_FFMPEG`，此变量为1时将会连接到FFmpeg库，并启用FFmpeg音视频支持。
-* 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_MIXER`，仅启动受限的音频支持。
+* 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_mixer`，仅启动受限的音频支持。
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
 * 如果你需要构建Windows版本，设置`IMPORT_WINDOWS_ICON`为1时将会为可执行文件添加图标。
 
@@ -603,14 +597,14 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 
 ## pymo-converter
 
-该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包。    
+该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
 要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
 
 pymo-converter目前支持将游戏适配到以下设备：
 
-* s60v3
-* s60v5
-* pymo-android
+* s60v3（pymo规定的s60v3数据包标准）
+* s60v5（pymo规定的s60v5数据包标准）
+* pymo-android（pymo所规定的安卓数据包标准）
 * 3ds
 * psp
 * psv
@@ -629,7 +623,7 @@ pymo-converter目前支持将游戏适配到以下设备：
 
 ## libpymo
 
-该工具用于将PyMO API公开到[YukimiScript](github.com/Strrationalism/YukimiScript)语言中，    
+用于将PyMO API公开到[YukimiScript](github.com/Strrationalism/YukimiScript)语言中，    
 使得YukimiScript语言可以访问PyMO/CPyMO引擎的各项功能。    
 
 # 贡献者
@@ -650,6 +644,7 @@ pymo-converter目前支持将游戏适配到以下设备：
   - 镜面倾斜
   - 七月缘
   - __
+  - 约汉
 
 # 赞助
 
