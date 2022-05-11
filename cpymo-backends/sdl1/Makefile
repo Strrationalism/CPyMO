@@ -25,8 +25,6 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
-LDFLAGS += -lSDLmain -lSDL -lm
-
 ifneq ($(strip $(SDL)), "")
 CFLAGS += -I$(SDL)/include
 LDFLAGS += -L$(SDL)/lib
@@ -50,6 +48,8 @@ ifeq ($(IMPORT_WINDOWS_ICON), 1)
 OBJS += $(BUILD_DIR)/cpymo.res
 endif
 endif
+
+LDFLAGS += -lSDLmain -lSDL -lm
 
 ifeq ($(strip $(USE_FFMPEG)), 1)
 LDFLAGS += -lswscale -lavformat -lavcodec -lavutil -lswresample
