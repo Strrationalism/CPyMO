@@ -374,6 +374,7 @@ error_t cpymo_list_ui_enter(
 	data->scroll_delta_y_sum = 0;
 	data->no_more_content_callback = NULL;
 	data->selection_changed = NULL;
+	data->allow_exit_list_ui = true;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
@@ -418,6 +419,13 @@ static error_t cpymo_list_ui_selecting_no_more_content_callback_looping(cpymo_en
 	cpymo_engine_request_redraw(e);
 
 	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_list_ui_exit(cpymo_engine * e)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
+	if (ui->allow_exit_list_ui)
+		cpymo_ui_exit(e);
 }
 
 void cpymo_list_ui_enable_loop(cpymo_engine *e)

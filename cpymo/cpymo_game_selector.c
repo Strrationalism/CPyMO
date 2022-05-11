@@ -268,6 +268,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 		CPYMO_THROW(err);
 
 		cpymo_list_ui *list_ui = (cpymo_list_ui *)cpymo_ui_data(e);
+		list_ui->allow_exit_list_ui = false;
 		list_ui->selection_relative_to_cur = relative;
 
 		cpymo_list_ui_set_custom_update(e, &cpymo_game_selector_init_refresh);

@@ -37,6 +37,8 @@ typedef struct {
 
 	bool allow_scroll;
 
+	bool allow_exit_list_ui;
+
 	cpymo_list_ui_selecting_no_more_content_callback no_more_content_callback;
 
 	float current_y;
@@ -79,8 +81,7 @@ static inline void cpymo_list_ui_set_selecting_no_more_content_callback(struct c
 static inline const void *cpymo_list_ui_data_const(const struct cpymo_engine *e)
 { return ((uint8_t *)cpymo_ui_data_const(e)) + sizeof(cpymo_list_ui); }
 
-static inline void cpymo_list_ui_exit(struct cpymo_engine *e)
-{ cpymo_ui_exit(e); }
+void cpymo_list_ui_exit(struct cpymo_engine *e);
 
 void cpymo_list_ui_enable_loop(struct cpymo_engine *);
 
