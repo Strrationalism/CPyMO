@@ -54,9 +54,9 @@ macOS (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载
 Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
 POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                       | 外置字体       | 在控制台上操作并输出画面
 
-**注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**
-**注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**
-**注：SDL_mixer音频后端音频支持格式有限。**
+**注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**   
+**注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**   
+**注：SDL_mixer音频后端音频支持格式有限。**   
 
 # 与pymo行为差异
 
