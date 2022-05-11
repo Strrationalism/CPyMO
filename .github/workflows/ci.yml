@@ -298,7 +298,7 @@ jobs:
         with:
           msystem: MINGW32
           update: true
-          install: mingw-w64-clang-i686-toolchain mingw-w64-i686-SDL mingw-w64-i686-SDL_mixer mingw-w64-clang-i686-make
+          install: mingw-w64-clang-i686-toolchain mingw-w64-i686-SDL mingw-w64-i686-SDL_mixer make
 
       - name: 'Build'
         run: |
