@@ -49,8 +49,7 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 Sony PSP         | SDL2      | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体     | 游戏选择器
 Sony PSV         | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
 Nintendo Wii     | SDL 1.2   | 不支持     | 不支持                        | 外置字体     | 游戏选择器
-Windows 95       | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
-macOS (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
+Windows (SDL 1.2)| SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
 POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                       | 外置字体       | 在控制台上操作并输出画面
 
