@@ -48,7 +48,7 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 ---------------- | --------- | --------- | ---------------------------- | ---------- | ----------
 Sony PSP         | SDL2      | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体     | 游戏选择器
 Sony PSV         | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
-Wii              | SDL 1.2   | 不支持     | 不支持                        | 外置字体     | 游戏选择器
+Nintendo Wii     | SDL 1.2   | 不支持     | 不支持                        | 外置字体     | 游戏选择器
 Windows 95       | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 macOS (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
@@ -398,7 +398,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 之后从开始菜单启动CPyMO。
 
 
-# Wii 平台
+# Nintendo Wii 平台
 
 ## 依赖
 
