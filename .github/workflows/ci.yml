@@ -70,6 +70,27 @@ jobs:
           ./cpymo-backends/3ds/cpymo.3dsx
           ./cpymo-backends/3ds/cpymo.cia
 
+  build-wii:
+    name: 'Nintendo Wii'
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitppc:latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with: 
+          submodules: true
+
+      - name: 'Build'
+        run: |
+          cd cpymo-backends/sdl1
+          make -f Makefile.Wii
+
+      - name: 'Upload'
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: CPyMO for Nintendo Wii
+          path: ./cpymo-backends/sdl1/cpymo.dol
+
   build-psv:
     name: 'Sony PSV'
     runs-on: ubuntu-latest
