@@ -282,7 +282,37 @@ jobs:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
 
-  build-SDL1:
+  build-SDL1-windows:
+    name: 'Windows (SDL 1.2)'
+    runs-on: 'windows-latest'
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: mingw-w64-i686-toolchain
+
+      - name: 'Build'
+        run: |
+          cd cpymo-backends/sdl1
+          mingw32-make -j
+          strip cpymo.exe
+
+      - name: Upload
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: CPyMO for Linux (SDL 1.2)
+          path: ./cpymo-backends/sdl1/cpymo.exe
+
+  build-SDL1-linux:
     name: 'Linux (SDL 1.2)'
     runs-on: 'ubuntu-latest'
 
