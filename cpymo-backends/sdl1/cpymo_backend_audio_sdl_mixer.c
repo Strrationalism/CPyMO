@@ -18,9 +18,6 @@
 
 static bool enabled = false;
 
-void cpymo_backend_audio_init(void) {}
-void cpymo_backend_audio_free(void) {}
-
 void cpymo_audio_init(cpymo_audio_system *s)
 {
     Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MOD | MIX_INIT_FLAC);

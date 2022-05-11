@@ -1,7 +1,7 @@
+#include <cpymo_engine.h>
 #ifndef DISABLE_FFMPEG_AUDIO
 
 #include <SDL/SDL.h>
-#include <cpymo_engine.h>
 #include <cpymo_backend_audio.h>
 
 #ifndef DEFAULT_CHANNELS
@@ -105,4 +105,9 @@ void cpymo_backend_audio_unlock(void)
         SDL_UnlockAudio();
 }
 
+#endif
+
+#if (defined DISABLE_AUDIO || defined ENABLE_SDL_MIXER_AUDIO_BACKEND)
+void cpymo_backend_audio_init(void) {}
+void cpymo_backend_audio_free(void) {}
 #endif

@@ -41,6 +41,10 @@ extern int mouse_wheel;
 #define SCREEN_FLAGS (SDL_HWSURFACE | SDL_ASYNCBLIT | SDL_ANYFORMAT | SDL_HWPALETTE | SDL_DOUBLEBUF)
 #endif
 
+#ifdef __WII__
+#define GAME_SELECTOR_DIR "sd:/pymogames/"
+#endif
+
 extern error_t cpymo_backend_font_init(const char *gamedir);
 extern void cpymo_backend_font_free();
 
@@ -248,10 +252,22 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 #include <libavutil/log.h>
 #endif
 
+#ifdef __WII__
+#include <fat.h>
+#include <gccore.h>
+#include <wiiuse/wpad.h>
+#endif
+
 int main(int argc, char **argv) 
 {
 #if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
 	av_log_set_level(AV_LOG_ERROR);
+#endif
+
+#ifdef __WII__
+    fatInitDefault();
+    WPAD_Init();
+    stbi_set_flip_vertically_on_load_thread(false);
 #endif
 
     if (SDL_Init(
@@ -263,6 +279,11 @@ int main(int argc, char **argv)
         printf("[Error] SDL_Init: %s\n", SDL_GetError());
         return -1;
     }
+
+    extern void cpymo_backend_audio_init(void);
+    extern void cpymo_backend_audio_free(void);
+
+    cpymo_backend_audio_init();
 
 #ifdef USE_GAME_SELECTOR
     cpymo_game_selector_item *items = get_game_list(GAME_SELECTOR_DIR);
@@ -282,6 +303,7 @@ int main(int argc, char **argv)
         printf("[Error] cpymo_engine_init_with_game_selector: %s\n", cpymo_error_message(err));
         cpymo_game_selector_item_free_all(items);
         free(last_selected);
+        cpymo_backend_audio_free();
         SDL_Quit();
         return -1;
     }
@@ -295,11 +317,6 @@ int main(int argc, char **argv)
     }
 
     load_game_icon(gamedir);
-
-    extern void cpymo_backend_audio_init(void);
-    extern void cpymo_backend_audio_free(void);
-
-    cpymo_backend_audio_init();
 
     error_t err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
@@ -320,7 +337,7 @@ int main(int argc, char **argv)
         SDL_Quit();
         return -1;
     }
-
+    
     err = set_video_mode(SCREEN_WIDTH, SCREEN_HEIGHT, 
 #ifdef DEFAULT_FULLSCREEN
     true
@@ -397,14 +414,27 @@ int main(int argc, char **argv)
             goto EXIT;
         }
 
+#ifdef REDRAW_WHAT_EVER
+        redraw = true;
+#endif
+
         if (redraw || redraw_system) {
             SDL_FillRect(framebuffer, NULL, 0);
             cpymo_engine_draw(&engine);
             SDL_Flip(framebuffer);
+#if (defined REDRAW_WHAT_EVER && !defined __WII__)
+            SDL_Delay(16);
+#endif
         }
         else {
+#ifndef __WII__
             SDL_Delay(16);
+#endif
         }
+
+#ifdef __WII
+        VIDEO_WaitVSync();
+#endif
 
         prev_time = cur_time;
     }

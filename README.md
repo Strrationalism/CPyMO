@@ -44,16 +44,19 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 ### 第三梯队
 **CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
 
-平台              | 后端  | 视频播放器 | 音频支持                      | 字体支持 | 额外功能
----------------- | ---- | --------- | ---------------------------- | ------- | ----------
-Sony PSP         | SDL2 | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体  | 游戏选择器
-Sony PSV         | SDL2 | FFmpeg    | FFmpeg                       | 外置字体  | 游戏选择器
-Windows 95       | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer            | 加载系统字体 | 
-macOS (SDL 1.2)  | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer            | 加载系统字体 | 
-Linux (SDL 1.2)  | SDL 1.2 | FFmpeg | FFmpeg, SDL_mixer            | 外置字体 | 
-POSIX (ASCII ART)| ASCII ART | 不支持 | 不支持                       | 外置字体 | 在控制台上操作并输出画面
+平台              | 后端       | 视频播放器 | 音频支持                      | 字体支持      | 额外功能
+---------------- | --------- | --------- | ---------------------------- | ---------- | ----------
+Sony PSP         | SDL2      | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体     | 游戏选择器
+Sony PSV         | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
+Wii              | SDL 1.2   | 不支持     | 不支持                        | 外置字体     | 游戏选择器
+Windows 95       | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
+macOS (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
+Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
+POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                       | 外置字体       | 在控制台上操作并输出画面
 
-##### 注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。
+**注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**
+**注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**
+**注：SDL_mixer音频后端音频支持格式有限。**
 
 # 与pymo行为差异
 
@@ -395,6 +398,24 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 之后从开始菜单启动CPyMO。
 
 
+# Wii 平台
+
+## 依赖
+
+* devkitPro + wii dev
+* wii-sdl
+
+直接使用devkitPro pacman安装即可。
+
+## 编译
+
+cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文件。
+
+## 启动
+
+将游戏和`default.ttf`放入SD卡的`/pymogames/`目录即可。
+
+
 # CPyMO ASCII ART
 
 这是一个CPyMO变种，没有音频和视频播放器支持，它将会在控制台上输出画面，Just for fun!
@@ -547,6 +568,7 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
     - `SCREEN_FLAGS`可定义`SDL_SetVideoMode`的`flags`参数。
     - `SCREEN_RESIZABLE`定义时，将允许调整游戏窗口大小。
     - `TOGGLE_FULLSCREEN`定义时，将允许用户通过`Alt+Enter`键切换全屏。
+    - `REDRAW_WHAT_EVER`定义时，将会不断刷新屏幕，忽略CPyMO的按需刷新功能。
 * FFmpeg支持的音频系统
     - `DEFAULT_CHANNELS`将设置默认音频输出通道数。
     - `DEFAULT_FREQ`将设置默认音频输出的频率。
@@ -556,6 +578,8 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
     - `SDL_MIXER_CHANNELS`将设置音频默认输出的通道数（可选）。
     - `SDL_MIXER_CHUNKSIZE`将设置缓冲区大小（可选）。
 * `LOAD_GAME_ICON`定义时，将加载游戏图标，此项目与`USE_GAME_SELECTOR`冲突。
+* 游戏选择器宏与SDL2后端一致
+    - 扩展：定义`GAME_SELECTOR_RESET_SCREEN_SIZE_AFTER_START_GAME`后将允许在启动游戏后重设游戏画面大小。
 
 # 工具
 

@@ -24,7 +24,7 @@ cpymo_color getpixel(SDL_Surface *surface, int x, int y)
 		break;
 
     case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+        if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
             px = (p[0] << 16 | p[1] << 8 | p[2]);
         else
             px = (p[0] | p[1] << 8 | p[2] << 16);
@@ -98,6 +98,15 @@ error_t cpymo_backend_image_load(
 	gmask = 0x0000ff00;
 	bmask = 0x00ff0000;
 	amask = 0xff000000;
+#endif
+
+#ifdef __WII__
+	if (format == cpymo_backend_image_format_rgb) {
+		rmask >>= 8;
+		gmask >>= 8;
+		bmask >>= 8;
+		amask >>= 8;
+	}
 #endif
 
 	int channels = format == cpymo_backend_image_format_rgb ? 3 : 4;
@@ -293,10 +302,6 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 			int px_y = y + rect.y;
 
 			if (px_x < rect.x || px_x >= rect.x + rect.w || px_y < rect.y || px_y >= rect.y + rect.h) continue;
-
-			size_t px_offset = framebuffer->pitch * px_y + px_x * framebuffer->format->BytesPerPixel;
-
-			Uint8 *px = (Uint8 *)framebuffer->pixels + px_offset;
 
 			float mask =
 				(float)(((unsigned char*)m)[y * engine.gameconfig.imagesize_w + x]) / 255;
