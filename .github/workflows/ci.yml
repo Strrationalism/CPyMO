@@ -403,7 +403,7 @@ jobs:
       if: ${{ runner.os != 'Windows' }}
       run: |
         cd cpymo-backends/ascii-art/
-        mingw32-make -j
+        make -j
         strip ./cpymo-ascii-art
         
     - name: 'Build'
@@ -411,7 +411,7 @@ jobs:
       shell: msys2 {0}
       run: |
         cd cpymo-backends/ascii-art/
-        make -j
+        mingw32-make -j
         strip ./cpymo-ascii-art.exe
 
     - name: Upload
