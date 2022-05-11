@@ -385,35 +385,19 @@ jobs:
 
     strategy:
       matrix: 
-        os: [ 'windows-latest', 'macos-latest', 'ubuntu-latest' ]
+        os: [ 'macos-latest', 'ubuntu-latest' ]
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-        
-    - name: 'Setup MSys2'
-      if: ${{ runner.os == 'Windows' }}
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW32
-        
 
     - name: 'Build'
-      if: ${{ runner.os != 'Windows' }}
       run: |
         cd cpymo-backends/ascii-art/
         make -j
         strip ./cpymo-ascii-art
         
-    - name: 'Build'
-      if: ${{ runner.os == 'Windows' }}
-      shell: msys2 {0}
-      run: |
-        cd cpymo-backends/ascii-art/
-        mingw32-make -j
-        strip ./cpymo-ascii-art.exe
-
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
