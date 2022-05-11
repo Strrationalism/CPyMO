@@ -25,7 +25,7 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
-LDFLAGS += -lSDLmain -lSDL -lm
+LDFLAGS += -lmingw32 -lSDLmain -lSDL -lm
 
 ifneq ($(strip $(SDL)), "")
 CFLAGS += -I$(SDL)/include
