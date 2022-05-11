@@ -25,7 +25,7 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
-LDFLAGS += -lm -lSDL -lSDLmain
+LDFLAGS += -lSDLmain -lSDL -lm
 
 ifneq ($(strip $(SDL)), "")
 CFLAGS += -I$(SDL)/include
