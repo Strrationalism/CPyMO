@@ -305,7 +305,7 @@ jobs:
           cd cpymo-backends/sdl1
           export USE_SDL_MIXER=1
           export IMPORT_WINDOWS_ICON=1
-          make -j
+          mingw-w64-clang-i686-make -j
           strip cpymo.exe
 
       - name: Upload
