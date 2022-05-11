@@ -83,7 +83,7 @@ $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	@windres $< -m32 $@
+	@windres $< -O res $@
 
 $(TARGET): $(OBJS)
 	@echo "Linking..."
