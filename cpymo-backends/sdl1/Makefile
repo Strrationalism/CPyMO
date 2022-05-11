@@ -25,7 +25,7 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
-LDFLAGS += -lmingw32 -lSDLmain -lSDL -lm
+LDFLAGS += -lSDLmain -lSDL -lm
 
 ifneq ($(strip $(SDL)), "")
 CFLAGS += -I$(SDL)/include
@@ -44,7 +44,7 @@ endif
 
 ifeq ($(OS), Windows_NT)
 CFLAGS += -m32
-LDFLAGS += -m32
+LDFLAGS += -m32 -lmingw32
 
 ifeq ($(IMPORT_WINDOWS_ICON), 1)
 OBJS += $(BUILD_DIR)/cpymo.res
