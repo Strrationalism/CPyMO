@@ -397,7 +397,7 @@ jobs:
         cd cpymo-backends/ascii-art/
         make -j
         strip ./cpymo-ascii-art
-
+        
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
