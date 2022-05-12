@@ -42,8 +42,8 @@ endif
 
 ifeq ($(OS), Windows_NT)
 
-CC := i686-w64-mingw32-cc -c
-LD := i686-w64-mingw32-cc
+CC := i686-w64-mingw32-gcc -c
+LD := i686-w64-mingw32-gcc
 
 CFLAGS += -m32
 LDFLAGS += -m32 -lmingw32
