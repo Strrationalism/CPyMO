@@ -316,7 +316,7 @@ jobs:
         with:
           msystem: MINGW32
           update: true
-          install: mingw-w64-i686-clang-toolchain
+          install: mingw-w64-clang-i686-toolchain
 
       - name: 'Build'
         run: |
