@@ -42,8 +42,8 @@ endif
 
 ifeq ($(OS), Windows_NT)
 
-CC := i686-w64-mingw32-clang -c -m32
-LD := i686-w64-mingw32-clang -m32 -lmingw32
+CC := i686-w64-mingw32-gcc -c -m32
+LD := i686-w64-mingw32-gcc -m32 -lmingw32
 
 ifeq ($(IMPORT_WINDOWS_ICON), 1)
 OBJS += $(BUILD_DIR)/cpymo.res
