@@ -46,7 +46,7 @@ $(BUILD_DIR)/%.o: %.c
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
 	@windres $< $@ -O coff
 
-ifeq ($(strip $(IMPORT_WINDOWS_ICON)), 1)
+ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res
 endif
 
