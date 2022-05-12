@@ -308,6 +308,7 @@ jobs:
         unzip SDL_mixer-devel-1.2.12-VC.zip
         cp SDL_mixer-1.2.12/include/SDL_mixer.h SDL-1.2.15/include/SDL/SDL_mixer.h
         cp SDL_mixer-1.2.12/lib/x86/SDL_mixer.lib SDL-1.2.15/lib/SDL_mixer.lib
+        cp SDL-1.2.15/bin/SDL.dll cpymo-backends/sdl1/SDL.dll
         cp SDL_mixer-1.2.12/lib/x86/*.dll cpymo-backends/sdl1
         cp SDL_mixer-1.2.12/lib/x86/*.txt cpymo-backends/sdl1
 
