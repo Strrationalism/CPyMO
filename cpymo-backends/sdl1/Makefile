@@ -42,11 +42,8 @@ endif
 
 ifeq ($(OS), Windows_NT)
 
-CC := i686-w64-mingw32-gcc -c
-LD := i686-w64-mingw32-gcc
-
-CFLAGS += -m32
-LDFLAGS += -m32 -lmingw32
+CC := i686-w64-mingw32-clang -c -m32
+LD := i686-w64-mingw32-clang -m32 -lmingw32
 
 ifeq ($(IMPORT_WINDOWS_ICON), 1)
 OBJS += $(BUILD_DIR)/cpymo.res
@@ -90,7 +87,7 @@ $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	@windres $< $@
+	@i686-w64-mingw32-windres $< $@
 
 $(TARGET): $(OBJS)
 	@echo "Linking..."
