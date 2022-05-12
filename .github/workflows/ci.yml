@@ -294,27 +294,35 @@ jobs:
         with:
           submodules: true
           
-      - shell: pwsh
+      - name: Download SDL
+        shell: pwsh
         run:
           $SDL_ver = "1.2.14"
+          
           $SDL_mixer_ver = "1.2.12"
+          
           $Bin = "cpymo-backends/sdl1/"
 
           wget https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-$SDL_mixer_ver-VC.zip -OutFile SDL_mixer.zip
+          
           wget https://www.libsdl.org/release/SDL-devel-$SDL_ver-mingw32.zip -OutFile SDL.zip
 
           Expand-Archive SDL.zip ./SDL
+          
           Expand-Archive SDL_mixer.zip ./SDL_mixer
 
-
           copy ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/include/* ./SDL/SDL-1.2.14/include/SDL/
+          
           copy ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.lib ./SDL/SDL-$SDL_ver/lib/
 
           copy ./SDL/SDL-$SDL_ver/bin/SDL.dll $Bin/
+          
           copy ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.dll $Bin/
+          
           copy ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.txt $Bin/
 
           wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING -OutFile $Bin/LICENSE.SDL.txt
+          
           wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING -OutFile $Bin/LICENSE.SDL_mixer.txt
 
       
