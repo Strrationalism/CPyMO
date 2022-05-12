@@ -282,7 +282,7 @@ jobs:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
         
-  build-SDL1-windows:
+  build-win:
     name: 'Windows (SDL 1.2)'
     runs-on: 'windows-latest'
     defaults:
