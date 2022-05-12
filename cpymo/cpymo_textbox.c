@@ -112,12 +112,14 @@ void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
             span.len -= 2;
     }
 
-    float width;
-    cpymo_backend_text refreshed_line;
-    error_t err = cpymo_backend_text_create(
-        &refreshed_line, &width, span, tb->character_size);
-    if (err != CPYMO_ERR_SUCC) return;
+    float width = 0;
+    cpymo_backend_text refreshed_line = NULL;
 
+    if (span.len) {
+        error_t err = cpymo_backend_text_create(
+            &refreshed_line, &width, span, tb->character_size);
+        if (err != CPYMO_ERR_SUCC) return;
+    }
 
     cpymo_backend_text *line = &tb->lines[tb->active_line];
     if (*line) cpymo_backend_text_free(*line);
@@ -151,17 +153,16 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
 
     tb->text_curline_size += next_char.len;
 
-    if (cpymo_parser_stream_span_equals_str(next_char, "\n") || cpymo_textbox_line_full(tb)) {
-        cpymo_textbox_show_next_line(tb);
-    }
-
-    else if (cpymo_parser_stream_span_equals_str(next_char, "\\")) {
+    if (cpymo_parser_stream_span_equals_str(next_char, "\\")) {
         next_char = cpymo_parser_stream_span_utf8_try_head(&span);
-        if (cpymo_parser_stream_span_equals_str(next_char, "n") 
+        if (cpymo_parser_stream_span_equals_str(next_char, "n")
             || cpymo_parser_stream_span_equals_str(next_char, "r")) {
             tb->text_curline_size += next_char.len;
             cpymo_textbox_show_next_line(tb);
         }
+    }
+    else if (cpymo_parser_stream_span_equals_str(next_char, "\n") || cpymo_textbox_line_full(tb)) {
+        cpymo_textbox_show_next_line(tb);
     }
 }
 

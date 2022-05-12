@@ -206,7 +206,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	D("say") {
 		cpymo_interpreter_checkpoint(interpreter);
 
-		POP_ARG(name_or_text); ENSURE(name_or_text);
+		POP_ARG(name_or_text);
 		POP_ARG(text);
 
 		if (IS_EMPTY(text)) {
@@ -224,6 +224,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_backlog_record_write_full_text(&engine->backlog, full_text);
 		}
 #endif
+
+		if (IS_EMPTY(text)) {
+			text = cpymo_parser_stream_span_pure(" ");
+		}
 
 		cpymo_text_clear(&engine->text);
 

@@ -29,7 +29,8 @@ error_t cpymo_backend_text_create(
     float single_character_size_in_logical_screen)
 {
     cpymo_parser_stream_span text = utf8_string;
-    if (text.len == 0) return CPYMO_ERR_INVALID_ARG;
+    if (text.len == 0) 
+        return CPYMO_ERR_INVALID_ARG;
 
     cpymo_backend_text_internal *t = 
         (cpymo_backend_text_internal *)malloc(sizeof(cpymo_backend_text_internal));
