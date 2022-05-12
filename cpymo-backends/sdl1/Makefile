@@ -9,9 +9,6 @@ OBJS := \
 
 INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
 
-CC := cc -c
-LD := cc
-
 CFLAGS += \
 	-DNON_VISUALLY_IMPAIRED_HELP \
 	-DSCREEN_RESIZABLE \
@@ -41,13 +38,7 @@ LDFLAGS += -L$(FFMPEG)/lib
 endif
 
 ifeq ($(OS), Windows_NT)
-
-CC := i686-w64-mingw32-gcc -c -m32
-LD := i686-w64-mingw32-gcc -m32 -lmingw32
-
-ifeq ($(IMPORT_WINDOWS_ICON), 1)
-OBJS += $(BUILD_DIR)/cpymo.res
-endif
+LDFLAGS += -lmingw32
 endif
 
 LDFLAGS += -lSDLmain -lSDL -lm
@@ -65,6 +56,12 @@ endif
 
 endif
 
+ifeq ($(OS), Windows_NT)
+OBJS += $(BUILD_DIR)/cpymo.res
+LDFLAGS += -Wl,-Bstatic -lwinpthread
+endif
+
+
 TARGET := cpymo
 
 build: $(TARGET)
@@ -77,7 +74,7 @@ clean:
 
 define compile
 	@echo "$(notdir $1)"
-	@$(CC) $1 -o $2 $(CFLAGS)
+	@$(CC) -c $1 -o $2 $(CFLAGS) 
 endef
 
 $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c
@@ -87,9 +84,9 @@ $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	@i686-w64-mingw32-windres $< $@
+	@windres -i $< -o $@ -O coff
 
 $(TARGET): $(OBJS)
 	@echo "Linking..."
-	@$(LD) $^ -o $@ $(LDFLAGS) 
+	@$(CC) $^ -o $@ $(LDFLAGS)
 	@echo "=> $@"

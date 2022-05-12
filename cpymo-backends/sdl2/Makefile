@@ -6,10 +6,7 @@ BUILD_DIR_CPYMO := $(shell mkdir -p $(BUILD_DIR)/cpymo)$(BUILD_DIR)/cpymo
 OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(wildcard *.c)) $(patsubst %.c, $(BUILD_DIR_CPYMO)/%.o, $(notdir $(wildcard ../../cpymo/*.c)))
 INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
 
-CC := cc -c
-LD := cc
-
-LDFLAGS :=
+LDFLAGS := 
 CFLAGS := \
 	-I../../cpymo \
 	-I../../endianness.h \
@@ -17,10 +14,14 @@ CFLAGS := \
 	-I../include \
 	-O3 -DNDEBUG
 
+ifeq ($(OS), Windows_NT)
+LDFLAGS += -lmingw32
+endif
+
+LDFLAGS += -lSDL2main -lSDL2 -lm
+
 ifeq ($(DISABLE_AUDIO), 1)
 CFLAGS += -DDISABLE_AUDIO -DDISABLE_MOVIE
-else
-
 endif
 
 ifneq ($(strip $(SDL2)), )
@@ -55,8 +56,6 @@ LDFLAGS += -lswscale -lavformat -lavcodec -lavutil -lswresample
 endif
 endif
 
-LDFLAGS += -lSDL2main -lSDL2 -lm
-
 build: $(TARGET)
 
 clean:
@@ -64,15 +63,16 @@ clean:
 
 define compile
 	@echo "$(notdir $1)"
-	@$(CC) $1 -o $2 $(CFLAGS)
+	@$(CC) -c $1 -o $2 $(CFLAGS)
 endef
 
 ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res
+LDFLAGS += -Wl,-Bstatic -lwinpthread
 endif
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	@windres $< $@
+	@windres -i $< -o $@ -O coff
 
 $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c $(INC)
 	$(call compile,$<,$@)
@@ -81,5 +81,5 @@ $(BUILD_DIR)/%.o: %.c $(INC)
 
 $(TARGET): $(OBJS)
 	@echo "Linking..."
-	@$(LD) $^ -o $@ $(LDFLAGS) 
+	@$(CC) $^ $(LDFLAGS) -o $@
 	@echo "=> $@"

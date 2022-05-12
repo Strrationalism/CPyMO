@@ -273,8 +273,6 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 	- 在放入太多游戏时将无法加载游戏列表
 	- 加载音效和语音可能会导致内存占用过高，故禁用音效和语音
 	- 将不会在启动游戏时加载游戏目录下的`system/default.ttf`字体
-* 由于stb_image会在PSP中崩溃
-    - 某些情况下使用icon.png会导致崩溃，如果出现了这种情况请删除icon.png
 * 由于SDL2 for PSP存在问题
     - 游戏将会在屏幕左上角显示，而不是居中显示
 * PPSSPP的“快速内存访问”可能存在问题
@@ -409,31 +407,6 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
 注意，Wii平台仅可启动s60v5数据包。
 
 
-# CPyMO ASCII ART
-
-这是一个CPyMO变种，没有音频和视频播放器支持，它将会在控制台上输出画面，Just for fun!
-
-## 编译
-
-如果你需要编译到Windows，那么你应该使用`MinGW`和`MSYS2`来构建它。
-
-cd到`cpymo-backends/ascii-art`，执行`make`或`mingw32-make`即可生成可执行文件。
-
-## 启动
-
-参见CPyMO Desktop的启动方式。
-
-注意：**光敏性癫痫患者请不要使用该版本。**    
-注意：Windows上控制台输出效率较低，帧率可能会很差，建议使用Linux来执行该程序。
-
-CPyMO ASCII ART仅支持键盘操作：
-
-* WSAD为方向键
-* J或空格为确认
-* K为取消
-* L为快进
-
-
 # 使用CPyMO开发新游戏
 
 我们推荐你使用[YukimiScript](https://github.com/Strrationalism/YukimiScript)作为开发语言，当然也可以使用传统PyMO游戏的开发方式。    
@@ -531,7 +504,7 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 
 ## SDL 1.2后端
 
-该后端用于兼容较为老旧的平台。
+该后端用于兼容较为老旧的平台，位于`cpymo-backends/sdl1`中。
 
 SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层的Alpha变化，同时也禁用了右键菜单的背景缩放功能。
 
@@ -548,7 +521,6 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 * `USE_FFMPEG`，此变量为1时将会连接到FFmpeg库，并启用FFmpeg音视频支持。
 * 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_mixer`，仅启动受限的音频支持。
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
-* 如果你需要构建Windows版本，设置`IMPORT_WINDOWS_ICON`为1时将会为可执行文件添加图标。
 
 之后在`cpymo-backends/sdl1`中执行`make`即可编译。
 
@@ -574,6 +546,32 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 * `LOAD_GAME_ICON`定义时，将加载游戏图标，此项目与`USE_GAME_SELECTOR`冲突。
 * 游戏选择器宏与SDL2后端一致
     - 扩展：定义`GAME_SELECTOR_RESET_SCREEN_SIZE_AFTER_START_GAME`后将允许在启动游戏后重设游戏画面大小。
+
+
+## CPyMO ASCII ART
+
+这是一个CPyMO变种，没有音频和视频播放器支持，它将会在控制台上输出画面，Just for fun!
+
+### 编译
+
+如果你需要编译到Windows，那么你应该使用`MinGW`和`MSYS2`来构建它。
+
+cd到`cpymo-backends/ascii-art`，执行`make`或`mingw32-make`即可生成可执行文件。
+
+### 启动
+
+参见CPyMO Desktop的启动方式。
+
+注意：**光敏性癫痫患者请不要使用该版本。**    
+注意：Windows上控制台输出效率较低，帧率可能会很差，建议使用Linux来执行该程序。
+
+CPyMO ASCII ART仅支持键盘操作：
+
+* WSAD为方向键
+* J或空格为确认
+* K为取消
+* L为快进
+
 
 # 工具
 

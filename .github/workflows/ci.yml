@@ -281,7 +281,54 @@ jobs:
       with:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
+  
+  build-SDL1-windows:
+    name: 'Windows (SDL 1.2)'
+    runs-on: 'windows-latest'
+    defaults:
+      run:
+        shell: msys2 {0}
 
+    steps: action/checkout@v1
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW32
+        update: true
+        install: mingw-w64-i686-toolchain unzip
+
+    - name: 'Build'
+      runs: |
+        wget https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
+        wget https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
+        tar -xf SDL-devel-1.2.15-mingw32.tar.gz
+        unzip SDL_mixer-devel-1.2.12-VC.zip
+        cp SDL_mixer-1.2.12/include/SDL_mixer.h SDL-1.2.15/include/SDL/SDL_mixer.h
+        cp SDL_mixer-1.2.12/lib/x86/SDL_mixer.lib SDL-1.2.15/lib/SDL_mixer.lib
+        cp SDL_mixer-1.2.12/lib/x86/*.dll cpymo-backends/sdl1
+        cp SDL_mixer-1.2.12/lib/x86/*.txt cpymo-backends/sdl1
+        wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
+        mv COPYING cpymo_backends/sdl1/COPYING.SDL_mixer.txt
+        wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
+        mv COPYING cpymo_backends/sdl1/COPYING.SDL.txt
+
+        cd cpymo-backends/sdl1
+        export SDL=../../SDL-1.2.15
+        export USE_SDL_MIXER=1
+        make -j
+
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Linux (SDL 1.2)
+        path: |
+          ./cpymo-backends/sdl1/*.exe
+          ./cpymo-backends/sdl1/*.dll
+          ./cpymo-backends/sdl1/*.txt
+        
   build-SDL1-linux:
     name: 'Linux (SDL 1.2)'
     runs-on: 'ubuntu-latest'
@@ -448,7 +495,5 @@ jobs:
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO ASCII ART for ${{ runner.os }}
-        path: |
-            ./cpymo-backends/ascii-art/cpymo-ascii-art
-            ./cpymo-backends/ascii-art/cpymo-ascii-art.exe
+        path: ./cpymo-backends/ascii-art/cpymo-ascii-art
             
