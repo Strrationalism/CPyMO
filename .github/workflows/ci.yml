@@ -311,11 +311,11 @@ jobs:
         cp SDL_mixer-1.2.12/lib/x86/*.dll cpymo-backends/sdl1
         cp SDL_mixer-1.2.12/lib/x86/*.txt cpymo-backends/sdl1
         wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
-        mv COPYING cpymo_backends/sdl1/COPYING.SDL_mixer.txt
+        mv ./COPYING ./cpymo_backends/sdl1/COPYING.SDL_mixer.txt
         wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
-        mv COPYING cpymo_backends/sdl1/COPYING.SDL.txt
+        mv ./COPYING ./cpymo_backends/sdl1/COPYING.SDL.txt
 
-        cd cpymo-backends/sdl1
+        cd ./cpymo-backends/sdl1
         export SDL=../../SDL-1.2.15
         export USE_SDL_MIXER=1
         make -j
