@@ -301,7 +301,7 @@ jobs:
         install: mingw-w64-i686-toolchain unzip
 
     - name: 'Build'
-      runs: |
+      run: |
         wget https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
         wget https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
         tar -xf SDL-devel-1.2.15-mingw32.tar.gz
