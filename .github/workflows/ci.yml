@@ -310,12 +310,12 @@ jobs:
         cp SDL_mixer-1.2.12/lib/x86/SDL_mixer.lib SDL-1.2.15/lib/SDL_mixer.lib
         cp SDL_mixer-1.2.12/lib/x86/*.dll cpymo-backends/sdl1
         cp SDL_mixer-1.2.12/lib/x86/*.txt cpymo-backends/sdl1
-        wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
-        mv COPYING COPYING.SDL_mixer.txt
-        mv COPYING.SDL_mixer.txt ./cpymo_backends/sdl1/
-        wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
-        mv COPYING COPYING.SDL.txt
-        mv COPYING.SDL.txt ./cpymo_backends/sdl1/
+        #wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
+        #mv COPYING COPYING.SDL_mixer.txt
+        #mv COPYING.SDL_mixer.txt ./cpymo_backends/sdl1/
+        #wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
+        #mv COPYING COPYING.SDL.txt
+        #mv COPYING.SDL.txt ./cpymo_backends/sdl1/
 
         cd ./cpymo-backends/sdl1
         export SDL=../../SDL-1.2.15
