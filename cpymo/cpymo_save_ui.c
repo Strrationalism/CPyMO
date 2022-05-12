@@ -147,7 +147,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 		&cpymo_save_ui_get_next,
 		&cpymo_save_ui_get_prev,
 		false,
-		4);
+		3);
 	CPYMO_THROW(err);
 	
 	cpymo_list_ui_enable_loop(e);

@@ -43,7 +43,7 @@ void cpymo_utils_replace_str_newline_n(char *str)
 	char prev_char = '?';
 	
 	while (*str) {
-		if (prev_char == '\\' && *str == 'n') {
+		if (prev_char == '\\' && (*str == 'n' || *str == 'r')) {
 			*str = '\n';
 			*(str - 1) = ' ';
 		}
