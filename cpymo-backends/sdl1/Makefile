@@ -41,6 +41,10 @@ LDFLAGS += -L$(FFMPEG)/lib
 endif
 
 ifeq ($(OS), Windows_NT)
+
+CC := i686-w64-mingw32-cc -c
+LD := i686-w64-mingw32-cc
+
 CFLAGS += -m32
 LDFLAGS += -m32 -lmingw32
 
