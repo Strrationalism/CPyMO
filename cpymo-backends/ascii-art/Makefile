@@ -2,18 +2,12 @@
 
 BUILD_DIR := $(shell mkdir -p build)build
 BUILD_DIR_CPYMO := $(shell mkdir -p $(BUILD_DIR)/cpymo)$(BUILD_DIR)/cpymo
-BUILD_DIR_SDL2_BACKEND_MODULES := $(shell mkdir -p $(BUILD_DIR)/cpymo_backend_sdl2)$(BUILD_DIR)/cpymo_backend_sdl2
-MODULES_FROM_SDL2_BACKEND := cpymo_backend_save.c cpymo_backend_font.c
 
 OBJS := \
 	$(patsubst %.c, $(BUILD_DIR)/%.o, $(wildcard *.c)) \
-	$(patsubst %.c, $(BUILD_DIR_CPYMO)/%.o, $(notdir $(wildcard ../../cpymo/*.c))) \
-	$(patsubst %.c, $(BUILD_DIR_SDL2_BACKEND_MODULES)/%.o, $(MODULES_FROM_SDL2_BACKEND))
+	$(patsubst %.c, $(BUILD_DIR_CPYMO)/%.o, $(notdir $(wildcard ../../cpymo/*.c)))
 
 INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
-
-CC := cc -c
-LD := cc
 
 CFLAGS += \
 	-DDISABLE_AUDIO \
@@ -26,7 +20,7 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
-LDFLAGS += -lm
+LDFLAGS += -O3 -lm
 
 TARGET := cpymo-ascii-art
 
@@ -40,11 +34,8 @@ clean:
 
 define compile
 	@echo "$(notdir $1)"
-	@$(CC) $1 -o $2 $(CFLAGS)
+	@$(CC) -c $1 -o $2 $(CFLAGS)
 endef
-
-$(BUILD_DIR_SDL2_BACKEND_MODULES)/%.o: ../sdl2/%.c
-	$(call compile,$<,$@)
 
 $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c
 	$(call compile,$<,$@)
@@ -53,13 +44,13 @@ $(BUILD_DIR)/%.o: %.c
 	$(call compile,$<,$@)
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
-	@windres $< $@
+	@windres $< $@ -O coff
 
-ifeq ($(OS), Windows_NT)
+ifeq ($(strip $(IMPORT_WINDOWS_ICON)), 1)
 OBJS += $(BUILD_DIR)/cpymo.res
 endif
 
 $(TARGET): $(OBJS) $(WINDOWS_RES)
 	@echo "Linking..."
-	@$(LD) $^ -o $@ $(LDFLAGS) 
+	@$(CC) $^ -o $@ $(LDFLAGS) --static
 	@echo "=> $@"
