@@ -316,6 +316,7 @@ jobs:
         export SDL=../../SDL-1.2.15
         export USE_SDL_MIXER=1
         mingw32-make -j
+        strip cpymo.exe
         
         wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
         mv COPYING COPYING.SDL_mixer.txt
