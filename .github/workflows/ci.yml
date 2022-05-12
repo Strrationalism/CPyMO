@@ -296,21 +296,21 @@ jobs:
           
       - name: Download SDL
         shell: pwsh
-        run:
-          $SDL_ver = "1.2.14";
-          $SDL_mixer_ver = "1.2.12";
-          $Bin = "cpymo-backends/sdl1/";
-          Invoke-WebRequest https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-$SDL_mixer_ver-VC.zip -OutFile SDL_mixer.zip;
-          Invoke-WebRequest https://www.libsdl.org/release/SDL-devel-$SDL_ver-mingw32.zip -OutFile SDL.zip;
-          Expand-Archive SDL.zip ./SDL;
-          Expand-Archive SDL_mixer.zip ./SDL_mixer;
-          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/include/* ./SDL/SDL-1.2.14/include/SDL/;
-          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.lib ./SDL/SDL-$SDL_ver/lib/;
-          Copy-Item ./SDL/SDL-$SDL_ver/bin/SDL.dll $Bin/;
-          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.dll $Bin/;
-          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.txt $Bin/;
-          Invoke-WebRequest https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING -OutFile $Bin/LICENSE.SDL.txt;
-          Invoke-WebRequest https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING -OutFile $Bin/LICENSE.SDL_mixer.txt;
+        run: |
+          $SDL_ver = "1.2.14"
+          $SDL_mixer_ver = "1.2.12"
+          $Bin = "cpymo-backends/sdl1/"
+          Invoke-WebRequest https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-$SDL_mixer_ver-VC.zip -OutFile SDL_mixer.zip
+          Invoke-WebRequest https://www.libsdl.org/release/SDL-devel-$SDL_ver-mingw32.zip -OutFile SDL.zip
+          Expand-Archive SDL.zip ./SDL
+          Expand-Archive SDL_mixer.zip ./SDL_mixer
+          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/include/* ./SDL/SDL-1.2.14/include/SDL/
+          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.lib ./SDL/SDL-$SDL_ver/lib/
+          Copy-Item ./SDL/SDL-$SDL_ver/bin/SDL.dll $Bin/
+          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.dll $Bin/
+          Copy-Item ./SDL_mixer/SDL_mixer-$SDL_mixer_ver/lib/x86/*.txt $Bin/
+          Invoke-WebRequest https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING -OutFile $Bin/LICENSE.SDL.txt
+          Invoke-WebRequest https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING -OutFile $Bin/LICENSE.SDL_mixer.txt
       
       - uses: msys2/setup-msys2@v2
         with:
@@ -330,7 +330,7 @@ jobs:
         uses: actions/upload-artifact@v2.3.0
         with:
           name: CPyMO for Windows (SDL 1.2)
-          path: 
+          path: |
             ./cpymo-backends/sdl1/cpymo.exe
             ./cpymo-backends/sdl1/*.dll
             ./cpymo-backends/sdl1/*.txt
