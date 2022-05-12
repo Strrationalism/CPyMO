@@ -316,14 +316,14 @@ jobs:
         with:
           msystem: MINGW32
           update: true
-          install: mingw-w64-clang-i686-toolchain
+          install: mingw-w64-clang-i686-toolchain make
 
       - name: 'Build'
         run: |
           cd cpymo-backends/sdl1
           export USE_SDL_MIXER=1
           export SDL=../../SDL/SDL-1.2.14
-          mingw32-make -j
+          make -j
           strip cpymo.exe
 
       - name: Upload
