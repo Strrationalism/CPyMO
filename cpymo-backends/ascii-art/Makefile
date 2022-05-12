@@ -48,9 +48,10 @@ $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
 
 ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res
+LDFLAGS += --static
 endif
 
 $(TARGET): $(OBJS) $(WINDOWS_RES)
 	@echo "Linking..."
-	@$(CC) $^ -o $@ $(LDFLAGS) --static
+	@$(CC) $^ -o $@ $(LDFLAGS)
 	@echo "=> $@"
