@@ -123,7 +123,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for PSV
+        name: CPyMO for Sony PSV
         path: |
           ./cpymo-backends/sdl2/cpymo.vpk
 
@@ -156,7 +156,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for PSP
+        name: CPyMO for Sony PSP
         path: |
           ./cpymo-backends/sdl2/EBOOT.PBP
 
