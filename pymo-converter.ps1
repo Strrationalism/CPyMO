@@ -173,15 +173,16 @@ Unpack-Convert-Pack `
     "$outdir/bg-unpack" `
     "$outdir/bg-convert"
 
-
-Unpack-Convert-Pack `
-    "chara" `
-    ($gameconfig["charaformat"].TrimStart('.')) `
-    ($spec.Charaformat) `
-    "$gamedir/chara" `
-    "$outdir/chara" `
-    "$outdir/chara-unpack" `
-    "$outdir/chara-convert"
+if (Test-Path $outdir/chara) {
+    Unpack-Convert-Pack `
+        "chara" `
+        ($gameconfig["charaformat"].TrimStart('.')) `
+        ($spec.Charaformat) `
+        "$gamedir/chara" `
+        "$outdir/chara" `
+        "$outdir/chara-unpack" `
+        "$outdir/chara-convert"
+}
 
 
 Convert-Images "system" "png" "png" "$gamedir/system" "$outdir/system"
