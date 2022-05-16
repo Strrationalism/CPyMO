@@ -173,7 +173,7 @@ Unpack-Convert-Pack `
     "$outdir/bg-unpack" `
     "$outdir/bg-convert"
 
-if (Test-Path $outdir/chara) {
+if (Test-Path $gamedir/chara) {
     Unpack-Convert-Pack `
         "chara" `
         ($gameconfig["charaformat"].TrimStart('.')) `
