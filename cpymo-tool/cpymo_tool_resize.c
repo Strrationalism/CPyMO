@@ -120,6 +120,16 @@ int cpymo_tool_invoke_resize(int argc, const char ** argv)
 		return -1;
 	}
 
+	if (strcmp(resize_ratio_w, "1") == 0 && strcmp(resize_ratio_h, "1") == 0) {
+		cpymo_tool_image img;
+		error_t err = cpymo_tool_image_load_from_file(&img, src_file, load_mask);
+		if (err != CPYMO_ERR_SUCC) return process_err(err);
+
+		err = cpymo_tool_image_save_to_file_with_mask(&img, dst_file, cpymo_parser_stream_span_pure(out_format), create_mask);
+		cpymo_tool_image_free(img);
+		return process_err(err);
+	}
+
 	error_t err =
 		cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
 	return process_err(err);
