@@ -123,7 +123,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for PSV
+        name: CPyMO for Sony PSV
         path: |
           ./cpymo-backends/sdl2/cpymo.vpk
 
@@ -156,7 +156,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for PSP
+        name: CPyMO for Sony PSP
         path: |
           ./cpymo-backends/sdl2/EBOOT.PBP
 
@@ -308,24 +308,25 @@ jobs:
         unzip SDL_mixer-devel-1.2.12-VC.zip
         cp SDL_mixer-1.2.12/include/SDL_mixer.h SDL-1.2.15/include/SDL/SDL_mixer.h
         cp SDL_mixer-1.2.12/lib/x86/SDL_mixer.lib SDL-1.2.15/lib/SDL_mixer.lib
+        cp SDL-1.2.15/bin/SDL.dll cpymo-backends/sdl1/SDL.dll
         cp SDL_mixer-1.2.12/lib/x86/*.dll cpymo-backends/sdl1
         cp SDL_mixer-1.2.12/lib/x86/*.txt cpymo-backends/sdl1
-        wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
-        mv COPYING COPYING.SDL_mixer.txt
-        mv COPYING.SDL_mixer.txt ./cpymo_backends/sdl1/
-        wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
-        mv COPYING COPYING.SDL.txt
-        mv COPYING.SDL.txt ./cpymo_backends/sdl1/
 
         cd ./cpymo-backends/sdl1
         export SDL=../../SDL-1.2.15
         export USE_SDL_MIXER=1
-        make -j
+        mingw32-make -j
+        strip cpymo.exe
+        
+        wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
+        mv COPYING COPYING.SDL_mixer.txt
+        wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
+        mv COPYING COPYING.SDL.txt
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for Linux (SDL 1.2)
+        name: CPyMO for Windows (SDL 1.2)
         path: |
           ./cpymo-backends/sdl1/*.exe
           ./cpymo-backends/sdl1/*.dll
