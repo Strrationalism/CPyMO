@@ -307,12 +307,14 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			1.0f);
 	}
 
+#define CHARA_BUF_SIZE 64
+
 	/*** II. Video ***/
 	D("chara") {
-		int chara_ids[16];
-		int layers[16];
-		float pos_x_s[16];
-		cpymo_parser_stream_span filenames[16];
+		int chara_ids[CHARA_BUF_SIZE];
+		int layers[CHARA_BUF_SIZE];
+		float pos_x_s[CHARA_BUF_SIZE];
+		cpymo_parser_stream_span filenames[CHARA_BUF_SIZE];
 		size_t command_buffer_size = 0;
 
 		float time = 0.3f;
@@ -335,7 +337,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			ENSURE(pos_x_str);
 			ENSURE(layer_str);
 
-			if (command_buffer_size >= 16) {
+			if (command_buffer_size >= CHARA_BUF_SIZE) {
 				printf("[Warning] chara command buffer was overflow.\n");
 			} 
 			else {
@@ -603,11 +605,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 	}
 
 	D("chara_y") {
-		int chara_ids[16];
-		int layers[16];
-		float pos_x_s[16];
-		float pos_y_s[16];
-		cpymo_parser_stream_span filenames[16];
+		int chara_ids[CHARA_BUF_SIZE];
+		int layers[CHARA_BUF_SIZE];
+		float pos_x_s[CHARA_BUF_SIZE];
+		float pos_y_s[CHARA_BUF_SIZE];
+		cpymo_parser_stream_span filenames[CHARA_BUF_SIZE];
 		size_t command_buffer_size = 0;
 
 		POP_ARG(coord_mode_str); ENSURE(coord_mode_str);
@@ -635,7 +637,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			ENSURE(pos_y_str);
 			ENSURE(layer_str);
 
-			if (command_buffer_size >= 16) {
+			if (command_buffer_size >= CHARA_BUF_SIZE) {
 				printf("[Warning] chara command buffer was overflow.\n");
 			}
 			else {
