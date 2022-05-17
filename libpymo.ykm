@@ -100,26 +100,26 @@
 
 ## II. Video
 
-- extern chara_multi charaID filename position layer
+- extern chara_multi charaID filename position=50 layer=0
 @__type charaID int
 @__type filename string
 @__type position number
 @__type layer int
 
-- extern chara_multi_do time
+- extern chara_multi_do time=300
 @__type time int
 
-- macro chara charaID filename position layer time
+- macro chara charaID filename position=50 layer=0 time=300
 @chara_multi charaID filename position layer
 @chara_multi_do time
 
-- extern chara_cls charaID time=300
+- extern chara_cls charaID=a time=300
 @__type charaID int
 @__type_symbol charaID a
 @__type time int
 
 - extern chara_pos charaID new_x new_y coord_mode
-- macro  chara_pos charaID new_x new_y coord_mode
+- macro  chara_pos charaID new_x new_y coord_mode=cm5
 @__type charaID int
 @__type new_x number
 @__type new_y number
@@ -142,7 +142,7 @@
 @__type_symbol time BG_VERYSLOW
 
 - extern flash color time
-- macro  flash color time
+- macro  flash color=white time=300
 @__type_color color
 @__type time int
 @flash color time
@@ -150,18 +150,18 @@
 - extern quake
 
 - extern fade_out color time
-- macro  fade_out color time
+- macro  fade_out color=black time=300
 @__type_color time
 @__type time int
 @fade_out color time
 
-- extern fade_in time
+- extern fade_in time=300
 @__type time int
 
 - extern movie filename
 @__type filename string
 
-- extern textbox message name
+- extern textbox message="message" name="name"
 @__type message string
 @__type name string
 
@@ -192,7 +192,7 @@
 @chara_up_multi charaID
 @chara_up_multi_do
 
-- extern scroll filename startx starty endx endy time
+- extern scroll filename startx starty endx endy time=300
 @__type filename string
 @__type startx number
 @__type starty number
@@ -200,7 +200,7 @@
 @__type endy number
 @__type time int
 
-- extern chara_y_multi charaID filename x y layer
+- extern chara_y_multi charaID filename x y layer=0
 @__type charaID int
 @__type filename string
 @__type x number
@@ -208,17 +208,17 @@
 @__type layer int
 
 - extern chara_y_multi_do coord_mode time
-- macro  chara_y_multi_do coord_mode time
+- macro  chara_y_multi_do coord_mode=cm5 time=300
 @__type time int
 @__type_coord_mode coord_mode
 @chara_y_multi_do coord_mode time
 
-- macro chara_y coord_mode charaID filename x y layer time
+- macro chara_y coord_mode charaID filename x y layer=0 time=300
 @chara_y_multi charaID filename x y layer
 @chara_y_multi_do coord_mode time
 
 - extern chara_scroll coord_mode charaID endx endy time
-- macro  chara_scroll coord_mode charaID endx endy time
+- macro  chara_scroll coord_mode charaID endx endy time=300
 @__type_coord_mode coord_mode
 @__type charaID int
 @__type endx number
@@ -226,7 +226,7 @@
 @__type time int
 
 - extern chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
-- macro  chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
+- macro  chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha=0 layer=0 time=300
 @__type charaID int
 @__type filename string
 @__type startx number
@@ -239,22 +239,22 @@
 @__type_coord_mode coord_mode
 @chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
 
-- extern anime_on num filename x y interval isloop=false
+- extern anime_on num filename x=0 y=0 interval=500 loop=false
 @__type num int
 @__type filename string
 @__type x number
 @__type y number
 @__type interval int
-@__type isloop bool
+@__type loop bool
 
-- extern anime_off filename
+- extern anime_off filename=""
 @__type filename string
 
 - extern chara_anime offset_x offset_y
 @__type offset_x number
 @__type offset_y number
 
-- extern chara_anime_do charaID period loop_num
+- extern chara_anime_do charaID period=500 loop_num=1
 @__type charaID int
 @__type period int
 @__type loop_num int
@@ -262,62 +262,62 @@
 
 # III. Variables
 
-- extern set var_name var_value
-@__type var_name symbol
-@__type var_value int
-@__type var_value symbol
+- extern set var val
+@__type var symbol
+@__type val int
+@__type val symbol
 
-- extern add var_name add_value
-@__type var_name symbol
-@__type add_value int
-@__type add_value symbol
+- extern add var val
+@__type var symbol
+@__type val int
+@__type val symbol
 
-- extern sub var_name sub_value
-@__type var_name symbol
-@__type sub_value int
-@__type sub_value symbol
+- extern sub var val
+@__type var symbol
+@__type val int
+@__type val symbol
 
-- extern goto label_name
-- macro  goto label_name
-@__type label_name string
-@__diagram_link_to label_name
-@goto label_name
+- extern goto label
+- macro  goto label
+@__type label string
+@__diagram_link_to label
+@goto label
 
-- extern if_goto condition_left condition_op condition_right label_name
-- macro  if_goto condition_left condition_op condition_right label_name
-@__type condition_left symbol
-@__type condition_right symbol
-@__type condition_right int
-@__type_symbol condition_op eq
-@__type_symbol condition_op gt
-@__type_symbol condition_op ge
-@__type_symbol condition_op lt
-@__type_symbol condition_op le
-@__type_symbol condition_op ne
-@__type label_name string
-@__diagram_link_to label_name
-@if_goto condition_left condition_op condition_right label_name
+- extern if_goto left op right label
+- macro  if_goto left op right label
+@__type left symbol
+@__type right symbol
+@__type right int
+@__type_symbol op eq
+@__type_symbol op gt
+@__type_symbol op ge
+@__type_symbol op lt
+@__type_symbol op le
+@__type_symbol op ne
+@__type label string
+@__diagram_link_to label
+@if_goto left eq right label
 
-- extern change filename
-- macro  change filename
-@__type filename string
-@__diagram_link_to filename
-@change filename
+- extern change file
+- macro  change file
+@__type file string
+@__diagram_link_to file
+@change file
 
-- extern call filename
-- macro  call filename
-@__type filename string
-@__diagram_link_to filename
-@call filename
+- extern call file
+- macro  call file
+@__type file string
+@__diagram_link_to file
+@call file
 
 - extern ret
 
-- extern sel choice_text
-@__type choice_text string
+- extern sel text
+@__type text string
 
-- extern sel_do hint_pic=null
-@__type hint_pic null
-@__type hint_pic string
+- extern sel_do hint=null
+@__type hint null
+@__type hint string
 
 - extern select_text text
 @__type text string
@@ -332,10 +332,10 @@
 @__type init_position int
 @select_text_do x1 y1 x2 y2 color init_position
 
-- extern select_var choice_text var
-@__type choice_text string
-@__type var symbol
-@__type var int
+- extern select_var text enabled=1
+@__type text string
+@__type enabled symbol
+@__type enabled int
 
 - extern select_var_do x1 y1 x2 y2 color init_position
 - macro  select_var_do x1 y1 x2 y2 color=white init_position=0
@@ -347,73 +347,73 @@
 @__type init_position int
 @select_var_do x1 y1 x2 y2 color init_position
 
-- extern select_img x y var
+- extern select_img x y enabled=1
 @__type x number
 @__type y number
-@__type var symbol
-@__type var int
+@__type enabled symbol
+@__type enabled int
 
 - extern select_img_do filename init_position=0
 @__type filename string
 @__type init_position int
 
-- extern select_imgs filename x y var
+- extern select_imgs filename x y enabled=1
 @__type filename string
 @__type x number
 @__type y number
-@__type var symbol
-@__type var int
+@__type enabled symbol
+@__type enabled int
 
 - extern select_imgs_do init_position=0
 @__type init_position int
 
-- extern wait time
+- extern wait time=300
 @__type time int
 
 - extern wait_se
 
-- extern rand var_name min_value max_value
-@__type var_name symbol
-@__type min_value int
-@__type max_value int
+- extern rand var min max
+@__type var symbol
+@__type min int
+@__type max int
 
 
 # IV. Audio
 
-- extern bgm filename isloop=true
-@__type filename string
-@__type isloop bool
+- extern bgm file loop=true
+@__type file string
+@__type loop bool
 
 - extern bgm_stop
 
-- extern se filename isloop=false
+- extern se filename loop=false
 @__type filename string
-@__type isloop bool
+@__type loop bool
 
 - extern se_stop
 
-- extern vo filename
-@__type filename string
+- extern vo file
+@__type file string
 
 
 # V. System
 
-- extern load save_num=null
-@__type save_num null
-@__type save_num int
+- extern load id=null
+@__type id null
+@__type id int
 
-- extern album album_list_filename=null
-@__type album_list_filename string
-@__type album_list_filename null
+- extern album list=null
+@__type list string
+@__type list null
 
 - extern music
 
-- extern date date_bg x y color
-- macro  date date_bg x y color=white
-@__type date_bg string
+- extern date bg x y color
+- macro  date bg x y color=white
+@__type bg string
 @__type x number
 @__type y number
 @__type_color color
-@date date_bg x y color
+@date bg x y color
 
 - extern config
