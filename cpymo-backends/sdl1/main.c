@@ -93,6 +93,10 @@ static inline void load_game_icon(const char *gamedir)
     stbi_uc *data = stbi_load(path, &w, &h, NULL, 4);
     if (data == NULL) return;
 
+    if (w != 57 || h != 57) {
+        printf("[Warning] Icon must be 57x57.\n");
+    }
+
     void *px = (void *)malloc(32 * 32 * 4);
     if (px == NULL) {
         free(data);

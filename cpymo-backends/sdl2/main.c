@@ -81,6 +81,10 @@ static void set_window_icon(const char *gamedir)
 	stbi_uc *icon = stbi_load(icon_path, &w, &h, NULL, 4);
 	if (icon == NULL) return;
 
+	if (w != 57 || h != 57) {
+		printf("[Warning] Icon must be 57x57.\n");
+	}
+
 	Uint32 rmask, gmask, bmask, amask;
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
