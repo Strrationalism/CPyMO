@@ -12,6 +12,7 @@ typedef int error_t;
 #define CPYMO_ERR_NO_MORE_CONTENT (-6)
 #define CPYMO_ERR_UNSUPPORTED (-7)
 #define CPYMO_ERR_SCRIPT_LABEL_NOT_FOUND (-8)
+#define CPYMO_ERR_SCRIPT_FILE_NOT_FOUND (-9)
 #define CPYMO_ERR_UNKNOWN (-65536)
 
 extern const char * cpymo_error_message(error_t err);

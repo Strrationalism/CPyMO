@@ -439,7 +439,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 			return CPYMO_ERR_SUCC;
 		}
 
-		if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 			cpymo_engine_request_redraw(e);
 			cpymo_album_exit_showing_cg(album);
 			return CPYMO_ERR_SUCC;
@@ -624,7 +624,7 @@ error_t cpymo_album_enter(
 	album->mouse_wheel_sum = 0;
 	album->cv_thumb_cover = NULL;
 	album->mouse_x_sum = 0;
-	album->ignore_mouse_button_release = 1;
+	album->ignore_mouse_button_release = 0;
 	album->showing_cg = NULL;
 	album->showing_cg_image = NULL;
 

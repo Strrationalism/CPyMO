@@ -10,6 +10,7 @@ const char * cpymo_error_message(error_t err) {
 	case CPYMO_ERR_OUT_OF_MEM: return "Out of memory.";
 	case CPYMO_ERR_NO_MORE_CONTENT: return "No more content.";
 	case CPYMO_ERR_SCRIPT_LABEL_NOT_FOUND: return "Script label not found.";
+	case CPYMO_ERR_SCRIPT_FILE_NOT_FOUND: return "Script file not found.";
 	default: return "Unknown error.";
 	}
 }
