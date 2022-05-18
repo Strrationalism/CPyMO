@@ -246,6 +246,9 @@ error_t cpymo_bg_command(
 				transition, 
 				&engine->assetloader) == CPYMO_ERR_SUCC) 
 				bg->trans = trans;
+			else {
+				printf("[Warning] Failed to load mask transition.\n");
+			}
 		}
 
 		bg->transform_progression = cpymo_tween_create(time * 2);
