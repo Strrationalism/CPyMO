@@ -70,9 +70,50 @@
 @__type_symbol color green
 @__type_symbol color blue
 
+- macro __type_if left op right
+@__type left symbol
+@__type right symbol
+@__type right int
+@__type_symbol op eq
+@__type_symbol op gt
+@__type_symbol op ge
+@__type_symbol op lt
+@__type_symbol op le
+@__type_symbol op ne
+
 - extern __define_character character_symbol name
 @__type character_symbol symbol
 @__type name string
+
+
+# if statement
+# Example:
+#     @if FSEL eq 0
+#         @a
+#     @elif FSEL eq 1
+#         @b
+#     @else
+#         @c
+#     @endif
+
+- extern if left op right
+- macro if left op right
+@__type_if left op right
+@if left op right
+
+- extern elif left op right
+- macro elif left op right
+@__type_if left op right
+@elif left op right
+
+- extern else
+- extern endif
+
+- macro if_sel selection
+@if FSEL eq selection
+
+- macro elif_sel selection
+@elif FSEL eq selection
 
 # I. Text
 
@@ -285,15 +326,7 @@
 
 - extern if_goto left op right label
 - macro  if_goto left op right label
-@__type left symbol
-@__type right symbol
-@__type right int
-@__type_symbol op eq
-@__type_symbol op gt
-@__type_symbol op ge
-@__type_symbol op lt
-@__type_symbol op le
-@__type_symbol op ne
+@__type_if left op right
 @__type label string
 @__diagram_link_to label
 @if_goto left eq right label
