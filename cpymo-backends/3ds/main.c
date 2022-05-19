@@ -349,7 +349,7 @@ int main(void) {
 		case CPYMO_ERR_NO_MORE_CONTENT: goto EXIT;
 		case CPYMO_ERR_SUCC: break;
 		default: {
-			printf("[Error] %s.\n", cpymo_error_message(err));
+			printf("[Error] %s(%d).\n", cpymo_error_message(err), err);
 			while(aptMainLoop()) {
 				hidScanInput();
 				gspWaitForVBlank();
