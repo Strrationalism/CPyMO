@@ -240,7 +240,11 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 	THROW(err != CPYMO_ERR_SUCC, err, "Faild to get video path");
 
 	int averr = avformat_open_input(&m->format_context, path, NULL, NULL);
-	THROW_AVERR(averr, CPYMO_ERR_CAN_NOT_OPEN_FILE);
+	if (averr != 0) {
+		if (path) free(path);
+		cpymo_ui_exit(e);
+		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+	}
 
 	averr = avformat_find_stream_info(m->format_context, NULL);
 	THROW_AVERR(averr < 0, CPYMO_ERR_NOT_FOUND);
