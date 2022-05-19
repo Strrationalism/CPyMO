@@ -146,6 +146,7 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	case CPYMO_ERR_CAN_NOT_OPEN_FILE:
 	case CPYMO_ERR_BAD_FILE_FORMAT:
 	case CPYMO_ERR_UNSUPPORTED:
+	case CPYMO_ERR_INVALID_ARG:
 	case CPYMO_ERR_UNKNOWN:
 		printf("[Error] In script \'%s\'(%d): %s\n",
 			interpreter->script_name,
