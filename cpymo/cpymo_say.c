@@ -71,7 +71,8 @@ void cpymo_say_free(cpymo_say *say)
 void cpymo_say_draw(const struct cpymo_engine *e)
 {
 	if (e->say.active && !e->input.hide_window && !e->say.hide_window) {
-		float msg_h = (float)e->say.msgbox_h;
+		float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
+		float msg_h = (float)e->say.msgbox_h * ratio;
 		float y = (float)e->gameconfig.imagesize_h - msg_h;
 		float offx = (float)e->gameconfig.nameboxorg_x / 540.0f * (float)e->gameconfig.imagesize_w;
 		float offy = (float)e->gameconfig.nameboxorg_y / 360.0f * (float)e->gameconfig.imagesize_h;
@@ -102,8 +103,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 
 		if (e->say.msgbox) {
 			cpymo_backend_image_draw(
-				((float)e->gameconfig.imagesize_w - (float)e->say.msgbox_w) / 2, 
-				y, (float)e->say.msgbox_w, msg_h,
+				0, y, (float)e->gameconfig.imagesize_w, msg_h,
 				e->say.msgbox, 0, 0, e->say.msgbox_w, e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_text_say_textbox);
 		}
@@ -225,7 +225,7 @@ error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_parser_str
 	return CPYMO_ERR_SUCC;
 }
 
-/** Mermaid Flow Chart 
+/** Mermaid Flow Chart
 
 graph TB
 	A(START) --> cpymo_say_wait_text_fadein
@@ -243,7 +243,7 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
 
-	const enum cpymo_key_hold_result mouse_button_state = 
+	const enum cpymo_key_hold_result mouse_button_state =
 		cpymo_key_hold_update(&e->say.key_mouse_button, dt, e->input.mouse_button);
 
 	if (e->say.hide_window) {
@@ -268,7 +268,7 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 static bool cpymo_say_wait_text_fadein(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
-	
+
 	if (e->say.hide_window) {
 		if (cpymo_input_foward_key_just_released(e)) {
 			e->say.hide_window = false;
@@ -306,10 +306,10 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 
 static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 {
-	if(!cpymo_engine_skipping(e)) cpymo_save_autosave(e);
+	if (!cpymo_engine_skipping(e)) cpymo_save_autosave(e);
 	cpymo_key_hold_init(&e->say.key_mouse_button, e->input.mouse_button);
 	cpymo_wait_register_with_callback(
-		&e->wait, 
+		&e->wait,
 		&cpymo_say_wait_text_reading,
 		&cpymo_say_wait_text_read_callback);
 	return CPYMO_ERR_SUCC;
@@ -352,13 +352,16 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 	cpymo_backlog_record_write_name(&e->backlog, say->name);
 
 	// Create say message text
+	float msglr_l = (float)e->gameconfig.msglr_l * e->gameconfig.imagesize_w / 540.0f;
+	float msglr_r = (float)e->gameconfig.msglr_r * e->gameconfig.imagesize_w / 540.0f;
 	float msgtb_t = (float)e->gameconfig.msgtb_t * e->gameconfig.imagesize_h / 360.0f;
 	float msgtb_b = (float)e->gameconfig.msgtb_b * e->gameconfig.imagesize_h / 360.0f;
 
-	float msg_h = (float)e->say.msgbox_h;
+	float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
+	float msg_h = (float)e->say.msgbox_h * ratio;
 
-	float x = (e->gameconfig.imagesize_w - e->say.msgbox_w) / 2 + fontsize / 2;
-	float w = e->say.msgbox_w - fontsize;
+	float x = msglr_l;
+	float w = (float)e->gameconfig.imagesize_w - msglr_l - msglr_r;
 	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
 	float h = msg_h - msgtb_t - msgtb_b;
 
@@ -370,8 +373,8 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 	e->say.active = true;
 
 	cpymo_wait_register_with_callback(
-		&e->wait, 
-		&cpymo_say_wait_text_fadein, 
+		&e->wait,
+		&cpymo_say_wait_text_fadein,
 		&cpymo_say_wait_text_fadein_callback);
 
 	return err;
