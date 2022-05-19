@@ -140,7 +140,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 			return CPYMO_ERR_SUCC;
 #endif
 
-/*#ifdef __SWITCH__
+#ifdef __SWITCH__
 	Result r = plInitialize(PlServiceType_User);
 	if (R_FAILED(r)) return CPYMO_ERR_NOT_FOUND;
 
@@ -157,7 +157,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 		return CPYMO_ERR_SUCC;
 	}
 	plExit();
-#endif*/
+#endif
 
 #ifdef __ANDROID__
 	SDL_AndroidShowToast("Can not find /sdcard/pymogames/default.ttf", 1, -1, 0, 0);

@@ -36,7 +36,7 @@ Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | �
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
 Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体  | 视障帮助
 macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
-Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
+Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
 Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
@@ -219,9 +219,13 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 ## 启动
 
-将`default.ttf`和游戏放入SD卡的`/pymogames/`目录即可。
+将游戏放入SD卡的`/pymogames/`目录即可。
 
-如果没有放置`default.ttf`，则不能启动CPyMO。
+## 自定义字体
+
+将字体文件改名为`default.ttf`放入`/pymogames/`目录即可加载该字体文件。
+
+默认将会加载Switch自带的字体。
 
 ## 为Switch适配游戏
 
