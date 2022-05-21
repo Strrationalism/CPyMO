@@ -329,7 +329,7 @@
 @__type_if left op right
 @__type label string
 @__diagram_link_to label
-@if_goto left eq right label
+@if_goto left op right label
 
 - extern change file
 - macro  change file
