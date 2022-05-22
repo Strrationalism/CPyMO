@@ -1203,8 +1203,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			POP_ARG(init_position);
 			int init_position_i = cpymo_parser_stream_span_atoi(init_position);
 
-			init_position_i %= choices;
-
 			cpymo_select_img_configuare_end(&engine->select_img, &engine->wait, engine, init_position_i);
 		}
 		else return CPYMO_ERR_INVALID_ARG;

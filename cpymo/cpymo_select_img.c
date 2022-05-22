@@ -149,6 +149,8 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 
 static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 {
+	if (cpymo_ui_enabled(e)) return true;
+
 	if (e->select_img.hint[0] != NULL) {
 		e->select_img.hint_timer += dt;
 		if (e->select_img.hint_timer >= 1.0f) {
@@ -216,6 +218,9 @@ void cpymo_select_img_configuare_end(cpymo_select_img *sel, cpymo_wait *wait, st
 
 	sel->current_selection = init_position >= 0 ? init_position : 0;
 	sel->save_enabled = init_position == -1;
+
+	if (sel->current_selection >= (int)sel->all_selections)
+		sel->current_selection %= (int)sel->all_selections;
 
 	// In pymo, if all options are disabled, it will enable every option.
 	bool all_is_disabled = true;
