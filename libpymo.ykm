@@ -331,6 +331,9 @@
 @__diagram_link_to label
 @if_goto left op right label
 
+- macro if_sel_goto sel label
+@if_goto FSEL eq sel label
+
 - extern change file
 - macro  change file
 @__type file string
