@@ -245,6 +245,7 @@ static error_t after_select_game(cpymo_engine *e, const char *gamedir)
 }
 
 int main(void) {
+	srand((unsigned)time(NULL));
 	engine.ui = NULL;
 	engine.say.active = false;
 	bool is_new_3ds = false;

@@ -255,6 +255,7 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 
 int main(int argc, char **argv)
 {
+	srand((unsigned)time(NULL));
 	//_CrtSetBreakAlloc(1371);
 
 #if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))

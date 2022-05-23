@@ -53,6 +53,7 @@ cpymo_engine engine;
 
 int main(int argc, char **argv) 
 {
+    srand((unsigned)time(NULL));
     prev = millis();
 
     extern error_t cpymo_backend_image_subsys_init(void);
