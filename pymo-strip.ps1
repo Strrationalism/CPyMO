@@ -16,7 +16,12 @@ if ($args.Length -ne 1) {
 $script:dir = "$pwd/$($args[0])"
 
 if (Test-Path "$dir/strip") {
-    Write-Host "Strip directory already exists, you must delete to continue."
+    Write-Host "[Error] Strip directory already exists, you must delete to continue."
+    Break Script
+}
+
+if (-not (Test-Path "$dir/gameconfig.txt")) {
+    Write-Host "[Error] Can not find $dir/gameconfig.txt."
     Break Script
 }
 
