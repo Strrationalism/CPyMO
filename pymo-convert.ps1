@@ -64,7 +64,7 @@ if ($spec -eq $null) {
 }
 
 function Parse-GameConfig($filename) {
-    $src = Get-Content $filename
+    $src = Get-Content $filename -Encoding utf8
     $dst = [Ordered]@{}
     foreach ($line in $src) {
         $line = $line.Trim()
