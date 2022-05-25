@@ -69,7 +69,7 @@ foreach ($i in $asstypes) {
 
 $script:actived_asset = New-Object System.Collections.Generic.HashSet[String]
 
-function Active-Asset($asstype, $filename, $ext, $mask, $mask_format, $warn = $true) {
+function Active-Asset($asstype, $filename, $ext, $mask, $mask_format, $warn=$true) {
     $dst = "$dir/$asstype/$filename$ext"
     if (-not $actived_asset.Contains($dst.ToLower())) {
         if (-not (Test-Path "$dir/$asstype")) {
@@ -79,7 +79,7 @@ function Active-Asset($asstype, $filename, $ext, $mask, $mask_format, $warn = $t
         $src = "$dir/strip/$asstype/$filename$ext"
         
 
-        if (-not (Test-Path $src)) {
+        if ($warn -and -not (Test-Path $src)) {
             Write-Host ("[Warning] Can not find file $dst.")
             return
         } else {
@@ -120,6 +120,10 @@ function Active-Script($script_name) {
 
     Write-Host "Processing $script_name..."
     Active-Asset "script" $script_name ".txt" $false ""
+
+    if (-not (Test-Path "$dir/script/$script_name.txt")) {
+        return
+    }
 
     $content = [System.IO.File]::ReadAllLines("$dir/script/$script_name.txt")
     foreach ($line in $content) {
@@ -202,6 +206,16 @@ function Active-Script($script_name) {
                     Active-Asset "system" "sel_highlight" ".png" $true ".png"
                     Active-Asset "system" "option" ".png" $true ".png"
                     Active-Asset "system" "menu" ".png" $true ".png"
+
+                    if ($a.Lenght -ge 2) {
+                        if (-not [System.String]::IsWhitespaceOrNull) {
+                            Active-Asset "system" "$($a)0" ".png" $true ".png"
+                            Active-Asset "system" "$($a)1" ".png" $true ".png"
+                            Active-Asset "system" "$($a)2" ".png" $true ".png"
+                            Active-Asset "system" "$($a)3" ".png" $true ".png"
+                        }
+                    }
+
                     break
                 }
                 "select_text" {
@@ -231,7 +245,15 @@ function Active-Script($script_name) {
                     break
                 }
 
-                # select_imgs
+                "select_imgs" {
+                    [int]$choices = $a[0]
+            
+                    for ($i = 0; $i -lt $choices; $i += 1) {
+                        Active-Asset "system" $a[$i * 4 + 1] ".png" $true ".png"
+                    }
+
+                    break
+                }
                 "bgm" {
                     Active-Asset "bgm" $a[0] $gc["bgmformat"] $false ""
                     break
@@ -291,26 +313,23 @@ Active-Script $gc["startscript"]
 
 
 function Pack-Dir($asstype) {
-    pushd "$dir/$asstype"
     $files = @()
-    ls "*" | ForEach-Object {
-        $files += $_.Name
+    (ls "$dir/$asstype/*").Name | ForEach-Object {
+        $files += "$dir/$asstype/$_"
     }
 
     Out-File `
-        -FilePath "./list.txt" `
+        -FilePath "$dir/$asstype/list.txt" `
         -Force `
         -InputObject $files `
         -Encoding utf8
 
-    cpymo-tool pack "$asstype.pak" --file-list "./list.txt"
-    rm -Force "./list.txt"
+    cpymo-tool pack "$dir/$asstype/$asstype.pak" --file-list "$dir/$asstype/list.txt"
+    rm -Force "$dir/$asstype/list.txt"
 
     foreach ($i in $files) {
         rm $i -Force
     }
-
-    popd
 }
 
 foreach ($ass in $packed_assets) {
