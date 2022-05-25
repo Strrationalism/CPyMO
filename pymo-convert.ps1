@@ -28,7 +28,7 @@ function Write-Help() {
     Write-Host "You must ensure cpymo-tool has installed!"
     Write-Host ""
     Write-Host "Usage:"
-	Write-Host "    pymo-convert.ps1 <device-spec> <src-game> <dst-dir>"
+	Write-Host "    pymo-convert.ps1 <device-spec> <src-game> [dst-dir]"
     Write-Host ""
     Write-Host "Avaliable device specs:"
     foreach ($i in $device_specs) {
@@ -42,7 +42,7 @@ function Ensure-Dir($dir) {
     }
 }
 
-if ($args.Length -ne 3) { 
+if (($args.Length -ne 3) -and ($args.Length -ne 2)) { 
     Write-Help
     Break Script
 }
@@ -79,7 +79,11 @@ function Parse-GameConfig($filename) {
 }
 
 $gamedir = [System.IO.Path]::Combine($pwd, $args[1])
-$outdir = [System.IO.Path]::Combine($pwd, $args[2])
+$outdir = [System.IO.Path]::Combine($pwd, "$($args[1])_$($spec.Name)")
+
+if ($args.Length -eq 3) {
+    $outdir = [System.IO.Path]::Combine($pwd, $args[2])
+}
 Ensure-Dir $outdir
 
 if (-not (Test-Path "$gamedir/gameconfig.txt")) {
