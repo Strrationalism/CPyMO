@@ -352,12 +352,15 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 		}
 
 		if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
+			bool touch = false;
 			for (int i = 0; i < (int)o->all_selections; ++i) {
 				if (cpymo_select_img_mouse_in_selection(o, i, e)) {
 					o->current_selection = i;
-					return cpymo_select_img_ok(e, i, o->selections[o->current_selection].hash, o);
+					touch = true;
 				}
 			}
+
+			return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash, o);
 		}
 	}
 
