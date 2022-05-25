@@ -424,7 +424,7 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
     - 注：CPyMO不保证所有平台都可以播放视频。
 * 图片：png
 
-如果你需要生成特定于平台的包，你可以先创建发布包，然后再使用pymo-converter工具将其转换为各个平台上通用的包。
+如果你需要生成特定于平台的包，你可以先创建发布包，然后再使用pymo-convert工具将其转换为各个平台上通用的包。
 
 # 将CPyMO移植到其他平台
 
@@ -595,12 +595,12 @@ CPyMO ASCII ART仅支持键盘操作：
 2. 使用GNU Make在`cpymo-tool`目录中执行`make`命令。
 2. 使用Microsoft NMake在`cpymo-tool`目录中执行`nmake -f Makefile.Win32`命令构建。
 
-## pymo-converter
+## pymo-convert
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
 要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
 
-pymo-converter目前支持将游戏适配到以下设备：
+pymo-convert目前支持将游戏适配到以下设备：
 
 * s60v3（pymo规定的s60v3数据包标准）
 * s60v5（pymo规定的s60v5数据包标准）
