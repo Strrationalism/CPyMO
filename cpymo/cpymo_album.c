@@ -448,7 +448,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		return CPYMO_ERR_SUCC;
 	}
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, cancel)) {
+	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 		cpymo_ui_exit(e);
 		return CPYMO_ERR_SUCC;
 	}
