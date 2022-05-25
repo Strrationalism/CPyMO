@@ -595,6 +595,10 @@ CPyMO ASCII ART仅支持键盘操作：
 2. 使用GNU Make在`cpymo-tool`目录中执行`make`命令。
 2. 使用Microsoft NMake在`cpymo-tool`目录中执行`nmake -f Makefile.Win32`命令构建。
 
+## pymo-strip
+
+该工具用于删除PyMO游戏数据包中没有被使用的部分。
+
 ## pymo-convert
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
