@@ -75,6 +75,18 @@ void cpymo_backend_image_free(cpymo_backend_image image)
 	SDL_DestroyTexture((SDL_Texture *)image);
 }
 
+#ifdef RENDER_LOGICAL_SIZE_UNSUPPORTED_FORCED_CENTERED
+#include <cpymo_engine.h>
+void cpymo_backend_image_calc_force_center_offset(float *posx, float *posy)
+{
+	extern const cpymo_engine *engine;
+	*posx += ((float)SCREEN_W - (float)engine->gameconfig.imagesize_w) / 2;
+	*posy += ((float)SCREEN_H - (float)engine->gameconfig.imagesize_h) / 2;
+}
+#else
+#define cpymo_backend_image_calc_force_center_offset(...)
+#endif
+
 void cpymo_backend_image_draw(
 	float dstx, 
 	float dsty, 
@@ -88,6 +100,7 @@ void cpymo_backend_image_draw(
 	float alpha, 
 	enum cpymo_backend_image_draw_type draw_type)
 {
+	cpymo_backend_image_calc_force_center_offset(&dstx, &dsty);
 	SDL_Rect src_rect;
 	src_rect.x = srcx;
 	src_rect.y = srcy;
