@@ -506,6 +506,10 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 
 定位到`cpymo_backend_font.c`中的函数`error_t cpymo_backend_font_init(const char *gamedir)`，向此函数添加用于加载系统字体的代码。
 
+### 选择帧缓存格式
+
+定义`FRAMEBUFFER_PIXELFORMAT`为需要使用的SDL2像素格式，即可使用对应的像素格式作为帧缓存格式。
+
 ## SDL 1.2后端
 
 该后端用于兼容较为老旧的平台，位于`cpymo-backends/sdl1`中。

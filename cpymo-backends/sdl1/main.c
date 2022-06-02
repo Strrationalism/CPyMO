@@ -429,7 +429,7 @@ int main(int argc, char **argv)
             SDL_FillRect(framebuffer, NULL, 0);
             cpymo_engine_draw(&engine);
             SDL_Flip(framebuffer);
-#if (defined REDRAW_WHAT_EVER && !defined __WII__)
+#ifdef REDRAW_WHAT_EVER
             SDL_Delay(16);
 #endif
         }
