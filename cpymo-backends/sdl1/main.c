@@ -421,11 +421,10 @@ int main(int argc, char **argv)
             goto EXIT;
         }
 
-#ifdef REDRAW_WHAT_EVER
-        redraw = true;
+#ifndef REDRAW_WHAT_EVER
+        if (redraw || redraw_system) 
 #endif
-
-        if (redraw || redraw_system) {
+        {
             SDL_FillRect(framebuffer, NULL, 0);
             cpymo_engine_draw(&engine);
             SDL_Flip(framebuffer);
@@ -433,7 +432,11 @@ int main(int argc, char **argv)
             SDL_Delay(16);
 #endif
         }
-        else {
+
+#ifndef REDRAW_WHAT_EVER
+        else 
+#endif
+        {
 #ifndef __WII__
             SDL_Delay(16);
 #endif
