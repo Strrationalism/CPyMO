@@ -197,6 +197,15 @@ void cpymo_backend_image_draw(
 	dstrect.w = (Uint16)dstw;
 	dstrect.h = (Uint16)dsth;
 
+	int xoff = ((int)dstrect.w - (int)srcrect.w) / 2;
+	int yoff = ((int)dstrect.h - (int)srcrect.h) / 2;
+
+	if (xoff < 0) xoff = 0;
+	if (yoff < 0) yoff = 0;
+
+	dstrect.x += xoff;
+	dstrect.y += yoff;
+
 	SDL_SetAlpha(src, SDL_SRCALPHA, (Uint8)(alpha * 255));
 	
 	SDL_BlitSurface(src, &srcrect, framebuffer, &dstrect);

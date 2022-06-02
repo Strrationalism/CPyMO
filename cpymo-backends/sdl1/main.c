@@ -20,6 +20,7 @@
 #include <SDL/SDL.h>
 #include <cpymo_engine.h>
 #include <cpymo_error.h>
+#include <time.h>
 
 cpymo_engine engine;
 SDL_Surface *framebuffer;
