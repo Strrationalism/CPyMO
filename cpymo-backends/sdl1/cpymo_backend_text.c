@@ -9,6 +9,11 @@ const extern stbtt_fontinfo font;
 const extern cpymo_engine engine;
 extern SDL_Surface *framebuffer;
 
+
+#ifndef FONT_RENDER_QUALITY     // 0 ~ 3
+#define FONT_RENDER_QUALITY 3
+#endif
+
 extern void cpymo_backend_font_render(
     void *out_or_null, int *w, int *h, 
     cpymo_parser_stream_span text, float scale, float baseline);
@@ -69,16 +74,24 @@ static void cpymo_backend_text_draw_internal(
     float src_g = col.g / 255.0f;
     float src_b = col.b / 255.0f;
 
+    int base_x = (int)x_pos + clip.x;
+    int base_y = (int)y_pos + clip.y;
+
     for (int y = 0; y < t->h; ++y) {
         for (int x = 0; x < t->w; ++x) {
-            int draw_x = clip.x + x + (int)x_pos;
-            int draw_y = clip.y + y + (int)y_pos;
+            int draw_x = x + base_x;
+            int draw_y = y + base_y;
 
             if (draw_x < 0 || draw_x >= clip.x + clip.w || draw_y < 0 || draw_y >= clip.y + clip.h) continue;
 
-            float fontpx = alpha * (t->px[y * t->w + x] / 255.0f);
-            if (fontpx == 0.0f) continue;
+            const uint8_t fontsmp = t->px[y * t->w + x];
 
+#if (FONT_RENDER_QUALITY == 0 || FONT_RENDER_QUALITY == 1)
+            if (!fontsmp) continue;
+            putpixel(framebuffer, draw_x, draw_y, col);
+#else
+            float fontpx = alpha * (fontsmp / 255.0f);
+            if (fontpx == 0.0f) continue;
             cpymo_color dst = getpixel(framebuffer, draw_x, draw_y);
             float dst_r = dst.r / 255.0f;
             float dst_g = dst.g / 255.0f;
@@ -93,6 +106,7 @@ static void cpymo_backend_text_draw_internal(
             dst.b = (uint8_t)cpymo_utils_clampf(blend_b * 255.0f, 0.0f, 255.0f);
 
             putpixel(framebuffer, draw_x, draw_y, dst);
+#endif
         }
     }
 }
@@ -108,7 +122,9 @@ void cpymo_backend_text_draw(
 
     if (SDL_LockSurface(framebuffer) == -1) return;
 
+#if (FONT_RENDER_QUALITY == 1 || FONT_RENDER_QUALITY == 3)
     cpymo_backend_text_draw_internal(t, x + 1, y + 1, cpymo_color_inv(col), alpha);
+#endif
     cpymo_backend_text_draw_internal(t, x, y, col, alpha);
 
     SDL_UnlockSurface(framebuffer);

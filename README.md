@@ -537,6 +537,7 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
     - `SCREEN_RESIZABLE`定义时，将允许调整游戏窗口大小。
     - `TOGGLE_FULLSCREEN`定义时，将允许用户通过`Alt+Enter`键切换全屏。
     - `REDRAW_WHAT_EVER`定义时，将会不断刷新屏幕，忽略CPyMO的按需刷新功能。
+    - `FONT_RENDER_QUALITY`宏可定义为0~3之间的一个值，该值越大，质量越好，该值越小，性能越好。
 * FFmpeg支持的音频系统
     - `DEFAULT_CHANNELS`将设置默认音频输出通道数。
     - `DEFAULT_FREQ`将设置默认音频输出的频率。
