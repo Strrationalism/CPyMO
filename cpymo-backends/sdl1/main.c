@@ -438,7 +438,7 @@ int main(int argc, char **argv)
 #endif
         }
 
-#ifdef __WII
+#ifdef __WII__
         VIDEO_WaitVSync();
 #endif
 
