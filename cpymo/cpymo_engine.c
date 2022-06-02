@@ -201,7 +201,7 @@ void cpymo_engine_free(cpymo_engine *engine)
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
 	error_t err;
-	*redraw = engine->redraw;
+	*redraw |= engine->redraw;
 	engine->redraw = false;
 
 	engine->prev_input = engine->input;
@@ -256,6 +256,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	}
 
 	*redraw |= engine->redraw;
+	engine->redraw = false;
 
 	return CPYMO_ERR_SUCC;
 }

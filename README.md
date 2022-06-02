@@ -406,7 +406,9 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
 
 将游戏和`default.ttf`放入SD卡的`/pymogames/`目录即可。
 
-注意，Wii平台仅可启动s60v5数据包。
+注意，Wii平台仅s60v5数据包才可有较好体验。
+
+如果你使用Dolphin模拟器，则需要将“图形” - “修正” - “纹理缓存”的“精确度”选项设置为“安全”，否则会导致画面刷新卡顿。
 
 
 # 使用CPyMO开发新游戏

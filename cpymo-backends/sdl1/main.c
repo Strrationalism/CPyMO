@@ -409,6 +409,9 @@ int main(int argc, char **argv)
 
         bool redraw = false;
         Uint32 cur_time = SDL_GetTicks();
+#ifdef REDRAW_WHAT_EVER
+        cpymo_engine_request_redraw(engine);
+#endif
         err = cpymo_engine_update(
             &engine, 
             (float)(cur_time - prev_time) / 1000.0f, 
@@ -421,9 +424,7 @@ int main(int argc, char **argv)
             goto EXIT;
         }
 
-#ifndef REDRAW_WHAT_EVER
         if (redraw || redraw_system) 
-#endif
         {
             SDL_FillRect(framebuffer, NULL, 0);
             cpymo_engine_draw(&engine);
@@ -432,19 +433,10 @@ int main(int argc, char **argv)
             SDL_Delay(16);
 #endif
         }
-
-#ifndef REDRAW_WHAT_EVER
         else 
-#endif
         {
-#ifndef __WII__
             SDL_Delay(16);
-#endif
         }
-
-#ifdef __WII__
-        VIDEO_WaitVSync();
-#endif
 
         prev_time = cur_time;
     }
