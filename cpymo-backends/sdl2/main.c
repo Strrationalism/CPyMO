@@ -253,6 +253,54 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 }
 #endif
 
+static error_t create_window_and_renderer(int width, int height, SDL_Window **window, SDL_Renderer **renderer)
+{
+#ifdef USE_GAME_SELECTOR
+	const char *title = "CPyMO";
+#else
+	const char *title = engine.gameconfig.gametitle;
+#endif
+
+	*window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
+		SDL_WINDOW_ALLOW_HIGHDPI
+		| SDL_WINDOW_RESIZABLE
+#ifdef __ANDROID__
+		| SDL_WINDOW_FULLSCREEN
+#endif
+	);
+
+	if (*window == NULL) {
+		SDL_Log("[Error] Can not create window: %s.", SDL_GetError());
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+
+#ifdef FRAMEBUFFER_PIXELFORMAT
+	SDL_DisplayMode display_mode;
+	if (SDL_GetWindowDisplayMode(*window, &display_mode) == 0) {
+		display_mode.format = FRAMEBUFFER_PIXELFORMAT;
+		if (SDL_SetWindowDisplayMode(*window, &display_mode) != 0) {
+			SDL_Log("[Warning] Can not set window display mode.");
+		}
+	}
+	else {
+		SDL_Log("[Warning] Can not get display mode.");
+	}
+#endif
+
+
+	*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_PRESENTVSYNC);
+	if (*renderer == NULL) {
+		SDL_DestroyWindow(*window);
+		*window = NULL;
+		SDL_Log("[Error] Can not create renderer: %s.", SDL_GetError());
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	return CPYMO_ERR_SUCC;
+}
+
+
 int main(int argc, char **argv)
 {
 	srand((unsigned)time(NULL));
@@ -340,7 +388,6 @@ int main(int argc, char **argv)
 	}
 
 	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
@@ -369,17 +416,7 @@ int main(int argc, char **argv)
 	const uint16_t window_size_h = engine.gameconfig.imagesize_h;
 #endif
 	
-	if (SDL_CreateWindowAndRenderer(
-		window_size_w,
-		window_size_h,
-		SDL_WINDOW_ALLOW_HIGHDPI
-		| SDL_WINDOW_RESIZABLE
-#ifdef __ANDROID__
-		| SDL_WINDOW_FULLSCREEN
-#endif
-		,
-		&window,
-		&renderer) != 0) {
+	if (create_window_and_renderer(window_size_w, window_size_h, &window, &renderer) != CPYMO_ERR_SUCC) {
 		cpymo_engine_free(&engine);
 		cpymo_backend_audio_free();
 		SDL_Log("[Error] Can not create window and renderer: %s", SDL_GetError());
@@ -390,9 +427,6 @@ int main(int argc, char **argv)
 #ifndef USE_GAME_SELECTOR
 	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);
-	SDL_SetWindowTitle(window, engine.gameconfig.gametitle);
-#else
-	SDL_SetWindowTitle(window, "CPyMO");
 #endif
 
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
