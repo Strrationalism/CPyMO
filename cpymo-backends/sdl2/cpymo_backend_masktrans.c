@@ -117,7 +117,7 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 #define SDL_RenderCopyF SDL_RenderCopy
 #endif
 
-	SDL_RenderCopyF(renderer, m->text, NULL, &dst_rect);
+	SDL_RenderCopyF(renderer, m->tex, NULL, &dst_rect);
 
 #endif
 
