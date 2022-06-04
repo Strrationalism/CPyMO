@@ -80,8 +80,29 @@ void cpymo_backend_image_free(cpymo_backend_image image)
 void cpymo_backend_image_calc_force_center_offset(float *posx, float *posy)
 {
 	extern const cpymo_engine *engine;
-	*posx += ((float)SCREEN_WIDTH - (float)engine->gameconfig.imagesize_w) / 2;
-	*posy += ((float)SCREEN_HEIGHT - (float)engine->gameconfig.imagesize_h) / 2;
+
+	float game_width = engine->gameconfig.imagesize_w;
+	float game_height = engine->gameconfig.imagesize_h;
+
+	float ratio_w = game_width / SCREEN_WIDTH;
+	float ratio_h = game_height / SCREEN_HEIGHT;
+
+	float viewport_width, viewport_height;
+
+	if (ratio_w > ratio_h) {
+		viewport_width = SCREEN_WIDTH;
+		viewport_height = game_height / ratio_w;
+	}
+	else {
+		viewport_width = game_width / ratio_h;
+		viewport_height = SCREEN_HEIGHT;
+	}
+
+	float offset_x = SCREEN_WIDTH / 2 - viewport_width / 2;
+	float offset_y = SCREEN_HEIGHT / 2 - viewport_height / 2;
+
+	*posx = *posx / game_width * viewport_width + offset_x;
+	*posy = *posy / game_height * viewport_height + offset_y;
 }
 #else
 #define cpymo_backend_image_calc_force_center_offset(...)
