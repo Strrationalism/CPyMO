@@ -277,17 +277,17 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 
 #ifdef FRAMEBUFFER_PIXELFORMAT
 	SDL_DisplayMode display_mode;
-	if (SDL_GetWindowDisplayMode(*window, &display_mode) == 0) {
-		display_mode.format = FRAMEBUFFER_PIXELFORMAT;
-		if (SDL_SetWindowDisplayMode(*window, &display_mode) != 0) {
-			SDL_Log("[Warning] Can not set window display mode.");
-		}
-		else {
-			SDL_Log("[Info] Running on 16bpp mode.");
-		}
+	memset(&display_mode, 0, sizeof(display_mode));
+	
+	display_mode.format = FRAMEBUFFER_PIXELFORMAT;
+	display_mode.w = SCREEN_WIDTH;
+	display_mode.h = SCREEN_HEIGHT;
+	
+	if (SDL_SetWindowDisplayMode(*window, &display_mode) != 0) {
+		SDL_Log("[Warning] Can not set window display mode.");
 	}
 	else {
-		SDL_Log("[Warning] Can not get display mode.");
+		SDL_Log("[Info] Running on 16bpp mode.");
 	}
 #endif
 
