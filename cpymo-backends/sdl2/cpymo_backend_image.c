@@ -121,6 +121,10 @@ void cpymo_backend_image_draw(
 	float alpha, 
 	enum cpymo_backend_image_draw_type draw_type)
 {
+#ifdef DISABLE_IMAGE_SCALING
+	assert(dstw == (int)srcw);
+	assert(dsth == (int)srch);
+#endif
 	cpymo_backend_image_calc_force_center_offset(&dstx, &dsty);
 	SDL_Rect src_rect;
 	src_rect.x = srcx;

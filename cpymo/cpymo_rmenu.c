@@ -46,15 +46,11 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 
 static inline float cpymo_rmenu_zoom(const cpymo_engine *e) 
 {
-#ifdef DISABLE_SCALE
-	return 1.0f;
-#else
 	if (cpymo_gameconfig_is_symbian(&e->gameconfig)) {
 		if (e->gameconfig.platform[4] == '5') return 1.3f;		// s60v5
 		else return 1.6f;	// s60v3
 	}
 	else return 1.0f;	// android
-#endif
 }
 
 static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
@@ -76,6 +72,20 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 	};
 
 	if (r->bg) {
+#ifdef DISABLE_IMAGE_SCALING
+		cpymo_backend_image_draw(
+			bg_xywh[0] + (bg_xywh[2] - r->bg_w) / 2,
+			bg_xywh[1] + (bg_xywh[3] - r->bg_h) / 2, 
+			r->bg_w,
+			r->bg_h,
+			r->bg,
+			0,
+			0,
+			r->bg_w,
+			r->bg_h,
+			1.0f,
+			cpymo_backend_image_draw_type_ui_element_bg);
+#else
 		cpymo_backend_image_draw(
 			bg_xywh[0],
 			bg_xywh[1],
@@ -88,6 +98,7 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 			r->bg_h,
 			1.0f,
 			cpymo_backend_image_draw_type_ui_element_bg);
+#endif
 	}
 	else {
 		cpymo_backend_image_fill_rects(

@@ -76,12 +76,21 @@ void cpymo_textbox_draw(
         float cursor_w = ratio * (float)e->say.msg_cursor_w;
         float cursor_h = ratio * (float)e->say.msg_cursor_h;
 
+#ifdef DISABLE_IMAGE_SCALING
+        cpymo_backend_image_draw(
+            tb->x + tb->width - cursor_w,
+            tb->y + (tb->max_lines) * tb->character_size - cursor_h,
+            e->say.msg_cursor_w, e->say.msg_cursor_h,
+            e->say.msg_cursor, 0, 0, e->say.msg_cursor_w, e->say.msg_cursor_h,
+            1.0f, drawtype);
+#else
         cpymo_backend_image_draw(
             tb->x + tb->width - cursor_w,
             tb->y + (tb->max_lines) * tb->character_size - cursor_h,
             cursor_w, cursor_h,
             e->say.msg_cursor, 0, 0, e->say.msg_cursor_w, e->say.msg_cursor_h,
             1.0f, drawtype);
+#endif
     }
 }
 

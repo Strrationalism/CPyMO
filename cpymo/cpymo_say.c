@@ -102,10 +102,22 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 		const cpymo_color gray = { 127, 127, 127 };
 
 		if (e->say.msgbox) {
+#ifdef DISABLE_IMAGE_SCALING
+			const float screen_w = e->gameconfig.imagesize_w;
+			const float screen_h = e->gameconfig.imagesize_h;
+			cpymo_backend_image_draw(
+				screen_w / 2 - (float)e->say.msgbox_w / 2,
+				screen_h - (float)e->say.msgbox_h,
+				e->say.msgbox_w, e->say.msgbox_h,
+				e->say.msgbox,
+				0, 0, e->say.msgbox_w, e->say.msgbox_h, 1.0f,
+				cpymo_backend_image_draw_type_text_say_textbox);
+#else
 			cpymo_backend_image_draw(
 				0, y, (float)e->gameconfig.imagesize_w, msg_h,
 				e->say.msgbox, 0, 0, e->say.msgbox_w, e->say.msgbox_h,
 				1.0f, cpymo_backend_image_draw_type_text_say_textbox);
+#endif
 		}
 		else {
 			float xywh[] = {
@@ -123,10 +135,20 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 				namebox_w / 2 - (float)e->say.name_width / 2 + namebox_x;
 
 			if (e->say.namebox) {
+#ifdef DISABLE_IMAGE_SCALING
+				cpymo_backend_image_draw(
+					namebox_x + (namebox_w - e->say.namebox_w) / 2,
+					namebox_y + (namebox_h - e->say.namebox_h) / 2,
+					e->say.namebox_w, 
+					e->say.namebox_h,
+					e->say.namebox, 0, 0, e->say.namebox_w, e->say.namebox_h, 1.0f,
+					cpymo_backend_image_draw_type_text_say_textbox);
+#else
 				cpymo_backend_image_draw(
 					namebox_x, namebox_y, namebox_w, namebox_h,
 					e->say.namebox, 0, 0, e->say.namebox_w, e->say.namebox_h, 1.0f,
 					cpymo_backend_image_draw_type_text_say_textbox);
+#endif
 			}
 			else {
 				float xywh[] = { namebox_x, namebox_y, namebox_w, namebox_h };
