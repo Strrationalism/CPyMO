@@ -147,6 +147,12 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
 #ifndef NON_VISUALLY_IMPAIRED_HELP
 void cpymo_backend_text_visually_impaired_help(const char *text)
 {
+#ifdef __ANDROID__
+    extern int Android_JNI_TextToSpeech(const char *text);
+
+    Android_JNI_TextToSpeech(text);
+#else
     SDL_SetClipboardText(text);
+#endif
 }
 #endif
