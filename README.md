@@ -48,10 +48,10 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 ---------------- | --------- | --------- | ---------------------------- | ---------- | ----------
 Sony PSP         | SDL2      | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体     | 游戏选择器
 Sony PSV         | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
-Nintendo Wii     | SDL 1.2   | 不支持     | 不支持                        | 外置字体     | 游戏选择器
+Nintendo Wii     | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2)| SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
-POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                       | 外置字体       | 在控制台上操作并输出画面
+POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                        | 外置字体     | 在控制台上操作并输出画面
 
 **注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**   
 **注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**   
@@ -395,6 +395,11 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 * devkitPro + wii dev
 * wii-sdl
+* wii-sdl_mixer
+* ppc-libogg
+* ppc-libvorbis
+* ppc-libmodplug
+* ppc-libmad
 
 直接使用devkitPro pacman安装即可。
 
@@ -614,15 +619,6 @@ CPyMO ASCII ART仅支持键盘操作：
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
 要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
-
-pymo-convert目前支持将游戏适配到以下设备：
-
-* s60v3（pymo规定的s60v3数据包标准）
-* s60v5（pymo规定的s60v5数据包标准）
-* pymo-android（pymo所规定的安卓数据包标准）
-* 3ds
-* psp
-* psv
 
 ## pymo-convert-audio-to-ogg
 

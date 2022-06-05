@@ -26,9 +26,10 @@ INCLUDES	:= ../../cpymo ../../stb ../../endianness.h ../include
 #---------------------------------------------------------------------------------
 
 CFLAGS	= -O3 -Wall $(MACHDEP) $(INCLUDE) \
-			-DDISABLE_AUDIO -DDISABLE_MOVIE \
+			-DDISABLE_FFMPEG_AUDIO -DENABLE_SDL_MIXER_AUDIO_BACKEND -DDISABLE_MOVIE \
 			-DNON_VISUALLY_IMPAIRED_HELP \
 			-DUSE_GAME_SELECTOR \
+			-DSDL_MIXER_CHUNKSIZE=256 \
 			-DSCREEN_BPP=16 \
 			-DSCREEN_WIDTH=640 \
 			-DSCREEN_HEIGHT=480 \
@@ -48,7 +49,8 @@ LDFLAGS	=	-L$(PORTLIBS_PATH)/wii/lib -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lSDLmain -lSDL -laesnd -lwiiuse -lbte -lwiikeyboard -lfat -logc -lm
+LIBS	:=	-lSDLmain -lSDL_mixer -lSDL -lmad -lmodplug -lvorbisfile -lvorbis -logg -laesnd -lwiiuse -lbte -lwiikeyboard -lfat -logc -lstdc++ -lm 
+
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -105,7 +107,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -I $(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
-export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib) -L$(PORTLIBS_PATH)/ppc/lib
 
 export OUTPUT	:=	$(CURDIR)/$(BUILD)/$(TARGET)
 .PHONY: $(BUILD) clean

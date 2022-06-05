@@ -20,6 +20,9 @@ $device_specs = @(
 
     @{ Name = "psv"; Width = 960; Height = 544; UseMask = $false; Movie = $false;
        BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") }
+
+    @{ Name = "wii"; Width = 640; Height = 480; UseMask = $false; Movie = $false;
+       BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") }
 )
 
 function Write-Help() {

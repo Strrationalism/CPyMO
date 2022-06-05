@@ -360,7 +360,9 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 				}
 			}
 
-			return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash, o);
+			if (touch) {
+				return cpymo_select_img_ok(e, o->current_selection, o->selections[o->current_selection].hash, o);
+			}
 		}
 	}
 
