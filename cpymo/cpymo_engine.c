@@ -12,6 +12,10 @@
 #include "cpymo_localization.h"
 
 static void cpymo_logo() {
+	static bool logo_printed = false;
+	if (logo_printed) return;
+	logo_printed = true;
+
 	puts("   __________        __  _______");
 	puts("  / ____/ __ \\__  __/  |/  / __ \\");
 	puts(" / /   / /_/ / / / / /|_/ / / / /");

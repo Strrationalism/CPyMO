@@ -380,10 +380,17 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 	float msgtb_b = (float)e->gameconfig.msgtb_b * e->gameconfig.imagesize_h / 360.0f;
 
 	float ratio = (float)e->gameconfig.imagesize_w / (float)e->say.msgbox_w;
-	float msg_h = (float)e->say.msgbox_h * ratio;
 
+#ifndef DISABLE_IMAGE_SCALING
+	float msg_h = (float)e->say.msgbox_h * ratio;
 	float x = msglr_l;
 	float w = (float)e->gameconfig.imagesize_w - msglr_l - msglr_r;
+#else
+	float msg_h = (float)e->say.msgbox_h;
+	float x = (e->gameconfig.imagesize_w - e->say.msgbox_w) / 2 + msglr_l;
+	float w = e->say.msgbox_w - msglr_l - msglr_r;
+#endif
+
 	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
 	float h = msg_h - msgtb_t - msgtb_b;
 
