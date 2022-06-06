@@ -4,6 +4,10 @@
 #include <cpymo_backend_text.h>
 #include "cpymo_backlog.h"
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#include <cpymo_backend_audio.h>
+#endif
+
 struct cpymo_engine;
 
 typedef struct {

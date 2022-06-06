@@ -22,4 +22,16 @@ const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void);
 void cpymo_backend_audio_lock(void);
 void cpymo_backend_audio_unlock(void);
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#define SOUND_ENTER 1
+#define SOUND_LOAD 2
+#define SOUND_MENU 3
+#define SOUND_MOUSE_DOWN 4
+#define SOUND_MOUSE_UP 5
+#define SOUND_SAVE 6
+#define SOUND_SELECT 7
+
+void cpymo_backend_audio_android_play_sound(int sound_type);
+#endif
+
 #endif

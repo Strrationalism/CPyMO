@@ -123,7 +123,9 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 		error_t err = cpymo_gameconfig_parse_from_file(&game_config, path);
 		if (err != CPYMO_ERR_SUCC) FAIL;
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
         strcpy(item->gametitle_text, game_config.gametitle);
+#endif
 		cpymo_backend_text_create(&item->gametitle, &item->gametitle_w,
 			cpymo_parser_stream_span_pure(game_config.gametitle), fontsize);
 

@@ -4,7 +4,7 @@
 
 static jclass mVisualHelperClass;
 static jmethodID midTextToSpeech;
-
+static jmethodID midPlaySound;
 
 JNIEXPORT jboolean JNICALL
 Java_xyz_xydm_cpymo_Config_nativeGetNonVisuallyImpairedHelp(JNIEnv *env, jclass clazz)
@@ -21,6 +21,7 @@ Java_xyz_xydm_cpymo_VisualHelper_nativeSetupJNI(JNIEnv *env, jclass clazz)
 {
     mVisualHelperClass = (jclass)((*env)->NewGlobalRef(env, clazz));
     midTextToSpeech = (*env)->GetStaticMethodID(env, clazz, "textToSpeech", "(Ljava/lang/String;)Z");
+    midPlaySound = (*env)->GetStaticMethodID(env, clazz, "playSound", "(I)V");
 }
 
 /* Show toast notification */
@@ -31,4 +32,10 @@ int Android_JNI_TextToSpeech(const char* text)
     jboolean result = (*env)->CallStaticBooleanMethod(env, mVisualHelperClass, midTextToSpeech, jtext);
     (*env)->DeleteLocalRef(env, jtext);
     return (int)result;
+}
+
+void Android_JNI_PlaySound(int sound_type)
+{
+    JNIEnv *env = SDL_AndroidGetJNIEnv();
+    (*env)->CallStaticVoidMethod(env, mVisualHelperClass, midPlaySound, sound_type);
 }

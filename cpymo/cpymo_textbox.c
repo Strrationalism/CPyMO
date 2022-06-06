@@ -28,6 +28,11 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->timer = 0;
     o->msg_cursor_visible = false;
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+    // play sound
+    cpymo_backend_audio_android_play_sound(SOUND_ENTER);
+#endif
+
     return CPYMO_ERR_SUCC;
 }
 

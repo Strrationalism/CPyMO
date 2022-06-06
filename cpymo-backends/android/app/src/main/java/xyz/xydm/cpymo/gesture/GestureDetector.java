@@ -17,7 +17,7 @@ public class GestureDetector {
     private static final int TIME_DELAY2 = 200;
     private static final int WHAT_DELAY2 = 2;
     // distinguish short press and long press
-    private static final int TIME_DELAY3 = 200;
+    private static final int TIME_DELAY3 = 500;
     private static final int WHAT_DELAY3 = 3;
     // whether two finger release at the same time or not
     private static final int TIME_DELAY4 = 400;
@@ -25,21 +25,22 @@ public class GestureDetector {
 
     public enum State {
         Initial,
-        OneDown,
-        OnePress,
-        OneMove,
-        OneTap,
-        OneDoubleDown,
+        OneDown,        // 单指按下
+        OnePress,       // 单指按住
+        OneMove,        // 单指移动
+        OneTap,         // 单指点击
+        OneDoubleDown,  // 单指第二次按下
         //        OneDoubleTap,
-        TwoDown,
+        TwoDown,        // 双指按下
         //        TwoPress,
-        TwoMove,
-        TwoMoveUpOne,   // release one finger after two fingers move
-        TwoDownUpOne,   // release one finger after two fingers down
-        TwoTap,
-        TwoDoubleOneDown,
-        TwoDoubleDown,
-        TwoDoubleDownUpOne,
+        TwoMove,        // 双指移动
+        TwoMoveUpOne,   // 双指移动后松开一指
+        TwoDownUpOne,   // 双指按下后松开一指
+        TwoTap,         // 双指点击
+        TwoDoubleOneDown,   // 双指松开后按下一指
+        TwoDoubleDown,      // 第二次双指按下
+        TwoDoublePress,     // 双指第二次按下后按住
+        TwoDoubleDownUpOne, // 第二次双指按下后松开一指
 //        TwoDoubleTap,
     }
 
@@ -120,6 +121,9 @@ public class GestureDetector {
                 break;
             case TwoDoubleDownUpOne:
                 result = dispatchTwoDoubleDownUpOne(event);
+                break;
+            case TwoDoublePress:
+                result = dispatchTwoDoublePress(event);
                 break;
             default:
                 result = false;
@@ -338,7 +342,10 @@ public class GestureDetector {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE: {
                 SlideDetector detector = getPointerDetector(pointerId);
-                return detector.ignoreTinyMove(event);
+                if (detector.ignoreTinyMove(event))
+                    return true;
+                cancelDelay4();
+                return false;
             }
             case MotionEvent.ACTION_UP: {
                 cancelDelay4();
@@ -354,7 +361,6 @@ public class GestureDetector {
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
             cancelDelay2();
             gotoState(State.TwoDoubleOneDown);
-            sendDelay1(event);
             return true;
         }
         return false;
@@ -370,9 +376,9 @@ public class GestureDetector {
                 return detector.ignoreTinyMove(event);
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
-                cancelDelay1();
                 gotoState(State.TwoDoubleDown);
                 detector.start(event.getX(index), event.getY(index));
+                sendDelay1(event);
                 return true;
             }
             case MotionEvent.ACTION_UP: {
@@ -390,9 +396,13 @@ public class GestureDetector {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE: {
                 SlideDetector detector = getPointerDetector(pointerId);
-                return detector.ignoreTinyMove(event);
+                if (detector.ignoreTinyMove(event))
+                    return true;
+                cancelDelay1();
+                return false;
             }
             case MotionEvent.ACTION_POINTER_UP: {
+                cancelDelay1();
                 gotoState(State.TwoDoubleDownUpOne);
                 sendDelay4(event);
                 return true;
@@ -421,6 +431,14 @@ public class GestureDetector {
                 return true;
             }
         }
+        return false;
+    }
+
+    private boolean dispatchTwoDoublePress(@NonNull MotionEvent event) {
+        if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+            return true;
+        }
+        mListener.onTwoDoublePressEnd(event);
         return false;
     }
 
@@ -478,8 +496,9 @@ public class GestureDetector {
                 gotoState(State.Initial);
                 return;
             }
-            case TwoDoubleOneDown: {
-                gotoState(State.Initial);
+            case TwoDoubleDown: {
+                gotoState(State.TwoDoublePress);
+                mListener.onTwoDoublePressStart(event);
                 return;
             }
         }

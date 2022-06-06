@@ -305,6 +305,12 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 #define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_visually_impaired_help(X)
 #endif
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#define CALL_VISUALLY_PLAY_SOUND(X) cpymo_backend_audio_android_play_sound(X)
+#else
+#define CALL_VISUALLY_PLAY_SOUND(X)
+#endif
+
 error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 {
 	if (o->selections) {
@@ -315,6 +321,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 			cpymo_select_img_move(o, 1);
 			cpymo_engine_request_redraw(e);
 
+			CALL_VISUALLY_PLAY_SOUND(SOUND_SELECT);
 			CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
 		}
 
@@ -322,6 +329,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 			cpymo_select_img_move(o, -1);
 			cpymo_engine_request_redraw(e);
 
+			CALL_VISUALLY_PLAY_SOUND(SOUND_SELECT);
 			CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
 		}
 
@@ -332,6 +340,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 						o->current_selection = i;
 						cpymo_engine_request_redraw(e);
 
+						CALL_VISUALLY_PLAY_SOUND(SOUND_SELECT);
 						CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
 					}
 				}

@@ -2177,7 +2177,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     @Override
     public void onLongPress(MotionEvent event) {
-        VisualHelper.vibrate(100);
+        VisualHelper.vibrate(50);
         VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_ESCAPE);
     }
 
@@ -2195,7 +2195,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     @Override
     public void onSlide(MotionEvent event, @NonNull SlideDetector.Direction direction) {
-        VisualHelper.vibrate(100);
+        VisualHelper.vibrate(10);
         switch (direction) {
             case Up: VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_DPAD_UP); break;
             case Down: VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_DPAD_DOWN); break;
@@ -2206,31 +2206,44 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     @Override
     public void onDoubleTap(MotionEvent event) {
-        VisualHelper.vibrate(100);
+        VisualHelper.vibrate(10);
         VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_ENTER);
     }
 
     @Override
     public void onTwoDoubleTap(MotionEvent event) {
-        VisualHelper.vibrate(100);
+        VisualHelper.vibrate(10);
         VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_CTRL_LEFT);
     }
 
     @Override
     public void onTwoSlide(MotionEvent event, SlideDetector.Direction direction) {
-        VisualHelper.vibrate(100);
         switch (direction) {
             case Left: {
+                VisualHelper.vibrate(10);
                 VisualHelper.copyLastSpeechText();
                 VisualHelper.textToSpeechWithoutCopy("已复制");
                 break;
             }
             case Right: {
+                VisualHelper.vibrate(10);
                 VisualHelper.appendCopyLastSpeechText();
                 VisualHelper.textToSpeechWithoutCopy("已追加复制");
                 break;
             }
         }
+    }
+
+    @Override
+    public void onTwoDoublePressStart(MotionEvent event) {
+        VisualHelper.vibrate(20);
+        SDLActivity.onNativeKeyDown(KeyEvent.KEYCODE_CTRL_LEFT);
+    }
+
+    @Override
+    public void onTwoDoublePressEnd(MotionEvent event) {
+        VisualHelper.vibrate(20);
+        SDLActivity.onNativeKeyUp(KeyEvent.KEYCODE_CTRL_LEFT);
     }
 
     /* gesture callback methods end */

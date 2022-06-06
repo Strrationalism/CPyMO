@@ -12,6 +12,11 @@
 #include "cpymo_key_pulse.h"
 #include "cpymo_key_hold.h"
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#include <stdint.h>
+#include <cpymo_backend_audio.h>
+#endif
+
 struct cpymo_engine;
 
 enum cpymo_select_img_selection_hint_state {
