@@ -79,7 +79,7 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 #ifdef DISABLE_IMAGE_SCALING
 		cpymo_backend_image_draw(
 			bg_xywh[0] + (bg_xywh[2] - r->bg_w) / 2,
-			bg_xywh[1] + (bg_xywh[3] - r->bg_h) / 2,
+			bg_xywh[1] + (bg_xywh[3] - r->bg_h) / 2, 
 			r->bg_w,
 			r->bg_h,
 			r->bg,
