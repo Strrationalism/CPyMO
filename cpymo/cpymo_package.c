@@ -65,6 +65,14 @@ void cpymo_package_close(cpymo_package * package)
 
 error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package * package, cpymo_parser_stream_span filename)
 {
+	if (filename.len > 31) {
+		filename.len = 31;
+		printf("[Warning] File name \"");
+		for (size_t i = 0; i < filename.len; ++i)
+			putchar(filename.begin[i]);
+		puts("\" is too long!");
+	}
+
 	for (uint32_t i = 0; i < package->file_count; ++i) {
 		if (cpymo_parser_stream_span_equals_str_ignore_case(filename, package->files[i].file_name)) {
 			*out_index = package->files[i];

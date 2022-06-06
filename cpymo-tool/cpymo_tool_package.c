@@ -112,15 +112,22 @@ static error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_
 		const char *ext_start = strrchr(filename, '.');
 
 		size_t j = 0;
+		bool finished = false;
 		for (; j < 31; ++j) {
-			if (filename + j == ext_start || filename[j] == '\0')
+			if (filename + j == ext_start || filename[j] == '\0') {
+				finished = true;
 				break;
+			}
 			else
 				index[i].file_name[j] = toupper(filename[j]);
 		}
 
 		for (; j < 32; ++j)
 			index[i].file_name[j] = '\0';
+
+		if (!finished) {
+			printf("[Warning] File name \"%s\" is too long!\n", index[i].file_name);
+		}
 
 		index[i].file_length = end_htole32(index[i].file_length);
 		index[i].file_offset = end_htole32(index[i].file_offset);
