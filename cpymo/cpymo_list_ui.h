@@ -6,10 +6,6 @@
 #include "cpymo_key_hold.h"
 #include <stdint.h>
 
-#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
-#include <cpymo_backend_audio.h>
-#endif
-
 #define CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX) ((void *)((INDEX) + 1))
 #define CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR) (((uintptr_t)(PTR)) - 1)
 

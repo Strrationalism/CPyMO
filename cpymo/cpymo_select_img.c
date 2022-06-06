@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#include <cpymo_android.h>
+#endif
+
 static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, uint64_t hash, bool save_enabled)
 {
 	if (save_enabled)
@@ -306,7 +310,7 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 #endif
 
 #if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
-#define CALL_VISUALLY_PLAY_SOUND(X) cpymo_backend_audio_android_play_sound(X)
+#define CALL_VISUALLY_PLAY_SOUND(X) cpymo_android_play_sound(X)
 #else
 #define CALL_VISUALLY_PLAY_SOUND(X)
 #endif

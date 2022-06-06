@@ -3,6 +3,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#include <cpymo_android.h>
+#endif
+
 error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, float height, float character_size, cpymo_color col, cpymo_parser_stream_span text)
 {
     o->x = x;
@@ -29,8 +33,7 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->msg_cursor_visible = false;
 
 #if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
-    // play sound
-    cpymo_backend_audio_android_play_sound(SOUND_ENTER);
+    cpymo_android_play_sound(SOUND_ENTER);
 #endif
 
     return CPYMO_ERR_SUCC;

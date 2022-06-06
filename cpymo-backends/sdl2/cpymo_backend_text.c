@@ -148,9 +148,9 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
 void cpymo_backend_text_visually_impaired_help(const char *text)
 {
 #ifdef __ANDROID__
-    extern int Android_JNI_TextToSpeech(const char *text);
+    extern int cpymo_android_text_to_speech(const char *text);
 
-    Android_JNI_TextToSpeech(text);
+    cpymo_android_text_to_speech(text);
 #else
     SDL_SetClipboardText(text);
 #endif

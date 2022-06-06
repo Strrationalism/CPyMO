@@ -181,16 +181,6 @@ void cpymo_backend_audio_unlock(void)
 {
 	SDL_UnlockAudio();
 }
-
-
-#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
-extern void Android_JNI_PlaySound(int);
-
-void cpymo_backend_audio_android_play_sound(int sound_type)
-{
-	Android_JNI_PlaySound(sound_type);
-}
-#endif
 #else
 
 void cpymo_backend_audio_init() {}

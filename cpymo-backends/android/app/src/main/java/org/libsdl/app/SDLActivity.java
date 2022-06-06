@@ -65,6 +65,7 @@ import java.util.Locale;
 
 import xyz.xydm.cpymo.BuildConfig;
 import xyz.xydm.cpymo.Config;
+import xyz.xydm.cpymo.R;
 import xyz.xydm.cpymo.VisualHelper;
 import xyz.xydm.cpymo.gesture.GestureDetector;
 import xyz.xydm.cpymo.gesture.OnGestureListener;
@@ -231,7 +232,8 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
-                Toast.makeText(this, "请授予所有文件的管理权限", Toast.LENGTH_SHORT).show();
+                String text = getString(R.string.all_file_access_prompt);
+                Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
                 Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
                 startActivity(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri));
             }

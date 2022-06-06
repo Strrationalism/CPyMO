@@ -37,6 +37,7 @@ add_definitions(
 )
 
 include_directories(
+        "./include"
         "../../../../../include"
         "../../../../../../cpymo"
         "../../../../../../stb"
@@ -53,7 +54,7 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
 
-        "visual_helper.c"
+        "./cpymo_android.c"
         "../../../../../sdl2/main.c"
         "../../../../../sdl2/cpymo_backend_image.c"
         "../../../../../sdl2/cpymo_backend_input.c"

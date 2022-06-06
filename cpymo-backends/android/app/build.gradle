@@ -2,6 +2,13 @@ plugins {
     id 'com.android.application'
 }
 
+Boolean NON_VISUALLY_IMPAIRED_HELP
+if (System.getenv("NON_VISUALLY_IMPAIRED_HELP") == null) {
+    NON_VISUALLY_IMPAIRED_HELP = project.property("NON_VISUALLY_IMPAIRED_HELP").toBoolean()
+} else {
+    NON_VISUALLY_IMPAIRED_HELP = true
+}
+
 android {
     compileSdk 32
     ndkVersion "21.4.7075529"
@@ -18,6 +25,13 @@ android {
             cmake {
                 cppFlags ''
                 arguments "-DANDROID_STL=c++_static"
+
+                if (NON_VISUALLY_IMPAIRED_HELP) {
+                    println "添加标志"
+                    cFlags.add("-DNON_VISUALLY_IMPAIRED_HELP=1")
+                } else {
+                    println "不添加标志"
+                }
             }
         }
     }

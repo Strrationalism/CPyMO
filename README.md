@@ -39,7 +39,7 @@ macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | �
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
-Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
+Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器,视障帮助
 
 ### 第三梯队
 **CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
@@ -87,9 +87,11 @@ brew install libxcb
 
 ## 视障帮助功能
 
-github action及release上的版本默认会开启视障帮助功能，如果你需要禁用视障帮助功能，可在编译时定义宏NON_VISUALLY_IMPAIRED_HELP.
+github action及release上的版本默认会开启视障帮助功能，除了Android会同时构建开启和不开启两个版本。如果你需要禁用视障帮助功能，可在编译时定义宏`NON_VISUALLY_IMPAIRED_HELP. 
 
-视障帮助功能将会把游戏中的文本复制到剪切板供读屏软件读取。    
+安卓版的视障帮助功能会直接调用系统TTS进行读屏。
+
+非安卓版的视障帮助功能将会把游戏中的文本复制到剪切板供读屏软件读取。
 
 ## 全屏
 
@@ -355,6 +357,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 1. cd到`cpymo-backends/android`后执行`./build-android-ffmpeg.sh`以构建FFmpeg。
 2. 使用Android Studio打开`cpymo-backends/android`即可构建APK。
+3. 如果需要禁用视障帮助功能，请修改`gradle.properties`中的`NON_VISUALLY_IMPAIRED_HELP`属性为`true`
 
 ## 启动
 

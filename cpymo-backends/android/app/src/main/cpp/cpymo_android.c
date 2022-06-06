@@ -1,3 +1,5 @@
+#include "include/cpymo_android.h"
+
 #include <jni.h>
 #include <SDL.h>
 #include <android/log.h>
@@ -24,8 +26,7 @@ Java_xyz_xydm_cpymo_VisualHelper_nativeSetupJNI(JNIEnv *env, jclass clazz)
     midPlaySound = (*env)->GetStaticMethodID(env, clazz, "playSound", "(I)V");
 }
 
-/* Show toast notification */
-int Android_JNI_TextToSpeech(const char* text)
+int cpymo_android_text_to_speech(const char* text)
 {
     JNIEnv *env = SDL_AndroidGetJNIEnv();
     jstring jtext = (*env)->NewStringUTF(env, text);
@@ -34,7 +35,7 @@ int Android_JNI_TextToSpeech(const char* text)
     return (int)result;
 }
 
-void Android_JNI_PlaySound(int sound_type)
+void cpymo_android_play_sound(int sound_type)
 {
     JNIEnv *env = SDL_AndroidGetJNIEnv();
     (*env)->CallStaticVoidMethod(env, mVisualHelperClass, midPlaySound, sound_type);
