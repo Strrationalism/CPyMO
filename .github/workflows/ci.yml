@@ -282,7 +282,7 @@ jobs:
         uses: sparkfabrik/android-build-action@v1.0.0
         with:
           project-path: ./cpymo-backends/android
-          output-path: cpymo.apk
+          output-path: cpymo-accessibility.apk
           gradle-task: assembleRelease
 
       - name: Sign APK
@@ -305,7 +305,7 @@ jobs:
         with:
           name: CPyMO for Android
           path: |
-            ./cpymo-signed.apk
+            ./cpymo-accessibility-signed.apk
 
   build-uwp:
     name: 'Universal Windows Platform'
