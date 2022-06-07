@@ -27,10 +27,7 @@ android {
                 arguments "-DANDROID_STL=c++_static"
 
                 if (NON_VISUALLY_IMPAIRED_HELP) {
-                    println "添加标志"
                     cFlags.add("-DNON_VISUALLY_IMPAIRED_HELP=1")
-                } else {
-                    println "不添加标志"
                 }
             }
         }
