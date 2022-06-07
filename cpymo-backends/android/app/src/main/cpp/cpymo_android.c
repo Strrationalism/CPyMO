@@ -26,13 +26,12 @@ Java_xyz_xydm_cpymo_VisualHelper_nativeSetupJNI(JNIEnv *env, jclass clazz)
     midPlaySound = (*env)->GetStaticMethodID(env, clazz, "playSound", "(I)V");
 }
 
-int cpymo_android_text_to_speech(const char* text)
+void cpymo_android_text_to_speech(const char* text)
 {
     JNIEnv *env = SDL_AndroidGetJNIEnv();
     jstring jtext = (*env)->NewStringUTF(env, text);
-    jboolean result = (*env)->CallStaticBooleanMethod(env, mVisualHelperClass, midTextToSpeech, jtext);
+    (*env)->CallStaticBooleanMethod(env, mVisualHelperClass, midTextToSpeech, jtext);
     (*env)->DeleteLocalRef(env, jtext);
-    return (int)result;
 }
 
 void cpymo_android_play_sound(int sound_type)

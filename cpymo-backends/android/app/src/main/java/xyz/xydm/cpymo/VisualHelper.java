@@ -16,12 +16,8 @@ import java.util.HashMap;
 
 public class VisualHelper {
     public static final int SOUND_ENTER = 1;
-    public static final int SOUND_LOAD = 2;
-    public static final int SOUND_MENU = 3;
-    public static final int SOUND_MOUSE_DOWN = 4;
-    public static final int SOUND_MOUSE_UP = 5;
-    public static final int SOUND_SAVE = 6;
-    public static final int SOUND_SELECT = 7;
+    public static final int SOUND_MENU = 2;
+    public static final int SOUND_SELECT = 3;
 
     private static final String TAG = "VisualHelper";
 
@@ -60,11 +56,7 @@ public class VisualHelper {
                     .build();
 
             mSoundMap.put(SOUND_ENTER, mSoundPool.load(context, R.raw.enter, 1));
-            mSoundMap.put(SOUND_LOAD, mSoundPool.load(context, R.raw.load, 1));
             mSoundMap.put(SOUND_MENU, mSoundPool.load(context, R.raw.menu, 1));
-            mSoundMap.put(SOUND_MOUSE_DOWN, mSoundPool.load(context, R.raw.mouse_down, 1));
-            mSoundMap.put(SOUND_MOUSE_UP, mSoundPool.load(context, R.raw.mouse_up, 1));
-            mSoundMap.put(SOUND_SAVE, mSoundPool.load(context, R.raw.save, 1));
             mSoundMap.put(SOUND_SELECT, mSoundPool.load(context, R.raw.select, 1));
         }
 
