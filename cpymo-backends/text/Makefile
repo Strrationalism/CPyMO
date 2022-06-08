@@ -17,6 +17,13 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
+LDFLAGS += -O3 -lm
+
+ifeq ($(OS), Windows_NT)
+OBJS += $(BUILD_DIR)/cpymo.res
+LDFLAGS += --static
+endif
+
 TARGET := cpymo-text
 
 build: $(TARGET)
