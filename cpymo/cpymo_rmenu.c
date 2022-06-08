@@ -9,6 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#include <cpymo_android.h>
+#endif
+
 typedef struct {
 	cpymo_backend_image bg;
 	int bg_w, bg_h;
@@ -169,6 +173,10 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		&cpymo_rmenu_draw,
 		&cpymo_rmenu_delete);
 	CPYMO_THROW(err);
+
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+	cpymo_android_play_sound(SOUND_MENU);
+#endif
 
 	rmenu->alive = true;
 

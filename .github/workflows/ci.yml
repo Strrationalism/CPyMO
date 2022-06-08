@@ -216,9 +216,19 @@ jobs:
 
     - name: Build APK
       uses: sparkfabrik/android-build-action@v1.0.0
+
       with:
         project-path: ./cpymo-backends/android
         output-path: cpymo.apk
+        gradle-task: assembleRelease
+      env:
+        NON_VISUALLY_IMPAIRED_HELP: 1
+    - name: Build APK (Accessibility)
+      uses: sparkfabrik/android-build-action@v1.0.0
+
+      with:
+        project-path: ./cpymo-backends/android
+        output-path: cpymo-accessibility.apk
         gradle-task: assembleRelease
 
     - name: Sign APK
@@ -242,6 +252,7 @@ jobs:
         name: CPyMO for Android
         path: |
           ./cpymo-signed.apk
+          ./cpymo-accessibility-signed.apk
 
   build-uwp:
     name: 'Universal Windows Platform'
@@ -281,7 +292,7 @@ jobs:
       with:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
-        
+
   build-SDL1-windows:
     name: 'Windows (SDL 1.2)'
     runs-on: 'windows-latest'
@@ -331,7 +342,7 @@ jobs:
           ./cpymo-backends/sdl1/*.exe
           ./cpymo-backends/sdl1/*.dll
           ./cpymo-backends/sdl1/*.txt
-        
+
   build-SDL1-linux:
     name: 'Linux (SDL 1.2)'
     runs-on: 'ubuntu-latest'

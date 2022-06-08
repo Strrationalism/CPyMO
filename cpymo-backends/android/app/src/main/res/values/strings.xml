@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CPyMO</string>
+    <string name="all_file_access_prompt">Please grant access to all files</string>
 </resources>

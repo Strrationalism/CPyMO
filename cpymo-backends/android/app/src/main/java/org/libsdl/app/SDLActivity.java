@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.UiModeManager;
-import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +15,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -25,8 +24,13 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -54,13 +58,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import java.util.Hashtable;
 import java.util.Locale;
 
+import xyz.xydm.cpymo.BuildConfig;
+import xyz.xydm.cpymo.Config;
+import xyz.xydm.cpymo.R;
+import xyz.xydm.cpymo.VisualHelper;
+import xyz.xydm.cpymo.gesture.GestureDetector;
+import xyz.xydm.cpymo.gesture.OnGestureListener;
+import xyz.xydm.cpymo.gesture.SlideDetector;
+
 
 /**
-    SDL Activity
-*/
+ * SDL Activity
+ */
 public class SDLActivity extends Activity implements View.OnSystemUiVisibilityChangeListener {
     private static final String TAG = "SDL";
 
@@ -216,6 +230,15 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         Log.v(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                String text = getString(R.string.all_file_access_prompt);
+                Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+                Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                startActivity(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri));
+            }
+        }
+
         try {
             Thread.currentThread().setName("SDLActivity");
         } catch (Exception e) {
@@ -259,6 +282,9 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
            return;
         }
+
+        // Set up visual helper
+        VisualHelper.setup(this);
 
         // Set up JNI
         SDL.setupJNI();
@@ -1691,17 +1717,20 @@ class SDLMain implements Runnable {
 
 
 /**
-    SDLSurface. This is what we draw on, so we need to know when it's created
-    in order to do anything useful.
-
-    Because of this, that's where we set up the SDL thread
-*/
+ * SDLSurface. This is what we draw on, so we need to know when it's created
+ * in order to do anything useful.
+ * <p>
+ * Because of this, that's where we set up the SDL thread
+ */
 class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
-    View.OnKeyListener, View.OnTouchListener, SensorEventListener  {
+        View.OnKeyListener, SensorEventListener, OnGestureListener {
 
     // Sensors
     protected SensorManager mSensorManager;
     protected Display mDisplay;
+
+    // Gesture
+    protected GestureDetector mGestureDetector;
 
     // Keep track of the surface size to normalize touch events
     protected float mWidth, mHeight;
@@ -1718,10 +1747,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         setFocusableInTouchMode(true);
         requestFocus();
         setOnKeyListener(this);
-        setOnTouchListener(this);
 
-        mDisplay = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        mDisplay = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
         setOnGenericMotionListener(SDLActivity.getMotionListener());
 
@@ -1730,6 +1758,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         mHeight = 1.0f;
 
         mIsSurfaceReady = false;
+
+        mGestureDetector = new GestureDetector(this);
     }
 
     public void handlePause() {
@@ -1741,7 +1771,6 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         setFocusableInTouchMode(true);
         requestFocus();
         setOnKeyListener(this);
-        setOnTouchListener(this);
         enableSensor(Sensor.TYPE_ACCELEROMETER, true);
     }
 
@@ -1783,18 +1812,15 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         mHeight = height;
         int nDeviceWidth = width;
         int nDeviceHeight = height;
-        try
-        {
-            if (Build.VERSION.SDK_INT >= 17) {
-                DisplayMetrics realMetrics = new DisplayMetrics();
-                mDisplay.getRealMetrics( realMetrics );
-                nDeviceWidth = realMetrics.widthPixels;
-                nDeviceHeight = realMetrics.heightPixels;
-            }
-        } catch(Exception ignored) {
+        try {
+            DisplayMetrics realMetrics = new DisplayMetrics();
+            mDisplay.getRealMetrics(realMetrics);
+            nDeviceWidth = realMetrics.widthPixels;
+            nDeviceHeight = realMetrics.heightPixels;
+        } catch (Exception ignored) {
         }
 
-        synchronized(SDLActivity.getContext()) {
+        synchronized (SDLActivity.getContext()) {
             // In case we're waiting on a size change after going fullscreen, send a notification.
             SDLActivity.getContext().notifyAll();
         }
@@ -1811,23 +1837,23 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) {
             if (mWidth > mHeight) {
-               skip = true;
+                skip = true;
             }
         } else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
             if (mWidth < mHeight) {
-               skip = true;
+                skip = true;
             }
         }
 
         // Special Patch for Square Resolution: Black Berry Passport
         if (skip) {
-           double min = Math.min(mWidth, mHeight);
-           double max = Math.max(mWidth, mHeight);
+            double min = Math.min(mWidth, mHeight);
+            double max = Math.max(mWidth, mHeight);
 
-           if (max / min < 1.20) {
-              Log.v("SDL", "Don't skip on such aspect-ratio. Could be a square resolution.");
-              skip = false;
-           }
+            if (max / min < 1.20) {
+                Log.v("SDL", "Don't skip on such aspect-ratio. Could be a square resolution.");
+                skip = false;
+            }
         }
 
         // Don't skip in MultiWindow.
@@ -1841,9 +1867,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         }
 
         if (skip) {
-           Log.v("SDL", "Skip .. Surface is not ready.");
-           mIsSurfaceReady = false;
-           return;
+            Log.v("SDL", "Skip .. Surface is not ready.");
+            mIsSurfaceReady = false;
+            return;
         }
 
         /* If the surface has been previously destroyed by onNativeSurfaceDestroyed, recreate it here */
@@ -1858,7 +1884,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     // Key events
     @Override
-    public boolean onKey(View  v, int keyCode, KeyEvent event) {
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
 
         int deviceId = event.getDeviceId();
         int source = event.getSource();
@@ -1914,11 +1940,11 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             // they are ignored here because sending them as mouse input to SDL is messy
             if ((keyCode == KeyEvent.KEYCODE_BACK) || (keyCode == KeyEvent.KEYCODE_FORWARD)) {
                 switch (event.getAction()) {
-                case KeyEvent.ACTION_DOWN:
-                case KeyEvent.ACTION_UP:
-                    // mark the event as handled or it will be handled by system
-                    // handling KEYCODE_BACK by system will call onBackPressed()
-                    return true;
+                    case KeyEvent.ACTION_DOWN:
+                    case KeyEvent.ACTION_UP:
+                        // mark the event as handled or it will be handled by system
+                        // handling KEYCODE_BACK by system will call onBackPressed()
+                        return true;
                 }
             }
         }
@@ -1927,8 +1953,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     // Touch events
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouch(MotionEvent event) {
         /* Ref: http://developer.android.com/training/gestures/multi.html */
         int touchDevId = event.getDeviceId();
         final int pointerCount = event.getPointerCount();
@@ -2031,16 +2056,25 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         return true;
    }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        if (Config.needAccessibility()) {
+            return mGestureDetector.onTouchEvent(event);
+        }
+        return onTouch(event);
+    }
+
     // Sensor events
     public void enableSensor(int sensortype, boolean enabled) {
         // TODO: This uses getDefaultSensor - what if we have >1 accels?
         if (enabled) {
             mSensorManager.registerListener(this,
-                            mSensorManager.getDefaultSensor(sensortype),
-                            SensorManager.SENSOR_DELAY_GAME, null);
+                    mSensorManager.getDefaultSensor(sensortype),
+                    SensorManager.SENSOR_DELAY_GAME, null);
         } else {
             mSensorManager.unregisterListener(this,
-                            mSensorManager.getDefaultSensor(sensortype));
+                    mSensorManager.getDefaultSensor(sensortype));
         }
     }
 
@@ -2136,6 +2170,85 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         return false;
     }
 
+    /* gesture callback methods */
+
+    @Override
+    public void onTap(MotionEvent event, float x, float y) {
+        this.onScan(event, x, y);
+    }
+
+    @Override
+    public void onLongPress(MotionEvent event) {
+        VisualHelper.vibrate(50);
+        VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_ESCAPE);
+    }
+
+    @Override
+    public void onScan(MotionEvent event, float x, float y) {
+        int touchDevId = event.getDeviceId();
+        int index = event.getActionIndex();
+        int pointerId = event.getPointerId(index);
+        x /= mWidth;
+        y /= mHeight;
+        float p = event.getPressure(index);
+        if (p > 1.0f) p = 1.0f;
+        SDLActivity.onNativeTouch(touchDevId, pointerId, MotionEvent.ACTION_MOVE, x, y, p);
+    }
+
+    @Override
+    public void onSlide(MotionEvent event, @NonNull SlideDetector.Direction direction) {
+        VisualHelper.vibrate(10);
+        switch (direction) {
+            case Up: VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_DPAD_UP); break;
+            case Down: VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_DPAD_DOWN); break;
+            case Left: VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_DPAD_LEFT); break;
+            case Right: VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_DPAD_RIGHT); break;
+        }
+    }
+
+    @Override
+    public void onDoubleTap(MotionEvent event) {
+        VisualHelper.vibrate(10);
+        VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_ENTER);
+    }
+
+    @Override
+    public void onTwoDoubleTap(MotionEvent event) {
+        VisualHelper.vibrate(10);
+        VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_CTRL_LEFT);
+    }
+
+    @Override
+    public void onTwoSlide(MotionEvent event, SlideDetector.Direction direction) {
+        switch (direction) {
+            case Left: {
+                VisualHelper.vibrate(10);
+                VisualHelper.copyLastSpeechText();
+                VisualHelper.textToSpeechWithoutCopy("已复制");
+                break;
+            }
+            case Right: {
+                VisualHelper.vibrate(10);
+                VisualHelper.appendCopyLastSpeechText();
+                VisualHelper.textToSpeechWithoutCopy("已追加复制");
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onTwoDoublePressStart(MotionEvent event) {
+        VisualHelper.vibrate(20);
+        SDLActivity.onNativeKeyDown(KeyEvent.KEYCODE_CTRL_LEFT);
+    }
+
+    @Override
+    public void onTwoDoublePressEnd(MotionEvent event) {
+        VisualHelper.vibrate(20);
+        SDLActivity.onNativeKeyUp(KeyEvent.KEYCODE_CTRL_LEFT);
+    }
+
+    /* gesture callback methods end */
 }
 
 /* This is a fake invisible editor view that receives the input and defines the

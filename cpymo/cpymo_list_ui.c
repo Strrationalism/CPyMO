@@ -4,6 +4,10 @@
 #include <limits.h>
 #include <math.h>
 
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#include <cpymo_android.h>
+#endif
+
 static inline float cpymo_list_ui_get_y(const cpymo_engine *e, int relative_to_current)
 {
 	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
@@ -207,6 +211,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		}
 
 		if (ui->selection_changed) {
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+			cpymo_android_play_sound(SOUND_SELECT);
+#endif
 			error_t err = ui->selection_changed(e,
 				cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur));
 			CPYMO_THROW(err);
@@ -230,6 +237,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		}
 
 		if (ui->selection_changed) {
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+			cpymo_android_play_sound(SOUND_SELECT);
+#endif
 			error_t err = ui->selection_changed(e,
 				cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur));
 			CPYMO_THROW(err);
@@ -243,6 +253,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			cpymo_engine_request_redraw(e);
 
 			if (ui->selection_changed) {
+#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+				cpymo_android_play_sound(SOUND_SELECT);
+#endif
 				error_t err = ui->selection_changed(e, 
 					cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur));
 				CPYMO_THROW(err);

@@ -12,6 +12,9 @@ typedef struct cpymo_game_selector_item {
 	struct cpymo_game_selector_item *next;
 	struct cpymo_game_selector_item *prev;
 	char *gamedir;
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	char gametitle_text[256];
+#endif
 
 	cpymo_backend_image icon;
 	int icon_w, icon_h;

@@ -31,13 +31,13 @@ add_definitions(
         -DSCREEN_HEIGHT=600
         -D__ANDROID__
         -DGAME_SELECTOR_FONTSIZE=46
-        -DNON_VISUALLY_IMPAIRED_HELP
-        "-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=56"
+        -DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=56
         -DGAME_SELECTOR_COUNT_PER_SCREEN=4
         -DGAME_SELECTOR_DIR="/sdcard/pymogames"
 )
 
 include_directories(
+        "./include"
         "../../../../../include"
         "../../../../../../cpymo"
         "../../../../../../stb"
@@ -54,6 +54,7 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
 
+        "./cpymo_android.c"
         "../../../../../sdl2/main.c"
         "../../../../../sdl2/cpymo_backend_image.c"
         "../../../../../sdl2/cpymo_backend_input.c"

@@ -12,6 +12,17 @@ typedef struct {
 	size_t draw_times;
 } cpymo_game_selector;
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+static error_t cpymo_game_selector_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
+{
+	if (sel) {
+		cpymo_game_selector_item *item = (cpymo_game_selector_item *)sel;
+		cpymo_backend_text_visually_impaired_help(item->gametitle_text);
+	}
+	return CPYMO_ERR_SUCC;
+}
+#endif
+
 error_t cpymo_game_selector_init_refresh(cpymo_engine *e, float dt, void *selected)
 {
 	cpymo_game_selector *ui = (cpymo_game_selector *)cpymo_list_ui_data(e);
@@ -112,6 +123,9 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 		error_t err = cpymo_gameconfig_parse_from_file(&game_config, path);
 		if (err != CPYMO_ERR_SUCC) FAIL;
 
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+        strcpy(item->gametitle_text, game_config.gametitle);
+#endif
 		cpymo_backend_text_create(&item->gametitle, &item->gametitle_w,
 			cpymo_parser_stream_span_pure(game_config.gametitle), fontsize);
 
@@ -266,6 +280,10 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			data->nodes_per_screen
 		);
 		CPYMO_THROW(err);
+
+		#ifndef NON_VISUALLY_IMPAIRED_HELP
+			cpymo_list_ui_set_selection_changed_callback(e, &cpymo_game_selector_visual_im_help_selection_changed_callback);
+		#endif
 
 		cpymo_list_ui *list_ui = (cpymo_list_ui *)cpymo_ui_data(e);
 		list_ui->allow_exit_list_ui = false;
