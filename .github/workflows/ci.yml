@@ -525,19 +525,6 @@ jobs:
       matrix:
         os: [ 'windows-latest', 'ubuntu-latest', 'macos-latest' ]
 
-        include:
-        - os: 'windows-latest'
-          filename: 'cpymo-text.exe'
-          sh: msys2 {0}
-
-        - os: 'ubuntu-latest'
-          filename: 'cpymo-text'
-          sh: bash
-
-        - os: 'macos-latest'
-          filename: 'cpymo-text'
-          sh: bash
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -552,15 +539,23 @@ jobs:
 
 
       - name: 'Build'
-        shell: '${{ matrix.sh }}'
         run: |
           cd cpymo-backends/text/
           make -j
-          strip ${{ matrix.filename }}
+          strip cpymo-text
+
+      - name: 'Build'
+        shell: msys2 {0}
+        run: |
+          cd cpymo-backends/text/
+          make -j
+          strip cpymo-text.exe
 
       - name: 'Upload'
         uses: actions/upload-artifact@v2.3.0
         with:
           name: CPyMO Text for ${{ runner.os }}
-          path: ./cpymo-backends/text/${{ matrix.filename }}
+          path: |
+            ./cpymo-backends/text/cpymo-text
+            ./cpymo-backends/text/cpymo-text.exe
           
