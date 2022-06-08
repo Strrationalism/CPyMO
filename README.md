@@ -591,10 +591,10 @@ cd到`cpymo-backends/ascii-art`，执行`make`或`mingw32-make`即可生成可�
 
 ### 启动
 
-参见CPyMO Desktop的启动方式。
+参见“CPyMO 桌面平台”的启动方式。
 
 注意：**光敏性癫痫患者请不要使用该版本。**    
-注意：Windows上控制台输出效率较低，帧率可能会很差，建议使用Linux来执行该程序。
+注意：Windows上控制台输出效率较低，帧率可能会很差，建议使用Linux或macOS来执行该程序。
 
 CPyMO ASCII ART仅支持键盘操作：
 

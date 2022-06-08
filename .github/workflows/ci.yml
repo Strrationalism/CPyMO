@@ -252,6 +252,12 @@ jobs:
         name: CPyMO for Android
         path: |
           ./cpymo-signed.apk
+
+    - name: Upload (Accessibility)
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Android (Accessibility)
+        path: |
           ./cpymo-accessibility-signed.apk
 
   build-uwp:
