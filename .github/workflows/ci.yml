@@ -533,9 +533,13 @@ jobs:
           filename: 'cpymo-text'
 
         - os: 'macos-latest'
-          filename: 'macos-latest'
+          filename: 'cpymo-text'
 
     steps:
+      - uses: actions/checkout@v2
+        with:
+        submodules: 'recursive'
+        
       - name: 'Build'
         run: |
           cd cpymo-backends/text/
