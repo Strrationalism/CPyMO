@@ -528,15 +528,15 @@ jobs:
         include:
         - os: 'windows-latest'
           filename: 'cpymo-text.exe'
-          shell: msys2 {0}
+          sh: msys2 {0}
 
         - os: 'ubuntu-latest'
           filename: 'cpymo-text'
-          shell: bash
+          sh: bash
 
         - os: 'macos-latest'
           filename: 'cpymo-text'
-          shell: bash
+          sh: bash
 
     steps:
       - uses: actions/checkout@v2
@@ -552,7 +552,7 @@ jobs:
 
 
       - name: 'Build'
-        shell: ${{ matrix.shell }}
+        shell: ${{ matrix.sh }}
         run: |
           cd cpymo-backends/text/
           make -j
