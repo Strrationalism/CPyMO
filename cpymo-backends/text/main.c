@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 #include <cpymo_backend_image.h>
 #include <cpymo_backend_masktrans.h>
 #include <cpymo_backend_text.h>
@@ -110,8 +112,6 @@ static uint64_t millis()
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 #include <cpymo_engine.h>
-#include <time.h>
-#include <unistd.h>
 
 cpymo_engine engine;
 
