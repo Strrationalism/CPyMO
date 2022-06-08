@@ -352,6 +352,10 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 
 仅支持 Android 4.3 及以上的系统，如果你需要在更低版本的Android上运行，则可以使用原版PyMO，而不是使用CPyMO。
 
+## 视障帮助
+
+GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为带有视障帮助的版本。
+
 视障帮助功能会调用系统TTS进行朗读，并加入了一些手势操作：
 
 + 单指轻点 ==> 移动鼠标位置但不点击
@@ -367,8 +371,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 ## 编译
 
 1. cd到`cpymo-backends/android`后执行`./build-android-ffmpeg.sh`以构建FFmpeg。
-2. 使用Android Studio打开`cpymo-backends/android`即可构建APK。
-3. 如果需要禁用视障帮助功能，请修改`gradle.properties`中的`NON_VISUALLY_IMPAIRED_HELP`属性为`true`
+2. 如果需要禁用视障帮助功能，请修改`gradle.properties`中的`NON_VISUALLY_IMPAIRED_HELP`属性为`true`.
+3. 使用Android Studio打开`cpymo-backends/android`即可构建APK。
 
 ## 启动
 
