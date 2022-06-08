@@ -21,7 +21,7 @@ LDFLAGS += -O3 -lm
 
 ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res
-LDFLAGS += --static
+LDFLAGS += --static -lmingw32
 endif
 
 TARGET := cpymo-text

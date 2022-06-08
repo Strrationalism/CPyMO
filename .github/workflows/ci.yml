@@ -540,6 +540,14 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - uses: msys2/setup-msys2@v2
+        if: ${{ runner.os == 'Windows' }}
+        with:
+          msystem: MINGW32
+          update: true
+          install: mingw-w64-i686-toolchain
+
+
       - name: 'Build'
         run: |
           cd cpymo-backends/text/
