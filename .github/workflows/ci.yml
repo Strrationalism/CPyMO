@@ -538,8 +538,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-        submodules: 'recursive'
-        
+          submodules: 'recursive'
+
       - name: 'Build'
         run: |
           cd cpymo-backends/text/
