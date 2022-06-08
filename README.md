@@ -52,6 +52,7 @@ Nintendo Wii     | SDL 1.2   | 不支持     | SDL_mixer                    | �
 Windows (SDL 1.2)| SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
 POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                        | 外置字体     | 在控制台上操作并输出画面
+POSIX (Text)     | Text      | 不支持     | 不支持                        | 无需        | 在控制台上操作并输出游戏文本
 
 **注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**   
 **注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**   
@@ -602,6 +603,12 @@ CPyMO ASCII ART仅支持键盘操作：
 * J或空格为确认
 * K为取消
 * L为快进
+
+## CPyMO Text
+
+这是一个CPyMO变种，仅在控制台上输出游戏文本，它在`cpymo-backends/text`内。
+
+关于编译和启动，均与CPyMO ASCII ART相同。
 
 
 # 工具

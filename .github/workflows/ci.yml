@@ -517,3 +517,34 @@ jobs:
         name: CPyMO ASCII ART for ${{ runner.os }}
         path: ./cpymo-backends/ascii-art/cpymo-ascii-art
             
+  build-text:
+    name: 'CPyMO Text'
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ 'windows-latest', 'ubuntu-latest', 'macos-latest' ]
+
+        include:
+        - os: 'windows-latest'
+          filename: 'cpymo-text.exe'
+
+        - os: 'ubuntu-latest'
+          filename: 'cpymo-text'
+
+        - os: 'macos-latest'
+          filename: 'macos-latest'
+
+    steps:
+      - name: 'Build'
+        run: |
+          cd cpymo-backends/text/
+          make -j
+          strip ${{ matrix.filename }}
+
+      - name: 'Upload'
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: CPyMO Text for ${{ runner.os }}
+          path: ./cpymo-backends/text/${{ matrix.filename }}
+          
