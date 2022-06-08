@@ -539,13 +539,15 @@ jobs:
 
 
       - name: 'Build'
+        if: ${{ runner.os != 'Windows' }}
         run: |
           cd cpymo-backends/text/
           make -j
           strip cpymo-text
 
-      - name: 'Build'
+      - name: 'Build (Windows)'
         shell: msys2 {0}
+        if: ${{ runner.os == 'Windows' }}
         run: |
           cd cpymo-backends/text/
           make -j
