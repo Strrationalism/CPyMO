@@ -552,7 +552,7 @@ jobs:
 
 
       - name: 'Build'
-        shell: ${{ matrix.sh }}
+        shell: '${{ matrix.sh }}'
         run: |
           cd cpymo-backends/text/
           make -j
