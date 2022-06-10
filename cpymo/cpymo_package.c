@@ -108,11 +108,49 @@ error_t cpymo_package_read_file(char **out_buffer, size_t *sz, const cpymo_packa
 	return cpymo_package_read_file_from_index(*out_buffer, package, &idx);
 }
 
+#ifdef STREAMING_LOAD_IMAGE
+
+static int cpymo_package_stream_read_image_eof(void *stream_reader)
+{
+	return cpymo_package_stream_reader_eof((cpymo_package_stream_reader *)stream_reader);
+}
+
+static int cpymo_package_stream_reader_image_read(void *stream_reader, char *data, int size)
+{
+	return (int)cpymo_package_stream_reader_read(data, (size_t)size, (cpymo_package_stream_reader *)stream_reader);
+}
+
+static void cpymo_package_stream_reader_image_skip(void *stream_reader, int n)
+{
+	cpymo_package_stream_reader_seek_cur(n, (cpymo_package_stream_reader *)stream_reader);
+}
+
+#endif
+
 error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, const cpymo_package_index * index)
 {	
+#ifdef STREAMING_LOAD_IMAGE
+	stbi_io_callbacks cbs;
+	cbs.eof = &cpymo_package_stream_read_image_eof;
+	cbs.read = &cpymo_package_stream_reader_image_read;
+	cbs.skip = &cpymo_package_stream_reader_image_skip;
+
+	cpymo_package_stream_reader sr = cpymo_package_stream_reader_create(pkg, index);
+
+	*pixels = stbi_load_from_callbacks(&cbs, &sr, w, h, NULL, channels);
+
+	cpymo_package_stream_reader_close(&sr);
+
+	if (*pixels == NULL) {
+		return CPYMO_ERR_BAD_FILE_FORMAT;
+	}
+
+	return CPYMO_ERR_SUCC;
+
+#else
 	stbi_uc *file_data = (stbi_uc *)malloc(index->file_length);
 	if (file_data == NULL) return CPYMO_ERR_OUT_OF_MEM;
-	
+
 	error_t err = cpymo_package_read_file_from_index((char *)file_data, pkg, index);
 	if (err != CPYMO_ERR_SUCC) {
 		free(file_data);
@@ -128,6 +166,7 @@ error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, in
 	}
 
 	return CPYMO_ERR_SUCC;
+#endif
 }
 
 error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, cpymo_parser_stream_span filename)
