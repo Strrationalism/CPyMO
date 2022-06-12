@@ -46,3 +46,13 @@ void cpymo_wait_callback_after_seconds(cpymo_wait *wait, float seconds, cpymo_wa
 	wait->wait_for_seconds = seconds;
 	cpymo_wait_register_with_callback(wait, &cpymo_wait_second_waiter, cb);
 }
+
+static bool cpymo_wait_dummy_wait(cpymo_engine *e, float _)
+{
+	return true;
+}
+
+void cpymo_wait_callback_nextframe(cpymo_wait *w, cpymo_wait_over_callback cb)
+{
+	cpymo_wait_register_with_callback(w, &cpymo_wait_dummy_wait, cb);
+}

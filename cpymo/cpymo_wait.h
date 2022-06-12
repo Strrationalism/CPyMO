@@ -39,5 +39,6 @@ error_t cpymo_wait_update(cpymo_wait *wait, struct cpymo_engine *engine, float d
 
 void cpymo_wait_for_seconds(cpymo_wait *, float seconds);
 void cpymo_wait_callback_after_seconds(cpymo_wait *, float seconds, cpymo_wait_over_callback);
+void cpymo_wait_callback_nextframe(cpymo_wait *, cpymo_wait_over_callback);
 
 #endif
