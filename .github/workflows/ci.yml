@@ -359,12 +359,12 @@ jobs:
         submodules: true
 
     - name: Install dependents
-      run: sudo apt-get install libsdl-dev libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
+      run: sudo apt-get install libsdl-dev libsdl_mixer-dev # libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
 
     - name: Build
       run: |
         cd cpymo-backends/sdl1
-        export USE_FFMPEG=1
+        export USE_SDL_MIXER=1
         make -j
         strip ./cpymo
 
