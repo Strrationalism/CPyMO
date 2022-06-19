@@ -326,14 +326,20 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
+static error_t cpymo_say_autosave_and_next(cpymo_engine *e)
 {
 	if (!cpymo_engine_skipping(e)) cpymo_save_autosave(e);
-	cpymo_key_hold_init(&e->say.key_mouse_button, e->input.mouse_button);
 	cpymo_wait_register_with_callback(
 		&e->wait,
 		&cpymo_say_wait_text_reading,
 		&cpymo_say_wait_text_read_callback);
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
+{
+	cpymo_key_hold_init(&e->say.key_mouse_button, e->input.mouse_button);
+	cpymo_wait_callback_nextframe(&e->wait, cpymo_say_autosave_and_next);
 	return CPYMO_ERR_SUCC;
 }
 

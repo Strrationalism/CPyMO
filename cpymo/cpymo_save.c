@@ -230,17 +230,6 @@ void cpymo_save_autosave(cpymo_engine *e)
 	cpymo_save_global_save(e);
 }
 
-static error_t cpymo_save_autosave_request_callback(cpymo_engine *e)
-{
-	cpymo_save_autosave(e);
-	return CPYMO_ERR_SUCC;
-}
-
-void cpymo_save_request_autosave(cpymo_engine *e)
-{
-	cpymo_wait_callback_nextframe(&e->wait, &cpymo_save_autosave_request_callback);
-}
-
 FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id)
 {
 	char filename[16];
