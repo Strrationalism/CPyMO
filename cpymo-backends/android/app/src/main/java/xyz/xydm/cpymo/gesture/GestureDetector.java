@@ -209,12 +209,10 @@ public class GestureDetector {
             }
             case MotionEvent.ACTION_UP: {
                 SlideDetector.Direction[] directions = detector.getDirections();
-                if (directions.length == 1) {
-                    gotoState(State.Initial);
-                    mListener.onSlide(event, directions[0]);
-                    return true;
-                }
-                return false;
+                if (directions.length != 1) return false;
+                gotoState(State.Initial);
+                mListener.onSlide(event, directions[0]);
+                return true;
             }
         }
         return false;
@@ -231,8 +229,13 @@ public class GestureDetector {
     }
 
     private boolean dispatchOneDoubleDown(@NonNull MotionEvent event) {
+        int index = event.getActionIndex();
+        int pointerId = event.getPointerId(index);
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE: {
+                SlideDetector detector = getPointerDetector(pointerId);
+                if (detector.ignoreTinyMove(event)) return true;
                 cancelDelay1();
                 gotoState(State.OneMove);
                 return true;
@@ -342,8 +345,7 @@ public class GestureDetector {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE: {
                 SlideDetector detector = getPointerDetector(pointerId);
-                if (detector.ignoreTinyMove(event))
-                    return true;
+                if (detector.ignoreTinyMove(event)) return true;
                 cancelDelay4();
                 return false;
             }
@@ -406,10 +408,6 @@ public class GestureDetector {
                 gotoState(State.TwoDoubleDownUpOne);
                 sendDelay4(event);
                 return true;
-            }
-            case MotionEvent.ACTION_UP: {
-//                throw new RuntimeException("不应该出现这个事件");
-                return false;
             }
         }
         return false;
