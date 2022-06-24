@@ -367,6 +367,7 @@ GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为
 + 双指双击并按住 ==> 长按CTRL键
 + 双指向左滑动 ==> 将上一次TTS朗读的内容复制到剪贴板
 + 双指向右滑动 ==> 将上一次TTS朗读的内容追加到剪贴板
++ 双指向下滑动 ==> ESC键
 
 ## 编译
 

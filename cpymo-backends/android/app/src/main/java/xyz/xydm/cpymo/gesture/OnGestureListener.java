@@ -17,7 +17,7 @@ public interface OnGestureListener {
 //    void onLongPressAfterTap(MotionEvent e);
 //    void onScanAfterTap(MotionEvent e);
 //    void onFlingAfterTap(MotionEvent e);
-    void onDoubleTap(MotionEvent event);    //FIXME 华为手机双击失效
+    void onDoubleTap(MotionEvent event);
 //    void onTwoTap(MotionEvent event);
     void onTwoDoubleTap(MotionEvent event);
 
