@@ -27,10 +27,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -2232,6 +2229,10 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                 VisualHelper.appendCopyLastSpeechText();
                 VisualHelper.textToSpeechWithoutCopy("已追加复制");
                 break;
+            }
+            case Down: {
+                VisualHelper.vibrate(50);
+                VisualHelper.sendKeyKnock(KeyEvent.KEYCODE_ESCAPE);
             }
         }
     }

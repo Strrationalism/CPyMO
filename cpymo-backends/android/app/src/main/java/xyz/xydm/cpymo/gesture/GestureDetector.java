@@ -220,6 +220,11 @@ public class GestureDetector {
 
     private boolean dispatchOneTap(@NonNull MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            int index = event.getActionIndex();
+            int pointerId = event.getPointerId(index);
+            SlideDetector detector = getPointerDetector(pointerId);
+
+            detector.start(event.getX(index), event.getY(index));
             cancelDelay2();
             gotoState(State.OneDoubleDown);
             sendDelay1(event);
@@ -361,6 +366,11 @@ public class GestureDetector {
 
     private boolean dispatchTwoTap(@NonNull MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            int index = event.getActionIndex();
+            int pointerId = event.getPointerId(index);
+            SlideDetector detector = getPointerDetector(pointerId);
+
+            detector.start(event.getX(index), event.getY(index));
             cancelDelay2();
             gotoState(State.TwoDoubleOneDown);
             return true;
@@ -383,10 +393,6 @@ public class GestureDetector {
                 sendDelay1(event);
                 return true;
             }
-            case MotionEvent.ACTION_UP: {
-//                throw new RuntimeException("不应该出现这个事件");
-                return false;
-            }
         }
         return false;
     }
@@ -398,8 +404,7 @@ public class GestureDetector {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE: {
                 SlideDetector detector = getPointerDetector(pointerId);
-                if (detector.ignoreTinyMove(event))
-                    return true;
+                if (detector.ignoreTinyMove(event)) return true;
                 cancelDelay1();
                 return false;
             }
