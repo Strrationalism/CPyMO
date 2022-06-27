@@ -170,10 +170,6 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
-	cpymo_audio_bgm_stop(engine);
-	cpymo_audio_se_stop(engine);
-	cpymo_audio_vo_stop(engine);
-
 	if (engine->ui) cpymo_ui_exit(engine);
 
 	if (engine->assetloader.gamedir) {

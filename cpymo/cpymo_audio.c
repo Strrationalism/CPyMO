@@ -491,13 +491,18 @@ void cpymo_audio_free(cpymo_audio_system *s)
 {
 	if (s->enabled == false) return;
 
+	cpymo_backend_audio_lock();
+
 	for (size_t i = 0; i < CPYMO_AUDIO_MAX_CHANNELS; ++i) {
-		cpymo_audio_channel_reset(s->channels + i);
+		s->channels[i].enabled = false;
+		cpymo_audio_channel_reset_unsafe(s->channels + i);
 
 		if (s->channels[i].packet) av_packet_free(&s->channels[i].packet);
 		if (s->channels[i].frame) av_frame_free(&s->channels[i].frame);
 		if (s->channels[i].converted_buf) free(s->channels[i].converted_buf);
 	}
+
+	cpymo_backend_audio_unlock();
 
 	s->enabled = false;
 
