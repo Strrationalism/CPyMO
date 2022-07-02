@@ -156,6 +156,10 @@ static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)
 
 static void cpymo_backlog_ui_deleter(cpymo_engine *e, void *ui_)
 {
+#ifndef NON_VISUALLY_IMPAIRED_HELP
+	if (e->backlog.pending_text) 
+		cpymo_backend_text_visually_impaired_help(e->backlog.pending_text);
+#endif
 }
 
 static void *cpymo_backlog_ui_get_next(const cpymo_engine *e, const void *ui_data, const void *cur)
