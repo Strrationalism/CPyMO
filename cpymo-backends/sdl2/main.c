@@ -425,8 +425,8 @@ int main(int argc, char **argv)
 	}
 
 #ifndef USE_GAME_SELECTOR
-	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);
+	ensure_save_dir(gamedir);
 #endif
 
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {

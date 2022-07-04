@@ -48,10 +48,11 @@ static void cpymo_game_selector_draw_node(const cpymo_engine *e, const void *nod
 			item->icon_w, item->icon_h, 1.0f, cpymo_backend_image_draw_type_ui_element);
 	}
 
-	assert(item->gametitle);
-	cpymo_backend_text_draw(
-		item->gametitle, 28 + game_icon_size, y + (float)e->gameconfig.fontsize, cpymo_color_white, 1.0f,
-		cpymo_backend_image_draw_type_ui_element);
+	if (item->gametitle) {
+		cpymo_backend_text_draw(
+			item->gametitle, 28 + game_icon_size, y + (float)e->gameconfig.fontsize, cpymo_color_white, 1.0f,
+			cpymo_backend_image_draw_type_ui_element);
+	}
 }
 
 static error_t cpymo_game_selector_ok(cpymo_engine *e, void *selected)

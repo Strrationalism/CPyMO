@@ -211,6 +211,8 @@ error_t cpymo_gameconfig_parse_from_file(cpymo_gameconfig *out_config, const cha
 	error_t err = cpymo_utils_loadfile(path, &buf, &len);
 	if (err != CPYMO_ERR_SUCC) return err;
 
+	cpymo_utils_replace_cr(buf, len);
+
 	err = cpymo_gameconfig_parse(out_config, buf, len);
 
 	free(buf);

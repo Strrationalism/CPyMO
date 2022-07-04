@@ -275,7 +275,11 @@ error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, con
 	error_t err = cpymo_assetloader_load_filesystem_file(
 		out_buffer, buf_size, "script", cpymo_parser_stream_span_pure(script_name),
 		"txt", loader);
+
 	if (err != CPYMO_ERR_SUCC) return CPYMO_ERR_SCRIPT_FILE_NOT_FOUND;
+
+	cpymo_utils_replace_cr(*out_buffer, *buf_size);
+
 	return CPYMO_ERR_SUCC;
 }
 

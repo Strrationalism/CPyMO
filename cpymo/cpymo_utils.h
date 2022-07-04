@@ -25,6 +25,8 @@ float cpymo_utils_lerp(float a, float b, float t);
 
 void cpymo_utils_replace_str_newline_n(char *str);
 
+void cpymo_utils_replace_cr(char *text, size_t len);
+
 void cpymo_utils_attach_mask_to_rgba(void *rgba, void *mask, int w, int h);
 
 void cpymo_utils_attach_mask_to_rgba_ex(void *rgba, int w, int h, void *mask, int mask_w, int mask_h);
