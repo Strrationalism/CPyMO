@@ -17,19 +17,19 @@ Option:
   MediaFootPadding        : false # If true CCI files are created with padding
   EnableCrypt             : false # Enables encryption for NCCH and CIA
   EnableCompress          : true # Compresses where applicable (currently only exefs:/.code)
-
+  
 AccessControlInfo:
   CoreVersion                   : 2
 
   # Exheader Format Version
   DescVersion                   : 2
-
+  
   # Minimum Required Kernel Version (below is for 4.5.0)
   ReleaseKernelMajor            : "02"
-  ReleaseKernelMinor            : "33"
+  ReleaseKernelMinor            : "33" 
 
   # ExtData
-  UseExtSaveData                : false # enables ExtData
+  UseExtSaveData                : false # enables ExtData       
   #ExtSaveDataId                : 0x300 # only set this when the ID is different to the UniqueId
 
   # FS:USER Archive Access Permissions
@@ -37,7 +37,7 @@ AccessControlInfo:
   FileSystemAccess:
    #- CategorySystemApplication
    #- CategoryHardwareCheck
-   - CategoryFileSystemTool
+   #- CategoryFileSystemTool
    #- Debug
    #- TwlCardBackup
    #- TwlNandData
@@ -76,30 +76,30 @@ AccessControlInfo:
   HandleTableSize               : 0x200
   DisableDebug                  : true
   EnableForceDebug              : false
-  CanWriteSharedPage            : true
+  CanWriteSharedPage            : false
   CanUsePrivilegedPriority      : false
-  CanUseNonAlphabetAndNumber    : true
-  PermitMainFunctionArgument    : true
-  CanShareDeviceMemory          : true
+  CanUseNonAlphabetAndNumber    : false
+  PermitMainFunctionArgument    : false
+  CanShareDeviceMemory          : false
   RunnableOnSleep               : false
-  SpecialMemoryArrange          : true
+  SpecialMemoryArrange          : false
 
   # New3DS Exclusive Process Settings
   SystemModeExt                 : 178MB # Legacy(Default)/124MB/178MB  Legacy:Use Old3DS SystemMode
-  CpuSpeed                      : 804MHz # 256MHz(Default)/804MHz
+  CpuSpeed                      : 804MHz # 268MHz(Default)/804MHz
   EnableL2Cache                 : true # false(default)/true
   CanAccessCore2                : false
 
   # Virtual Address Mappings
   IORegisterMapping:
    - 1ff00000-1ff7ffff   # DSP memory
-  MemoryMapping:
+  MemoryMapping: 
    - 1f000000-1f5fffff:r # VRAM
 
   # Accessible SVCs, <Name>:<ID>
-  SystemCallAccess:
+  SystemCallAccess: 
     ArbitrateAddress: 34
-    Backdoor: 123
+    #Backdoor: 123
     Break: 60
     CancelTimer: 28
     ClearEvent: 25
@@ -107,7 +107,7 @@ AccessControlInfo:
     CloseHandle: 35
     ConnectToPort: 45
     ControlMemory: 1
-    ControlProcessMemory: 112
+    #ControlProcessMemory: 112
     CreateAddressArbiter: 33
     CreateEvent: 23
     CreateMemoryBlock: 30
@@ -151,6 +151,8 @@ AccessControlInfo:
     UnmapMemoryBlock: 32
     WaitSynchronization1: 36
     WaitSynchronizationN: 37
+    #FlushProcessDataCache: 84
+    #ControlProcessMemory: 112
 
   # Service List
   # Maximum 34 services (32 if firmware is prior to 9.6.0)
@@ -163,23 +165,23 @@ AccessControlInfo:
    #- cecd:u
    #- cfg:nor
    #- cfg:u
-   - csnd:SND
-   - dsp::DSP
+   #- csnd:SND
+   #- dsp::DSP
    #- frd:u
    - fs:USER
    - gsp::Gpu
    - hid:USER
    #- http:C
-   - ir:rst
-   - ir:u
-   - ir:USER
+   #- ir:rst
+   #- ir:u
+   #- ir:USER
    #- mic:u
    #- ndm:u
    #- news:u
    #- nwm::UDS
    #- ptm:u
-   - pxi:dev
-   - soc:U
+   #- pxi:dev
+   #- soc:U
    #- ssl:C
    #- y2r:u
 
@@ -187,12 +189,14 @@ AccessControlInfo:
 SystemControlInfo:
   SaveDataSize: 0KB # Change if the app uses savedata
   RemasterVersion: 2
-  StackSize: 0x40000
+  StackSize: 0x8000
 
   # Modules that run services listed above should be included below
   # Maximum 48 dependencies
+  # If a module is listed that isn't present on the 3DS, the title will get stuck at the logo (3ds waves)
+  # So act, nfc and qtm are commented for 4.x support. Uncomment if you need these.
   # <module name>:<module titleid>
-  Dependency:
+  Dependency: 
     #ac: 0x0004013000002402
     #act: 0x0004013000003802
     #am: 0x0004013000001502
@@ -201,28 +205,28 @@ SystemControlInfo:
     #cecd: 0x0004013000002602
     #cfg: 0x0004013000001702
     #codec: 0x0004013000001802
-    csnd: 0x0004013000002702
-    dlp: 0x0004013000002802
-    dsp: 0x0004013000001a02
+    #csnd: 0x0004013000002702
+    #dlp: 0x0004013000002802
+    #dsp: 0x0004013000001a02
     #friends: 0x0004013000003202
-    gpio: 0x0004013000001b02
+    #gpio: 0x0004013000001b02
     gsp: 0x0004013000001c02
     hid: 0x0004013000001d02
     #http: 0x0004013000002902
-    i2c: 0x0004013000001e02
-    ir: 0x0004013000003302
-    mcu: 0x0004013000001f02
+    #i2c: 0x0004013000001e02
+    #ir: 0x0004013000003302
+    #mcu: 0x0004013000001f02
     #mic: 0x0004013000002002
     #ndm: 0x0004013000002b02
     #news: 0x0004013000003502
     #nfc: 0x0004013000004002
     #nim: 0x0004013000002c02
     #nwm: 0x0004013000002d02
-    pdn: 0x0004013000002102
-    ps: 0x0004013000003102
+    #pdn: 0x0004013000002102
+    #ps: 0x0004013000003102
     #ptm: 0x0004013000002202
     #qtm: 0x0004013020004202
-    ro: 0x0004013000003702
+    #ro: 0x0004013000003702
     #socket: 0x0004013000002e02
-    spi: 0x0004013000002302
+    #spi: 0x0004013000002302
     #ssl: 0x0004013000002f02
