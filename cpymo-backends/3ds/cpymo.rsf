@@ -85,7 +85,7 @@ AccessControlInfo:
   SpecialMemoryArrange          : false
 
   # New3DS Exclusive Process Settings
-  SystemModeExt                 : 178MB # Legacy(Default)/124MB/178MB  Legacy:Use Old3DS SystemMode
+  SystemModeExt                 : 124MB # Legacy(Default)/124MB/178MB  Legacy:Use Old3DS SystemMode
   CpuSpeed                      : 804MHz # 268MHz(Default)/804MHz
   EnableL2Cache                 : true # false(default)/true
   CanAccessCore2                : false
@@ -223,7 +223,7 @@ SystemControlInfo:
     #nim: 0x0004013000002c02
     #nwm: 0x0004013000002d02
     pdn: 0x0004013000002102
-    ps: 0x0004013000003102
+    #ps: 0x0004013000003102
     #ptm: 0x0004013000002202
     #qtm: 0x0004013020004202
     #ro: 0x0004013000003702
