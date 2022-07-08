@@ -65,10 +65,14 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for Nintendo 3DS
-        path: |
-          ./cpymo-backends/3ds/cpymo.3dsx
-          ./cpymo-backends/3ds/cpymo.cia
+        name: CPyMO for Nintendo 3DS (cia)
+        path: ./cpymo-backends/3ds/cpymo.cia
+        
+    - name: Upload
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Nintendo 3DS (3dsx)
+        path: ./cpymo-backends/3ds/cpymo.3dsx
 
   build-wii:
     name: 'Nintendo Wii'
