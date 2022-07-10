@@ -62,13 +62,13 @@ jobs:
         $DEVKITARM/bin/arm-none-eabi-strip ./build/cpymo.elf
         ./makerom -f cia -o cpymo.cia -elf ./build/cpymo.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
     
-    - name: Upload
+    - name: Upload cia
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Nintendo 3DS (cia)
         path: ./cpymo-backends/3ds/cpymo.cia
         
-    - name: Upload
+    - name: Upload 3dsx
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Nintendo 3DS (3dsx)
