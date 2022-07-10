@@ -249,7 +249,7 @@ int main(void) {
 	engine.ui = NULL;
 	engine.say.active = false;
 	bool is_new_3ds = false;
-	APT_CheckNew3DS(&is_new_3ds);
+	//APT_CheckNew3DS(&is_new_3ds);
 
 	av_log_set_level(AV_LOG_ERROR);
 	
