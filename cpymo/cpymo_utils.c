@@ -60,7 +60,7 @@ void cpymo_utils_replace_cr(char *text, size_t len)
 	for (size_t i = 0; i < len; ++i) {
 		if (text[i] == '\r') {
 			if (i + 1 < len) {
-				if (text[i] != '\n') { REPLACE; }
+				if (text[i + 1] != '\n') { REPLACE; }
 			}
 			else {
 				REPLACE;
