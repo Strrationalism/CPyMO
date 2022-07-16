@@ -46,6 +46,8 @@ include_directories(
 
 add_subdirectory("../../../../../../cpymo" cpymolib)
 
+file (GLOB CPYMO_BACKEND_SRC "../../../../../sdl2/*.c")
+
 add_library( # Sets the name of the library.
         cpymo
 
@@ -55,17 +57,7 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
 
         "./cpymo_android.c"
-        "../../../../../sdl2/main.c"
-        "../../../../../sdl2/cpymo_backend_image.c"
-        "../../../../../sdl2/cpymo_backend_input.c"
-        "../../../../../sdl2/cpymo_backend_font.c"
-        "../../../../../sdl2/cpymo_backend_masktrans.c"
-        "../../../../../sdl2/cpymo_backend_text.c"
-        "../../../../../sdl2/posix_win32.h"
-        "../../../../../sdl2/cpymo_backend_save.c"
-        "../../../../../sdl2/cpymo_backend_audio.c"
-        "../../../../../sdl2/cpymo_backend_movie.c"
-        "../../../../../sdl2/cpymo_import_sdl2.h")
+        ${CPYMO_BACKEND_SRC})
 
 link_directories("../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/")
 
@@ -73,7 +65,7 @@ add_library(avformat SHARED IMPORTED)
 set_target_properties(avformat PROPERTIES IMPORTED_LOCATION
         "${CMAKE_SOURCE_DIR}/../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/libavformat.so")
 
-add_library(avcodec SHARED IMPORTED)
+add_library(avcodec SHARED IMPORTED) 
 set_target_properties(avcodec PROPERTIES IMPORTED_LOCATION
         "${CMAKE_SOURCE_DIR}/../../../../ffmpeg-android-maker/output/lib/${ANDROID_ABI}/libavcodec.so")
 

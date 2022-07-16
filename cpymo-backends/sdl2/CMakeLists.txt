@@ -2,23 +2,12 @@ cmake_minimum_required (VERSION 3.8)
 
 include_directories("../../cpymo")
 
-
 find_package (SDL2 CONFIG REQUIRED)
 find_package (FFMPEG REQUIRED)
 
-add_executable (cpymo 
-	"cpymo_import_sdl2.h"
-	"main.c" 
-	"cpymo_backend_image.c" 
-	"cpymo_backend_input.c" 
-	"cpymo_backend_font.c" 
-	"cpymo_backend_masktrans.c" 
-	"cpymo_backend_text.c" 
-	"posix_win32.h" 
-	"cpymo_backend_save.c" 
-	"cpymo_backend_audio.c" 
-	"cpymo_backend_movie.c" 
-	"cpymo_backend_audio_sdl2_mixer.c")
+file (GLOB CPYMO_BACKEND_SRC "*.h" "*.c")
+
+add_executable (cpymo ${CPYMO_BACKEND_SRC})
 
 target_link_libraries(cpymo PRIVATE 
 	SDL2::SDL2 

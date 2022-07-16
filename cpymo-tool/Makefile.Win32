@@ -5,11 +5,7 @@ TARGET = cpymo-tool.exe
 !endif
 
 SRC = \
-	main.c \
-	cpymo_tool_resize.c \
-	cpymo_tool_package.c \
-	cpymo_tool_image.c \
-	cpymo_tool_pack_images.c \
+	*.c \
 	../cpymo/cpymo_error.c \
 	../cpymo/cpymo_package.c \
 	../cpymo/cpymo_parser.c \
