@@ -15,12 +15,16 @@ CFLAGS += \
 	-DLOAD_GAME_ICON \
 	-DTOGGLE_FULLSCREEN \
 	-DDISABLE_IMAGE_SCALING \
-	-DNDEBUG \
-	-O3 \
 	-I../../cpymo \
 	-I../../endianness.h \
 	-I../../stb \
 	-I../include
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -g -DDEBUG
+else
+CFLAGS += -DNDEBUG -O3
+endif
 
 ifneq ($(strip $(SDL)), "")
 CFLAGS += -I$(SDL)/include

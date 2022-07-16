@@ -131,7 +131,17 @@ github action及release上的版本默认会开启视障帮助功能，除了And
 4. 如果你不想播放音视频，可直接定义`export DISABLE_AUDIO=1`。
 5. 如果你不想使用视障帮助功能，则可以定义`export NON_VISUALLY_IMPAIRED_HELP=1`。
 6. 通过定义`TARGET`环境变量来指定输出文件名的名称。
-7. 执行`make -j`即可产生可执行文件。
+7. 通过定义`DEBUG=1`环境变量来启动调试信息，之后便可使用gdb进行调试。
+8. 执行`make -j`即可产生可执行文件。
+
+在Windows下，你也许需要拷贝以下dll文件到可执行文件目录才可以在非MSYS2环境下运行CPyMO并启动调试：
+
+- avcodec-58.dll
+- avformat-58.dll
+- avutil-56.dll
+- libwinpthread-1.dll
+- SDL2.dll
+- swresample-3.dll
 
 
 # Nintendo 3DS 平台
@@ -561,8 +571,17 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 * `USE_FFMPEG`，此变量为1时将会连接到FFmpeg库，并启用FFmpeg音视频支持。
 * 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_mixer`，仅启动受限的音频支持。
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
+* 设置`DEBUG`为1时，将会启动调试信息。
 
 之后在`cpymo-backends/sdl1`中执行`make`即可编译。
+
+在Windows上，如果你要使用MSYS2进行编译，那么你可能需要以下DLL：
+- avcodec-58.dll
+- avformat-58.dll
+- avutil-56.dll
+- libwinpthread-1.dll
+- SDL.dll
+- swresample-3.dll
 
 ### 使用宏适配目标系统
 

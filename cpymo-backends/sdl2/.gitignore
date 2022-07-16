@@ -1,13 +1,12 @@
 *.elf
 *.nacp
 *.nro
-build.*/
+build*/
 CPyMO.vpk
 PARAM.SFO
 EBOOT.PBP
 SDL_Log.txt
 default.ttf
-DAICHYAN_s60v3
 last_game.txt
 cpymo.wasm
 cpymo.data
@@ -15,3 +14,4 @@ cpymo.js
 cpymo.html
 cpymo.exe
 cpymo
+*.dll

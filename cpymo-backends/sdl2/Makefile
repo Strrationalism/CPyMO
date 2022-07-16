@@ -12,7 +12,12 @@ CFLAGS := \
 	-I../../endianness.h \
 	-I../../stb \
 	-I../include \
-	-O3 -DNDEBUG
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -DDEBUG -g
+else
+CFLAGS += -O3 -DNDEBUG
+endif
 
 ifeq ($(OS), Windows_NT)
 LDFLAGS += -lmingw32
@@ -68,7 +73,7 @@ endef
 
 ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res
-LDFLAGS += -Wl,-Bstatic -lwinpthread
+LDFLAGS += -lwinpthread
 endif
 
 $(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc

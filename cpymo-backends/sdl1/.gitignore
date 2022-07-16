@@ -1,0 +1,8 @@
+/.vscode
+/build*
+/stdout.txt
+/SDL.dll
+/cpymo.exe
+/cpymo
+/cpymo.dol
+/*.dll
