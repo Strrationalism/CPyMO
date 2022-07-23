@@ -17,7 +17,7 @@ static error_t cpymo_game_selector_visual_im_help_selection_changed_callback(cpy
 {
 	if (sel) {
 		cpymo_game_selector_item *item = (cpymo_game_selector_item *)sel;
-		cpymo_backend_text_visually_impaired_help(item->gametitle_text);
+		cpymo_backend_text_extract(item->gametitle_text);
 	}
 	return CPYMO_ERR_SUCC;
 }

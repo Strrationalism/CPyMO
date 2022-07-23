@@ -11,7 +11,7 @@ CFLAGS := \
 	-I../../cpymo \
 	-I../../endianness.h \
 	-I../../stb \
-	-I../include \
+	-I../include
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -DDEBUG -g

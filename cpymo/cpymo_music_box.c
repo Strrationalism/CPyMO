@@ -85,7 +85,7 @@ static error_t cpymo_musicbox_visual_help_selection_change(cpymo_engine *e, void
 	if (box->music_title_text) {
 		uintptr_t node_index = DECODE_NODE(selected);
 		if (box->music_title_text[node_index])
-			cpymo_backend_text_visually_impaired_help(box->music_title_text[node_index]);
+			cpymo_backend_text_extract(box->music_title_text[node_index]);
 	}
 
 	return CPYMO_ERR_SUCC;

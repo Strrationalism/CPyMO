@@ -145,7 +145,7 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
 }
 
 #ifdef ENABLE_TEXT_EXTRACT
-void cpymo_backend_text_visually_impaired_help(const char *text)
+void cpymo_backend_text_extract(const char *text)
 {
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
     extern void cpymo_android_text_to_speech(const char *text);

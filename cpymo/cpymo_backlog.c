@@ -158,7 +158,7 @@ static void cpymo_backlog_ui_deleter(cpymo_engine *e, void *ui_)
 {
 #ifdef ENABLE_TEXT_EXTRACT
 	if (e->backlog.pending_text) 
-		cpymo_backend_text_visually_impaired_help(e->backlog.pending_text);
+		cpymo_backend_text_extract(e->backlog.pending_text);
 #endif
 }
 
@@ -212,7 +212,7 @@ static error_t cpymo_backlog_ui_selection_changed(cpymo_engine *e, void *selecte
 	if (selected) {
 		size_t index = (size_t)DEC(selected);
 		if (e->backlog.records[index].text) {
-			cpymo_backend_text_visually_impaired_help(e->backlog.records[index].text);
+			cpymo_backend_text_extract(e->backlog.records[index].text);
 		}
 	}
 	return CPYMO_ERR_SUCC;
@@ -247,7 +247,7 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 	cpymo_list_ui_set_selection_changed_callback(
 		e, &cpymo_backlog_ui_selection_changed);
 	if (e->backlog.records[first].text)
-		cpymo_backend_text_visually_impaired_help(e->backlog.records[first].text);
+		cpymo_backend_text_extract(e->backlog.records[first].text);
 #endif
 
 	ui->press_key_down_to_close = true;

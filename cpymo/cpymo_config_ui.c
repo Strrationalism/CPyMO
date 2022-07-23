@@ -107,7 +107,7 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 	}
 
 #ifdef ENABLE_TEXT_EXTRACT
-	cpymo_backend_text_visually_impaired_help(val_str);
+	cpymo_backend_text_extract(val_str);
 #endif
 	
 	error_t err = cpymo_backend_text_create(
@@ -212,7 +212,7 @@ static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_e
 	default: assert(false);
 	}
 
-	cpymo_backend_text_visually_impaired_help(p);
+	cpymo_backend_text_extract(p);
 
 	return CPYMO_ERR_SUCC;
 }

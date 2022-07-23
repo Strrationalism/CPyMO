@@ -306,7 +306,7 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 #ifndef ENABLE_TEXT_EXTRACT
 #define CALL_VISUALLY_IMPAIRED(X)
 #else
-#define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_visually_impaired_help(X)
+#define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_extract(X)
 #endif
 
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
@@ -624,7 +624,7 @@ void cpymo_select_img_configuare_end_select_text(
 	if (full_first_hint) {
 		strcpy(full_first_hint, hint_header);
 		strcpy(full_first_hint + hint_header_len, hint_content);
-		cpymo_backend_text_visually_impaired_help(full_first_hint);
+		cpymo_backend_text_extract(full_first_hint);
 		free(full_first_hint);
 	}
 #endif

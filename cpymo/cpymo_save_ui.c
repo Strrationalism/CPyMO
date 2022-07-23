@@ -126,7 +126,7 @@ static error_t cpymo_save_ui_visual_impaired_selection_changed(cpymo_engine *e, 
 	if (cur) {
 		uintptr_t i = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
 		const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data(e);
-		cpymo_backend_text_visually_impaired_help(ui->items[i].orginal_text);
+		cpymo_backend_text_extract(ui->items[i].orginal_text);
 	}
 	return CPYMO_ERR_SUCC;
 }
