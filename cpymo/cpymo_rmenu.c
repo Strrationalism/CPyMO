@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
 #include <cpymo_android.h>
 #endif
 
@@ -174,7 +174,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		&cpymo_rmenu_delete);
 	CPYMO_THROW(err);
 
-#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
 	cpymo_android_play_sound(SOUND_MENU);
 #endif
 

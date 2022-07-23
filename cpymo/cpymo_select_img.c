@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
 #include <cpymo_android.h>
 #endif
 
@@ -309,7 +309,7 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 #define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_extract(X)
 #endif
 
-#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
 #define CALL_VISUALLY_PLAY_SOUND(X) cpymo_android_play_sound(X)
 #else
 #define CALL_VISUALLY_PLAY_SOUND(X)

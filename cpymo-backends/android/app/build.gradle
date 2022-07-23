@@ -28,7 +28,7 @@ android {
 
                 if (!NON_VISUALLY_IMPAIRED_HELP) {
                     cFlags.add("-DENABLE_TEXT_EXTRACT")
-                    cFlags.add("-DENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE")
+                    cFlags.add("-DENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY")
                 }
             }
         }
