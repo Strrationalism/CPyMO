@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
 #include <cpymo_android.h>
 #endif
 
@@ -32,7 +32,7 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->timer = 0;
     o->msg_cursor_visible = false;
 
-#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
     cpymo_android_play_sound(SOUND_ENTER);
 #endif
 

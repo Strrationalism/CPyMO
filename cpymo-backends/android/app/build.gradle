@@ -26,8 +26,9 @@ android {
                 cppFlags ''
                 arguments "-DANDROID_STL=c++_static"
 
-                if (NON_VISUALLY_IMPAIRED_HELP) {
-                    cFlags.add("-DNON_VISUALLY_IMPAIRED_HELP=1")
+                if (!NON_VISUALLY_IMPAIRED_HELP) {
+                    cFlags.add("-DENABLE_TEXT_EXTRACT")
+                    cFlags.add("-DENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE")
                 }
             }
         }

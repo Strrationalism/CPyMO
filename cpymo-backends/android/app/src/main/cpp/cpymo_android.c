@@ -11,7 +11,7 @@ static jmethodID midPlaySound;
 JNIEXPORT jboolean JNICALL
 Java_xyz_xydm_cpymo_Config_nativeGetNonVisuallyImpairedHelp(JNIEnv *env, jclass clazz)
 {
-#ifdef NON_VISUALLY_IMPAIRED_HELP
+#if defined ENABLE_TEXT_EXTRACT && defined ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
     return JNI_TRUE;
 #else
     return JNI_FALSE;

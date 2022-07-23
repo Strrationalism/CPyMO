@@ -54,7 +54,6 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 NO_NACP := 1
 CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
-			-DNON_VISUALLY_IMPAIRED_HELP -DNDEBUG \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ \

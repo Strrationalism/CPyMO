@@ -12,7 +12,7 @@ void cpymo_backlog_init(cpymo_backlog *b)
 	b->owning_name = false;
 	b->pending_name = NULL;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	b->pending_text = NULL;
 #endif
 
@@ -22,7 +22,7 @@ void cpymo_backlog_init(cpymo_backlog *b)
 		b->records[i].name = NULL;
 		b->records[i].lines = NULL;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 		b->records[i].text = NULL;
 #endif
 	}
@@ -48,7 +48,7 @@ static void cpymo_backlog_record_clean(cpymo_backlog_record *rec)
 	rec->max_lines = 0;
 	rec->vo_filename[0] = '\0';
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	if (rec->text) free(rec->text);
 	rec->text = NULL;
 #endif
@@ -64,7 +64,7 @@ void cpymo_backlog_free(cpymo_backlog *b)
 		cpymo_backlog_record_clean(rec);
 	}
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	if (b->pending_text) free(b->pending_text);
 #endif
 }
@@ -75,7 +75,7 @@ void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_parser_stream_span vo
 		b->pending_vo_filename, sizeof(b->pending_vo_filename), vo);
 }
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backlog_record_write_full_text(cpymo_backlog *b, char * text)
 {
 	assert(b->pending_text == NULL);
@@ -105,7 +105,7 @@ error_t cpymo_backlog_record_write_text(cpymo_backlog *b, cpymo_backend_text **t
 	*textlines_moveinto = NULL;
 	rec->max_lines = max_lines;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	rec->text = b->pending_text;
 	b->pending_text = NULL;
 #endif
@@ -156,7 +156,7 @@ static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)
 
 static void cpymo_backlog_ui_deleter(cpymo_engine *e, void *ui_)
 {
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	if (e->backlog.pending_text) 
 		cpymo_backend_text_visually_impaired_help(e->backlog.pending_text);
 #endif
@@ -206,7 +206,7 @@ static error_t cpymo_backlog_ui_update(cpymo_engine *e, float dt, void *selected
 	return CPYMO_ERR_SUCC;
 }
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_backlog_ui_selection_changed(cpymo_engine *e, void *selected)
 {
 	if (selected) {
@@ -243,7 +243,7 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 
 	cpymo_list_ui_set_custom_update(e, &cpymo_backlog_ui_update);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	cpymo_list_ui_set_selection_changed_callback(
 		e, &cpymo_backlog_ui_selection_changed);
 	if (e->backlog.records[first].text)

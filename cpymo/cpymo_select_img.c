@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
 #include <cpymo_android.h>
 #endif
 
@@ -38,7 +38,7 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 				cpymo_backend_image_free(img->selections[i].image); 
 			if (img->selections[i].or_text)
 				cpymo_backend_text_free(img->selections[i].or_text);
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 			if (img->selections[i].original_text)
 				free(img->selections[i].original_text);
 #endif
@@ -100,7 +100,7 @@ void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, 
 	cpymo_select_img_selection *sel = &e->select_img.selections[e->select_img.current_selection++];
 	sel->image = e->select_img.select_img_image;
 	sel->or_text = NULL;
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	sel->original_text = NULL;
 #endif
 
@@ -144,7 +144,7 @@ error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo
 	sel->hash = hash;
 	sel->has_selected = cpymo_hash_flags_check(&e->flags, hash);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	sel->original_text = NULL;
 #endif
 
@@ -259,7 +259,7 @@ void cpymo_select_img_configuare_end(cpymo_select_img *sel, cpymo_wait *wait, st
 				sel->selections[i].or_text = NULL;
 			}
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 			if (sel->selections[i].original_text) {
 				free(sel->selections[i].original_text);
 				sel->selections[i].original_text = NULL;
@@ -303,13 +303,13 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 	return err;
 }
 
-#ifdef NON_VISUALLY_IMPAIRED_HELP
+#ifndef ENABLE_TEXT_EXTRACT
 #define CALL_VISUALLY_IMPAIRED(X)
 #else
 #define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_visually_impaired_help(X)
 #endif
 
-#if !defined NON_VISUALLY_IMPAIRED_HELP && defined __ANDROID__
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSABLE
 #define CALL_VISUALLY_PLAY_SOUND(X) cpymo_android_play_sound(X)
 #else
 #define CALL_VISUALLY_PLAY_SOUND(X)
@@ -519,7 +519,7 @@ error_t cpymo_select_img_configuare_select_text(
 	s->hash = hash;
 	s->has_selected = cpymo_hash_flags_check(flags, hash);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	s->original_text = (char *)malloc(text.len + 1);
 	if (s->original_text)
 		cpymo_parser_stream_span_copy(s->original_text, text.len + 1, text);
@@ -615,7 +615,7 @@ void cpymo_select_img_configuare_end_select_text(
 		}
 	}
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	const char *hint_header = cpymo_localization_get(e)->visual_help_selection;
 	size_t hint_header_len = strlen(hint_header);
 	const char *hint_content = sel->selections[sel->current_selection].original_text;

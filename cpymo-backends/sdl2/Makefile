@@ -44,10 +44,6 @@ CFLAGS += -I$(FFMPEG)/include/
 LDFLAGS += -L$(FFMPEG)/lib/
 endif
 
-ifeq ($(NON_VISUALLY_IMPAIRED_HELP), 1)
-CFLAGS += -DNON_VISUALLY_IMPAIRED_HELP
-endif
-
 ifndef TARGET
 TARGET := cpymo
 endif

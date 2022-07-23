@@ -15,10 +15,6 @@ LD_FLAGS = $(LD_FLAGS) /SUBSYSTEM:WINDOWS
 LD_FLAGS = $(LD_FLAGS) /SUBSYSTEM:CONSOLE
 !endif
 
-!if "$(NON_VISUALLY_IMPAIRED_HELP)" == "1"
-CFLAGS = $(CFLAGS) -DNON_VISUALLY_IMPAIRED_HELP
-!endif
-
 !ifdef FFMPEG
 CFLAGS = $(CFLAGS) -I$(FFMPEG)/include
 LD_FLAGS = $(LD_FLAGS) /LIBPATH:$(FFMPEG)/lib avcodec.lib avformat.lib swresample.lib avutil.lib

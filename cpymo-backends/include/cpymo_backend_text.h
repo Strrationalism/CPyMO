@@ -26,7 +26,7 @@ float cpymo_backend_text_width(
     cpymo_parser_stream_span,
     float single_character_size_in_logical_screen);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backend_text_visually_impaired_help(const char *text);
 #endif
 
