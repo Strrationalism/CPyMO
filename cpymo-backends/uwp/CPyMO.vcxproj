@@ -159,7 +159,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -169,7 +169,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -179,7 +179,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -189,7 +189,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -199,7 +199,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -209,7 +209,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -219,7 +219,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -229,7 +229,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;NON_VISUALLY_IMPAIRED_HELP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SCREEN_WIDTH=800;SCREEN_HEIGHT=600;USE_GAME_SELECTOR;ADAPT_SCREEN_SIZE;__UWP__;GAME_SELECTOR_FONTSIZE=46;GAME_SELECTOR_EMPTY_MSG_FONTSIZE=36;GAME_SELECTOR_COUNT_PER_SCREEN=4;GAME_SELECTOR_DIR="";__CXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
