@@ -179,3 +179,29 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 }
 
 bool cpymo_backend_image_album_ui_writable() { return true; }
+
+#ifdef ENABLE_SDL2_IMAGE
+#include <SDL2/SDL_image.h>
+error_t cpymo_assetloader_load_icon_pixels(
+	void **px, int *w, int *h, const char *gamedir)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
+{
+	char *path = alloca(strlen(gamedir) + 10);
+	sprintf(path, "%s/icon.png", gamedir);
+	SDL_Texture *t = IMG_LoadTexture(renderer, path);
+	if (t == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	if (SDL_QueryTexture(t, NULL, NULL, w, h)) {
+		SDL_DestroyTexture(t);
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	*out = (cpymo_backend_image)t;
+	return CPYMO_ERR_SUCC;
+}
+#endif

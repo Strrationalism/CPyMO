@@ -150,7 +150,7 @@ static error_t cpymo_assetloader_load_filesystem_image_pixels(
 	char *path = NULL;
 	error_t err = cpymo_assetloader_get_fs_path(&path, asset_name, asset_type, asset_ext_name, l);
 	CPYMO_THROW(err);
-	
+
 	*pixels = stbi_load(path, w, h, NULL, c);
 	free(path);
 
@@ -330,6 +330,7 @@ error_t cpymo_assetloader_load_system_image(
 		out_image, out_width, out_height, filename_span, "system", "png", "png", false, NULL, loader, load_mask);
 }
 
+#ifndef DISABLE_STB_IMAGE
 error_t cpymo_assetloader_load_icon_pixels(
 	void **px, int *w, int *h, const char *gamedir)
 {
@@ -360,3 +361,4 @@ error_t cpymo_assetloader_load_icon(
 	if (e != CPYMO_ERR_SUCC) free(px);
 	return CPYMO_ERR_SUCC;
 }
+#endif

@@ -16,14 +16,15 @@ CFLAGS   = -G0 -Wall -O2 \
            -DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
            -DGAME_SELECTOR_DIR="\"./\"" \
            -DFRAMEBUFFER_PIXELFORMAT=SDL_PIXELFORMAT_BGR565 \
-           -DSTREAMING_LOAD_IMAGE
+           -DDISABLE_STB_IMAGE -DENABLE_SDL2_IMAGE -DDISABLE_MOUSE
 		
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS  = $(CFLAGS)
 
 LIBDIR  =
 LDFLAGS =
-LIBS = -Xlinker "-(" -logg -lvorbisfile -lvorbis -lSDL2_mixer -lSDL2 -lSDL2main -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc \
+LIBS = -Xlinker "-(" -logg -lvorbisfile -lvorbis -lSDL2_image -lSDL2_mixer -lSDL2 -lSDL2main -lGL -lGLU -lglut -lz -lpspvfpu \
+        -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpng -ljpeg \
        -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan \
 	   -lpspnet_adhocmatching -lpspnet_adhoc -lpspnet_adhocctl -lm -lpspvram -Xlinker "-)"
 
