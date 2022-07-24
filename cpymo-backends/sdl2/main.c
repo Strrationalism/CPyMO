@@ -73,17 +73,10 @@ static void set_window_icon(const char *gamedir)
 {
 #if (defined _WIN32) || (defined __LINUX__) || (defined __APPLE__)
 	int w, h;
-	char *icon_path = (char *)alloca(strlen(gamedir) + 10);
-	if (icon_path == NULL) return;
+	void *icon = NULL;
 
-	sprintf(icon_path, "%s/icon.png", gamedir);
-
-	stbi_uc *icon = stbi_load(icon_path, &w, &h, NULL, 4);
-	if (icon == NULL) return;
-
-	if (w != 57 || h != 57) {
-		printf("[Warning] Icon must be 57x57.\n");
-	}
+	error_t e = cpymo_assetloader_load_icon_pixels(&icon, &w, &h, gamedir);
+	if (icon == NULL || e != CPYMO_ERR_SUCC) return;
 
 	Uint32 rmask, gmask, bmask, amask;
 
@@ -100,7 +93,8 @@ static void set_window_icon(const char *gamedir)
 #endif
 
 	SDL_Surface *surface =
-		SDL_CreateRGBSurfaceFrom(icon, w, h, 4 * 8, 4 * w, rmask, gmask, bmask, amask);
+		SDL_CreateRGBSurfaceFrom(
+			icon, w, h, 4 * 8, 4 * w, rmask, gmask, bmask, amask);
 
 	if (surface == NULL) {
 		stbi_image_free(icon);
@@ -109,7 +103,7 @@ static void set_window_icon(const char *gamedir)
 
 	SDL_SetWindowIcon(window, surface);
 	SDL_FreeSurface(surface);
-	stbi_image_free(icon);
+	free(icon);
 #endif
 }
 

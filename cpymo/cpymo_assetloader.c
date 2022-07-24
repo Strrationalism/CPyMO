@@ -330,3 +330,33 @@ error_t cpymo_assetloader_load_system_image(
 		out_image, out_width, out_height, filename_span, "system", "png", "png", false, NULL, loader, load_mask);
 }
 
+error_t cpymo_assetloader_load_icon_pixels(
+	void **px, int *w, int *h, const char *gamedir)
+{
+	cpymo_assetloader l;
+	l.gamedir = gamedir;
+	error_t e = cpymo_assetloader_load_filesystem_image_pixels(
+		px, w, h, 4, ".", cpymo_parser_stream_span_pure("icon"), 
+		"png", &l);
+
+	CPYMO_THROW(e);
+
+	if (*w != 57 || *h != 57) 
+		printf("[Warning] Icon must be 57x57 (%s).\n", gamedir);
+	
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
+{
+	void *px = NULL;
+	error_t e = cpymo_assetloader_load_icon_pixels(px, w, h, gamedir);
+	CPYMO_THROW(e);
+
+	e = cpymo_backend_image_load(
+		out, px, *w, *h, cpymo_backend_image_format_rgba);
+
+	if (e != CPYMO_ERR_SUCC) free(px);
+	return CPYMO_ERR_SUCC;
+}

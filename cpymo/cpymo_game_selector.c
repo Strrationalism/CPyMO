@@ -133,15 +133,11 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 #ifdef __PSP__
 		item->icon = NULL;
 #else
-		sprintf(path, "%s/icon.png", item->gamedir);
-		stbi_uc *pixels = stbi_load(path, &item->icon_w, &item->icon_h, NULL, 4);
-		if (pixels) {
-			err = cpymo_backend_image_load(&item->icon, pixels, item->icon_w, item->icon_h, cpymo_backend_image_format_rgba);
-			if (err != CPYMO_ERR_SUCC) {
-				free(pixels);
-				item->icon = NULL;
-			}
-		}
+		err = cpymo_assetloader_load_icon(
+			&item->icon, &item->icon_w, &item->icon_h, item->gamedir);
+
+		if (err != CPYMO_ERR_SUCC)
+			item->icon = NULL;
 #endif
 
 		prev = item;
