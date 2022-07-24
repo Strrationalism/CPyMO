@@ -30,15 +30,11 @@ cpymo_input cpymo_input_snapshot()
 	float scale_x, scale_y;
 	SDL_RenderGetScale(renderer, &scale_x, &scale_y);
 
-#ifdef __APPLE__
-    /* Inside macOS, Apple uses the concept of points,
-     * rather than pixels, as its way of measuring screen dimensions. */
     int point_w, point_h, pixel_w, pixel_h;
     SDL_GetWindowSize(window, &point_w, &point_h);
     SDL_GetRendererOutputSize(renderer, &pixel_w, &pixel_h);
     scale_x *= (float) point_w / pixel_w;
     scale_y *= (float) point_h / pixel_h;
-#endif
 
 	int mx, my;
 	Uint32 mouse_state = SDL_GetMouseState(&mx, &my);
