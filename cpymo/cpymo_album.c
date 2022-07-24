@@ -157,6 +157,8 @@ static error_t cpymo_album_generate_album_ui_image(
 		free(pixels);
 		return err;
 	}
+
+	return CPYMO_ERR_SUCC;
 }
 
 static error_t cpymo_album_load_ui_image(
