@@ -35,7 +35,7 @@ cpymo_input cpymo_input_snapshot()
      * rather than pixels, as its way of measuring screen dimensions. */
     int point_w, point_h, pixel_w, pixel_h;
     SDL_GetWindowSize(window, &point_w, &point_h);
-    SDL_GL_GetDrawableSize(window, &pixel_w, &pixel_h);
+    SDL_GetRendererOutputSize(renderer, &pixel_w, &pixel_h);
     scale_x *= (float) point_w / pixel_w;
     scale_y *= (float) point_h / pixel_h;
 #endif
