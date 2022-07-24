@@ -108,13 +108,14 @@ brew install libxcb
 * 若`NO_CONSOLE`环境变量存在或通过-a传入并设置为1，则禁用命令行窗口，使得CPyMO仅创建一个游戏窗口。
 * 若`RC_FILE`环境变量存在或通过-a传入，则允许传入用户指定的资源文件（主要用于修改图标）。
 * 若`TARGET`环境变量存在或通过-a传入，则允许用户通过TARGET指定输出的可执行文件名称。
+* 若`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为1或通过-a传入1，则将会导出游戏文本到剪切板（用于视障玩家）。
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
 
 ## 使用GNU Make进行构建
 
 1. 你需要安装SDL2，可以选择直接安装`libsdl2-dev`，或者将SDL2的预编译二进制库存入环境变量`SDL2`中。
-2. 如果你需要使用FFmpeg播放音频和视频，可以选择安装以下库，或者将其预编译的二进制库存入环境变量`FFmpeg`中：
+2. 如果你需要使用FFmpeg播放音频和视频，可以选择安装以下库，或者将其预编译的库存入环境变量`FFmpeg`中：
     * libavformat-dev
     * libavutil-dev
     * libavcodec-dev
@@ -134,6 +135,12 @@ brew install libxcb
 - libwinpthread-1.dll
 - SDL2.dll
 - swresample-3.dll
+
+在构建之前，你可以进行一些配置：
+* 使用`RC_FILE`环境变量可以自定义RC文件。（仅Windows）
+* 使`NO_CONSOLE`环境变量为`1`可以禁止CPyMO创建控制台窗口。（仅Windows）
+* 使用`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量可将游戏文本复制到控制台上。（用于视障玩家）
+
 
 
 # Nintendo 3DS 平台
