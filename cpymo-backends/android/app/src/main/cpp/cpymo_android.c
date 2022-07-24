@@ -9,7 +9,7 @@ static jmethodID midTextToSpeech;
 static jmethodID midPlaySound;
 
 JNIEXPORT jboolean JNICALL
-Java_xyz_xydm_cpymo_Config_nativeGetNonVisuallyImpairedHelp(JNIEnv *env, jclass clazz)
+Java_xyz_xydm_cpymo_Config_nativeNeedAccessibility(JNIEnv *env, jclass clazz)
 {
 #if defined ENABLE_TEXT_EXTRACT && defined ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
     return JNI_TRUE;
