@@ -154,6 +154,7 @@ jobs:
 
     - name: Build
       run: |
+        psp-pacman -S sdl2 sdl2-image sdl2-ttf sdl2-mixer
         cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
 
