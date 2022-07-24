@@ -2,11 +2,17 @@ plugins {
     id 'com.android.application'
 }
 
-Boolean NON_VISUALLY_IMPAIRED_HELP
-if (System.getenv("NON_VISUALLY_IMPAIRED_HELP") == null) {
-    NON_VISUALLY_IMPAIRED_HELP = project.property("NON_VISUALLY_IMPAIRED_HELP").toBoolean()
+Boolean ENABLE_TEXT_EXTRACT
+Boolean ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
+if (System.getenv("ENABLE_TEXT_EXTRACT") == null) {
+    ENABLE_TEXT_EXTRACT = project.property("ENABLE_TEXT_EXTRACT").toBoolean()
 } else {
-    NON_VISUALLY_IMPAIRED_HELP = true
+    ENABLE_TEXT_EXTRACT = false
+}
+if (System.getenv("ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY") == null) {
+    ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY = project.property("ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY").toBoolean()
+} else {
+    ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY = false
 }
 
 android {
@@ -17,8 +23,8 @@ android {
         applicationId "xyz.xydm.cpymo"
         minSdk 18
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -26,8 +32,10 @@ android {
                 cppFlags ''
                 arguments "-DANDROID_STL=c++_static"
 
-                if (!NON_VISUALLY_IMPAIRED_HELP) {
+                if (ENABLE_TEXT_EXTRACT) {
                     cFlags.add("-DENABLE_TEXT_EXTRACT")
+                }
+                if (ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY) {
                     cFlags.add("-DENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY")
                 }
             }
