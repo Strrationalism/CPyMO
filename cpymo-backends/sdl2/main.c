@@ -39,9 +39,9 @@
 #include <pspdebug.h>
 
 /* Define the module info section */
-PSP_MODULE_INFO("CPyMO", 0, 1, 0);
+/*PSP_MODULE_INFO("CPyMO", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_MAX();
+PSP_HEAP_SIZE_MAX();*/
 #endif
 
 #if _WIN32 && !NDEBUG

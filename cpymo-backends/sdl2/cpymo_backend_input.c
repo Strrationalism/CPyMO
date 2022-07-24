@@ -26,7 +26,11 @@ cpymo_input cpymo_input_snapshot()
 	out.skip = keyboard[SDL_SCANCODE_LCTRL] || keyboard[SDL_SCANCODE_RCTRL];
 	out.hide_window = keyboard[SDL_SCANCODE_LSHIFT] || keyboard[SDL_SCANCODE_RSHIFT];
 
-
+#ifdef __PSP__
+	out.mouse_position_useable = false;
+	out.mouse_button = false;
+	out.mouse_wheel_delta = 0;
+#else
 	float scale_x, scale_y;
 	SDL_RenderGetScale(renderer, &scale_x, &scale_y);
 
@@ -43,6 +47,7 @@ cpymo_input cpymo_input_snapshot()
 	out.mouse_x = ((float)mx / scale_x - viewport.x) / (float)viewport.w;
 	out.mouse_y = ((float)my / scale_y - viewport.y) / (float)viewport.h;
 	out.mouse_wheel_delta = mouse_wheel;
+#endif
 
 	if (
 		out.mouse_x >= 1.0f 
