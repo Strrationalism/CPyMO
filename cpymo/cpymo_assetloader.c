@@ -351,7 +351,7 @@ error_t cpymo_assetloader_load_icon(
 	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
 {
 	void *px = NULL;
-	error_t e = cpymo_assetloader_load_icon_pixels(px, w, h, gamedir);
+	error_t e = cpymo_assetloader_load_icon_pixels(&px, w, h, gamedir);
 	CPYMO_THROW(e);
 
 	e = cpymo_backend_image_load(
