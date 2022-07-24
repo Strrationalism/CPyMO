@@ -139,7 +139,7 @@ brew install libxcb
 在构建之前，你可以进行一些配置：
 * 使用`RC_FILE`环境变量可以自定义RC文件。（仅Windows）
 * 使`NO_CONSOLE`环境变量为`1`可以禁止CPyMO创建控制台窗口。（仅Windows）
-* 使用`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量可将游戏文本复制到控制台上。（用于视障玩家）
+* 使`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为`1`可将游戏文本复制到控制台上。（用于视障玩家）
 
 
 
@@ -381,7 +381,7 @@ GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为
 ## 编译
 
 1. cd到`cpymo-backends/android`后执行`./build-android-ffmpeg.sh`以构建FFmpeg。
-2. 如果需要禁用视障帮助功能，请修改`gradle.properties`中的`NON_VISUALLY_IMPAIRED_HELP`属性为`true`.
+2. 如果需要启用视障帮助功能，请修改`gradle.properties`中的`ENABLE_TEXT_EXTRACT`和`ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY`属性为`true`.
 3. 使用Android Studio打开`cpymo-backends/android`即可构建APK。
 
 ## 启动
