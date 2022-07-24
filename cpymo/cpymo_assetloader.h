@@ -36,4 +36,10 @@ error_t cpymo_assetloader_load_system_image(
 	const cpymo_assetloader *loader,
 	bool load_mask);
 
+error_t cpymo_assetloader_load_icon_pixels(
+	void **px, int *w, int *h, const char *gamedir);
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir);
+
 #endif
