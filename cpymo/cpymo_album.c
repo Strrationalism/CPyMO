@@ -16,8 +16,8 @@
 
 #define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
 
-static error_t cpymo_album_generate_album_ui_image(
-	cpymo_backend_image *out_image, 
+static error_t cpymo_album_generate_album_ui_image_pixels(
+	void **out_image, 
 	cpymo_parser_stream_span album_list_text, 
 	cpymo_parser_stream_span output_cache_ui_file_name,
 	size_t page, 
@@ -27,10 +27,12 @@ static error_t cpymo_album_generate_album_ui_image(
 	stbi_uc *pixels = NULL;
 
 	{
-		char *path = (char *)malloc(strlen(loader->gamedir) + 22);
+		char *path = (char *)malloc(strlen(loader->gamedir) + 15 + output_cache_ui_file_name.len);
 		if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 		strcpy(path, loader->gamedir);
-		strcat(path, "/system/albumbg.png");
+		strcat(path, "/system/");
+		strncat(path, output_cache_ui_file_name.begin, output_cache_ui_file_name.len);
+		strcat(path, ".png");
 
 		int w2, h2;
 		pixels = stbi_load(path, &w2, &h2, NULL, 3);
@@ -91,7 +93,8 @@ static error_t cpymo_album_generate_album_ui_image(
 				cpymo_parser_curline_pop_commacell(&album_list_parser);
 			cpymo_parser_stream_span_trim(&bgname_span);
 		
-			error_t err = cpymo_assetloader_load_bg_pixels(&thumb_pixels, &cg_w, &cg_h, bgname_span, loader);
+			error_t err = cpymo_assetloader_load_bg_pixels(
+				&thumb_pixels, &cg_w, &cg_h, bgname_span, loader);
 
 			if (err != CPYMO_ERR_SUCC) break;
 		}
@@ -121,13 +124,39 @@ static error_t cpymo_album_generate_album_ui_image(
 		}
 	}
 
-	error_t err = cpymo_backend_image_load(out_image, pixels, (int)*ref_w, (int)*ref_h, cpymo_backend_image_format_rgb);
+	*out_image = pixels;
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_album_generate_album_ui_image(
+	cpymo_backend_image *out_image, 
+	cpymo_parser_stream_span album_list_text, 
+	cpymo_parser_stream_span output_cache_ui_file_name,
+	size_t page, 
+	cpymo_assetloader* loader,
+	size_t *ref_w, size_t *ref_h)
+{
+	void *pixels = NULL;
+	error_t err = cpymo_album_generate_album_ui_image_pixels(
+		&pixels,
+		album_list_text,
+		output_cache_ui_file_name,
+		page,
+		loader,
+		ref_w, 
+		ref_h);
+
+	CPYMO_THROW(err);
+
+	err = cpymo_backend_image_load(
+		out_image, pixels, (int)*ref_w, (int)*ref_h, 
+		cpymo_backend_image_format_rgb);
+
 	if (err != CPYMO_ERR_SUCC) {
 		free(pixels);
 		return err;
 	}
-
-	return CPYMO_ERR_SUCC;
 }
 
 static error_t cpymo_album_load_ui_image(
