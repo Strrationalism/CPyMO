@@ -3,13 +3,12 @@ OBJS   = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.c,%.o,$(wildcard ../..
 
 INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h
 CFLAGS   = -G0 -Wall -O2 \
-           -DDISABLE_FFMPEG_AUDIO \
+           -DDISABLE_AUDIO \
            -DDISABLE_MOVIE \
            -DNON_VISUALLY_IMPAIRED_HELP \
            -DNDEBUG \
            -D__PSP__ \
-           -DENABLE_SDL2_MIXER_AUDIO_BACKEND \
-		   -DSCREEN_WIDTH=480 \
+           -DSCREEN_WIDTH=480 \
            -DSCREEN_HEIGHT=272 \
            -DUSE_GAME_SELECTOR \
            -DGAME_SELECTOR_FONTSIZE=28 \
