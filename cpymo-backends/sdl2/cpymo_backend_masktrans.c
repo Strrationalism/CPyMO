@@ -93,32 +93,5 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 
 	SDL_UnlockTexture(m->tex);
 
-#ifndef RENDER_LOGICAL_SIZE_UNSUPPORTED_FORCED_CENTERED
 	SDL_RenderCopy(renderer, m->tex, NULL, NULL);
-#else
-	extern void cpymo_backend_image_calc_force_center_offset(float *posx, float *posy);
-	float x, y;
-	cpymo_backend_image_calc_force_center_offset(&x, &y);
-
-	extern const cpymo_engine *engine;
-
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-	SDL_FRect dst_rect;
-	dst_rect.x = x;
-	dst_rect.y = y;
-	dst_rect.w = engine->gameconfig.imagesize_w;
-	dst_rect.h = engine->gameconfig.imagesize_w;
-#else
-	SDL_Rect dst_rect;
-	dst_rect.x = (int)x;
-	dst_rect.y = (int)y;
-	dst_rect.w = (int)engine->gameconfig.imagesize_w;
-	dst_rect.h = (int)engine->gameconfig.imagesize_w;
-#define SDL_RenderCopyF SDL_RenderCopy
-#endif
-
-	SDL_RenderCopyF(renderer, m->tex, NULL, &dst_rect);
-
-#endif
-
 }
