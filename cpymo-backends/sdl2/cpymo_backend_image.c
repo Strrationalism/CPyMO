@@ -257,6 +257,16 @@ static void cpymo_assetloader_sdl2_attach_mask(
 	}
 
 	if (mask == NULL) return;
+	if (mask->w != (*img)->w || mask->h != (*img)->h) {
+		SDL_FreeSurface(mask);
+		return;
+	}
+
+	SDL_Surface *mask2 = SDL_ConvertSurfaceFormat(
+		mask, SDL_PIXELFORMAT_RGBA8888, 0);
+	SDL_FreeSurface(mask);
+	if (mask2 == NULL) return;
+	mask = mask2;
 
 	SDL_Surface *img_rgba = SDL_ConvertSurfaceFormat(
 		*img, SDL_PIXELFORMAT_RGBA8888, 0);
@@ -273,19 +283,12 @@ static void cpymo_assetloader_sdl2_attach_mask(
 				+ ((size_t)y * img_rgba->pitch)
 				+ ((size_t)x * img_rgba->format->BytesPerPixel);
 
-			float fx = (float)x / (float)img_rgba->w;
-			float fy = (float)y / (float)img_rgba->h;
-			size_t mx = (size_t)(fx * mask->w);
-			size_t my = (size_t)(fy * mask->h);
-			if (mx >= mask->w) mx = (size_t)(mask->w - 1);
-			if (my >= mask->h) my = (size_t)(mask->h - 1);
-
 			uint8_t *mask_px = 
 				((uint8_t *)mask->pixels)
-				+ ((size_t)my * mask->pitch)
-				+ ((size_t)mx * mask->format->BytesPerPixel);
+				+ ((size_t)y * mask->pitch)
+				+ ((size_t)x * mask->format->BytesPerPixel);
 
-			img_rgba_px[0] = mask_px[0];
+			img_rgba_px[0] = mask_px[1];
 		}
 	}
 
@@ -360,8 +363,45 @@ error_t cpymo_assetloader_load_bg_image(
 
 error_t cpymo_assetloader_load_system_masktrans(
 	cpymo_backend_masktrans *out, cpymo_parser_stream_span name, 
-	const cpymo_assetloader * loader)
-{ return CPYMO_ERR_UNSUPPORTED; }
+	const cpymo_assetloader *loader)
+{ 
+	char *path = NULL;
+	error_t err = cpymo_assetloader_get_fs_path(
+		&path, name, "system", "png", loader);
+	CPYMO_THROW(err);
+
+	SDL_Surface *sur = IMG_Load(path);
+	if (sur == NULL) {
+		free(path);
+		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+	}
+
+	SDL_Surface *sur2 = 
+		SDL_ConvertSurfaceFormat(sur, SDL_PIXELFORMAT_RGBA8888, 0);
+	SDL_FreeSurface(sur);
+	if (sur2 == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	uint8_t *px = malloc(sur2->w * sur2->h);
+	if (px == NULL) {
+		SDL_FreeSurface(sur2);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	for (int y = 0; y < sur2->h; ++y) {
+		for (int x = 0; x < sur2->w; ++x) {
+			uint8_t *px_ = 
+				((uint8_t *)sur2->pixels)
+				+ ((size_t)y * sur2->pitch)
+				+ ((size_t)x * sur2->format->BytesPerPixel);
+			px[y * sur2->w + x] = px_[3];
+		}
+	}
+
+	int w = sur2->w, h = sur2->h;
+	SDL_FreeSurface(sur2);
+	
+	return cpymo_backend_masktrans_create(out, px, w, h);
+}
 
 #endif
 
