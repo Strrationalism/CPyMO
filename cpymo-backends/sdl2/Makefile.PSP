@@ -5,7 +5,6 @@ INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h
 CFLAGS   = -G0 -Wall -O2 \
            -DDISABLE_FFMPEG_AUDIO \
            -DDISABLE_MOVIE \
-           -DNON_VISUALLY_IMPAIRED_HELP \
            -DNDEBUG \
            -D__PSP__ \
            -DENABLE_SDL2_MIXER_AUDIO_BACKEND \

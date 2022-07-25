@@ -20,7 +20,7 @@ typedef struct {
 
 	char vo_filename[32];
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	char *text;
 #endif
 
@@ -34,7 +34,7 @@ typedef struct {
 	bool owning_name;
 	cpymo_backend_text pending_name;
 	
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	char *pending_text;
 #endif
 } cpymo_backlog;
@@ -46,7 +46,7 @@ void cpymo_backlog_record_write_vo(
 	cpymo_backlog *,
 	cpymo_parser_stream_span vo);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backlog_record_write_full_text(
 	cpymo_backlog *,
 	char *text);

@@ -29,7 +29,6 @@ CFLAGS := \
 	-I$(CURDIR)/../../endianness.h \
 	-D__EMSCRIPTEN__ \
 	-DEMSCRIPTEN_GAMEDIR="\"$(BUILD_GAME_DIR)\"" \
-	-DNON_VISUALLY_IMPAIRED_HELP \
 	-DNDEBUG \
 	$(EM_FLAGS) \
 	-O3

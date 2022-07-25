@@ -144,14 +144,16 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
     return (float)w;
 }
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
-void cpymo_backend_text_visually_impaired_help(const char *text)
+#ifdef ENABLE_TEXT_EXTRACT
+void cpymo_backend_text_extract(const char *text)
 {
-#ifdef __ANDROID__
+#ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
     extern void cpymo_android_text_to_speech(const char *text);
 
     cpymo_android_text_to_speech(text);
-#else
+#endif
+
+#ifdef ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD
     SDL_SetClipboardText(text);
 #endif
 }

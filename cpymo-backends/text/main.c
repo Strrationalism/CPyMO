@@ -72,7 +72,7 @@ float cpymo_backend_text_width(
     float single_character_size_in_logical_screen) 
 { return t.len * single_character_size_in_logical_screen; }
 
-void cpymo_backend_text_visually_impaired_help(const char *text)
+void cpymo_backend_text_extract(const char *text)
 { puts(text); }
 
 #ifdef _WIN32

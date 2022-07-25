@@ -106,8 +106,8 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 		break;
 	}
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
-	cpymo_backend_text_visually_impaired_help(val_str);
+#ifdef ENABLE_TEXT_EXTRACT
+	cpymo_backend_text_extract(val_str);
 #endif
 	
 	error_t err = cpymo_backend_text_create(
@@ -197,7 +197,7 @@ static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
 		(int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(selected));
 }
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
 {
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
@@ -212,7 +212,7 @@ static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_e
 	default: assert(false);
 	}
 
-	cpymo_backend_text_visually_impaired_help(p);
+	cpymo_backend_text_extract(p);
 
 	return CPYMO_ERR_SUCC;
 }
@@ -235,7 +235,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		5);
 	CPYMO_THROW(err);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	cpymo_list_ui_set_selection_changed_callback(e, &cpymo_config_ui_visual_im_help_selection_changed_callback);
 #endif
 

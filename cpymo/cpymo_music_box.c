@@ -16,7 +16,7 @@ typedef struct {
 	cpymo_parser_stream_span *music_filename;
 	cpymo_backend_text *music_title;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	char **music_title_text;
 #endif
 
@@ -30,7 +30,7 @@ static void cpymo_music_box_deleter(cpymo_engine *e, void *ui_)
 	for (uintptr_t i = 0; i < box->music_count; ++i)
 		cpymo_backend_text_free(box->music_title[i]);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	if (box->music_title_text) {
 		for (uintptr_t i = 0; i < box->music_count; ++i)
 			if (box->music_title_text[i]) free(box->music_title_text[i]);
@@ -77,7 +77,7 @@ static error_t cpymo_musicbox_ok(struct cpymo_engine *e, void *selected)
 	return CPYMO_ERR_SUCC;
 }
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_musicbox_visual_help_selection_change(cpymo_engine *e, void *selected)
 {
 	const cpymo_music_box *box = (cpymo_music_box *)cpymo_list_ui_data_const(e);
@@ -85,7 +85,7 @@ static error_t cpymo_musicbox_visual_help_selection_change(cpymo_engine *e, void
 	if (box->music_title_text) {
 		uintptr_t node_index = DECODE_NODE(selected);
 		if (box->music_title_text[node_index])
-			cpymo_backend_text_visually_impaired_help(box->music_title_text[node_index]);
+			cpymo_backend_text_extract(box->music_title_text[node_index]);
 	}
 
 	return CPYMO_ERR_SUCC;
@@ -155,7 +155,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	const cpymo_gameconfig *c = &e->gameconfig;
 	box->font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	box->music_title_text = (char **)malloc(sizeof(char *) * box->music_count);
 	cpymo_list_ui_set_selection_changed_callback(
 		e, &cpymo_musicbox_visual_help_selection_change);
@@ -175,7 +175,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 
 		box->music_filename[i] = music_file;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 		if (box->music_title_text) {
 			box->music_title_text[i] = (char *)malloc(music_title.len + 1);
 			if (box->music_title_text[i]) {

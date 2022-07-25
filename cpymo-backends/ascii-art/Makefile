@@ -12,7 +12,6 @@ INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
 CFLAGS += \
 	-DDISABLE_AUDIO \
 	-DDISABLE_MOVIE \
-	-DNON_VISUALLY_IMPAIRED_HELP \
 	-DNDEBUG \
 	-O3 \
 	-I../../cpymo \

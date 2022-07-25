@@ -12,12 +12,12 @@ typedef struct {
 	size_t draw_times;
 } cpymo_game_selector;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_game_selector_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
 {
 	if (sel) {
 		cpymo_game_selector_item *item = (cpymo_game_selector_item *)sel;
-		cpymo_backend_text_visually_impaired_help(item->gametitle_text);
+		cpymo_backend_text_extract(item->gametitle_text);
 	}
 	return CPYMO_ERR_SUCC;
 }
@@ -124,7 +124,7 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
 		error_t err = cpymo_gameconfig_parse_from_file(&game_config, path);
 		if (err != CPYMO_ERR_SUCC) FAIL;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
         strcpy(item->gametitle_text, game_config.gametitle);
 #endif
 		cpymo_backend_text_create(&item->gametitle, &item->gametitle_w,
@@ -278,7 +278,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 		);
 		CPYMO_THROW(err);
 
-		#ifndef NON_VISUALLY_IMPAIRED_HELP
+		#ifdef ENABLE_TEXT_EXTRACT
 			cpymo_list_ui_set_selection_changed_callback(e, &cpymo_game_selector_visual_im_help_selection_changed_callback);
 		#endif
 
