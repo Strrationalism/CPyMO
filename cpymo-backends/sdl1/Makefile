@@ -10,7 +10,6 @@ OBJS := \
 INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
 
 CFLAGS += \
-	-DNON_VISUALLY_IMPAIRED_HELP \
 	-DSCREEN_RESIZABLE \
 	-DLOAD_GAME_ICON \
 	-DTOGGLE_FULLSCREEN \

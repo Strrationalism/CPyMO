@@ -225,7 +225,8 @@ jobs:
         output-path: cpymo.apk
         gradle-task: assembleRelease
       env:
-        NON_VISUALLY_IMPAIRED_HELP: 1
+        ENABLE_TEXT_EXTRACT: 1
+        ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY: 1
     - name: Build APK (Accessibility)
       uses: sparkfabrik/android-build-action@v1.0.0
 

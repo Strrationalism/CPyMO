@@ -215,13 +215,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			name_or_text.len = 0;
 		}
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 		char *full_text = (char *)malloc(name_or_text.len + text.len + 1);
 		if (full_text) {
 			memset(full_text, 0, name_or_text.len + text.len + 1);
 			strncpy(full_text, name_or_text.begin, name_or_text.len);
 			strncat(full_text, text.begin, text.len);
-			cpymo_backend_text_visually_impaired_help(full_text);
+			cpymo_backend_text_extract(full_text);
 			cpymo_backlog_record_write_full_text(&engine->backlog, full_text);
 		}
 #endif
@@ -252,12 +252,12 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		POP_ARG(show_immediately_str);
 		bool show_immediately = cpymo_parser_stream_span_atoi(show_immediately_str) != 0;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 		char *full_text = (char *)malloc(content.len + 1);
 		if (full_text) {
 			memset(full_text, 0, content.len + 1);
 			strncpy(full_text, content.begin, content.len);
-			cpymo_backend_text_visually_impaired_help(full_text);
+			cpymo_backend_text_extract(full_text);
 			free(full_text);
 		}
 #endif
@@ -294,8 +294,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		if (strlen(engine->title) <= 0)
 			CONT_NEXTLINE;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
-		cpymo_backend_text_visually_impaired_help(engine->title);
+#ifdef ENABLE_TEXT_EXTRACT
+		cpymo_backend_text_extract(engine->title);
 #endif
 
 		return cpymo_floating_hint_start(

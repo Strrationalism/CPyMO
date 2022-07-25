@@ -34,7 +34,7 @@ typedef struct {
 	uint64_t hash;
 	bool has_selected;
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	char *original_text;
 #endif
 

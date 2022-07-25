@@ -12,7 +12,7 @@
 
 typedef struct {
 	cpymo_backend_text text;
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	char *orginal_text;
 #endif
 	bool is_empty_save;
@@ -97,7 +97,7 @@ static void cpymo_save_ui_deleter(cpymo_engine *e, void *ui_data)
 	for (size_t i = 0; i < MAX_SAVES; ++i) {
 		if (ui->items[i].text) 
 			cpymo_backend_text_free(ui->items[i].text);
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 		if (ui->items[i].orginal_text) free(ui->items[i].orginal_text);
 #endif
 	}
@@ -120,13 +120,13 @@ static void* cpymo_save_ui_get_prev(const cpymo_engine *e, const void *ui_data, 
 	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(i - 1);
 }
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_save_ui_visual_impaired_selection_changed(cpymo_engine *e, void *cur)
 {
 	if (cur) {
 		uintptr_t i = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
 		const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data(e);
-		cpymo_backend_text_visually_impaired_help(ui->items[i].orginal_text);
+		cpymo_backend_text_extract(ui->items[i].orginal_text);
 	}
 	return CPYMO_ERR_SUCC;
 }
@@ -152,7 +152,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 	
 	cpymo_list_ui_enable_loop(e);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 	cpymo_list_ui_set_selection_changed_callback(e, &cpymo_save_ui_visual_impaired_selection_changed);
 	ui->items[0].orginal_text = NULL;
 #endif
@@ -262,7 +262,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 		error_t err = cpymo_backend_text_create(
 			&ui->items[i].text, &w, cpymo_parser_stream_span_pure(text_buf), fontsize);
 
-#ifndef NON_VISUALLY_IMPAIRED_HELP
+#ifdef ENABLE_TEXT_EXTRACT
 		ui->items[i].orginal_text = (char *)malloc(strlen(text_buf) + 1);
 		if (ui->items[i].orginal_text) {
 			strcpy(ui->items[i].orginal_text, text_buf);

@@ -11,7 +11,7 @@ CFLAGS := \
 	-I../../cpymo \
 	-I../../endianness.h \
 	-I../../stb \
-	-I../include \
+	-I../include
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -DDEBUG -g
@@ -29,6 +29,10 @@ ifeq ($(DISABLE_AUDIO), 1)
 CFLAGS += -DDISABLE_AUDIO -DDISABLE_MOVIE
 endif
 
+ifeq ($(ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD), 1)
+CFLAGS += -DENABLE_TEXT_EXTRACT -DENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD
+endif
+
 ifneq ($(strip $(SDL2)), )
 CFLAGS += -I$(SDL2)/include/
 LDFLAGS += -L$(SDL2)/lib/
@@ -42,10 +46,6 @@ endif
 ifneq ($(strip $(FFMPEG)), )
 CFLAGS += -I$(FFMPEG)/include/
 LDFLAGS += -L$(FFMPEG)/lib/
-endif
-
-ifeq ($(NON_VISUALLY_IMPAIRED_HELP), 1)
-CFLAGS += -DNON_VISUALLY_IMPAIRED_HELP
 endif
 
 ifndef TARGET
@@ -74,9 +74,18 @@ endef
 ifeq ($(OS), Windows_NT)
 OBJS += $(BUILD_DIR)/cpymo.res
 LDFLAGS += -lwinpthread
+
+ifeq ($(NO_CONSOLE), 1)
+LDFLAGS += -mwindows
 endif
 
-$(BUILD_DIR)/cpymo.res: ../sdl2/pymo-icon-windows.rc
+ifneq ($(strip $(RC_FILE)), "")
+RC_FILE := ../sdl2/pymo-icon-windows.rc
+endif
+
+endif
+
+$(BUILD_DIR)/cpymo.res: $(RC_FILE)
 	@windres -i $< -o $@ -O coff
 
 $(BUILD_DIR_CPYMO)/%.o: ../../cpymo/%.c $(INC)

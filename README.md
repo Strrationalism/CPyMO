@@ -86,12 +86,6 @@ POSIX (Text)     | Text      | 不支持     | 不支持                        
 brew install libxcb
 ```
 
-## 视障帮助功能
-
-github action及release上的版本默认会开启视障帮助功能，除了Android会同时构建开启和不开启两个版本。如果你需要禁用视障帮助功能，可在编译时定义宏`NON_VISUALLY_IMPAIRED_HELP`. 
-
-视障帮助功能将会把游戏中的文本复制到剪切板供读屏软件读取(Android平台除外)。
-
 ## 全屏
 
 按下Alt + Enter键可在全屏/窗口模式中切换。
@@ -112,16 +106,16 @@ github action及release上的版本默认会开启视障帮助功能，除了And
 除此之外，你还可以使用以下编译开关：
 
 * 若`NO_CONSOLE`环境变量存在或通过-a传入并设置为1，则禁用命令行窗口，使得CPyMO仅创建一个游戏窗口。
-* 若`NON_VISUALLY_IMPAIRED_HELP`环境变量存在或通过-a传入并设置为1，则禁用视障帮助功能。
 * 若`RC_FILE`环境变量存在或通过-a传入，则允许传入用户指定的资源文件（主要用于修改图标）。
 * 若`TARGET`环境变量存在或通过-a传入，则允许用户通过TARGET指定输出的可执行文件名称。
+* 若`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为1或通过-a传入1，则将会导出游戏文本到剪切板（用于视障玩家）。
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
 
 ## 使用GNU Make进行构建
 
 1. 你需要安装SDL2，可以选择直接安装`libsdl2-dev`，或者将SDL2的预编译二进制库存入环境变量`SDL2`中。
-2. 如果你需要使用FFmpeg播放音频和视频，可以选择安装以下库，或者将其预编译的二进制库存入环境变量`FFmpeg`中：
+2. 如果你需要使用FFmpeg播放音频和视频，可以选择安装以下库，或者将其预编译的库存入环境变量`FFmpeg`中：
     * libavformat-dev
     * libavutil-dev
     * libavcodec-dev
@@ -129,10 +123,9 @@ github action及release上的版本默认会开启视障帮助功能，除了And
     * libswresample-dev
 3. 如果你需要使用SDL2_mixer播放音频，则可以选择安装`libsdl2-mixer-dev`，或者将SDL2_mixer的预编译二进制库存入环境变量`SDL2_mixer`中，并定义环境变量`export USE_SDL2_MIXER=1`.
 4. 如果你不想播放音视频，可直接定义`export DISABLE_AUDIO=1`。
-5. 如果你不想使用视障帮助功能，则可以定义`export NON_VISUALLY_IMPAIRED_HELP=1`。
-6. 通过定义`TARGET`环境变量来指定输出文件名的名称。
-7. 通过定义`DEBUG=1`环境变量来启动调试信息，之后便可使用gdb进行调试。
-8. 执行`make -j`即可产生可执行文件。
+5. 通过定义`TARGET`环境变量来指定输出文件名的名称。
+6. 通过定义`DEBUG=1`环境变量来启动调试信息，之后便可使用gdb进行调试。
+7. 执行`make -j`即可产生可执行文件。
 
 在Windows下，你也许需要拷贝以下dll文件到可执行文件目录才可以在非MSYS2环境下运行CPyMO并启动调试：
 
@@ -142,6 +135,12 @@ github action及release上的版本默认会开启视障帮助功能，除了And
 - libwinpthread-1.dll
 - SDL2.dll
 - swresample-3.dll
+
+在构建之前，你可以进行一些配置：
+* 使用`RC_FILE`环境变量可以自定义RC文件。（仅Windows）
+* 使`NO_CONSOLE`环境变量为`1`可以禁止CPyMO创建控制台窗口。（仅Windows）
+* 使`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为`1`可将游戏文本复制到控制台上。（用于视障玩家）
+
 
 
 # Nintendo 3DS 平台
@@ -382,7 +381,7 @@ GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为
 ## 编译
 
 1. cd到`cpymo-backends/android`后执行`./build-android-ffmpeg.sh`以构建FFmpeg。
-2. 如果需要禁用视障帮助功能，请修改`gradle.properties`中的`NON_VISUALLY_IMPAIRED_HELP`属性为`true`.
+2. 如果需要启用视障帮助功能，请修改`gradle.properties`中的`ENABLE_TEXT_EXTRACT`和`ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY`属性为`true`.
 3. 使用Android Studio打开`cpymo-backends/android`即可构建APK。
 
 ## 启动
@@ -471,10 +470,6 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 其中`cpymo-backends/include`中的代码规定了每个后端都应当实现的接口。
 
 ## 通用部分
-
-### 视障帮助
-
-使用宏`NON_VISUALLY_IMPAIRED_HELP`可以关闭视障帮助功能。
 
 ### 音频系统
 
