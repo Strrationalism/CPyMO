@@ -2,8 +2,10 @@ TARGET = CPyMO_PSP
 OBJS   = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.c,%.o,$(wildcard ../../cpymo/*.c))
 
 INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h
-CFLAGS   = -G0 -Wall -O2 \
-           -DDISABLE_AUDIO \
+CFLAGS   = -G0 -Wall -O3 \
+           -DDISABLE_FFMPEG_AUDIO -DENABLE_SDL2_MIXER_AUDIO_BACKEND \
+           -DSDL2_MIXER_AUDIO_BACKEND_FREQ=44100 \
+           -DSDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE=65536*4 \
            -DDISABLE_MOVIE \
            -DNDEBUG \
            -D__PSP__ \

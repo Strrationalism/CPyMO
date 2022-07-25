@@ -41,6 +41,10 @@ static SDL_RWops *vo_rwops = NULL;
 #define SDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE (1024 * 256)
 #endif
 
+#ifndef SDL2_MIXER_AUDIO_FORMAT
+#define SDL2_MIXER_AUDIO_FORMAT MIX_DEFAULT_FORMAT
+#endif
+
 void cpymo_audio_init(cpymo_audio_system *s)
 {
 	enabled = false;
@@ -72,7 +76,7 @@ void cpymo_audio_init(cpymo_audio_system *s)
 	if ((supported & MIX_INIT_OGG) == 0)
 		SDL_Log("[Warning] OGG not supported.\n");
 
-	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, MIX_DEFAULT_FORMAT, 2, SDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE) == -1) {
+	if (Mix_OpenAudio(SDL2_MIXER_AUDIO_BACKEND_FREQ, SDL2_MIXER_AUDIO_FORMAT, 2, SDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE) == -1) {
         SDL_Log("[Error] SDL2_Mixer open audio failed: %s\n", Mix_GetError());
 		Mix_Quit();
 		return;
