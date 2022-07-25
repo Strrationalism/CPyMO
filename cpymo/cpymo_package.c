@@ -127,6 +127,7 @@ static void cpymo_package_stream_reader_image_skip(void *stream_reader, int n)
 
 #endif
 
+#ifndef DISABLE_STB_IMAGE
 error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, const cpymo_package_index * index)
 {	
 #ifdef STREAMING_LOAD_IMAGE
@@ -177,6 +178,7 @@ error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels,
 	
 	return cpymo_package_read_image_from_index(pixels, w, h, channels, pkg, &i);
 }
+#endif
 
 error_t cpymo_package_stream_reader_find_create(cpymo_package_stream_reader * r, const cpymo_package * package, cpymo_parser_stream_span filename)
 {	
