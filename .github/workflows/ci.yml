@@ -150,9 +150,13 @@ jobs:
         sudo chown -R $USER: $PSPDEV
         export PATH=$PATH:$PSPDEV/bin
         ./build-all.sh
+        psp-pacman -Syu
+        psp-pacman -S sdl2 sdl2-mixer sdl2-image sdl2-ttf --noconfirm
 
     - name: Build
       run: |
+        export PSPDEV=/usr/local/pspdev
+        export PATH=$PATH:$PSPDEV/bin
         cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
 
