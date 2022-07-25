@@ -421,6 +421,8 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 			if (sel->or_text) {
 				const bool selected = o->current_selection == i;
 
+				float y_off = 0, x_off = 0;
+
 				if (selected && o->sel_highlight) {
 					cpymo_backend_image_draw(
 						(float)sel->w / 2.0f - (float)o->sel_highlight_w / 2.0f + sel->x,
@@ -433,10 +435,15 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 						o->draw_type);
 				}
 
+				if (selected) {
+					y_off = -0.5f * logical_screen_h / 100.0f;
+					x_off = +0.5f * logical_screen_w / 100.0f;
+				}
+
 				cpymo_backend_text_draw(
 					sel->or_text,
-					sel->x,
-					sel->y,
+					sel->x + x_off,
+					sel->y + y_off,
 					(selected && o->sel_highlight == NULL) ? 
 						cpymo_color_inv(sel->text_color) : sel->text_color,
 					gray ? 0.75f : 1.0f,

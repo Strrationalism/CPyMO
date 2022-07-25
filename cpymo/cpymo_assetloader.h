@@ -24,6 +24,12 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int
 error_t cpymo_assetloader_load_script(char **out_buffer, size_t *buf_size, const char *script_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_parser_stream_span name, const cpymo_assetloader *loader);
 
+error_t cpymo_assetloader_get_fs_path(
+	char **out_str,
+	cpymo_parser_stream_span asset_name,
+	const char *asset_type,
+	const char *asset_ext,
+	const cpymo_assetloader *l);
 error_t cpymo_assetloader_get_bgm_path(char **out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span se_name, const cpymo_assetloader *l);
 error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l);
