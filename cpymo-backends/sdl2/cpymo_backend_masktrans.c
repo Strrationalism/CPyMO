@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #include <cpymo_engine.h>
-extern const cpymo_engine engine;
+extern cpymo_engine engine;
 
 
 typedef struct {
