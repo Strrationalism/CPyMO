@@ -297,7 +297,7 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 * platform参数：s60v3
 * 不支持的内容：
     * 视频
-	* 音效（se）
+    * 音效（se）
     * 语音（voice）
 
 # Sony Playstation Vita 平台
