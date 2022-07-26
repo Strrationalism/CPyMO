@@ -543,7 +543,27 @@ int main(int argc, char **argv)
 		if (need_to_redraw || redraw_by_event) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 			SDL_RenderClear(renderer);
+
 			cpymo_engine_draw(&engine);
+
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+			const float game_w = engine.gameconfig.imagesize_w;
+			const float game_h = engine.gameconfig.imagesize_h;
+			const float rects[] = {
+				-100, 0, 100, game_h,
+				game_w, 0, 100, game_h,
+				0, -100, game_w, 100,
+				0, game_h, game_w, 100
+			};
+
+			cpymo_backend_image_fill_rects(
+				rects,
+				CPYMO_ARR_COUNT(rects) / 4,
+				cpymo_color_black,
+				1.0f,
+				cpymo_backend_image_draw_type_bg);
+#endif
+
 			SDL_RenderPresent(renderer);
 			if (redraw_by_event) redraw_by_event--;
 			//fps_counter++;

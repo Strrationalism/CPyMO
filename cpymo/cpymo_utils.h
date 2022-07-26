@@ -32,7 +32,9 @@ void cpymo_utils_attach_mask_to_rgba(void *rgba, void *mask, int w, int h);
 void cpymo_utils_attach_mask_to_rgba_ex(
 	void *rgba, int w, int h, void *mask, int mask_w, int mask_h);
 
+#define CPYMO_ARR_COUNT(ARR) (sizeof(ARR) / sizeof(ARR[0]))
+
 #define CPYMO_FOREACH_ARR(INDEX, ARR) \
-	for (size_t INDEX = 0; INDEX < sizeof(ARR) / sizeof(ARR[0]); ++INDEX)
+	for (size_t INDEX = 0; INDEX < CPYMO_ARR_COUNT(ARR); ++INDEX)
 
 #endif
