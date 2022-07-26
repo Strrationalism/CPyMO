@@ -102,8 +102,8 @@ void trans_pos(float *x, float *y) {
         offset_x = ((drawing_bottom_screen ? 320 : 400) - viewport_w) / 2.0f,
         offset_y = 240 - viewport_h;
 
-    if (drawing_bottom_screen) 
-        offset_y = (240 - viewport_h) / 2.0f;
+    if (drawing_bottom_screen || enhanced_3ds_display_mode || !fill_screen) 
+        offset_y /= 2.0f;
 
     *x = *x / r + offset_x;
     *y = *y / r + offset_y;
