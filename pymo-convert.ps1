@@ -24,23 +24,11 @@ $device_specs = @(
        DisabledComponents = @(); ScreenFitSupport = $false;
        RuntimeName = "PyMO for Android 2.2~4.3"; },
 
-    @{ Name = "switch"; Width = 1920; Height = 1080; UseMask = $false; 
-       Movie = $true; BGFormat = "png"; Charaformat = "png"; 
-       PlatformId = "pygame"; Audio = @("mp3", "ogg", "wav");
-       DisabledComponents = @(); ScreenFitSupport = $false;
-       RuntimeName = "CPyMO for Nintendo Switch"; },
-
     @{ Name = "psp"; Width = 480; Height = 272; UseMask = $true; Movie = $false;
        BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; 
        Audio = @("ogg", "wav"); DisabledComponents = @("voice", "se");
        ScreenFitSupport = $false;
        RuntimeName = "CPyMO for Sony PSP" },
-
-    @{ Name = "psv"; Width = 960; Height = 544; UseMask = $false; 
-       Movie = $false; BGFormat = "png"; Charaformat = "png"; 
-       PlatformId = "pygame"; Audio = @("ogg", "wav"); 
-       DisabledComponents = @(); ScreenFitSupport = $false;
-       RuntimeName = "CPyMO for Sony PSV" }
 
     @{ Name = "wii"; Width = 640; Height = 480; UseMask = $false; 
        Movie = $false; BGFormat = "jpg"; Charaformat = "png"; 
