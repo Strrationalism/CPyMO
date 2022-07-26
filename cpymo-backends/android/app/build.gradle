@@ -2,17 +2,17 @@ plugins {
     id 'com.android.application'
 }
 
-Boolean ENABLE_TEXT_EXTRACT
-Boolean ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
+Boolean ENABLE_TEXT_EXTRACT = false
+Boolean ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY = false
 if (System.getenv("ENABLE_TEXT_EXTRACT") == null) {
     ENABLE_TEXT_EXTRACT = project.property("ENABLE_TEXT_EXTRACT").toBoolean()
 } else {
-    ENABLE_TEXT_EXTRACT = false
+    ENABLE_TEXT_EXTRACT = true
 }
 if (System.getenv("ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY") == null) {
     ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY = project.property("ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY").toBoolean()
 } else {
-    ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY = false
+    ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY = true
 }
 
 android {
@@ -42,8 +42,25 @@ android {
         }
     }
 
-    buildTypes {
+    signingConfigs {
         release {
+            //签名文件路径，我是放到项目中了
+            storeFile file { "keystore.jks" }
+            //签名密码
+            storePassword "123456"
+            //别名
+            keyAlias "key0"
+            //别名密码
+            keyPassword "123456"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
+        release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
