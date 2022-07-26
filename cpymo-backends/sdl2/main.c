@@ -182,15 +182,16 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
 	save_last_selected_game_dir(gamedir);
 
-	if (SDL_RenderSetLogicalSize(renderer, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
+#ifndef __PSP__
+	if (SDL_RenderSetLogicalSize(renderer, 
+		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
+#endif
 
-#ifndef __PSP__
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
-#endif
 
 	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);

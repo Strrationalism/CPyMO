@@ -96,6 +96,8 @@ void cpymo_backend_image_draw(
 #ifdef ENABLE_SCREEN_FORCE_CENTERED
 	float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
 	dstx += offset;
+	offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
+	dsty += offset;
 #endif
 
 #ifdef DISABLE_IMAGE_SCALING
@@ -153,6 +155,8 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 #ifdef ENABLE_SCREEN_FORCE_CENTERED
 		float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
 		rect.x += (int)offset;
+		offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
+		rect.y += offset;
 #endif
 		SDL_RenderFillRect(renderer, &rect);
 	}

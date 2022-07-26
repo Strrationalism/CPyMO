@@ -5,9 +5,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#ifdef RENDER_LOGICAL_SIZE_UNSUPPORTED_FORCED_CENTERED
 #include <cpymo_engine.h>
-#endif
+extern const cpymo_engine engine;
 
 
 typedef struct {
@@ -93,5 +92,16 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 
 	SDL_UnlockTexture(m->tex);
 
-	SDL_RenderCopy(renderer, m->tex, NULL, NULL);
+	SDL_Rect rect;
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = engine.gameconfig.imagesize_w;
+	rect.h = engine.gameconfig.imagesize_h;
+
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+	rect.x += (SCREEN_WIDTH - rect.w) / 2;
+	rect.y += (SCREEN_HEIGHT - rect.h) / 2;
+#endif
+
+	SDL_RenderCopy(renderer, m->tex, NULL, &rect);
 }
