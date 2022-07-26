@@ -1,3 +1,5 @@
+#ifndef DISABLE_STB_TRUETYPE
+
 #include <cpymo_error.h>
 #include <cpymo_utils.h>
 #include <cpymo_parser.h>
@@ -219,3 +221,5 @@ void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_parser_s
 	*w = width;
 	*h = height;
 }
+
+#endif

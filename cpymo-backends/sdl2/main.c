@@ -19,31 +19,26 @@
 #define STBI_NO_PNM
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#endif
 
 #define FASTEST_FILTER STBIR_FILTER_BOX
 #define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
 #define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize.h>
-#include <cpymo_backend_audio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+
+#endif
+
+#include <cpymo_backend_audio.h>
+
 
 #if defined __SWITCH__
 #include <switch.h>
 #elif defined __EMSCRIPTEN__
 #include <emscripten.h> 
 #define SDL_Delay emscripten_sleep
-#elif defined __PSP__
-#include <pspkernel.h>
-#include <pspdebug.h>
-
-/* Define the module info section */
-/*PSP_MODULE_INFO("CPyMO", 0, 1, 0);
-PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_MAX();*/
 #endif
 
 #if _WIN32 && !NDEBUG

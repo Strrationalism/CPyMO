@@ -1,3 +1,5 @@
+#ifndef DISABLE_STB_TRUETYPE
+
 #include <cpymo_backend_text.h>
 #include <stb_truetype.h>
 #include <stdlib.h>
@@ -139,6 +141,8 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
     return (float)w;
 }
 
+#endif
+
 #ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backend_text_extract(const char *text)
 {
@@ -153,3 +157,4 @@ void cpymo_backend_text_extract(const char *text)
 #endif
 }
 #endif
+
