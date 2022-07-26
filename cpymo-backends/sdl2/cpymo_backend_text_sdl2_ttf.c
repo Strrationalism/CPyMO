@@ -73,6 +73,12 @@ static void cpymo_backend_font_update_size(float s)
     }
 }
 
+typedef struct {
+    SDL_Texture *tex;
+    int w, h;
+    float scsils_size;
+} cpymo_backend_text_internal;
+
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
     float *out_width,
@@ -111,41 +117,57 @@ error_t cpymo_backend_text_create(
     if (text == NULL) return CPYMO_ERR_UNKNOWN;
 
     SDL_Texture *text_tex = SDL_CreateTextureFromSurface(renderer, text);
-    int w = text->w;
+    int w = text->w, h = text->h;
 
     SDL_FreeSurface(text);
     if (text_tex == NULL) return CPYMO_ERR_UNKNOWN;
 
     SDL_SetTextureBlendMode(text_tex, SDL_BLENDMODE_BLEND);
 
-    *out = text_tex;
-    *out_width = w;
+    cpymo_backend_text_internal *out_text =
+        (cpymo_backend_text_internal *)
+        malloc(sizeof(cpymo_backend_text_internal));
+    if (out == NULL) {
+        SDL_DestroyTexture(text_tex);
+        return CPYMO_ERR_OUT_OF_MEM;
+    }
+
+    out_text->tex = text_tex;
+    out_text->w = w;
+    out_text->h = h;
+    out_text->scsils_size = single_character_size_in_logical_screen;
+
+    *out = out_text;
+    *out_width = (float)w;
 
     return CPYMO_ERR_SUCC;
 }
 
 void cpymo_backend_text_free(cpymo_backend_text text)
-{ cpymo_backend_image_free(text); }
+{
+    cpymo_backend_text_internal *t = (cpymo_backend_text_internal *)text;
+    SDL_DestroyTexture(t->tex);
+    free(t);
+}
 
 void cpymo_backend_text_draw(
-    cpymo_backend_text t,
+    cpymo_backend_text text,
     float x, float y_baseline,
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type)
 {
-    int w, h;
-    if (SDL_QueryTexture(t, NULL, NULL, &w, &h)) return;
+    cpymo_backend_text_internal *t = (cpymo_backend_text_internal *)text;
+    int w = t->w, h = t->h;
 
-    const float magic_offset = 6.0f;
-    y_baseline += magic_offset;
+    float y = y_baseline - t->scsils_size;
     
-    SDL_SetTextureColorMod(t, 255 - col.r, 255 - col.g, 255 - col.b);
+    SDL_SetTextureColorMod(t->tex, 255 - col.r, 255 - col.g, 255 - col.b);
     cpymo_backend_image_draw(
-        x + 1, y_baseline - h + 1, w, h, t, 0, 0, w, h, alpha, draw_type);
+        x + 1, y + 1, w, h, t->tex, 0, 0, w, h, alpha, draw_type);
 
-    SDL_SetTextureColorMod(t, col.r, col.g, col.b);
+    SDL_SetTextureColorMod(t->tex, col.r, col.g, col.b);
     cpymo_backend_image_draw(
-        x, y_baseline - h, w, h, t, 0, 0, w, h, alpha, draw_type);
+        x, y, w, h, t->tex, 0, 0, w, h, alpha, draw_type);
 }
 
 float cpymo_backend_text_width(
