@@ -15,7 +15,7 @@ jobs:
     name: 'Nintendo Switch'
     runs-on: ubuntu-latest
     container: devkitpro/devkita64:latest
- 
+
     steps:
     - uses: actions/checkout@v1
       with:
@@ -25,7 +25,7 @@ jobs:
       run: |
         cd ./cpymo-backends/sdl2
         make -j -f Makefile.Switch
-    
+
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
@@ -36,12 +36,12 @@ jobs:
     name: 'Nintendo 3DS'
     runs-on: ubuntu-latest
     container: devkitpro/devkitarm:latest
- 
+
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: true
-        
+
     - name: Install Makerom
       run: |
         cd ./cpymo-backends/3ds
@@ -61,13 +61,13 @@ jobs:
         make -j
         $DEVKITARM/bin/arm-none-eabi-strip ./build/cpymo.elf
         ./makerom -f cia -o cpymo.cia -elf ./build/cpymo.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
-    
+
     - name: Upload cia
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Nintendo 3DS (cia)
         path: ./cpymo-backends/3ds/cpymo.cia
-        
+
     - name: Upload 3dsx
       uses: actions/upload-artifact@v2.3.0
       with:
@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-        with: 
+        with:
           submodules: true
 
       - name: 'Build'
@@ -98,12 +98,12 @@ jobs:
   build-psv:
     name: 'Sony PSV'
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: true
-    
+
     - name: Install Dependents
       run: |
         git clone https://github.com/vitasdk/vdpm.git --depth 1
@@ -188,7 +188,7 @@ jobs:
         cd cpymo-backends/sdl2
         export AUDIO_BACKEND=ffmpeg
         make -f Makefile.Emscripten -j
-        
+#
   build-android:
     name: 'Android'
     runs-on: ubuntu-latest
@@ -222,37 +222,19 @@ jobs:
         ./build-android-ffmpeg.sh
 
     - name: Build APK
-      uses: sparkfabrik/android-build-action@v1.0.0
+      run: |
+        cd ./cpymo-backends/android
+        ./gradlew assembleRelease --stacktrace
+        cp ./app/build/outputs/apk/release/app-release.apk ../../cpymo-signed.apk
 
-      with:
-        project-path: ./cpymo-backends/android
-        output-path: cpymo.apk
-        gradle-task: assembleRelease
+    - name: Build APK (Accessibility)
+      run: |
+        cd ./cpymo-backends/android
+        ./gradlew assembleRelease --stacktrace
+        cp ./app/build/outputs/apk/release/app-release.apk ../../cpymo-accessibility-signed.apk
       env:
         ENABLE_TEXT_EXTRACT: 1
         ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY: 1
-    - name: Build APK (Accessibility)
-      uses: sparkfabrik/android-build-action@v1.0.0
-
-      with:
-        project-path: ./cpymo-backends/android
-        output-path: cpymo-accessibility.apk
-        gradle-task: assembleRelease
-
-    - name: Sign APK
-      uses: r0adkll/sign-android-release@v1
-      # ID used to access action output
-      id: sign_app
-      with:
-        releaseDirectory: ./
-        signingKeyBase64: ${{ secrets.ANDROID_SIGN_KEYSTORE }}
-        alias: 'key0'
-        keyStorePassword: '123456'
-        keyPassword: '123456'
-      env:
-        # override default build-tools version (29.0.3) -- optional
-        BUILD_TOOLS_VERSION: "30.0.2"
-
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
@@ -279,10 +261,10 @@ jobs:
 
     - name: Find Visual Studio
       uses: ilammy/msvc-dev-cmd@v1
-        
+
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
-        
+
     - name: Donwload vcpkg
       run: git clone https://github.com/microsoft/vcpkg --depth 1
 
@@ -342,7 +324,7 @@ jobs:
         export USE_SDL_MIXER=1
         mingw32-make -j
         strip cpymo.exe
-        
+
         wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
         mv COPYING COPYING.SDL_mixer.txt
         wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
@@ -385,7 +367,7 @@ jobs:
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       matrix:
         tuple: [ win-x64, win-x86, win-arm64, win-arm, mac-x64, mac-arm64, linux-x64 ]
@@ -429,21 +411,21 @@ jobs:
             triplet: arm64-osx
             package-name: "macOS Apple Silicon"
             cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=arm64"
-            
+
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-        
+
     - uses: ilammy/msvc-dev-cmd@v1
       if: ${{ runner.os == 'Windows' }}
       with:
         arch: ${{ matrix.arch }}
-        
+
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
       if: ${{ runner.os != 'Windows' }}
-        
+
     - name: Donwload vcpkg
       run: git clone https://github.com/microsoft/vcpkg --depth 1
 
@@ -457,13 +439,13 @@ jobs:
 
     - name: Install SDL2
       run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
-      
+
     - name: Install X11 for Linux
       run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
       if: ${{ runner.os == 'Linux' }}
 
     - name: Install FFMPEG
-      run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
+      run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -505,7 +487,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      matrix: 
+      matrix:
         os: [ 'macos-latest', 'ubuntu-latest' ]
 
     steps:
@@ -518,13 +500,13 @@ jobs:
         cd cpymo-backends/ascii-art/
         make -j
         strip ./cpymo-ascii-art
-        
+
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO ASCII ART for ${{ runner.os }}
         path: ./cpymo-backends/ascii-art/cpymo-ascii-art
-            
+
   build-text:
     name: 'CPyMO Text'
     runs-on: ${{ matrix.os }}
@@ -568,4 +550,4 @@ jobs:
           path: |
             ./cpymo-backends/text/cpymo-text
             ./cpymo-backends/text/cpymo-text.exe
-          
+
