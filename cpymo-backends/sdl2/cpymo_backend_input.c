@@ -17,14 +17,39 @@ cpymo_input cpymo_input_snapshot()
 
 	const Uint8 *keyboard = SDL_GetKeyboardState(NULL);
 
-	out.up = keyboard[SDL_SCANCODE_UP];
-	out.down = keyboard[SDL_SCANCODE_DOWN];
-	out.left = keyboard[SDL_SCANCODE_LEFT];
-	out.right = keyboard[SDL_SCANCODE_RIGHT];
-	out.ok = keyboard[SDL_SCANCODE_KP_ENTER] || keyboard[SDL_SCANCODE_RETURN] || keyboard[SDL_SCANCODE_SPACE];
-	out.cancel = keyboard[SDL_SCANCODE_ESCAPE] || keyboard[SDL_SCANCODE_CANCEL] || keyboard[SDL_SCANCODE_AC_BACK];;
-	out.skip = keyboard[SDL_SCANCODE_LCTRL] || keyboard[SDL_SCANCODE_RCTRL];
-	out.hide_window = keyboard[SDL_SCANCODE_LSHIFT] || keyboard[SDL_SCANCODE_RSHIFT];
+	if (keyboard[SDL_SCANCODE_LALT] == 0 &&
+		keyboard[SDL_SCANCODE_RALT] == 0)
+	{
+		out.up = keyboard[SDL_SCANCODE_UP];
+		out.down = keyboard[SDL_SCANCODE_DOWN];
+		out.left = keyboard[SDL_SCANCODE_LEFT];
+		out.right = keyboard[SDL_SCANCODE_RIGHT];
+		out.ok = 
+			keyboard[SDL_SCANCODE_KP_ENTER] || 
+			keyboard[SDL_SCANCODE_RETURN] || 
+			keyboard[SDL_SCANCODE_SPACE];
+		out.cancel = 
+			keyboard[SDL_SCANCODE_ESCAPE] || 
+			keyboard[SDL_SCANCODE_CANCEL] || 
+			keyboard[SDL_SCANCODE_AC_BACK] ||
+			keyboard[SDL_SCANCODE_MENU];
+		out.skip = 
+			keyboard[SDL_SCANCODE_LCTRL] || 
+			keyboard[SDL_SCANCODE_RCTRL];
+		out.hide_window = 
+			keyboard[SDL_SCANCODE_LSHIFT] || 
+			keyboard[SDL_SCANCODE_RSHIFT];
+	}
+	else {
+		out.up = 0;
+		out.down = 0;
+		out.left = 0;
+		out.right = 0;
+		out.ok = 0;
+		out.cancel = 0;
+		out.skip = 0;
+		out.hide_window = 0;
+	}
 
 #ifdef DISABLE_MOUSE
 	out.mouse_position_useable = false;
