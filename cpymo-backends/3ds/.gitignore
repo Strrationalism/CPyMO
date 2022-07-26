@@ -1,5 +1,6 @@
 /.vscode
 /build
+/build.FFmpeg.3DS
 /cpymo.smdh
 /cpymo.elf
 /cpymo.3dsx
