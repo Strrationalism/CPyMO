@@ -3,11 +3,11 @@
 #include <assert.h>
 #include "cpymo_utils.h"
 
-extern SDL_Renderer * const renderer;
+extern SDL_Renderer * renderer;
 
 #ifdef ENABLE_SCREEN_FORCE_CENTERED
 #include <cpymo_engine.h>
-extern const cpymo_engine engine;
+extern cpymo_engine engine;
 #endif
 
 error_t cpymo_backend_image_load(
