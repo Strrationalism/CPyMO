@@ -1,28 +1,42 @@
 
 $device_specs = @(
-    @{ Name = "s60v3"; Width = 320; Height = 240; UseMask = $true; Movie = $true;
-       BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; Audio = @("mp3", "ogg", "wav"); },
+    @{ Name = "s60v3"; Width = 320; Height = 240; UseMask = $true; 
+       BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; 
+       Audio = @("mp3", "ogg", "wav"); DisabledComponents = @(); 
+       Movie = $true; },
 
-    @{ Name = "s60v5"; Width = 540; Height = 360; UseMask = $true; Movie = $true;
-       BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v5"; Audio = @("mp3", "ogg", "wav"); },
+    @{ Name = "s60v5"; Width = 540; Height = 360; UseMask = $true; 
+       Movie = $true; BGFormat = "jpg"; Charaformat = "jpg"; 
+       PlatformId = "s60v5"; Audio = @("mp3", "ogg", "wav"); 
+       DisabledComponents = @();},
 
     @{ Name = "3ds"; Width = 400; Height = 240; UseMask = $false; Movie = $true;
-       BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("mp3", "ogg", "wav") },
+       BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; 
+       Audio = @("mp3", "ogg", "wav"); DisabledComponents = @() },
 
-    @{ Name = "pymo-android"; Width = 800; Height = 600; UseMask = $false; Movie = $true;
-       BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") },
+    @{ Name = "pymo-android"; Width = 800; Height = 600; UseMask = $false; 
+       Movie = $true; BGFormat = "png"; Charaformat = "png"; 
+       PlatformId = "pygame"; Audio = @("ogg", "wav"); 
+       DisabledComponents = @() },
 
-    @{ Name = "switch"; Width = 1920; Height = 1080; UseMask = $false; Movie = $true;
-       BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("mp3", "ogg", "wav") },
+    @{ Name = "switch"; Width = 1920; Height = 1080; UseMask = $false; 
+       Movie = $true; BGFormat = "png"; Charaformat = "png"; 
+       PlatformId = "pygame"; Audio = @("mp3", "ogg", "wav");
+       DisabledComponents = @() },
 
     @{ Name = "psp"; Width = 480; Height = 272; UseMask = $true; Movie = $false;
-       BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; Audio = @("ogg", "wav") },
+       BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; 
+       Audio = @("ogg", "wav"); DisabledComponents = @("voice", "se") },
 
-    @{ Name = "psv"; Width = 960; Height = 544; UseMask = $false; Movie = $false;
-       BGFormat = "png"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") }
+    @{ Name = "psv"; Width = 960; Height = 544; UseMask = $false; 
+       Movie = $false; BGFormat = "png"; Charaformat = "png"; 
+       PlatformId = "pygame"; Audio = @("ogg", "wav"); 
+       DisabledComponents = @() }
 
-    @{ Name = "wii"; Width = 640; Height = 480; UseMask = $false; Movie = $false;
-       BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; Audio = @("ogg", "wav") }
+    @{ Name = "wii"; Width = 640; Height = 480; UseMask = $false; 
+       Movie = $false; BGFormat = "jpg"; Charaformat = "png"; 
+       PlatformId = "pygame"; Audio = @("ogg", "wav");
+       DisabledComponents = @() }
 )
 
 function Write-Help() {
@@ -209,9 +223,11 @@ else {
 }
 
 @("se", "voice", "icon.png", "bgm", "script") | ForEach-Object {
-    Write-Host "Coping $_..."
-    if (Test-Path "$gamedir/$_") {
-        Copy-Item "$gamedir/$_" "$outdir/$_" -Recurse -Force
+    if (-not ($spec.DisabledComponents -contains $_)) {
+        Write-Host "Coping $_..."
+        if (Test-Path "$gamedir/$_") {
+            Copy-Item "$gamedir/$_" "$outdir/$_" -Recurse -Force
+        }
     }
 }
 
