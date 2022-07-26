@@ -32,13 +32,13 @@ CFLAGS := \
 	-DGAME_SELECTOR_DIR="\"./\"" \
 	-DFRAMEBUFFER_PIXELFORMAT=SDL_PIXELFORMAT_BGR565 \
 	-D_PSP_FW_VERSION=150 \
-	-DENABLE_SDL2_IMAGE
+	-DENABLE_SDL2_IMAGE -DENABLE_SDL2_TTF -DDISABLE_STB_TRUETYPE
 
 LDFLAGS := \
 	-Wl,-zmax-page-size=128 \
 	-L. -L$(PSPDEV)/psp/lib -L$(PSPDEV)/psp/sdk/lib \
-	-Xlinker "-(" -logg -lvorbisfile -lvorbis \
-	-lSDL2_image -lSDL2_mixer -lSDL2 -lSDL2main -lGL \
+	-Xlinker "-(" -logg -lvorbisfile -lvorbis -lfreetype \
+	-lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2 -lSDL2main -lGL \
 	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
 	-lpspumd -lpsprtc -lpng -ljpeg \
 	-lpsppower -lpspgum -lpspgu -lpspaudiolib \

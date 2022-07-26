@@ -33,7 +33,6 @@
 
 #include <cpymo_backend_audio.h>
 
-
 #if defined __SWITCH__
 #include <switch.h>
 #elif defined __EMSCRIPTEN__

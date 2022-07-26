@@ -3,7 +3,7 @@
 #include <assert.h>
 #include "cpymo_utils.h"
 
-extern SDL_Renderer *renderer;
+extern SDL_Renderer * const renderer;
 
 error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, void *px, int w, int h, enum cpymo_backend_image_format fmt)
