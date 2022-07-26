@@ -254,7 +254,11 @@ static void cpymo_assetloader_sdl2_attach_mask(
 				+ ((size_t)y * mask->pitch)
 				+ ((size_t)x * mask->format->BytesPerPixel);
 
-			img_rgba_px[0] = mask_px[1];
+			Uint8 dummy;
+			SDL_GetRGBA(*(Uint32 *)mask_px, mask->format,
+				&img_rgba_px[0], &dummy, &dummy, &dummy);
+
+			img_rgba_px[0] = mask_px[2];
 		}
 	}
 
@@ -295,7 +299,7 @@ error_t cpymo_assetloader_load_image_with_mask(
 	if (sur == NULL) 
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 
-	if (load_mask) 
+	if (load_mask && cpymo_gameconfig_is_symbian(loader->game_config)) 
 		cpymo_assetloader_sdl2_attach_mask(
 			&sur, pkg, use_pkg, loader, asset_type, name, mask_ext);
 
