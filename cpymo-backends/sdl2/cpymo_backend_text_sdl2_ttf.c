@@ -99,13 +99,13 @@ error_t cpymo_backend_text_create(
 #endif
 
 #if ENABLE_SDL2_TTF == 1
-    SDL_Surface *text = TTF_RenderUTF8_Shaded(font, str, c, bg);
+    SDL_Surface *text = TTF_RenderText_Shaded_Wrapped(font, str, c, bg, 0);
 #elif ENABLE_SDL2_TTF == 2
-    SDL_Surface *text = TTF_RenderUTF8_Blended(font, str, c);
+    SDL_Surface *text = TTF_RenderUTF8_Blended_Wrapped(font, str, c, 0);
 #elif ENABLE_SDL2_TTF == 3
-    SDL_Surface *text = TTF_RenderUTF8_LCD(font, str, c, bg);
+    SDL_Surface *text = TTF_RenderUTF8_LCD_Wrapped(font, str, c, bg, 0);
 #else
-    SDL_Surface *text = TTF_RenderUTF8_Solid(font, str, c);
+    SDL_Surface *text = TTF_RenderUTF8_Solid_Wrapped(font, str, c, 0);
 #endif
 
     if (text == NULL) return CPYMO_ERR_UNKNOWN;
