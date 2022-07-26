@@ -90,7 +90,24 @@ error_t cpymo_backend_text_create(
     c.b = 255;
     c.a = 255;
 
+#if ENABLE_SDL2_TTF == 1 || ENABLE_SDL2_TTF == 3
+    SDL_Color bg;
+    c.r = 0;
+    c.g = 0;
+    c.b = 0;
+    c.a = 0;
+#endif
+
+#if ENABLE_SDL2_TTF == 1
+    SDL_Surface *text = TTF_RenderUTF8_Shaded(font, str, c, bg);
+#elif ENABLE_SDL2_TTF == 2
     SDL_Surface *text = TTF_RenderUTF8_Blended(font, str, c);
+#elif ENABLE_SDL2_TTF == 3
+    SDL_Surface *text = TTF_RenderUTF8_LCD(font, str, c, bg);
+#else
+    SDL_Surface *text = TTF_RenderUTF8_Solid(font, str, c);
+#endif
+
     if (text == NULL) return CPYMO_ERR_UNKNOWN;
 
     SDL_Texture *text_tex = SDL_CreateTextureFromSurface(renderer, text);
@@ -119,7 +136,7 @@ void cpymo_backend_text_draw(
     int w, h;
     if (SDL_QueryTexture(t, NULL, NULL, &w, &h)) return;
 
-    const float magic_offset = 2.0f;
+    const float magic_offset = 6.0f;
     y_baseline += magic_offset;
     
     SDL_SetTextureColorMod(t, 255 - col.r, 255 - col.g, 255 - col.b);

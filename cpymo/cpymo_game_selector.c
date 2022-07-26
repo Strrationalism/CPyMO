@@ -128,11 +128,7 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
         strcpy(item->gametitle_text, game_config.gametitle);
 #endif
 		cpymo_backend_text_create(&item->gametitle, &item->gametitle_w,
-#ifndef __PSP__
 			cpymo_parser_stream_span_pure(game_config.gametitle), 
-#else
-			cpymo_parser_stream_span_pure(strrchr(item->gamedir, '/') + 1), 
-#endif
 			fontsize);
 
 		err = cpymo_assetloader_load_icon(
