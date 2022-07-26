@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <cpymo_engine.h>
 
-const extern float game_width, game_height;
-const extern float offset_xb, offset_yb;
-const extern float viewport_width_bottom, viewport_height_bottom;
-const extern bool fill_screen;
 bool enhanced_3ds_display_mode_touch_ui_enabled(void);
 const extern bool enhanced_3ds_display_mode;
 extern cpymo_engine engine;
@@ -18,6 +14,9 @@ static bool touch_enabled(void) {
     }
     else return true;
 }
+
+const extern float game_width, game_height;
+const extern float ratio_wb, ratio_h;
 
 cpymo_input cpymo_input_snapshot()
 {
@@ -52,19 +51,23 @@ cpymo_input cpymo_input_snapshot()
         touchPosition touch_pos;
         hidTouchRead(&touch_pos);
 
+        const float r = ratio_wb > ratio_h ? ratio_wb : ratio_h;
+        
+        const float
+            viewport_w = game_width / r,
+            viewport_h = game_height / r;
+
+        const float
+            offset_x = (320 - viewport_w) / 2.0f,
+            offset_y = (240 - viewport_h) / 2.0f;
+
         float touch_x = (float)touch_pos.px;
         float touch_y = (float)touch_pos.py;
 
-        if (fill_screen) {
-            touch_x /= 320.0f;
-            touch_y /= 240.0f;
-        }
-        else {
-            touch_x -= offset_xb;
-            touch_y -= offset_yb;
-            touch_x /= viewport_width_bottom;
-            touch_y /= viewport_height_bottom;
-        }
+        touch_x -= offset_x;
+        touch_y -= offset_y;
+        touch_x /= viewport_w;
+        touch_y /= viewport_h;
 
         out.mouse_x = touch_x * game_width;
         out.mouse_y = touch_y * game_height;

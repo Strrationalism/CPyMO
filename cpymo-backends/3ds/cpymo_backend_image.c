@@ -32,12 +32,6 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
     }
 }
 
-float game_width, game_height;
-float viewport_width, viewport_height;
-float viewport_width_bottom, viewport_height_bottom;
-float offset_x, offset_y;
-float offset_xb, offset_yb;
-
 const extern bool fill_screen;
 
 const extern bool enhanced_3ds_display_mode;
@@ -63,84 +57,56 @@ bool enhanced_3ds_display_mode_select(enum cpymo_backend_image_draw_type t)
     else return true;
 }
 
+float game_width, game_height;
+float ratio_w, ratio_wb, ratio_h;
 void cpymo_backend_image_init(float game_w, float game_h)
 {
     game_width = game_w;
     game_height = game_h;
 
-    float ratio_w = game_w / 400;
-    float ratio_wb = game_w / 320;
-    float ratio_h = game_h / 240;
-
-    if(ratio_w > ratio_h) {
-        viewport_width = 400;
-        viewport_height = game_h / ratio_w;
-    } 
-    else {
-        viewport_width = game_w / ratio_h;
-        viewport_height = 240;
-    }
-
-    if(ratio_wb > ratio_h) {
-        viewport_width_bottom = 320;
-        viewport_height_bottom = game_h / ratio_wb;
-    }
-    else {
-        viewport_width_bottom = game_w / ratio_h;
-        viewport_height_bottom = 240;
-    }
-
-    offset_x = 400 / 2 - viewport_width / 2;
-    offset_y = 240 / 2 - viewport_height / 2;
-    offset_xb = 320 / 2 - viewport_width_bottom / 2;
-    offset_yb = 240 / 2 - viewport_height_bottom / 2;
+    ratio_w = game_width / 400.0f;
+    ratio_wb = game_width / 320.0f;
+    ratio_h = game_height / 240.0f;
 }
 
-void trans_size(float *w, float *h) {
-    if(drawing_bottom_screen) {
-        if(fill_screen) {
-            *w = *w / game_width * 320;
-            *h = *h / game_height * 240;
-        }
-        else {
-            *w = *w / game_width * viewport_width_bottom;
-            *h = *h / game_height * viewport_height_bottom;
-        }
-    }
-    else {
-        if(fill_screen) {
-            *w = *w / game_width * (400 + 20 * fabsf(render_3d_offset));
-            *h = *h / game_height * 240;
-        }
-        else {
-            *w = *w / game_width * viewport_width;
-            *h = *h / game_height * viewport_height;
-        }
-    }
+void trans_size(float *w, float *h) 
+{
+    float rw = drawing_bottom_screen ? ratio_wb : ratio_w;
+    float r = 
+        fill_screen ? 
+            (rw < ratio_h ? rw : ratio_h) :
+            (rw > ratio_h ? rw : ratio_h);
+
+    if (drawing_bottom_screen) 
+        r = rw > ratio_h ? rw : ratio_h;
+    
+    *w /= r;
+    *h /= r;
 }
 
 void trans_pos(float *x, float *y) {
-    if(drawing_bottom_screen) {
-        // enhanced_3ds_display_mode
-        if(fill_screen) {
-            *x = *x / game_width * 320;
-            *y = *y / game_height * 240;
-        }
-        else {
-            *x = *x / game_width * viewport_width_bottom + offset_xb;
-            *y = *y / game_height * viewport_height_bottom + offset_yb;
-        }
-    }
-    else {
-        if(fill_screen) {
-            *x = *x / game_width * (400 + 20 * fabsf(render_3d_offset)) - 10 * fabsf(render_3d_offset);
-            *y = *y / game_height * 240;
-        }
-        else {
-            *x = *x / game_width * viewport_width + offset_x;
-            *y = *y / game_height * viewport_height + offset_y;
-        }
-    }
+    float rw = drawing_bottom_screen ? ratio_wb : ratio_w;
+    float r = 
+        fill_screen ? 
+            (rw < ratio_h ? rw : ratio_h) :
+            (rw > ratio_h ? rw : ratio_h);
+
+    if (drawing_bottom_screen) 
+        r = rw > ratio_h ? rw : ratio_h;
+    
+    const float
+        viewport_w = game_width / r,
+        viewport_h = game_height / r;
+
+    float
+        offset_x = ((drawing_bottom_screen ? 320 : 400) - viewport_w) / 2.0f,
+        offset_y = 240 - viewport_h;
+
+    if (drawing_bottom_screen) 
+        offset_y = (240 - viewport_h) / 2.0f;
+
+    *x = *x / r + offset_x;
+    *y = *y / r + offset_y;
 }
 
 float enhanced_3ds_bottom_yoffset();
