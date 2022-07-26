@@ -3,7 +3,12 @@
 #include <assert.h>
 #include "cpymo_utils.h"
 
-extern SDL_Renderer *renderer;
+extern SDL_Renderer * renderer;
+
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+#include <cpymo_engine.h>
+extern cpymo_engine engine;
+#endif
 
 error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, void *px, int w, int h, enum cpymo_backend_image_format fmt)
@@ -75,39 +80,6 @@ void cpymo_backend_image_free(cpymo_backend_image image)
 	SDL_DestroyTexture((SDL_Texture *)image);
 }
 
-#ifdef RENDER_LOGICAL_SIZE_UNSUPPORTED_FORCED_CENTERED
-#include <cpymo_engine.h>
-void cpymo_backend_image_calc_force_center_offset(float *posx, float *posy)
-{
-	extern const cpymo_engine *engine;
-
-	float game_width = engine->gameconfig.imagesize_w;
-	float game_height = engine->gameconfig.imagesize_h;
-
-	float ratio_w = game_width / SCREEN_WIDTH;
-	float ratio_h = game_height / SCREEN_HEIGHT;
-
-	float viewport_width, viewport_height;
-
-	if (ratio_w > ratio_h) {
-		viewport_width = SCREEN_WIDTH;
-		viewport_height = game_height / ratio_w;
-	}
-	else {
-		viewport_width = game_width / ratio_h;
-		viewport_height = SCREEN_HEIGHT;
-	}
-
-	float offset_x = SCREEN_WIDTH / 2 - viewport_width / 2;
-	float offset_y = SCREEN_HEIGHT / 2 - viewport_height / 2;
-
-	*posx = *posx / game_width * viewport_width + offset_x;
-	*posy = *posy / game_height * viewport_height + offset_y;
-}
-#else
-#define cpymo_backend_image_calc_force_center_offset(...)
-#endif
-
 void cpymo_backend_image_draw(
 	float dstx, 
 	float dsty, 
@@ -121,11 +93,17 @@ void cpymo_backend_image_draw(
 	float alpha, 
 	enum cpymo_backend_image_draw_type draw_type)
 {
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+	float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
+	dstx += offset;
+	offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
+	dsty += offset;
+#endif
+
 #ifdef DISABLE_IMAGE_SCALING
 	assert(dstw == (int)srcw);
 	assert(dsth == (int)srch);
 #endif
-	cpymo_backend_image_calc_force_center_offset(&dstx, &dsty);
 	SDL_Rect src_rect;
 	src_rect.x = srcx;
 	src_rect.y = srcy;
@@ -163,7 +141,7 @@ void cpymo_backend_image_draw(
 void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_color color, float alpha, enum cpymo_backend_image_draw_type draw_type)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, (Uint8)(alpha * 255));
-#if SDL_VERSION_ATLEAST(2, 0, 10)
+#if SDL_VERSION_ATLEAST(2, 0, 10) && !defined ENABLE_SCREEN_FORCE_CENTERED
 	if (SDL_RenderFillRectsF(renderer, (SDL_FRect *)xywh, (int)count) != 0)
 		SDL_Log("Warning: SDL_RenderFillRectsF failed, %s", SDL_GetError());
 #else 
@@ -173,9 +151,246 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 		rect.y = (int)xywh[i * 4 + 1];
 		rect.w = (int)xywh[i * 4 + 2];
 		rect.h = (int)xywh[i * 4 + 3];
+
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+		float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
+		rect.x += (int)offset;
+		offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
+		rect.y += offset;
+#endif
 		SDL_RenderFillRect(renderer, &rect);
 	}
 #endif
 }
 
 bool cpymo_backend_image_album_ui_writable() { return true; }
+
+#ifdef ENABLE_SDL2_IMAGE
+#include <cpymo_package.h>
+#include <cpymo_assetloader.h>
+#include <SDL2/SDL_image.h>
+
+error_t cpymo_assetloader_load_icon_pixels(
+	void **px, int *w, int *h, const char *gamedir)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
+{
+	char *path = alloca(strlen(gamedir) + 10);
+	sprintf(path, "%s/icon.png", gamedir);
+	SDL_Texture *t = IMG_LoadTexture(renderer, path);
+	if (t == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
+
+	if (SDL_QueryTexture(t, NULL, NULL, w, h)) {
+		SDL_DestroyTexture(t);
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	*out = (cpymo_backend_image)t;
+	return CPYMO_ERR_SUCC;
+}
+
+static SDL_Surface *cpymo_package_sdl2_load_surface(
+	const cpymo_package *package, cpymo_parser_stream_span filename)
+{
+	cpymo_package_index index;
+	error_t err = cpymo_package_find(&index, package, filename);
+	if (err != CPYMO_ERR_SUCC) return NULL;
+
+	cpymo_package_stream_reader r = cpymo_package_stream_reader_create(
+		package, &index);
+	fseek(r.stream, r.file_offset, SEEK_SET);
+
+	SDL_RWops *rw = SDL_RWFromFP(r.stream, false);
+	if (rw == NULL) return NULL;
+
+	return IMG_Load_RW(rw, true);
+}
+
+static void cpymo_assetloader_sdl2_attach_mask(
+	SDL_Surface **img,
+	const cpymo_package *pkg, bool use_pkg,
+	const cpymo_assetloader *loader,
+	const char *asset_type,
+	cpymo_parser_stream_span asset_name,
+	const char *mask_ext)
+{
+	SDL_Surface *mask = NULL;
+	char *name = alloca(asset_name.len + 8);
+	cpymo_parser_stream_span_copy(name, asset_name.len + 8, asset_name);
+	strcat(name, "_mask");
+
+	if (use_pkg) {
+		mask = cpymo_package_sdl2_load_surface(
+			pkg, cpymo_parser_stream_span_pure(name));
+	}
+	else {
+		char *path = NULL;
+		error_t err = cpymo_assetloader_get_fs_path(
+			&path, cpymo_parser_stream_span_pure(name),
+			asset_type, mask_ext, loader);
+		
+		if (err != CPYMO_ERR_SUCC) return;
+
+		mask = IMG_Load(path);
+		free(path);
+	}
+
+	if (mask == NULL) return;
+	if (mask->w != (*img)->w || mask->h != (*img)->h) {
+		SDL_FreeSurface(mask);
+		return;
+	}
+
+	SDL_Surface *mask2 = SDL_ConvertSurfaceFormat(
+		mask, SDL_PIXELFORMAT_RGBA8888, 0);
+	SDL_FreeSurface(mask);
+	if (mask2 == NULL) return;
+	mask = mask2;
+
+	SDL_Surface *img_rgba = SDL_ConvertSurfaceFormat(
+		*img, SDL_PIXELFORMAT_RGBA8888, 0);
+
+	if (img_rgba == NULL) {
+		SDL_FreeSurface(mask);
+		return;
+	}
+
+	for (int y = 0; y < img_rgba->h; ++y) {
+		for (int x = 0; x < img_rgba->w; ++x) {
+			uint8_t *img_rgba_px = 
+				((uint8_t *)img_rgba->pixels)
+				+ ((size_t)y * img_rgba->pitch)
+				+ ((size_t)x * img_rgba->format->BytesPerPixel);
+
+			uint8_t *mask_px = 
+				((uint8_t *)mask->pixels)
+				+ ((size_t)y * mask->pitch)
+				+ ((size_t)x * mask->format->BytesPerPixel);
+
+			Uint8 dummy;
+			SDL_GetRGBA(*(Uint32 *)mask_px, mask->format,
+				&img_rgba_px[0], &dummy, &dummy, &dummy);
+
+			img_rgba_px[0] = mask_px[2];
+		}
+	}
+
+	SDL_FreeSurface(mask);
+	SDL_FreeSurface(*img);
+	*img = img_rgba;
+}
+
+error_t cpymo_assetloader_load_image_with_mask(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_parser_stream_span name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask)
+{
+	SDL_Surface *sur = NULL;
+	if (use_pkg) {
+		sur = cpymo_package_sdl2_load_surface(pkg, name);
+	}
+	else {
+		char *path = NULL;
+		error_t err = cpymo_assetloader_get_fs_path(
+			&path,
+			name,
+			asset_type,
+			asset_ext,
+			loader);
+		CPYMO_THROW(err);
+
+		sur = IMG_Load(path);
+		free(path);
+	}
+
+	if (sur == NULL) 
+		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	if (load_mask && cpymo_gameconfig_is_symbian(loader->game_config)) 
+		cpymo_assetloader_sdl2_attach_mask(
+			&sur, pkg, use_pkg, loader, asset_type, name, mask_ext);
+
+	SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, sur);
+	int sw = sur->w, sh = sur->h;
+	SDL_FreeSurface(sur);
+
+	if (t == NULL) return CPYMO_ERR_UNKNOWN;
+
+	SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
+
+	*img = (cpymo_backend_image)t;
+	*w = sw;
+	*h = sh;
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_bg_pixels(
+	void ** px, int * w, int * h, 
+	cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{ return CPYMO_ERR_UNSUPPORTED; }
+
+error_t cpymo_assetloader_load_bg_image(
+	cpymo_backend_image * img, int * w, int * h, 
+	cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+{
+	return cpymo_assetloader_load_image_with_mask(
+		img, w, h, name, "bg", loader->game_config->bgformat, "",
+		loader->use_pkg_bg, &loader->pkg_bg, loader, false);
+}
+
+error_t cpymo_assetloader_load_system_masktrans(
+	cpymo_backend_masktrans *out, cpymo_parser_stream_span name, 
+	const cpymo_assetloader *loader)
+{ 
+	char *path = NULL;
+	error_t err = cpymo_assetloader_get_fs_path(
+		&path, name, "system", "png", loader);
+	CPYMO_THROW(err);
+
+	SDL_Surface *sur = IMG_Load(path);
+	if (sur == NULL) {
+		free(path);
+		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+	}
+
+	SDL_Surface *sur2 = 
+		SDL_ConvertSurfaceFormat(sur, SDL_PIXELFORMAT_RGBA8888, 0);
+	SDL_FreeSurface(sur);
+	if (sur2 == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	uint8_t *px = malloc(sur2->w * sur2->h);
+	if (px == NULL) {
+		SDL_FreeSurface(sur2);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	for (int y = 0; y < sur2->h; ++y) {
+		for (int x = 0; x < sur2->w; ++x) {
+			uint8_t *px_ = 
+				((uint8_t *)sur2->pixels)
+				+ ((size_t)y * sur2->pitch)
+				+ ((size_t)x * sur2->format->BytesPerPixel);
+			px[y * sur2->w + x] = px_[3];
+		}
+	}
+
+	int w = sur2->w, h = sur2->h;
+	SDL_FreeSurface(sur2);
+	
+	return cpymo_backend_masktrans_create(out, px, w, h);
+}
+
+#endif
+

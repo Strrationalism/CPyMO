@@ -51,7 +51,11 @@ cpymo_input cpymo_input_snapshot()
 		out.hide_window = 0;
 	}
 
-
+#ifdef DISABLE_MOUSE
+	out.mouse_position_useable = false;
+	out.mouse_button = false;
+	out.mouse_wheel_delta = 0;
+#else
 	float scale_x, scale_y;
 	SDL_RenderGetScale(renderer, &scale_x, &scale_y);
 
@@ -86,6 +90,8 @@ cpymo_input cpymo_input_snapshot()
 	out.mouse_x *= engine.gameconfig.imagesize_w;
 	out.mouse_y *= engine.gameconfig.imagesize_h;
 
+#endif
+
 	#define MAP_CONTROLLER(OUT_KEY, CONTROLLER_KEY) \
 		for (size_t i = 0; i < gamecontrollers_count; ++i) \
 			if (SDL_GameControllerGetButton(gamecontrollers[i], CONTROLLER_KEY)) { \
@@ -97,15 +103,22 @@ cpymo_input cpymo_input_snapshot()
 	MAP_CONTROLLER(down, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
 	MAP_CONTROLLER(left, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
 	MAP_CONTROLLER(right, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-	MAP_CONTROLLER(skip, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-	MAP_CONTROLLER(skip, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
-	MAP_CONTROLLER(hide_window, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-	MAP_CONTROLLER(hide_window, SDL_CONTROLLER_BUTTON_LEFTSTICK);
 	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_START);
 	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_GUIDE);
 	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_BACK);
 
-#ifdef __SWITCH__
+#ifdef __PSP__
+	MAP_CONTROLLER(ok, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+	MAP_CONTROLLER(ok, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+#else
+	MAP_CONTROLLER(hide_window, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+	MAP_CONTROLLER(hide_window, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+#endif
+	
+	MAP_CONTROLLER(skip, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+	MAP_CONTROLLER(skip, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+
+#if defined __SWITCH__ || defined __PSP__
 	MAP_CONTROLLER(ok, SDL_CONTROLLER_BUTTON_B);
 	MAP_CONTROLLER(ok, SDL_CONTROLLER_BUTTON_X);
 	MAP_CONTROLLER(cancel, SDL_CONTROLLER_BUTTON_A);

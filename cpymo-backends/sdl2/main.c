@@ -11,6 +11,7 @@
 #include <libavutil/log.h>
 #endif
 
+#ifndef DISABLE_STB_IMAGE
 #define STBI_NO_PSD
 #define STBI_NO_TGA
 #define STBI_NO_HDR
@@ -24,24 +25,19 @@
 #define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize.h>
-#include <cpymo_backend_audio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+
+#endif
+
+#include <cpymo_backend_audio.h>
 
 #if defined __SWITCH__
 #include <switch.h>
 #elif defined __EMSCRIPTEN__
 #include <emscripten.h> 
 #define SDL_Delay emscripten_sleep
-#elif defined __PSP__
-#include <pspkernel.h>
-#include <pspdebug.h>
-
-/* Define the module info section */
-PSP_MODULE_INFO("CPyMO", 0, 1, 0);
-PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_MAX();
 #endif
 
 #if _WIN32 && !NDEBUG
@@ -186,15 +182,16 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
 	save_last_selected_game_dir(gamedir);
 
-	if (SDL_RenderSetLogicalSize(renderer, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
+#ifndef __PSP__
+	if (SDL_RenderSetLogicalSize(renderer, 
+		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
+#endif
 
-#ifndef __PSP__
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
-#endif
 
 	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);
@@ -546,7 +543,27 @@ int main(int argc, char **argv)
 		if (need_to_redraw || redraw_by_event) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 			SDL_RenderClear(renderer);
+
 			cpymo_engine_draw(&engine);
+
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+			const float game_w = engine.gameconfig.imagesize_w;
+			const float game_h = engine.gameconfig.imagesize_h;
+			const float rects[] = {
+				-100, 0, 100, game_h,
+				game_w, 0, 100, game_h,
+				0, -100, game_w, 100,
+				0, game_h, game_w, 100
+			};
+
+			cpymo_backend_image_fill_rects(
+				rects,
+				CPYMO_ARR_COUNT(rects) / 4,
+				cpymo_color_black,
+				1.0f,
+				cpymo_backend_image_draw_type_bg);
+#endif
+
 			SDL_RenderPresent(renderer);
 			if (redraw_by_event) redraw_by_event--;
 			//fps_counter++;

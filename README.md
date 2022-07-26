@@ -282,15 +282,9 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
         - 音频不支持mp3格式
 * 由于PSP机能有限
     - 仅能加载s60v3数据包或下述推荐的PSP数据包
-	- 在放入太多游戏时将无法加载游戏列表
-	- 加载音效和语音可能会导致内存占用过高，故禁用音效和语音
-	- 将不会在启动游戏时加载游戏目录下的`system/default.ttf`字体
-* 由于SDL2 for PSP存在问题
-    - 游戏将会在屏幕左上角显示，而不是居中显示
+	- 加载音效和语音会卡在解码上，故禁用音效和语音
 * PPSSPP的“快速内存访问”可能存在问题
     - 目前仅可在PPSSPP在关闭“快速内存访问”时才可以正常启动
-* 由于本人不会编写makefile :(
-	- Makefile.PSP将会把.o文件弄得到处都是
 
 ## 为PSP适配游戏
 
@@ -303,7 +297,8 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 * platform参数：s60v3
 * 不支持的内容：
     * 视频
-	* 音效（se）
+    * 音效（se）
+    * 语音（voice）
 
 # Sony Playstation Vita 平台
 
@@ -487,15 +482,50 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 某些设备可能刷新屏幕会造成闪烁，需要尽可能减少屏幕刷新，这时可定义LOW_FRAME_RATE宏来启用低帧率模式，它将关闭动画效果并显著减少刷新次数。
 
-## SDL2后端
+### 解除stb依赖
 
-SDL2后端在目录`cpymo-backends/sdl2`中。
+某些平台上不能运行stb库（如Sony PSP），可定义以下宏来分别禁用stb依赖：
+
+- `DISABLE_STB_IMAGE`
+
+但是你需要重新实现一些函数来加载图片。
+
+目前只有SDL2具有其他的图片加载实现，参见“SDL2后端 - 替换stb库”。
+
+注意，定义此宏后，album功能将不能产生album UI图像。
 
 ### 解除FFmpeg依赖
 
 某些平台上FFmpeg难以编译，同时定义`DISABLE_FFMPEG_AUDIO`和`DISABLE_FFMPEG_MOVIE`即可彻底对解除FFmpeg的依赖，并替换为你的音频视频后端。
 
 如果你只想解除FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
+
+## SDL2后端
+
+SDL2后端在目录`cpymo-backends/sdl2`中。
+
+
+### 强制居中
+
+某些平台不能使用SDL自带的居中功能，则可以在定义了`SCREEN_WIDTH`宏的情况下来启用`ENABLE_SCREEN_FORCE_CENTERED`宏来强制居中屏幕。
+
+### 禁用鼠标
+
+某些平台上没有鼠标和触摸屏，使用`DISABLE_MOUSE`宏即可禁用鼠标。
+
+### 替换stb库
+
+定义以下宏可以取消对stb_truetype的依赖：
+
+- `DISABLE_STB_TRUETYPE`
+
+定义以下宏可以使用SDL2库来替代上述stb库的功能：
+
+- `ENABLE_SDL2_IMAGE`
+    * 使用该宏，所有加载像素数据的API都将失效。
+- `ENABLE_SDL2_TTF`
+    * 改宏可定义为0~3之间的一个数字，数字越高质量越好性能越低
+
 
 ### SDL2_mixer音频后端
 
@@ -513,6 +543,13 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 2. 定义`ENABLE_SDL2_MIXER_AUDIO_BACKEND`启用SDL2_Mixer音频后端。
 
 如果你的设备上SDL_mixer中`Mix_Music`不能正常工作，则可以使用`DISABLE_SDL2_MIXER_MUSIC`宏将其替换为使用`Mix_Chunk`来播放BGM。
+
+你可以定义以下宏来改变SDL2_Mixer后端的音频参数：
+
+* 采样率`SDL2_MIXER_AUDIO_BACKEND_FREQ`
+* 音频缓存大小`SDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE`
+* 音频格式`SDL2_MIXER_AUDIO_FORMAT`，此格式与SDL2_Mixer文档中所述的音频格式宏一致。
+
 
 ### 全屏切换
 

@@ -1,39 +1,81 @@
-TARGET = CPyMO_PSP
-OBJS   = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.c,%.o,$(wildcard ../../cpymo/*.c))
+.PHONY: build clean
 
-INCDIR   = ../include ../../cpymo ../../stb ../../endianness.h
-CFLAGS   = -G0 -Wall -O2 \
-           -DDISABLE_FFMPEG_AUDIO \
-           -DDISABLE_MOVIE \
-           -DNDEBUG \
-           -D__PSP__ \
-           -DENABLE_SDL2_MIXER_AUDIO_BACKEND \
-		   -DSCREEN_WIDTH=480 \
-           -DSCREEN_HEIGHT=272 \
-           -DUSE_GAME_SELECTOR \
-           -DGAME_SELECTOR_FONTSIZE=28 \
-           -DGAME_SELECTOR_EMPTY_MSG_FONTSIZE="(GAME_SELECTOR_FONTSIZE * 2.0f)" \
-           -DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
-           -DGAME_SELECTOR_DIR="\"./\"" \
-           -DFRAMEBUFFER_PIXELFORMAT=SDL_PIXELFORMAT_BGR565 \
-           -DSTREAMING_LOAD_IMAGE
-		
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
-ASFLAGS  = $(CFLAGS)
+BUILD_DIR := $(shell mkdir -p build.PSP)build.PSP
+BUILD_DIR_BACKEND := $(shell mkdir -p build.PSP/backend)build.PSP/backend
 
-LIBDIR  =
-LDFLAGS =
-LIBS = -Xlinker "-(" -logg -lvorbisfile -lvorbis -lSDL2_mixer -lSDL2 -lSDL2main -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc \
-       -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan \
-	   -lpspnet_adhocmatching -lpspnet_adhoc -lpspnet_adhocctl -lm -lpspvram -Xlinker "-)"
+INC := $(wildcard *.h) $(wildcard ../include/*.h) $(wildcard ../../cpymo/*.h)
 
-BUILD_PRX = 1 
+SRC_CPYMO := $(wildcard ../../cpymo/*.c)
+SRC_BACKEND := $(wildcard *.c) 
+OBJS_CPYMO := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SRC_CPYMO)))
+OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND)))
 
-EXTRA_TARGETS   = EBOOT.PBP
-PSP_EBOOT_TITLE = CPyMO
-PSP_EBOOT_ICON= ../3ds/icon.png
-PSP_EBOOT_PIC1= 
-PSP_EBOOT_SND0= 
+CFLAGS := \
+	-G0 -G0 -Wall -O3 \
+	-I../include \
+	-I../../cpymo \
+	-I../../stb -I../../endianness.h \
+	-I. \
+	-I$(PSPDEV)/psp/include \
+	-I$(PSPDEV)/psp/sdk/include \
+	-DDISABLE_FFMPEG_AUDIO \
+	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
+	-DSDL2_MIXER_AUDIO_BACKEND_FREQ=44100 \
+	-DSDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE=65536*4 \
+	-DDISABLE_MOVIE -DDISABLE_STB_IMAGE -DDISABLE_MOUSE \
+	-DNDEBUG -D__PSP__ \
+	-DSCREEN_WIDTH=480 -DSCREEN_HEIGHT=272 \
+	-DUSE_GAME_SELECTOR \
+	-DGAME_SELECTOR_FONTSIZE=28 \
+	-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE="(GAME_SELECTOR_FONTSIZE * 2.0f)" \
+	-DGAME_SELECTOR_COUNT_PER_SCREEN=2 \
+	-DGAME_SELECTOR_DIR="\"./\"" \
+	-DFRAMEBUFFER_PIXELFORMAT=SDL_PIXELFORMAT_BGR565 \
+	-D_PSP_FW_VERSION=150 \
+	-DENABLE_SDL2_IMAGE -DENABLE_SDL2_TTF=2 -DDISABLE_STB_TRUETYPE \
+	-DENABLE_SCREEN_FORCE_CENTERED
 
-PSPSDK=$(shell psp-config --pspsdk-path)
-include $(PSPSDK)/lib/build.mak
+LDFLAGS := \
+	-Wl,-zmax-page-size=128 \
+	-L. -L$(PSPDEV)/psp/lib -L$(PSPDEV)/psp/sdk/lib \
+	-Xlinker "-(" -logg -lvorbisfile -lvorbis -lfreetype \
+	-lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2 -lSDL2main -lGL \
+	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
+	-lpspumd -lpsprtc -lpng -ljpeg \
+	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
+	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
+	-lpspnet_adhocmatching -lpspnet_adhoc \
+	-lpspnet_adhocctl -lm -lpspvram -Xlinker "-)" \
+	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl
+
+CC := psp-gcc
+
+define compile
+	@echo "$(notdir $1)"
+	@$(CC) -c -Wl,-q $1 -o $2 $(CFLAGS)
+endef
+
+build: EBOOT.PBP
+
+clean:
+	@rm -rf EBOOT.PBP $(BUILD_DIR)
+
+$(BUILD_DIR_BACKEND)/%.o: %.c $(INC)
+	$(call compile,$<,$@)
+
+$(BUILD_DIR)/%.o: ../../cpymo/%.c $(INC)
+	$(call compile,$<,$@)
+
+$(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
+	@echo "Linking..."
+	@$(CC) $^ $(LDFLAGS) -o $@
+	@psp-fixup-imports $@
+	@psp-strip $@
+
+$(BUILD_DIR)/PARAM.SFO: 
+	@mksfoex -d MEMSIZE=1 'CPyMO' $@
+
+EBOOT.PBP: $(BUILD_DIR)/cpymo.elf $(BUILD_DIR)/PARAM.SFO
+	@pack-pbp $@ $(BUILD_DIR)/PARAM.SFO ../3ds/icon.png \
+		NULL NULL NULL NULL $(BUILD_DIR)/cpymo.elf NULL
+

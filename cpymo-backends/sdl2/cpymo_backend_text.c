@@ -1,3 +1,5 @@
+#ifndef DISABLE_STB_TRUETYPE
+
 #include <cpymo_backend_text.h>
 #include <stb_truetype.h>
 #include <stdlib.h>
@@ -95,11 +97,6 @@ void cpymo_backend_text_draw(
     cpymo_color col, float alpha,
     enum cpymo_backend_image_draw_type draw_type)
 {
-#ifdef RENDER_LOGICAL_SIZE_UNSUPPORTED_FORCED_CENTERED
-    extern void cpymo_backend_image_calc_force_center_offset(float *posx, float *posy);
-    cpymo_backend_image_calc_force_center_offset(&x, &y_baseline);
-#endif
-
     cpymo_backend_text_internal *t = (cpymo_backend_text_internal *)text;
 
     SDL_SetTextureColorMod((SDL_Texture *)t->img, 255 - col.r, 255 - col.g, 255 - col.b);
@@ -144,6 +141,8 @@ float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_characte
     return (float)w;
 }
 
+#endif
+
 #ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backend_text_extract(const char *text)
 {
@@ -158,3 +157,4 @@ void cpymo_backend_text_extract(const char *text)
 #endif
 }
 #endif
+

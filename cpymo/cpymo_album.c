@@ -16,6 +16,7 @@
 
 #define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
 
+#ifndef DISABLE_STB_IMAGE
 static error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
 	cpymo_parser_stream_span album_list_text, 
@@ -128,6 +129,19 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 
 	return CPYMO_ERR_SUCC;
 }
+
+#else
+static error_t cpymo_album_generate_album_ui_image_pixels(
+	void **out_image, 
+	cpymo_parser_stream_span album_list_text, 
+	cpymo_parser_stream_span output_cache_ui_file_name,
+	size_t page, 
+	cpymo_assetloader* loader,
+	size_t *ref_w, size_t *ref_h)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+#endif
 
 static error_t cpymo_album_generate_album_ui_image(
 	cpymo_backend_image *out_image, 
