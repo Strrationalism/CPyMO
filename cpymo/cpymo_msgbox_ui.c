@@ -204,14 +204,14 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_scroll_draw(&e->scroll);
 
 	float screen_w = (float)e->gameconfig.imagesize_w, screen_h = (float)e->gameconfig.imagesize_h;
-	float xywh[] = { 0, 0, screen_w, screen_h };
+	float xywh[] = { -100, -100, screen_w + 200, screen_h + 200 };
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_bg);
 
 	const cpymo_msgbox_ui *ui = (const cpymo_msgbox_ui *)ui_data;
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 
-	float x = (xywh[2] - ui->message_width) / 2;
-	float y = xywh[3] * 0.3f + fontsize / 2;
+	float x = (screen_w - ui->message_width) / 2;
+	float y = screen_h * 0.3f + fontsize / 2;
 	cpymo_backend_text_draw(ui->message, x, y, cpymo_color_white, 1.0f, cpymo_backend_image_draw_type_ui_element);
 
 	bool key_down = e->input.mouse_button || e->input.ok;

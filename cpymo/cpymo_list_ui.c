@@ -304,7 +304,7 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_bg_draw(e);
 	cpymo_scroll_draw(&e->scroll);
 
-	float xywh[] = {0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h };
+	float xywh[] = {-100, -100, 200 + (float)e->gameconfig.imagesize_w, 200 + (float)e->gameconfig.imagesize_h };
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_ui_bg);
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
