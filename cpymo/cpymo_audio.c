@@ -705,7 +705,7 @@ void cpymo_audio_vo_stop(cpymo_engine * e)
 void cpymo_audio_play_video(cpymo_engine * e, const char * path)
 {
 	cpymo_audio_channel_play_file(
-		&e->audio.channels[CPYMO_AUDIO_CHANNEL_VO],
+		&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
 		path,
 		NULL,
 		false);

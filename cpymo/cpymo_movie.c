@@ -38,7 +38,7 @@ typedef struct {
 	bool backend_inited;
 	bool skip_pressed;
 
-	float vo_volume;
+	float bgm_volume;
 
 	float current_time;
 } cpymo_movie;
@@ -177,9 +177,9 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 {
 	cpymo_movie *m = (cpymo_movie *)ui_data;
 
-	cpymo_audio_vo_stop(e);
+	cpymo_audio_bgm_stop(e);
 
-	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, m->vo_volume);
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, m->bgm_volume);
 
 	if (m->video_frame) av_frame_free(&m->video_frame);
 	if (m->packet) av_packet_free(&m->packet);
@@ -190,6 +190,8 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 {
+	cpymo_audio_bgm_stop(e);
+	cpymo_audio_se_stop(e);
 	cpymo_audio_vo_stop(e);
 
 	switch (cpymo_backend_movie_how_to_play()) {
@@ -219,8 +221,8 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 	m->current_time = 0;
 	m->backend_inited = false;
 	m->skip_pressed = e->input.skip;
-	m->vo_volume = cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio);
-	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, 1.0f);
+	m->bgm_volume = cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio);
+	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, 1.0f);
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
