@@ -150,6 +150,10 @@ void cpymo_backend_movie_update_yuyv_surface(const void *p, size_t pitch)
 {
 }
 
+void trans_size(float *w, float *h);
+void trans_pos(float *x, float *y);
+const extern float game_width, game_height;
+
 void cpymo_backend_movie_draw_surface()
 {
 	if (drawing_bottom_screen) return;
@@ -159,18 +163,13 @@ void cpymo_backend_movie_draw_surface()
     p.center.y = 0;
     p.depth = 0;
 
-	if (fill_screen) {
-		p.pos.x = 0;
-		p.pos.y = 0;
-		p.pos.w = 400;
-		p.pos.h = 240;
-	}
-	else {
-		p.pos.x = (400 - subtex.width) / 2;
-		p.pos.y = (240 - subtex.height) / 2;
-		p.pos.w = subtex.width;
-		p.pos.h = subtex.height;
-	}
+	p.pos.x = 0;
+	p.pos.y = 0;
+	p.pos.w = game_width;
+	p.pos.h = game_height;
+
+	trans_size(&p.pos.w, &p.pos.h);
+	trans_pos(&p.pos.x, &p.pos.y);
 
     C2D_ImageTint tint;
     C2D_AlphaImageTint(&tint, 1.0f);
