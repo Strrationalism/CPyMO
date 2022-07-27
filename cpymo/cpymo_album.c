@@ -7,17 +7,18 @@
 #include <stdio.h>
 #include "cpymo_error.h"
 #include "cpymo_parser.h"
-#include <cpymo_backend_image.h>
 #include "cpymo_assetloader.h"
-#include "cpymo_engine.h"
 #include <assert.h>
 #include <ctype.h>
-#include "cpymo_album.h"
 
 #define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
 
+#ifdef CPYMO_TOOL
+bool cpymo_backend_image_album_ui_writable(void);
+#endif
+
 #ifndef DISABLE_STB_IMAGE
-static error_t cpymo_album_generate_album_ui_image_pixels(
+error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
 	cpymo_parser_stream_span album_list_text, 
 	cpymo_parser_stream_span output_cache_ui_file_name,
@@ -28,12 +29,16 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 	stbi_uc *pixels = NULL;
 
 	{
-		char *path = (char *)malloc(strlen(loader->gamedir) + 15 + output_cache_ui_file_name.len);
-		if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
-		strcpy(path, loader->gamedir);
-		strcat(path, "/system/");
-		strncat(path, output_cache_ui_file_name.begin, output_cache_ui_file_name.len);
-		strcat(path, ".png");
+		char *path = NULL;
+
+		error_t err = cpymo_assetloader_get_fs_path(
+			&path,
+			output_cache_ui_file_name,
+			"system",
+			"png",
+			loader);
+
+		CPYMO_THROW(err);
 
 		int w2, h2;
 		pixels = stbi_load(path, &w2, &h2, NULL, 3);
@@ -142,6 +147,11 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 	return CPYMO_ERR_UNSUPPORTED;
 }
 #endif
+
+#ifndef CPYMO_TOOL
+#include <cpymo_backend_image.h>
+#include "cpymo_album.h"
+#include "cpymo_engine.h"
 
 static error_t cpymo_album_generate_album_ui_image(
 	cpymo_backend_image *out_image, 
@@ -721,3 +731,4 @@ error_t cpymo_album_enter(
 	return cpymo_album_load_page(e, album);
 }
 
+#endif

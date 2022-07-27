@@ -7,6 +7,7 @@
 #include "cpymo_tool_package.h"
 #include "cpymo_tool_resize.h"
 #include "cpymo_tool_pack_images.h"
+#include "cpymo_tool_image.h"
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -41,6 +42,9 @@ int help() {
 		"    cpymo-tool pack-images\n"
 		"        <output-file> <num-of-cols> <input-files...>\n"
 		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
+	printf("Generate album UI image cache:\n");
+	printf(
+		"    cpymo-tool gen-album-cache <gamedir> [additional-album-lists...]\n");
 	printf("\n");
 	return 0;
 }
@@ -66,6 +70,8 @@ int main(int argc, const char **argv) {
 			return cpymo_tool_invoke_resize(argc, argv);
 		else if (strcmp(argv[1], "pack-images") == 0)
 			return cpymo_tool_invoke_pack_images(argc, argv);
+		else if (strcmp(argv[1], "gen-album-cache") == 0)
+			return cpymo_tool_invoke_generate_album_ui(argc, argv);
 		else return help();
 	}
 }

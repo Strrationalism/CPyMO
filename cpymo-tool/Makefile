@@ -12,12 +12,15 @@ SRC_CPYMO := \
 	../cpymo/cpymo_package.c \
 	../cpymo/cpymo_parser.c \
 	../cpymo/cpymo_utils.c \
-	../cpymo/cpymo_color.c
+	../cpymo/cpymo_color.c \
+	../cpymo/cpymo_gameconfig.c \
+	../cpymo/cpymo_assetloader.c \
+	../cpymo/cpymo_album.c
 
 OBJS := $(patsubst %.c, $(BUILD_DIR_CPYMO_TOOL)/%.o, $(SRC_TOOL)) \
 		$(patsubst %.c, $(BUILD_DIR_CPYMO)/%.o, $(notdir $(SRC_CPYMO)))
 
-CFLAGS := -O3 -DNDEBUG -I../cpymo -I../stb -I../endianness.h
+CFLAGS := -O3 -DNDEBUG -DCPYMO_TOOL -I../cpymo -I../stb -I../endianness.h
 
 CC = cc -c
 LD = cc

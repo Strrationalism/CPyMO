@@ -64,7 +64,7 @@ STR_I_I(chs, date_str, 32, "%d 月 %d 日");
 
 static error_t chs_version(char **out_str, cpymo_pymo_version v)
 {
-	ALLOC_STR(128);
+	ALLOC_STR(256);
 	sprintf(*out_str, 
 		"当前支持的PyMO版本为 %d.%d，\n"
 		"但该游戏需要的PyMO版本为 %d.%d，\n"
@@ -124,7 +124,7 @@ STR_I_I(cht, date_str, 32, "%d 月 %d 日");
 
 static error_t cht_version(char **out_str, cpymo_pymo_version v)
 {
-	ALLOC_STR(128);
+	ALLOC_STR(256);
 	sprintf(*out_str, 
 		"當前支持的PyMO版本為 %d.%d，\n"
 		"但該遊戲需要的PyMO版本為 %d.%d，\n"
@@ -183,7 +183,7 @@ STR_I_I(enu, date_str, 16, "%d / %d");
 
 static error_t enu_version(char **out_str, cpymo_pymo_version v)
 {
-	ALLOC_STR(192);
+	ALLOC_STR(256);
 	sprintf(*out_str, 
 		"The currently supported\nPyMO version is %d.%d,\n"
 		"But the pymo version\nrequired for this game is %d.%d.",

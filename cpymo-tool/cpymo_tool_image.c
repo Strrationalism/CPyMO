@@ -1,5 +1,7 @@
 #include "cpymo_tool_image.h"
 #include <cpymo_utils.h>
+#include <cpymo_gameconfig.h>
+#include <cpymo_assetloader.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -210,3 +212,130 @@ error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename)
 }
 
 
+bool cpymo_backend_image_album_ui_writable(void) { return true; }
+
+static size_t cpymo_tool_generate_album_ui_get_max_page_id(
+    cpymo_parser_stream_span album_list_content_text)
+{
+    size_t max_id = 0;
+
+    cpymo_parser parser;
+    cpymo_parser_init(
+        &parser, 
+        album_list_content_text.begin,
+        album_list_content_text.len);
+    
+    do {
+        cpymo_parser_stream_span page_id_str = 
+            cpymo_parser_curline_pop_commacell(&parser);
+        cpymo_parser_stream_span_trim(&page_id_str);
+        if (page_id_str.len == 0) continue;
+        size_t page_id = (size_t)cpymo_parser_stream_span_atoi(page_id_str);
+        if (page_id > max_id) max_id = page_id;
+    } while (cpymo_parser_next_line(&parser));
+
+    return max_id;
+}
+
+extern error_t cpymo_album_generate_album_ui_image_pixels(
+	void **out_image, 
+	cpymo_parser_stream_span album_list_text, 
+	cpymo_parser_stream_span output_cache_ui_file_name,
+	size_t page, 
+	cpymo_assetloader* loader,
+	size_t *ref_w, size_t *ref_h);
+
+static void cpymo_tool_generate_album_ui_generate(
+    const char *album_list_name,
+    bool is_default_album_list,
+    cpymo_assetloader *loader)
+{
+    char *album_list_text = NULL;
+    size_t album_list_text_size;
+    error_t err = cpymo_assetloader_load_script(
+        &album_list_text, &album_list_text_size, album_list_name, loader);
+
+    if (err != CPYMO_ERR_SUCC) {
+        if (!(is_default_album_list && err == CPYMO_ERR_SCRIPT_FILE_NOT_FOUND))
+            printf(
+                "[Error] Can not open album list file \"%s\": %s.\n",
+                album_list_name, cpymo_error_message(err));
+        return;
+    }
+
+    cpymo_parser_stream_span album_list_content = {
+        album_list_text,
+        album_list_text_size 
+    };
+
+    size_t max_page_id = cpymo_tool_generate_album_ui_get_max_page_id(
+        album_list_content);
+
+    const size_t game_width = loader->game_config->imagesize_w,
+                 game_height = loader->game_config->imagesize_h;
+
+    for (size_t page = 1; page <= max_page_id; ++page) {
+        void *pixels = NULL;
+        size_t w = game_width, h = game_height;
+        err = cpymo_album_generate_album_ui_image_pixels(
+            &pixels,
+            album_list_content,
+            cpymo_parser_stream_span_pure(
+                is_default_album_list ? "albumbg" : album_list_name),
+            page - 1,
+            loader,
+            &w, &h);
+        free(pixels);
+    }
+
+    free(album_list_text);
+}
+
+static int cpymo_tool_generate_album_ui(
+    const char *gamedir, 
+    const char **additional_album_lists,
+    size_t additional_album_lists_count)
+{
+    cpymo_gameconfig gameconfig;
+    cpymo_assetloader assetloader;
+    {
+        char *path = (char *)malloc(strlen(gamedir) + 18);
+        if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
+        sprintf(path, "%s/gameconfig.txt", gamedir);
+        error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, path);
+        if (err != CPYMO_ERR_SUCC) {
+            printf("[Error] Can not open file: %s(%s).\n", 
+                path, cpymo_error_message(err));
+            free(path);
+            return err;
+        }
+
+        free(path);
+
+        err = cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
+        if (err != CPYMO_ERR_SUCC) {
+            printf("[Error] Can not init assetloader: %s.\n", 
+                path, cpymo_error_message(err));
+            return err;
+        }
+    }
+
+    cpymo_tool_generate_album_ui_generate("album_list", true, &assetloader);
+    for (size_t i = 0; i < additional_album_lists_count; ++i) 
+        cpymo_tool_generate_album_ui_generate(
+            additional_album_lists[i], false, &assetloader);
+
+    cpymo_assetloader_free(&assetloader);
+    return CPYMO_ERR_SUCC;
+}
+
+extern int help();
+
+int cpymo_tool_invoke_generate_album_ui(
+    int argc, const char **argv)
+{
+    if (argc < 3) return help();
+    const char *gamedir = argv[2];
+
+    return cpymo_tool_generate_album_ui(gamedir, argv + 3, (size_t)(argc - 3));
+}

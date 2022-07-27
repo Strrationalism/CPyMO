@@ -194,6 +194,7 @@ error_t cpymo_assetloader_load_bg_pixels(void ** px, int * w, int * h, cpymo_par
 		loader->game_config->bgformat, loader->use_pkg_bg, &loader->pkg_bg, loader);
 }
 
+#ifndef CPYMO_TOOL
 error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
 {
 	void *pixels = NULL;
@@ -265,7 +266,9 @@ static error_t cpymo_assetloader_load_image_with_mask(
 
 	return CPYMO_ERR_SUCC;
 }
+#endif
 #else
+#ifndef CPYMO_TOOL
 error_t cpymo_assetloader_load_image_with_mask(
 	cpymo_backend_image *img, int *w, int *h, 
 	cpymo_parser_stream_span name, 
@@ -277,7 +280,9 @@ error_t cpymo_assetloader_load_image_with_mask(
 	const cpymo_assetloader *loader,
 	bool load_mask);
 #endif
+#endif
 
+#ifndef CPYMO_TOOL
 error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader)
 {
 	return cpymo_assetloader_load_image_with_mask(
@@ -285,6 +290,7 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int
 		name, "chara", loader->game_config->charaformat, loader->game_config->charamaskformat,
 		loader->use_pkg_chara, &loader->pkg_chara, loader, true);
 }
+#endif
 
 error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, const char * script_name, const cpymo_assetloader * loader)
 {
@@ -299,6 +305,7 @@ error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, con
 	return CPYMO_ERR_SUCC;
 }
 
+#ifndef CPYMO_TOOL
 #ifndef DISABLE_STB_IMAGE
 error_t cpymo_assetloader_load_system_masktrans(
 	cpymo_backend_masktrans *out, cpymo_parser_stream_span name, 
@@ -317,6 +324,7 @@ error_t cpymo_assetloader_load_system_masktrans(
 
 	return CPYMO_ERR_SUCC;
 }
+#endif
 #endif
 
 error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader)
@@ -340,6 +348,7 @@ error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span v
 }
 
 
+#ifndef CPYMO_TOOL
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,
@@ -350,6 +359,7 @@ error_t cpymo_assetloader_load_system_image(
 	return cpymo_assetloader_load_image_with_mask(
 		out_image, out_width, out_height, filename_span, "system", "png", "png", false, NULL, loader, load_mask);
 }
+#endif
 
 #ifndef DISABLE_STB_IMAGE
 error_t cpymo_assetloader_load_icon_pixels(
@@ -368,7 +378,7 @@ error_t cpymo_assetloader_load_icon_pixels(
 	
 	return CPYMO_ERR_SUCC;
 }
-
+#ifndef CPYMO_TOOL
 error_t cpymo_assetloader_load_icon(
 	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
 {
@@ -382,4 +392,5 @@ error_t cpymo_assetloader_load_icon(
 	if (e != CPYMO_ERR_SUCC) free(px);
 	return CPYMO_ERR_SUCC;
 }
+#endif
 #endif

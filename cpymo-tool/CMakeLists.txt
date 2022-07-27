@@ -4,6 +4,7 @@ include_directories ("../cpymo")
 
 file (GLOB CPYMO_COMPONENTS "*.h" "*.c")
 
+add_definitions (-DCPYMO_TOOL)
 
 add_executable (cpymo-tool
 	"../cpymo/cpymo_error.c"
@@ -11,6 +12,9 @@ add_executable (cpymo-tool
 	"../cpymo/cpymo_parser.c"
 	"../cpymo/cpymo_utils.c"
 	"../cpymo/cpymo_color.c"
+	"../cpymo/cpymo_gameconfig.c"
+	"../cpymo/cpymo_assetloader.c"
+	"../cpymo/cpymo_album.c"
 	${CPYMO_COMPONENTS})
 
 
