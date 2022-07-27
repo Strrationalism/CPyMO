@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-const cpymo_pymo_version version = { 1, 2 };
+const cpymo_pymo_version version = 
+	{ CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR };
 
 bool cpymo_pymo_version_compatible(cpymo_pymo_version v)
 {

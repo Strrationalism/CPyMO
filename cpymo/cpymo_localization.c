@@ -1,10 +1,9 @@
 #include "cpymo_localization.h"
+#include "cpymo_gameconfig.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-extern const cpymo_pymo_version version;
 
 #define F(LOC, FIELD) \
 	cpymo_localization_##LOC##_##FIELD
@@ -69,7 +68,7 @@ static error_t chs_version(char **out_str, cpymo_pymo_version v)
 		"当前支持的PyMO版本为 %d.%d，\n"
 		"但该游戏需要的PyMO版本为 %d.%d，\n"
 		"该游戏也许不会正常执行。", 
-		version.major, version.minor,
+		CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR,
 		v.major, v.minor);
 	return CPYMO_ERR_SUCC;
 }
@@ -129,7 +128,7 @@ static error_t cht_version(char **out_str, cpymo_pymo_version v)
 		"當前支持的PyMO版本為 %d.%d，\n"
 		"但該遊戲需要的PyMO版本為 %d.%d，\n"
 		"該遊戲也許不會正常執行。", 
-		version.major, version.minor,
+		CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR,
 		v.major, v.minor);
 	return CPYMO_ERR_SUCC;
 }
@@ -187,7 +186,7 @@ static error_t enu_version(char **out_str, cpymo_pymo_version v)
 	sprintf(*out_str, 
 		"The currently supported\nPyMO version is %d.%d,\n"
 		"But the pymo version\nrequired for this game is %d.%d.",
-		version.major, version.minor,
+		CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR,
 		v.major, v.minor);
 	return CPYMO_ERR_SUCC;
 }

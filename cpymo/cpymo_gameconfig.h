@@ -7,6 +7,9 @@
 #include "cpymo_error.h"
 #include "cpymo_color.h"
 
+#define CPYMO_PYMO_VERSION_MAJOR 1
+#define CPYMO_PYMO_VERSION_MINOR 2
+
 typedef struct {
 	uint16_t major;
 	uint16_t minor;
