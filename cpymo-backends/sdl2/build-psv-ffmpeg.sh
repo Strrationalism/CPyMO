@@ -1,4 +1,4 @@
-curl https://ffmpeg.org/releases/ffmpeg-5.0.tar.gz --output ffmpeg-5.0.tar.gz
+curl https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.0.tar.gz --output ffmpeg-5.0.tar.gz
 tar -xf ffmpeg-5.0.tar.gz
 
 cd ffmpeg-5.0
