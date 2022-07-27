@@ -1,7 +1,7 @@
-curl https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/refs/tags/n5.1 --output ffmpeg.tar.gz
+curl https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/refs/tags/n5.0.1 --output ffmpeg.tar.gz
 tar -xf ffmpeg.tar.gz
 
-cd FFmpeg-n5.1
+cd FFmpeg-n5.0.1
 
 chmod +x ./configure
 
@@ -45,5 +45,5 @@ chmod +x ./configure
 make install -j
 
 cd ..
-rm -rf FFmpeg-n5.1 ffmpeg.tar.gz
+rm -rf FFmpeg-n5.0.1 ffmpeg.tar.gz
 
