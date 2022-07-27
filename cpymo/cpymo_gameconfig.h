@@ -8,6 +8,13 @@
 #include "cpymo_color.h"
 
 typedef struct {
+	uint16_t major;
+	uint16_t minor;
+} cpymo_pymo_version;
+
+bool cpymo_pymo_version_compatible(cpymo_pymo_version version);
+
+typedef struct {
 	char gametitle[256];
 	char startscript[64];
 	char cgprefix[64];
@@ -34,6 +41,8 @@ typedef struct {
 	unsigned bgmvolume : 4;
 	unsigned vovolume : 4;
 	unsigned namealign : 2;
+
+	cpymo_pymo_version engineversion;
 } cpymo_gameconfig;
 
 #define CPYMO_GAMECONFIG_NAMEALIGN_MIDDLE 0

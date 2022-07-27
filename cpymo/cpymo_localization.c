@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern const cpymo_pymo_version version;
+
 #define F(LOC, FIELD) \
 	cpymo_localization_##LOC##_##FIELD
 
@@ -60,6 +62,18 @@ STR_S(chs, save_auto_title, 32, "自动存档  %s");
 STR_I(chs, save_are_you_sure_load, 64, "确定要加载存档 %d 吗？");
 STR_I_I(chs, date_str, 32, "%d 月 %d 日");
 
+static error_t chs_version(char **out_str, cpymo_pymo_version v)
+{
+	ALLOC_STR(128);
+	sprintf(*out_str, 
+		"当前支持的PyMO版本为 %d.%d，\n"
+		"但该游戏需要的PyMO版本为 %d.%d，\n"
+		"该游戏也许不会正常执行。", 
+		version.major, version.minor,
+		v.major, v.minor);
+	return CPYMO_ERR_SUCC;
+}
+
 const cpymo_localization chs = {
 	"确定",
 	"取消",
@@ -95,7 +109,8 @@ const cpymo_localization chs = {
 	"未找到游戏",
 	"你需要将游戏放在SD卡中的\"pymogames\"文件夹下，\n并确保路径中只包含英文、数字和下划线。\n",
 	"需为此游戏安装mo2pymo补丁才可以正常进行游戏",
-	"选项："
+	"选项：",
+	&chs_version
 };
 
 
@@ -106,6 +121,18 @@ STR_I_S(cht, save_title, 32, "檔案 %d      %s");
 STR_S(cht, save_auto_title, 32, "自動存檔  %s");
 STR_I(cht, save_are_you_sure_load, 64, "確定要加載檔案 %d 嗎？");
 STR_I_I(cht, date_str, 32, "%d 月 %d 日");
+
+static error_t cht_version(char **out_str, cpymo_pymo_version v)
+{
+	ALLOC_STR(128);
+	sprintf(*out_str, 
+		"當前支持的PyMO版本為 %d.%d，\n"
+		"但該遊戲需要的PyMO版本為 %d.%d，\n"
+		"該遊戲也許不會正常執行。", 
+		version.major, version.minor,
+		v.major, v.minor);
+	return CPYMO_ERR_SUCC;
+}
 
 const cpymo_localization cht = {
 	"確定",
@@ -142,7 +169,8 @@ const cpymo_localization cht = {
 	"未找到遊戲",
 	"你需要將遊戲放在SD卡中的\"pymogames\"資料夾下，\n並確保路徑中只包含英文、數位和底線。 \n",
 	"需為此遊戲安裝mo2pymo補丁才可以正常進行遊戲",
-	"選項："
+	"選項：",
+	&cht_version
 };
 
 STR_I(enu, save_already_save_to, 32, "Already save to slot %d.");
@@ -152,6 +180,17 @@ STR_I_S(enu, save_title, 16, "Slot %d   %s");
 STR_S(enu, save_auto_title, 16, "Auto Slot  %s");
 STR_I(enu, save_are_you_sure_load, 64, "Are you sure you want to\nload from slot %d?");
 STR_I_I(enu, date_str, 16, "%d / %d");
+
+static error_t enu_version(char **out_str, cpymo_pymo_version v)
+{
+	ALLOC_STR(192);
+	sprintf(*out_str, 
+		"The currently supported\nPyMO version is %d.%d,\n"
+		"But the pymo version\nrequired for this game is %d.%d.",
+		version.major, version.minor,
+		v.major, v.minor);
+	return CPYMO_ERR_SUCC;
+}
 
 const cpymo_localization enu = {
 	"OK",
@@ -188,7 +227,8 @@ const cpymo_localization enu = {
 	"No games found",
 	"Please make sure folder \"pymogames\" is in SD card root,\nand that you have at least one game in it.",
 	"You need to install mo2pymo patch for this game to play",
-	"Selection: "
+	"Selection: ",
+	&enu_version
 };
 
 #ifndef DEFAULT_LANG

@@ -32,7 +32,24 @@ static void cpymo_logo() {
 
 static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) {
 	const cpymo_localization *l = cpymo_localization_get(e);
-	cpymo_msgbox_ui_enter(e, cpymo_parser_stream_span_pure(l->mo2pymo_required), NULL, NULL);
+	cpymo_msgbox_ui_enter(
+		e, cpymo_parser_stream_span_pure(l->mo2pymo_required), NULL, NULL);
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_engine_version_warning(cpymo_engine *e) {
+	const cpymo_localization *l = cpymo_localization_get(e);
+	char *out = NULL;
+	error_t err = l->pymo_version_not_compatible_message(
+			&out, e->gameconfig.engineversion);
+	CPYMO_THROW(err);
+
+	cpymo_msgbox_ui_enter(
+		e,
+		cpymo_parser_stream_span_pure(out),
+		NULL,
+		NULL);
+	free(out);
 	return CPYMO_ERR_SUCC;
 }
 
@@ -163,6 +180,12 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		|| out->gameconfig.scripttype[3] != '\0')
 	{
 		cpymo_wait_callback_after_seconds(&out->wait, 0, &cpymo_engine_non_pymo_warning);
+	}
+
+	if (!cpymo_pymo_version_compatible(out->gameconfig.engineversion)) {
+		cpymo_wait_callback_after_seconds(
+			&out->wait, 0, 
+			&cpymo_engine_version_warning);
 	}
 
 	return CPYMO_ERR_SUCC;

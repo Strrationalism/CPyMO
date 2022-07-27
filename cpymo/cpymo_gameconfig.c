@@ -5,6 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+const cpymo_pymo_version version = { 1, 2 };
+
+bool cpymo_pymo_version_compatible(cpymo_pymo_version v)
+{
+	if (v.major < version.major) return true;
+	if (v.major == version.major && v.minor <= version.minor) return true;
+	return false;
+}
+
 static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_span key, cpymo_parser *parser) 
 {
 	size_t magic_key_len;
@@ -18,6 +27,19 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 		SPAN span = POP;
 		SETUP(gametitle, span);
 		cpymo_utils_replace_str_newline_n(o->gametitle);
+		return;
+	}
+
+	D("engineversion") {
+		cpymo_parser_stream_span major = 
+			cpymo_parser_curline_readuntil(parser, '.');
+
+		cpymo_parser_stream_span minor = 
+			cpymo_parser_curline_readuntil(parser, '.');
+
+		o->engineversion.major = cpymo_parser_stream_span_atoi(major);
+		o->engineversion.minor = cpymo_parser_stream_span_atoi(minor);
+
 		return;
 	}
 

@@ -2,6 +2,7 @@
 #define INCLUDE_CPYMO_LOCALIZATION
 
 #include "cpymo_error.h"
+#include "cpymo_gameconfig.h"
 
 typedef struct {
 	const char
@@ -43,6 +44,7 @@ typedef struct {
 
 	const char *mo2pymo_required;
 	const char *visual_help_selection;
+	error_t (*pymo_version_not_compatible_message)(char **, cpymo_pymo_version);
 } cpymo_localization;
 
 struct cpymo_engine;
