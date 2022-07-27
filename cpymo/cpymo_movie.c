@@ -41,6 +41,8 @@ typedef struct {
 	float bgm_volume;
 
 	float current_time;
+
+	char *current_bgm_name;
 } cpymo_movie;
 
 static error_t cpymo_movie_send_packets(cpymo_movie *m)
@@ -181,6 +183,14 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, m->bgm_volume);
 
+	if (m->current_bgm_name) {
+		cpymo_audio_bgm_play(
+			e, 
+			cpymo_parser_stream_span_pure(m->current_bgm_name), 
+			true);
+		free(m->current_bgm_name);
+	}
+
 	if (m->video_frame) av_frame_free(&m->video_frame);
 	if (m->packet) av_packet_free(&m->packet);
 	if (m->video_codec_context) avcodec_free_context(&m->video_codec_context);
@@ -190,6 +200,17 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 {
+	char *current_bgm_name = NULL;
+
+	{
+		const char *current_bgm_name_src = cpymo_audio_get_bgm_name(e);
+		if (current_bgm_name_src) {
+			current_bgm_name = (char *)malloc(strlen(current_bgm_name_src) + 1);
+			if (current_bgm_name)
+				strcpy(current_bgm_name, current_bgm_name_src);
+		}
+	}
+
 	cpymo_audio_bgm_stop(e);
 	cpymo_audio_se_stop(e);
 	cpymo_audio_vo_stop(e);
@@ -213,6 +234,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_parser_stream_span videoname)
 			&cpymo_movie_delete);
 	CPYMO_THROW(err);
 
+	m->current_bgm_name = current_bgm_name;
 	m->format_context = NULL;
 	m->video_codec_context = NULL;
 	m->no_more_content = false;
