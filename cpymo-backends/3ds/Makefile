@@ -47,13 +47,13 @@ APP_DESCRIPTION := PyMO AVG Game Engine implemention in C.
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-O3 -g -Wall -Wno-unknown-pragmas -Ofast -mword-relocations \
+CFLAGS	:=	-O3 -Wall -Wno-unknown-pragmas -Ofast -mword-relocations \
 			-ffunction-sections \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ -DNDEBUG
 
-CXXFLAGS	:= $(CFLAGS) -O3 -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) 
