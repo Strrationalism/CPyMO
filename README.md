@@ -197,7 +197,7 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 
 如果你需要为3DS适配PyMO游戏，那么建议你使用以下参数：
 
-* 分辨率：400×240
+* 分辨率：400×300 (3DS分辨率为400x240，但支持向外扩展适应全屏）
 * 音频格式：ogg，16bit signed little-endian，32000Hz
 * 背景格式：jpg
 * 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
@@ -291,10 +291,11 @@ cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PS
 如果你需要为PSP适配游戏，那么建议你使用以下参数：
 
 * 分辨率：480×272
-* 背景、立绘图像：jpg，立绘图像应当带jpg格式的透明通道mask图
-* 系统图像：png，带mask图
+* 背景图像：jpg
+* 立绘图像：png
+* 系统图像：png
 * 声音格式：ogg, 16bit signed little-endian, 44100Hz
-* platform参数：s60v3
+* platform参数：pygame
 * 不支持的内容：
     * 视频
     * 音效（se）
