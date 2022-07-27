@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern cpymo_pymo_version version;
+extern const cpymo_pymo_version version;
 
 #define F(LOC, FIELD) \
 	cpymo_localization_##LOC##_##FIELD
