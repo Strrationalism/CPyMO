@@ -1,9 +1,9 @@
 #!/bin/sh
 
-curl https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.0.tar.gz --output ffmpeg-5.0.tar.gz
-tar -xf ffmpeg-5.0.tar.gz
+curl https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/refs/tags/n5.1 --output ffmpeg.tar.gz
+tar -xf ffmpeg.tar.gz
 
-cd ffmpeg-5.0
+cd FFmpeg-n5.1
 
 export PATH=$DEVKITARM/bin:$PATH
 export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
@@ -50,5 +50,4 @@ chmod +x ./configure
 make install -j
 
 cd ..
-rm ffmpeg-5.0.tar.gz -f
-rm ffmpeg-5.0 -rf
+rm -rf FFmpeg-n5.1 ffmpeg.tar.gz
