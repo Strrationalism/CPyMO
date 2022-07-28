@@ -198,8 +198,6 @@ jobs:
       with:
         submodules: true
 
-    - run: chmod +x ./cpymo-backends/android/gradlew
-
     - name: Setup JDK
       uses: actions/setup-java@v3
       with:
@@ -222,37 +220,19 @@ jobs:
         ./build-android-ffmpeg.sh
 
     - name: Build APK
-      uses: sparkfabrik/android-build-action@v1.0.0
+      run: |
+        cd ./cpymo-backends/android
+        ./gradlew assembleRelease --stacktrace
+        cp ./app/build/outputs/apk/release/app-release.apk ../../cpymo-signed.apk
 
-      with:
-        project-path: ./cpymo-backends/android
-        output-path: cpymo.apk
-        gradle-task: assembleRelease
+    - name: Build APK (Accessibility)
+      run: |
+        cd ./cpymo-backends/android
+        ./gradlew assembleRelease --stacktrace
+        cp ./app/build/outputs/apk/release/app-release.apk ../../cpymo-accessibility-signed.apk
       env:
         ENABLE_TEXT_EXTRACT: 1
         ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY: 1
-    - name: Build APK (Accessibility)
-      uses: sparkfabrik/android-build-action@v1.0.0
-
-      with:
-        project-path: ./cpymo-backends/android
-        output-path: cpymo-accessibility.apk
-        gradle-task: assembleRelease
-
-    - name: Sign APK
-      uses: r0adkll/sign-android-release@v1
-      # ID used to access action output
-      id: sign_app
-      with:
-        releaseDirectory: ./
-        signingKeyBase64: ${{ secrets.ANDROID_SIGN_KEYSTORE }}
-        alias: 'key0'
-        keyStorePassword: '123456'
-        keyPassword: '123456'
-      env:
-        # override default build-tools version (29.0.3) -- optional
-        BUILD_TOOLS_VERSION: "30.0.2"
-
 
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
