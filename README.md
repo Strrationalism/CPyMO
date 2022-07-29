@@ -729,10 +729,11 @@ CPyMO ASCII ART仅支持键盘操作：
 * 协助
   - 守望
   - heiyu04
+* 调试设备提供
+  - Sony PSP - 白若秋
 * 测试
   - 幻世
   - °SARTINCE。
-  - 白若秋
   - 卢毅
   - benhonjen
   - 镜面倾斜
