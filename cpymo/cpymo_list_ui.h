@@ -34,6 +34,7 @@ typedef struct {
 	cpymo_key_pluse key_up, key_down;
 	cpymo_key_hold key_mouse_button;
 	float scroll_delta_y_sum;
+	float scroll_speed;
 
 	bool allow_scroll;
 
@@ -42,6 +43,7 @@ typedef struct {
 	cpymo_list_ui_selecting_no_more_content_callback no_more_content_callback;
 
 	float current_y;
+	size_t nodes_per_screen;
 } cpymo_list_ui;
 
 error_t cpymo_list_ui_enter(

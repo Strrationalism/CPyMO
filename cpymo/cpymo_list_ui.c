@@ -119,9 +119,45 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		return CPYMO_ERR_SUCC;
 	}
 
-	if ((e->input.mouse_button || e->input.mouse_wheel_delta) && ui->allow_scroll) {
+	bool scrolled = false;
+#ifndef LOW_FRAME_RATE
+	if (ui->allow_scroll) {
+		if (e->input.mouse_button) {
+			ui->scroll_speed = e->input.mouse_y - e->prev_input.mouse_y;
+		}
+		else {
+			if (fabsf(ui->scroll_speed) >= 0.001f) {
+				const float spd_dec = d * 100;
+				if (fabsf(ui->scroll_speed) - spd_dec < spd_dec)
+					ui->scroll_speed = 0;
+				else {
+					if (ui->scroll_speed > 0) ui->scroll_speed -= spd_dec;
+					else ui->scroll_speed += spd_dec;
+
+					ui->current_y += 
+						ui->from_bottom_to_top ?
+							-ui->scroll_speed : ui->scroll_speed;
+					scrolled = true;
+					cpymo_engine_request_redraw(e);
+				}
+			}
+			else ui->scroll_speed = 0;
+
+			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL)
+				if (ui->current_y > 0)
+					ui->current_y = 0;
+
+			if (ui->get_next(e, ui + 1, ui->current_node) == NULL)
+				if (ui->current_y < 0)
+					ui->current_y = 0;
+		}
+	}
+#endif	
+
+	if ((e->input.mouse_button || e->input.mouse_wheel_delta || scrolled) && ui->allow_scroll) {
 		ui->mouse_key_press_time += d;
 		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
+		if (!e->input.mouse_button) delta_y = 0;
 
 		if (mouse_button_state == cpymo_key_hold_result_just_press) {
 			ui->mouse_key_press_time = 0;
@@ -172,6 +208,12 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 				ui->selection_relative_to_cur--;
 			}
 		}
+
+		if (ui->selection_relative_to_cur < 0)
+			ui->selection_relative_to_cur = 0;
+
+		if (ui->selection_relative_to_cur > (int)ui->nodes_per_screen - 1)
+			ui->selection_relative_to_cur = (int)ui->nodes_per_screen - 1;
 
 		if (control_by_wheel) {
 			int s = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
@@ -385,9 +427,11 @@ error_t cpymo_list_ui_enter(
 	data->allow_scroll = true;
 	data->custom_update = NULL;
 	data->scroll_delta_y_sum = 0;
+	data->scroll_speed = 0;
 	data->no_more_content_callback = NULL;
 	data->selection_changed = NULL;
 	data->allow_exit_list_ui = true;
+	data->nodes_per_screen = nodes_per_screen;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
