@@ -123,7 +123,10 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 #ifndef LOW_FRAME_RATE
 	if (ui->allow_scroll) {
 		if (e->input.mouse_button) {
-			ui->scroll_speed = e->input.mouse_y - e->prev_input.mouse_y;
+			ui->scroll_speed = 0;
+			if (e->prev_input.mouse_position_useable && 
+				e->input.mouse_position_useable)
+				ui->scroll_speed = e->input.mouse_y - e->prev_input.mouse_y;
 		}
 		else {
 			if (fabsf(ui->scroll_speed) >= 0.001f) {
@@ -156,7 +159,10 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 
 	if ((e->input.mouse_button || e->input.mouse_wheel_delta || scrolled) && ui->allow_scroll) {
 		ui->mouse_key_press_time += d;
-		float delta_y = e->input.mouse_y - e->prev_input.mouse_y;
+		float delta_y = 0;
+		if (e->input.mouse_position_useable && 
+			e->prev_input.mouse_position_useable)
+			e->input.mouse_y - e->prev_input.mouse_y;
 		if (!e->input.mouse_button) delta_y = 0;
 
 		if (mouse_button_state == cpymo_key_hold_result_just_press) {
