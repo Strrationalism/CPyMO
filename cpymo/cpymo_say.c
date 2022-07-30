@@ -276,10 +276,24 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 		return false;
 	}
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, up) || e->input.mouse_wheel_delta > 0) {
-		cpymo_backlog_ui_enter(e);
+	bool open_backlog_by_slide = false;
+	if (e->prev_input.mouse_button && e->input.mouse_button) {
+		if (e->prev_input.mouse_position_useable && 
+			e->input.mouse_position_useable) {
+			
+			if (e->input.mouse_y - e->prev_input.mouse_y > 10) {
+				open_backlog_by_slide = true;
+			}
+		}
 	}
-	else if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mouse_button_state == cpymo_key_hold_result_hold_released) {
+
+	if (CPYMO_INPUT_JUST_PRESSED(e, up) || 
+		e->input.mouse_wheel_delta > 0 ||
+		open_backlog_by_slide)
+		cpymo_backlog_ui_enter(e);
+	else if (
+		CPYMO_INPUT_JUST_RELEASED(e, cancel) || 
+		mouse_button_state == cpymo_key_hold_result_hold_released) {
 		cpymo_rmenu_enter(e);
 		return false;
 	}
