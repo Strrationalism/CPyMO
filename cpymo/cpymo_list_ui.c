@@ -8,6 +8,8 @@
 #include <cpymo_android.h>
 #endif
 
+#define SLIDE_LIMIT 10.0f
+
 static inline float cpymo_list_ui_get_y(const cpymo_engine *e, int relative_to_current)
 {
 	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
@@ -328,7 +330,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			return CPYMO_ERR_SUCC;
 	}
 
-	if (mouse_button_state == cpymo_key_hold_result_hold_released && ui->scroll_delta_y_sum < 5.0f) {
+	if (mouse_button_state == cpymo_key_hold_result_hold_released && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
 		cpymo_list_ui_exit(e);
 		return CPYMO_ERR_SUCC;
 	}
@@ -337,7 +339,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		error_t err = ui->ok(e, obj);
 		CPYMO_THROW(err);
 	}
-	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f && ui->mouse_touch_move_y_sum < 10.0f) {
+	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
 		int selected = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 		if (selected != INT_MAX) {
 			if (ui->selection_relative_to_cur != selected) {
