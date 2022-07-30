@@ -44,6 +44,7 @@ typedef struct {
 
 	float current_y;
 	size_t nodes_per_screen;
+	float mouse_touch_move_y_sum;
 } cpymo_list_ui;
 
 error_t cpymo_list_ui_enter(

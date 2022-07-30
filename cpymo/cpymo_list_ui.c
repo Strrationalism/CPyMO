@@ -119,6 +119,17 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		return CPYMO_ERR_SUCC;
 	}
 
+	float mouse_y_delta = 0;
+	if (e->prev_input.mouse_position_useable && 
+		e->input.mouse_position_useable)
+		mouse_y_delta = e->input.mouse_y - e->prev_input.mouse_y;
+
+	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button))
+		ui->mouse_touch_move_y_sum = 0;
+
+	if (e->input.mouse_button)
+		ui->mouse_touch_move_y_sum += fabsf(mouse_y_delta);
+
 	bool scrolled = false;
 #ifndef LOW_FRAME_RATE
 	if (ui->allow_scroll) {
@@ -126,7 +137,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			ui->scroll_speed = 0;
 			if (e->prev_input.mouse_position_useable && 
 				e->input.mouse_position_useable)
-				ui->scroll_speed = e->input.mouse_y - e->prev_input.mouse_y;
+				ui->scroll_speed = mouse_y_delta;
 		}
 		else {
 			if (fabsf(ui->scroll_speed) >= 0.001f) {
@@ -159,10 +170,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 
 	if ((e->input.mouse_button || e->input.mouse_wheel_delta || scrolled) && ui->allow_scroll) {
 		ui->mouse_key_press_time += d;
-		float delta_y = 0;
-		if (e->input.mouse_position_useable && 
-			e->prev_input.mouse_position_useable)
-			delta_y = e->input.mouse_y - e->prev_input.mouse_y;
+		float delta_y = mouse_y_delta;
 		if (!e->input.mouse_button) delta_y = 0;
 
 		if (mouse_button_state == cpymo_key_hold_result_just_press) {
@@ -329,7 +337,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		error_t err = ui->ok(e, obj);
 		CPYMO_THROW(err);
 	}
-	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f) {
+	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f && ui->mouse_touch_move_y_sum < 10.0f) {
 		int selected = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 		if (selected != INT_MAX) {
 			if (ui->selection_relative_to_cur != selected) {
@@ -438,6 +446,7 @@ error_t cpymo_list_ui_enter(
 	data->selection_changed = NULL;
 	data->allow_exit_list_ui = true;
 	data->nodes_per_screen = nodes_per_screen;
+	data->mouse_touch_move_y_sum = 0;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
