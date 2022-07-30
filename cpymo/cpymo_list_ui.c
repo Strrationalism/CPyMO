@@ -162,7 +162,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		float delta_y = 0;
 		if (e->input.mouse_position_useable && 
 			e->prev_input.mouse_position_useable)
-			e->input.mouse_y - e->prev_input.mouse_y;
+			delta_y = e->input.mouse_y - e->prev_input.mouse_y;
 		if (!e->input.mouse_button) delta_y = 0;
 
 		if (mouse_button_state == cpymo_key_hold_result_just_press) {
