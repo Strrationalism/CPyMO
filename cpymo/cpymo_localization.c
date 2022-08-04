@@ -109,7 +109,8 @@ const cpymo_localization chs = {
 	"你需要将游戏放在SD卡中的\"pymogames\"文件夹下，\n并确保路径中只包含英文、数字和下划线。\n",
 	"需为此游戏安装mo2pymo补丁才可以正常进行游戏",
 	"选项：",
-	&chs_version
+	&chs_version,
+	"确定要退出游戏吗？"
 };
 
 
@@ -169,7 +170,8 @@ const cpymo_localization cht = {
 	"你需要將遊戲放在SD卡中的\"pymogames\"資料夾下，\n並確保路徑中只包含英文、數位和底線。 \n",
 	"需為此遊戲安裝mo2pymo補丁才可以正常進行遊戲",
 	"選項：",
-	&cht_version
+	&cht_version,
+	"確定要退出遊戲嗎？"
 };
 
 STR_I(enu, save_already_save_to, 32, "Already save to slot %d.");
@@ -227,7 +229,8 @@ const cpymo_localization enu = {
 	"Please make sure folder \"pymogames\" is in SD card root,\nand that you have at least one game in it.",
 	"You need to install mo2pymo patch for this game to play",
 	"Selection: ",
-	&enu_version
+	&enu_version,
+	"Are you sure you want to quit the game?"
 };
 
 #ifndef DEFAULT_LANG

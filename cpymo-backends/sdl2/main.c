@@ -3,6 +3,8 @@
 #include <cpymo_error.h>
 #include "cpymo_import_sdl2.h"
 #include <cpymo_engine.h>
+#include <cpymo_localization.h>
+#include <cpymo_msgbox_ui.h>
 #include <cpymo_interpreter.h>
 #include <string.h>
 #include <cpymo_backend_text.h>
@@ -293,6 +295,14 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 }
 
 
+#ifdef ENABLE_EXIT_CONFIRM
+static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
+{
+	return CPYMO_ERR_NO_MORE_CONTENT;
+}
+#endif
+
+
 int main(int argc, char **argv)
 {
 	srand((unsigned)time(NULL));
@@ -501,8 +511,26 @@ int main(int argc, char **argv)
 			else if (event.type == SDL_APP_TERMINATING || event.type == SDL_APP_LOWMEMORY)
 				goto EXIT;
 #ifndef __ANDROID__
-			else if (event.type == SDL_QUIT)
-                goto EXIT;
+			else if (event.type == SDL_QUIT) {
+				#ifdef ENABLE_EXIT_CONFIRM
+				
+				if (cpymo_ui_enabled(&engine))
+                	cpymo_ui_exit(&engine);
+
+				err = cpymo_msgbox_ui_enter(
+					&engine,
+					cpymo_parser_stream_span_pure(
+						cpymo_localization_get(&engine)->exit_confirm),
+					&cpymo_exit_confirm,
+					NULL);
+				if (err != CPYMO_ERR_SUCC) {
+					SDL_Log("[Error] Can not show message box: %s", 
+						cpymo_error_message(err));
+				}
+				#else
+				goto EXIT;
+				#endif
+			}
 #endif
 #ifdef ENABLE_ALT_ENTER_FULLSCREEN
 			else if (event.type == SDL_KEYDOWN) {

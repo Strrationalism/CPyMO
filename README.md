@@ -109,6 +109,7 @@ brew install libxcb
 * 若`RC_FILE`环境变量存在或通过-a传入，则允许传入用户指定的资源文件（主要用于修改图标）。
 * 若`TARGET`环境变量存在或通过-a传入，则允许用户通过TARGET指定输出的可执行文件名称。
 * 若`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为1或通过-a传入1，则将会导出游戏文本到剪切板（用于视障玩家）。
+* 若`ENABLE_EXIT_CONFIRM`环境变量为1或通过-a传入1，则会在退出游戏时询问是否要退出。
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
 
@@ -140,7 +141,7 @@ brew install libxcb
 * 使用`RC_FILE`环境变量可以自定义RC文件。（仅Windows）
 * 使`NO_CONSOLE`环境变量为`1`可以禁止CPyMO创建控制台窗口。（仅Windows）
 * 使`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为`1`可将游戏文本复制到控制台上。（用于视障玩家）
-
+* 若`ENABLE_EXIT_CONFIRM`环境变量为1或通过-a传入1，则会在退出游戏时询问是否要退出。
 
 
 # Nintendo 3DS 平台

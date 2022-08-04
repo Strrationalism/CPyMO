@@ -45,6 +45,7 @@ typedef struct {
 	const char *mo2pymo_required;
 	const char *visual_help_selection;
 	error_t (*pymo_version_not_compatible_message)(char **, cpymo_pymo_version);
+	const char *exit_confirm;
 } cpymo_localization;
 
 struct cpymo_engine;
