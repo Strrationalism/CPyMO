@@ -18,6 +18,7 @@ error_t cpymo_ui_enter(void ** out_uidata, cpymo_engine *e, size_t ui_data_size,
 	*out_uidata = ui + 1;
 
 	e->ui = ui;
+	cpymo_input_ignore_next_mouse_button_event(e);
 
 	cpymo_engine_request_redraw(e);
 
@@ -31,6 +32,7 @@ void cpymo_ui_exit(cpymo_engine *e)
 	free(e->ui);
 	e->ui = NULL;
 
+	cpymo_input_ignore_next_mouse_button_event(e);
 	cpymo_engine_request_redraw(e);
 }
 

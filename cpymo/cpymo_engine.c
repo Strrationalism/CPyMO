@@ -170,6 +170,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	}
 
 	out->input = out->prev_input = cpymo_input_snapshot();
+	out->ignore_next_mouse_button_flag = out->input.mouse_button;
 
 	cpymo_logo();
 
@@ -233,6 +234,9 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
+
+	if (!engine->prev_input.mouse_button && !engine->input.mouse_button)
+		engine->ignore_next_mouse_button_flag = false;
 
 	if (engine->skipping) {
 		if (engine->input.ok ||

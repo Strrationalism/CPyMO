@@ -49,6 +49,7 @@ struct cpymo_engine {
 	char *title;
 
 	bool redraw;
+	bool ignore_next_mouse_button_flag;
 };
 
 typedef struct cpymo_engine cpymo_engine;
@@ -68,7 +69,11 @@ static inline void cpymo_engine_request_redraw(cpymo_engine *engine)
 	(!PENGINE->prev_input.KEY && PENGINE->input.KEY)
 
 #define CPYMO_INPUT_JUST_RELEASED(PENGINE, KEY) \
-	(PENGINE->prev_input.KEY && !PENGINE->input.KEY)
+	(PENGINE->prev_input.KEY && !PENGINE->input.KEY && \
+	!PENGINE->ignore_next_mouse_button_flag)
+
+static inline void cpymo_input_ignore_next_mouse_button_event(cpymo_engine *e)
+{ e->ignore_next_mouse_button_flag = e->input.mouse_button; }
 
 static inline bool cpymo_input_mouse_moved(cpymo_engine *engine)
 {

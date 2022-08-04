@@ -293,7 +293,8 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 		cpymo_backlog_ui_enter(e);
 	else if (
 		CPYMO_INPUT_JUST_RELEASED(e, cancel) || 
-		mouse_button_state == cpymo_key_hold_result_hold_released) {
+		(mouse_button_state == cpymo_key_hold_result_just_hold && 
+		!e->ignore_next_mouse_button_flag)) {
 		cpymo_rmenu_enter(e);
 		return false;
 	}

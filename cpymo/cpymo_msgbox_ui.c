@@ -1,6 +1,7 @@
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_engine.h"
 #include "cpymo_localization.h"
+#include "cpymo_key_hold.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,6 +18,7 @@ typedef struct {
 
 	error_t(*confirm)(cpymo_engine *e, void *data);
 	void *confirm_data;
+	cpymo_key_hold mouse_button;
 } cpymo_msgbox_ui;
 
 static error_t cpymo_msgbox_ui_confirm(cpymo_engine *e)
@@ -91,12 +93,15 @@ static int cpymo_msgbox_ui_get_mouse_selection(cpymo_engine *e)
 
 static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 {
-	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
+	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
+
+	enum cpymo_key_hold_result mbs = cpymo_key_hold_update(
+		&ui->mouse_button, dt, e->input.mouse_button);
+	
+	if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mbs == cpymo_key_hold_result_holding) {
 		cpymo_ui_exit(e);
 		return CPYMO_ERR_SUCC;
 	}
-
-	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
 
 #ifdef ENABLE_TEXT_EXTRACT
 	const cpymo_localization *l = cpymo_localization_get(e);
@@ -282,6 +287,7 @@ error_t cpymo_msgbox_ui_enter(
 	ui->confirm = confirm;
 	ui->confirm_data = confirm_data;
 	ui->selection = confirm ? -1 : 0;
+	cpymo_key_hold_init(&ui->mouse_button, e->input.mouse_button);
 
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
 

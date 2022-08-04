@@ -330,7 +330,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			return CPYMO_ERR_SUCC;
 	}
 
-	if (mouse_button_state == cpymo_key_hold_result_hold_released && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
+	if (mouse_button_state == cpymo_key_hold_result_just_hold && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
 		cpymo_list_ui_exit(e);
 		return CPYMO_ERR_SUCC;
 	}

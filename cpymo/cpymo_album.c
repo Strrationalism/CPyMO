@@ -151,6 +151,7 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 #ifndef CPYMO_TOOL
 #include <cpymo_backend_image.h>
 #include "cpymo_album.h"
+#include "cpymo_key_hold.h"
 #include "cpymo_engine.h"
 
 static error_t cpymo_album_generate_album_ui_image(
@@ -244,7 +245,6 @@ typedef struct {
 
 	float mouse_wheel_sum;
 	float mouse_x_sum;
-	size_t ignore_mouse_button_release;
 
 	cpymo_album_cg_info *showing_cg;
 	cpymo_backend_image showing_cg_image;
@@ -253,6 +253,7 @@ typedef struct {
 	size_t showing_cg_next_cg_id;
 
 	cpymo_key_pluse key_up, key_down, key_left, key_right;
+	cpymo_key_hold key_mouse_button;
 } cpymo_album;
 
 uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
@@ -425,16 +426,18 @@ static bool cpymo_album_check_mouse_in_box(cpymo_engine *e, size_t i) {
 }
 #endif
 
-static void cpymo_album_exit_showing_cg(cpymo_album *a) {
+static void cpymo_album_exit_showing_cg(cpymo_engine *e, cpymo_album *a) {
 	if (a->showing_cg_image != NULL) {
 		cpymo_backend_image_free(a->showing_cg_image);
 		a->showing_cg_image = NULL;
 	}
 
 	a->showing_cg = NULL;
+	cpymo_input_ignore_next_mouse_button_event(e);
 }
 
 static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
+	cpymo_input_ignore_next_mouse_button_event(e);
 	if (a->showing_cg_image != NULL) {
 		cpymo_backend_image_free(a->showing_cg_image);
 		a->showing_cg_image = NULL;
@@ -444,8 +447,7 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 
 	size_t cg_id = a->showing_cg_next_cg_id++;
 	if (cg_id >= a->cg_count) {
-		a->ignore_mouse_button_release++;
-		cpymo_album_exit_showing_cg(a);
+		cpymo_album_exit_showing_cg(e, a);
 	}
 	else {
 		cpymo_parser_stream_span filename =
@@ -476,6 +478,7 @@ static error_t cpymo_album_select_ok(cpymo_engine *e, cpymo_album *a)
 	a->showing_cg_filename_parser = a->showing_cg->cg_name_parser;
 	a->showing_cg_next_cg_id = 0;
 	cpymo_album_showing_cg_next(e, a);
+	cpymo_input_ignore_next_mouse_button_event(e);
 	return CPYMO_ERR_SUCC;
 }
 
@@ -483,27 +486,30 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 {
 	cpymo_album *album = (cpymo_album *)a;
 
+	enum cpymo_key_hold_result mouse_button_state = cpymo_key_hold_update(
+		&album->key_mouse_button, dt, e->input.mouse_button);
+
 	cpymo_key_pluse_update(&album->key_left, dt, e->input.left);
 	cpymo_key_pluse_update(&album->key_up, dt, e->input.up);
 	cpymo_key_pluse_update(&album->key_right, dt, e->input.right);
 	cpymo_key_pluse_update(&album->key_down, dt, e->input.down);
 
 	if (album->showing_cg) {
-		if (CPYMO_INPUT_JUST_PRESSED(e, ok) || CPYMO_INPUT_JUST_PRESSED(e, mouse_button)) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, ok) || CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
 			cpymo_album_showing_cg_next(e, album);
 			return CPYMO_ERR_SUCC;
 		}
 
-		if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
+		if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mouse_button_state == cpymo_key_hold_result_just_hold) {
 			cpymo_engine_request_redraw(e);
-			cpymo_album_exit_showing_cg(album);
+			cpymo_album_exit_showing_cg(e, album);
 			return CPYMO_ERR_SUCC;
 		}
 
 		return CPYMO_ERR_SUCC;
 	}
 
-	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
+	if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mouse_button_state == cpymo_key_hold_result_just_hold) {
 		cpymo_ui_exit(e);
 		return CPYMO_ERR_SUCC;
 	}
@@ -519,8 +525,6 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 			album->mouse_x_sum = 0;
 			return cpymo_album_next_page(e, album);
 		}
-		else if (album->ignore_mouse_button_release)
-			album->ignore_mouse_button_release--;
 		else {
 			for (size_t i = 0; i < album->cg_count; ++i) {
 				if (cpymo_album_check_mouse_in_box(e, i)) {
@@ -540,7 +544,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		album->mouse_x_sum = 0;
 #endif
 
-	if (CPYMO_INPUT_JUST_PRESSED(e, ok)) return cpymo_album_select_ok(e, album);
+	if (CPYMO_INPUT_JUST_RELEASED(e, ok)) return cpymo_album_select_ok(e, album);
 	if (cpymo_key_pluse_output(&album->key_left)) return cpymo_album_prev_page(e, album);
 	if (cpymo_key_pluse_output(&album->key_right)) return cpymo_album_next_page(e, album);
 
@@ -679,7 +683,6 @@ error_t cpymo_album_enter(
 	album->mouse_wheel_sum = 0;
 	album->cv_thumb_cover = NULL;
 	album->mouse_x_sum = 0;
-	album->ignore_mouse_button_release = 0;
 	album->showing_cg = NULL;
 	album->showing_cg_image = NULL;
 
@@ -687,6 +690,7 @@ error_t cpymo_album_enter(
 	cpymo_key_pluse_init(&album->key_right, e->input.right);
 	cpymo_key_pluse_init(&album->key_up, e->input.up);
 	cpymo_key_pluse_init(&album->key_down, e->input.down);
+	cpymo_key_hold_init(&album->key_mouse_button, e->input.mouse_button);
 
 	int w, h;
 	err = cpymo_assetloader_load_system_image(
