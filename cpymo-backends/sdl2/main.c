@@ -472,7 +472,11 @@ int main(int argc, char **argv)
 			if (event.type == SDL_WINDOWEVENT || event.type == SDL_RENDER_TARGETS_RESET)
 				redraw_by_event++;
 			else if (event.type == SDL_MOUSEWHEEL) {
-				mouse_wheel = (float)event.wheel.y;
+				#if SDL_VERSION_ATLEAST(2,0,18)
+					mouse_wheel = (float)event.wheel.preciseY;
+				#else
+					mouse_wheel = (float)event.wheel.y;
+				#endif
 				if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
 					mouse_wheel *= -1;
 			}
