@@ -115,6 +115,8 @@
 - macro elif_sel selection
 @elif FSEL eq selection
 
+- extern exit
+
 # I. Text
 
 - extern text content x1 y1 x2 y2 color size show_immediately
