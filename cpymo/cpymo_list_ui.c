@@ -129,7 +129,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button))
 		ui->mouse_touch_move_y_sum = 0;
 
-	if (e->input.mouse_button)
+	if (e->input.mouse_button && e->prev_input.mouse_button)
 		ui->mouse_touch_move_y_sum += fabsf(mouse_y_delta);
 
 	bool scrolled = false;

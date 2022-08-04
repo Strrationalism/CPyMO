@@ -6,6 +6,7 @@
 #include <cpymo_interpreter.h>
 #include <string.h>
 #include <cpymo_backend_text.h>
+#include <time.h>
 
 #if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
 #include <libavutil/log.h>
