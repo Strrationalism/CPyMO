@@ -263,6 +263,15 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 #include <wiiuse/wpad.h>
 #endif
 
+#ifdef ENABLE_EXIT_CONFIRM
+#include <cpymo_msgbox_ui.h>
+#include <cpymo_localization.h>
+static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
+{
+	return CPYMO_ERR_NO_MORE_CONTENT;
+}
+#endif
+
 int main(int argc, char **argv) 
 {
     srand((unsigned)time(NULL));
@@ -374,7 +383,26 @@ int main(int argc, char **argv)
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: goto EXIT;
+            case SDL_QUIT: {
+                #ifdef ENABLE_EXIT_CONFIRM
+				
+				if (cpymo_ui_enabled(&engine))
+                	cpymo_ui_exit(&engine);
+
+				err = cpymo_msgbox_ui_enter(
+					&engine,
+					cpymo_parser_stream_span_pure(
+						cpymo_localization_get(&engine)->exit_confirm),
+					&cpymo_exit_confirm,
+					NULL);
+				if (err != CPYMO_ERR_SUCC) {
+					printf("[Error] Can not show message box: %s", 
+						cpymo_error_message(err));
+				}
+				#else
+				goto EXIT;
+				#endif
+            }
             case SDL_VIDEOEXPOSE: redraw_system = true; break;
             case SDL_VIDEORESIZE:
                 err = set_video_mode(event.resize.w, event.resize.h, current_full_screen);

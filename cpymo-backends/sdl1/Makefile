@@ -44,6 +44,10 @@ ifeq ($(OS), Windows_NT)
 LDFLAGS += -lmingw32
 endif
 
+ifeq ($(strip $(ENABLE_EXIT_CONFIRM)), 1)
+CFLAGS += -DENABLE_EXIT_CONFIRM
+endif
+
 LDFLAGS += -lSDLmain -lSDL -lm
 
 ifeq ($(strip $(USE_FFMPEG)), 1)

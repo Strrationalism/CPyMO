@@ -604,6 +604,7 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 
 * `USE_FFMPEG`，此变量为1时将会连接到FFmpeg库，并启用FFmpeg音视频支持。
 * 当`USE_FFMPEG`不为1时，若`USE_SDL_MIXER`为1将连接到`SDL_mixer`，仅启动受限的音频支持。
+* 若`ENABLE_EXIT_CONFIRM`环境变量为1，则会在退出游戏时询问是否要退出。
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
 * 设置`DEBUG`为1时，将会启动调试信息。
 
