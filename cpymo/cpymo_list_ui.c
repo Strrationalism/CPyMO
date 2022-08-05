@@ -67,7 +67,6 @@ static int cpymo_list_ui_get_selection_relative_to_cur_by_mouse(const cpymo_engi
 static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
 {
 	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
-	ui->current_y = 0;
 
 	float y = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
 
@@ -81,10 +80,12 @@ static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
 	}
 
 	if (a) {
+		ui->current_y = 0;
 		ui->current_node = ui->get_prev(e, ui + 1, ui->current_node);
 		ui->selection_relative_to_cur++;
 	}
 	else if (b) {
+		ui->current_y = 0;
 		ui->current_node = ui->get_next(e, ui + 1, ui->current_node);
 		ui->selection_relative_to_cur--;
 	}
