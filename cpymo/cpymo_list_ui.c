@@ -64,33 +64,6 @@ static int cpymo_list_ui_get_selection_relative_to_cur_by_mouse(const cpymo_engi
 	return INT_MAX;
 }
 
-static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
-{
-	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
-
-	float y = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
-
-	bool a = y < 0;
-	bool b = y > e->gameconfig.imagesize_h - ui->node_height;
-
-	if (ui->from_bottom_to_top) {
-		bool t = a;
-		a = b;
-		b = t;
-	}
-
-	if (a) {
-		ui->current_y = 0;
-		ui->current_node = ui->get_prev(e, ui + 1, ui->current_node);
-		ui->selection_relative_to_cur++;
-	}
-	else if (b) {
-		ui->current_y = 0;
-		ui->current_node = ui->get_next(e, ui + 1, ui->current_node);
-		ui->selection_relative_to_cur--;
-	}
-}
-
 static void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
 {
 	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
@@ -108,6 +81,43 @@ static void *cpymo_list_ui_get_relative_id_to_cur(const cpymo_engine *e, int id)
 	}
 
 	return node;
+}
+
+static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data(e);
+
+	float y = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
+
+	bool a = y < 0;
+	bool b = y > e->gameconfig.imagesize_h - ui->node_height;
+
+	if (ui->from_bottom_to_top) {
+		bool t = a;
+		a = b;
+		b = t;
+	}
+
+	if (a) {
+		ui->current_y = 0;
+
+		ui->current_node = cpymo_list_ui_get_relative_id_to_cur(
+			e, ui->selection_relative_to_cur);
+		ui->selection_relative_to_cur = 0;
+	}
+	else if (b) {
+		ui->current_y = 0;
+		ui->current_node = cpymo_list_ui_get_relative_id_to_cur(
+			e, ui->selection_relative_to_cur);
+		ui->selection_relative_to_cur = 0;
+
+		while (ui->selection_relative_to_cur < (int)ui->nodes_per_screen - 1) {
+			void *next_node = ui->get_prev(e, ui + 1, ui->current_node);
+			if (next_node == NULL) break;
+			ui->current_node = next_node;
+			ui->selection_relative_to_cur++;
+		}
+	}
 }
 
 static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
@@ -198,6 +208,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			b = a;
 			a = tmp;
 		}
+		
+		a = a && ui->current_y > 0;
+		b = b && ui->current_y < 0;
 
 		if (a) {
 			void *p = ui->get_prev(e, ui + 1, ui->current_node);
@@ -267,6 +280,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 				if (!cpymo_ui_enabled(e))
 					return CPYMO_ERR_SUCC;
 			}
+
+			cpymo_list_ui_fix_key_scroll(e);
 		}
 
 		if (ui->selection_changed) {
@@ -293,6 +308,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 				if (!cpymo_ui_enabled(e))
 					return CPYMO_ERR_SUCC;
 			}
+
+			cpymo_list_ui_fix_key_scroll(e);
 		}
 
 		if (ui->selection_changed) {
@@ -490,6 +507,8 @@ static error_t cpymo_list_ui_selecting_no_more_content_callback_looping(cpymo_en
 			ui->selection_relative_to_cur++;
 		}
 	}
+
+	ui->current_y = 0;
 
 	cpymo_engine_request_redraw(e);
 
