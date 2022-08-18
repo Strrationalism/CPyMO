@@ -8,6 +8,12 @@
 #include <cpymo_android.h>
 #endif
 
+#ifdef __3DS__
+extern bool fill_screen_enabled;
+const extern bool fill_screen;
+const extern bool enhanced_3ds_display_mode;
+#endif
+
 #define SLIDE_LIMIT 10.0f
 
 static inline float cpymo_list_ui_get_y(const cpymo_engine *e, int relative_to_current)
@@ -380,13 +386,16 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_bg_draw(e);
 	cpymo_scroll_draw(&e->scroll);
 
+	#ifdef __3DS__
+	if (fill_screen && !enhanced_3ds_display_mode)
+		fill_screen_enabled = false;
+	#endif
+
 	float xywh[] = {-100, -100, 200 + (float)e->gameconfig.imagesize_w, 200 + (float)e->gameconfig.imagesize_h };
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_ui_bg);
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
-	xywh[0] = -30;
 	xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
-	xywh[2] += 60;
 	xywh[3] = ui->node_height;
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_ui_element_bg);
 
@@ -418,6 +427,10 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 		node = ui->get_next(e, cpymo_list_ui_data_const(e), node);
 		if (node == NULL) break;
 	}
+
+	#ifdef __3DS__
+	fill_screen_enabled = true;
+	#endif
 }
 
 static void cpymo_list_ui_delete(cpymo_engine *e, void *ui)

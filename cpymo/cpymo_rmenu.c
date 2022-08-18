@@ -9,6 +9,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef __3DS__
+extern bool fill_screen_enabled;
+const extern bool fill_screen;
+const extern bool enhanced_3ds_display_mode;
+#endif
+
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
 #include <cpymo_android.h>
 #endif
@@ -64,6 +70,11 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_bg_draw(e);
 	cpymo_scroll_draw(&e->scroll);
 
+	#ifdef __3DS__
+	if (fill_screen && !enhanced_3ds_display_mode)
+		fill_screen_enabled = false;
+	#endif
+
 	float zoom = cpymo_rmenu_zoom(e);
 	float w = (float)r->bg_w * zoom;
 	float h = (float)r->bg_h * zoom;
@@ -111,6 +122,10 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 	}
 
 	cpymo_select_img_draw(&r->menu, e->gameconfig.imagesize_w, e->gameconfig.imagesize_h, false);
+
+	#ifdef __3DS__
+	fill_screen_enabled = true;
+	#endif
 }
 
 static void cpymo_rmenu_delete(cpymo_engine *e, void *ui_data)

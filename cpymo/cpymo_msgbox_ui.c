@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __3DS__
+extern bool fill_screen_enabled;
+const extern bool fill_screen;
+const extern bool enhanced_3ds_display_mode;
+#endif
+
 typedef struct {
 	cpymo_backend_text message;
 	float message_width;
@@ -208,6 +214,11 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_bg_draw(e);
 	cpymo_scroll_draw(&e->scroll);
 
+	#ifdef __3DS__
+	if (fill_screen && !enhanced_3ds_display_mode)
+		fill_screen_enabled = false;
+	#endif
+
 	float screen_w = (float)e->gameconfig.imagesize_w, screen_h = (float)e->gameconfig.imagesize_h;
 	float xywh[] = { -100, -100, screen_w + 200, screen_h + 200 };
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_bg);
@@ -246,6 +257,10 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 			ui->selection == 1,
 			key_down);
 	}
+
+	#ifdef __3DS__
+	fill_screen_enabled = true;
+	#endif
 }
 
 static void cpymo_msgbox_ui_delete(struct cpymo_engine *e, void *ui_data)

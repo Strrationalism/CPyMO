@@ -744,14 +744,7 @@ error_t cpymo_album_enter(
 
 	CPYMO_THROW(err);
 
-	error_t r = cpymo_album_load_page(e, album);
-
-	#ifdef __3DS__
-	if (r == CPYMO_ERR_SUCC)
-		fill_screen_enabled = false;
-	#endif
-
-	return r;
+	return cpymo_album_load_page(e, album);
 }
 
 #endif
