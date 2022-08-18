@@ -18,7 +18,6 @@ static C3D_Tex tex;
 static Tex3DS_SubTexture subtex;
 static C2D_Image image;
 static u8 *tex_line_by_line = NULL;
-const extern bool fill_screen;
 static struct SwsContext *sws = NULL;
 static size_t origin_height;
 const extern bool drawing_bottom_screen;

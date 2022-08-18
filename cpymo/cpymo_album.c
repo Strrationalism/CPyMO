@@ -17,6 +17,10 @@
 bool cpymo_backend_image_album_ui_writable(void);
 #endif
 
+#ifdef __3DS__
+extern bool fill_screen_enabled;
+#endif
+
 #ifndef DISABLE_STB_IMAGE
 error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
@@ -657,6 +661,10 @@ static void cpymo_album_deleter(cpymo_engine *e, void *a)
 	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i)
 		if (album->cg_infos[i].title != NULL)
 			cpymo_backend_text_free(album->cg_infos[i].title);
+
+	#ifdef __3DS__
+	fill_screen_enabled = false;
+	#endif
 }
 
 error_t cpymo_album_enter(
@@ -732,7 +740,14 @@ error_t cpymo_album_enter(
 
 	CPYMO_THROW(err);
 
-	return cpymo_album_load_page(e, album);
+	error_t r = cpymo_album_load_page(e, album);
+
+	#ifdef __3DS
+	if (r == CPYMO_ERR_SUCC)
+		fill_screen_enabled = true;
+	#endif
+
+	return r;
 }
 
 #endif

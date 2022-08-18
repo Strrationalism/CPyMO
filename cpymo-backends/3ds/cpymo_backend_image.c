@@ -33,6 +33,12 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
 }
 
 const extern bool fill_screen;
+bool fill_screen_enabled = true;
+
+static inline bool is_fill_screen(void)
+{
+    return fill_screen && fill_screen_enabled;
+}
 
 const extern bool enhanced_3ds_display_mode;
 const extern bool drawing_bottom_screen;
@@ -73,7 +79,7 @@ void trans_size(float *w, float *h)
 {
     float rw = drawing_bottom_screen ? ratio_wb : ratio_w;
     float r = 
-        fill_screen ? 
+        is_fill_screen() ? 
             (rw < ratio_h ? rw : ratio_h) :
             (rw > ratio_h ? rw : ratio_h);
 
@@ -87,7 +93,7 @@ void trans_size(float *w, float *h)
 void trans_pos(float *x, float *y) {
     float rw = drawing_bottom_screen ? ratio_wb : ratio_w;
     float r = 
-        fill_screen ? 
+        is_fill_screen() ? 
             (rw < ratio_h ? rw : ratio_h) :
             (rw > ratio_h ? rw : ratio_h);
 
@@ -102,7 +108,9 @@ void trans_pos(float *x, float *y) {
         offset_x = ((drawing_bottom_screen ? 320 : 400) - viewport_w) / 2.0f,
         offset_y = 240 - viewport_h;
 
-    if (drawing_bottom_screen || enhanced_3ds_display_mode || !fill_screen) 
+    if (drawing_bottom_screen || 
+        enhanced_3ds_display_mode || 
+        !is_fill_screen()) 
         offset_y /= 2.0f;
 
     *x = *x / r + offset_x;
