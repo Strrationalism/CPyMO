@@ -94,7 +94,7 @@ RETRY:
 		cpymo_parser_stream_span command = 
 			cpymo_parser_curline_pop_command(&interpreter->script_parser);
 
-		if (cpymo_parser_stream_span_equals_str(command, "label")) {
+		if (cpymo_parser_stream_span_equals_str_ignore_case(command, "label")) {
 			cpymo_parser_stream_span cur_label = 
 				cpymo_parser_curline_pop_commacell(&interpreter->script_parser);
 
