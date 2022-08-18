@@ -262,16 +262,15 @@ typedef struct {
 
 uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
 {
-	char cg_hash_str[64];
-	strcpy(cg_hash_str, "CG:");
+	uint64_t hash;
+	cpymo_parser_stream_span_hash_init(&hash);
+	cpymo_parser_stream_span_hash_append_cstr(&hash, "CG:");
+
 	for (size_t j = 0; j < cg_filename.len && j < 61; ++j)
-		cg_hash_str[j + 3] = (char)toupper(cg_filename.begin[j]);
+		cpymo_parser_stream_span_hash_step(
+			&hash, (char)toupper(cg_filename.begin[j]));
 
-	cpymo_parser_stream_span span;
-	span.begin = cg_hash_str;
-	span.len = (size_t)cpymo_utils_clamp((int)cg_filename.len + 3, 0, 64);
-
-	return cpymo_parser_stream_span_hash(span);
+	return hash;
 }
 
 error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_parser_stream_span cg_filename)

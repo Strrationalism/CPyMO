@@ -379,13 +379,22 @@ cpymo_parser_stream_span cpymo_parser_stream_span_split(cpymo_parser_stream_span
 	return span;
 }
 
-uint64_t cpymo_parser_stream_span_hash(cpymo_parser_stream_span span)
+void cpymo_parser_stream_span_hash_step(uint64_t *hash, char ch)
 {
-	uint64_t seed = 131313;
-	uint64_t hash = 0;
+	const static uint64_t hash_seed = 131313;
+	*hash = (*hash * hash_seed) + ch;
+}
 
-	for (size_t i = 0; i < span.len; ++i) 
-		hash = (hash * seed) + span.begin[i];
-	
-	return hash;
+void cpymo_parser_stream_span_hash_append(
+	uint64_t *hash, cpymo_parser_stream_span span)
+{
+	for (size_t i = 0; i < span.len; ++i)
+		cpymo_parser_stream_span_hash_step(hash, span.begin[i]);
+}
+
+void cpymo_parser_stream_span_hash_append_cstr(uint64_t *hash, const char *s)
+{
+	char ch;
+	while ('\0' != (ch = *s++))
+		cpymo_parser_stream_span_hash_step(hash, ch);
 }

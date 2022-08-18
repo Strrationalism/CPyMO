@@ -1033,16 +1033,21 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			cpymo_parser_stream_span text =
 				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
 
-			char hash_str[128];
-			sprintf(hash_str, "SEL: %s/%u/%d/", 
-				interpreter->script_name, 
-				(unsigned)interpreter->script_parser.cur_line, 
-				i);
+			uint64_t hash;
+			cpymo_parser_stream_span_hash_init(&hash);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "SEL: ");
+			cpymo_parser_stream_span_hash_append_cstr(
+				&hash, interpreter->script_name);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
 
-			size_t len = strlen(hash_str);
-			cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, text);
-
-			uint64_t sel_hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+			char buf[32];
+			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			sprintf(buf, "%d", i);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			cpymo_parser_stream_span_hash_append(&hash, text);
 
 			enum cpymo_select_img_selection_hint_state hint_mode = cpymo_select_img_selection_nohint;
 			if (!(IS_EMPTY(hint_pic))) {
@@ -1054,7 +1059,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			
 			err = cpymo_select_img_configuare_select_text(
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags, 
-				text, true, hint_mode, sel_hash, cpymo_gameconfig_font_size(&engine->gameconfig));
+				text, true, hint_mode, hash, cpymo_gameconfig_font_size(&engine->gameconfig));
 
 			CPYMO_THROW(err);
 		}
@@ -1084,20 +1089,27 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 		
 		for (int i = 0; i < choices; ++i) { 
 			POP_ARG(text); ENSURE(text); 
-			char hash_str[128];
-			sprintf(hash_str, "SELECT_TEXT: %s/%u/%d/",
-				interpreter->script_name,
-				(unsigned)interpreter->script_parser.cur_line,
-				i);
+			uint64_t hash;
+			cpymo_parser_stream_span_hash_init(&hash);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "SELECT_TEXT: ");
+			cpymo_parser_stream_span_hash_append_cstr(
+				&hash, interpreter->script_name);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
 
-			size_t len = strlen(hash_str);
-			cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, text);
-
-			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+			char buf[32];
+			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			sprintf(buf, "%d", i);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			cpymo_parser_stream_span_hash_append(&hash, text);
 
 			err = cpymo_select_img_configuare_select_text(
-				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
-				text, true, cpymo_select_img_selection_nohint, hash, cpymo_gameconfig_font_size(&engine->gameconfig));
+				&engine->select_img, &engine->assetloader, 
+				&engine->gameconfig, &engine->flags,
+				text, true, cpymo_select_img_selection_nohint, hash, 
+				cpymo_gameconfig_font_size(&engine->gameconfig));
 
 			CPYMO_THROW(err); 
 		} 
@@ -1134,15 +1146,20 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 			POP_ARG(text); ENSURE(text);
 			POP_ARG(expr); ENSURE(expr);
 
-			char hash_str[128];
-			sprintf(hash_str, "SELECT_VAR: %s/%u/%d/",
-				interpreter->script_name,
-				(unsigned)interpreter->script_parser.cur_line,
-				i);
-			size_t len = strlen(hash_str);
-			cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, text);
-
-			uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+			uint64_t hash;
+			cpymo_parser_stream_span_hash_init(&hash);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "SELECT_VAR: ");
+			cpymo_parser_stream_span_hash_append_cstr(
+				&hash, interpreter->script_name);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			char buf[32];
+			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			sprintf(buf, "%d", i);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+			cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+			cpymo_parser_stream_span_hash_append(&hash, text);
 
 			err = cpymo_select_img_configuare_select_text(
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
@@ -1189,14 +1206,20 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				const bool enabled = cpymo_vars_eval(&engine->vars, v_str) != 0;
 				POS(x, y, x_str, y_str);
 
-				char hash_str[128];
-				sprintf(hash_str, "SELECT_IMG: %s/%u/%d/",
-					interpreter->script_name,
-					(unsigned)interpreter->script_parser.cur_line,
-					(int)i);
-				size_t len = strlen(hash_str);
-				cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, filename);
-				uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
+				uint64_t hash;
+				cpymo_parser_stream_span_hash_init(&hash);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "SELECT_IMG: ");
+				cpymo_parser_stream_span_hash_append_cstr(
+					&hash, interpreter->script_name);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+				char buf[32];
+				sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+				sprintf(buf, "%d", (int)i);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+				cpymo_parser_stream_span_hash_append(&hash, filename);
 
 				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled, hash);
 			}
@@ -1231,16 +1254,21 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 				const bool enabled = cpymo_vars_eval(&engine->vars, v_str);
 				POS(x, y, x_str, y_str);
 
-				char hash_str[128];
-				sprintf(hash_str, "SELECT_IMGS: %s/%u/%d/",
-					interpreter->script_name,
-					(unsigned)interpreter->script_parser.cur_line,
-					(int)i);
+				uint64_t hash;
+				cpymo_parser_stream_span_hash_init(&hash);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "SELECT_IMGS: ");
+				cpymo_parser_stream_span_hash_append_cstr(&hash, interpreter->script_name);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+				
+				char buf[32];
+				sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+				sprintf(buf, "%d", (int)i);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, buf);
+				cpymo_parser_stream_span_hash_append_cstr(&hash, "/");
+				cpymo_parser_stream_span_hash_append(&hash, filename);
 
-				size_t len = strlen(hash_str);
-				cpymo_parser_stream_span_copy(hash_str + len, sizeof(hash_str) - len - 2, filename);
-
-				uint64_t hash = cpymo_parser_stream_span_hash(cpymo_parser_stream_span_pure(hash_str));
 
 				cpymo_select_img_configuare_select_imgs_selection(engine, filename, x, y, enabled, hash);
 			}
