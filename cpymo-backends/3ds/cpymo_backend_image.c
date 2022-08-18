@@ -34,13 +34,18 @@ float offset_3d(enum cpymo_backend_image_draw_type type)
 
 const extern bool fill_screen;
 bool fill_screen_enabled = true;
+const extern bool enhanced_3ds_display_mode;
+extern cpymo_engine engine;
 
 static inline bool is_fill_screen(void)
 {
+    if (!enhanced_3ds_display_mode && engine.ui && 
+        fill_screen && fill_screen_enabled)
+        return false;
+
     return fill_screen && fill_screen_enabled;
 }
 
-const extern bool enhanced_3ds_display_mode;
 const extern bool drawing_bottom_screen;
 
 bool enhanced_3ds_display_mode_touch_ui_enabled(void);
