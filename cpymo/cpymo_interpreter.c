@@ -205,6 +205,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_parser_stream_span command, cpym
 
 	/*** I. Text ***/
 	D("say") {
+		cpymo_fade_reset(&engine->fade);
 		cpymo_interpreter_checkpoint(interpreter);
 
 		POP_ARG(name_or_text);
