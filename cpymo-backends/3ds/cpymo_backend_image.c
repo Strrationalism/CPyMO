@@ -39,10 +39,6 @@ extern cpymo_engine engine;
 
 static inline bool is_fill_screen(void)
 {
-    if (!enhanced_3ds_display_mode && engine.ui && 
-        fill_screen && fill_screen_enabled)
-        return false;
-
     return fill_screen && fill_screen_enabled;
 }
 

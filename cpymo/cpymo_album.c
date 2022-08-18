@@ -605,6 +605,10 @@ static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
 {
 	const cpymo_album *a = (const cpymo_album *)_a;
 
+	#ifdef __3DS__
+	fill_screen_enabled = a->showing_cg;
+	#endif
+
 	if (a->showing_cg) {
 		if (a->showing_cg_image) {
 			cpymo_backend_image_draw(
@@ -663,7 +667,7 @@ static void cpymo_album_deleter(cpymo_engine *e, void *a)
 			cpymo_backend_text_free(album->cg_infos[i].title);
 
 	#ifdef __3DS__
-	fill_screen_enabled = false;
+	fill_screen_enabled = true;
 	#endif
 }
 
@@ -742,9 +746,9 @@ error_t cpymo_album_enter(
 
 	error_t r = cpymo_album_load_page(e, album);
 
-	#ifdef __3DS
+	#ifdef __3DS__
 	if (r == CPYMO_ERR_SUCC)
-		fill_screen_enabled = true;
+		fill_screen_enabled = false;
 	#endif
 
 	return r;
