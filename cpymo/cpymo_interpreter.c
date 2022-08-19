@@ -111,7 +111,7 @@ RETRY:
 					char label_name[32];
 					cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
 					printf("[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
-					return cpymo_interpreter_goto_line(interpreter, cur_line_num + 1);
+					return cpymo_interpreter_goto_line(interpreter, cur_line_num);
 				}
 				else {
 					cpymo_parser_reset(&interpreter->script_parser);
