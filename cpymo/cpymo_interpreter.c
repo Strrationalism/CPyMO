@@ -47,7 +47,7 @@ error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t li
 	cpymo_parser_reset(&interpreter->script_parser);
 	while (line != interpreter->script_parser.cur_line)
 		if (!cpymo_parser_next_line(&interpreter->script_parser))
-			return CPYMO_ERR_BAD_FILE_FORMAT;
+			return CPYMO_ERR_NO_MORE_CONTENT;
 	return CPYMO_ERR_SUCC;
 }
 
@@ -89,6 +89,8 @@ void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_parser_stream_span label)
 {
 	bool retring = false;
+	uint64_t cur_line_num = interpreter->script_parser.cur_line;
+
 RETRY:
 	while (1) {
 		cpymo_parser_stream_span command = 
@@ -109,7 +111,7 @@ RETRY:
 					char label_name[32];
 					cpymo_parser_stream_span_copy(label_name, sizeof(label_name), label);
 					printf("[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
-					return CPYMO_ERR_SCRIPT_LABEL_NOT_FOUND;
+					return cpymo_interpreter_goto_line(interpreter, cur_line_num + 1);
 				}
 				else {
 					cpymo_parser_reset(&interpreter->script_parser);
