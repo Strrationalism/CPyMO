@@ -11,6 +11,16 @@ extern SDL_Renderer * renderer;
 extern cpymo_engine engine;
 #endif
 
+#ifdef LEAKCHECK
+static int leakcheck_images = 0;
+void cpymo_backend_image_leakcheck(void)
+{
+	if (leakcheck_images) {
+		printf("cpymo_backend_image LEAKS: %d\n", leakcheck_images);
+	}
+}
+#endif
+
 error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, void *px, int w, int h, enum cpymo_backend_image_format fmt)
 {
@@ -65,6 +75,11 @@ error_t cpymo_backend_image_load(
 
 	*out_image = (cpymo_backend_image)tex;
 	free(px);
+
+	#ifdef LEAKCHECK
+	leakcheck_images++;
+	#endif
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -79,6 +94,9 @@ error_t cpymo_backend_image_load_with_mask(
 void cpymo_backend_image_free(cpymo_backend_image image)
 {
 	SDL_DestroyTexture((SDL_Texture *)image);
+	#ifdef LEAKCHECK
+	leakcheck_images--;
+	#endif
 }
 
 void cpymo_backend_image_draw(

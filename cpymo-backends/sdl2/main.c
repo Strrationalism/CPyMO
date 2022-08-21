@@ -629,6 +629,8 @@ EXIT:
 
 	#ifdef LEAKCHECK
 	stb_leakcheck_dumpmem();
+	extern void cpymo_backend_image_leakcheck(void);
+	cpymo_backend_image_leakcheck();
 	#endif
 
 	return ret;
