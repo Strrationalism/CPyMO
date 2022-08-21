@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_vars.h"
 #include <stdlib.h>
 #include <assert.h>
@@ -95,4 +96,5 @@ int cpymo_vars_eval(cpymo_vars * vars, cpymo_parser_stream_span expr)
 	if (cpymo_vars_is_constant(expr)) return cpymo_parser_stream_span_atoi(expr);
 	else return cpymo_vars_get(vars, expr);
 }
+
 

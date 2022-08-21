@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_bg.h"
 #include "cpymo_engine.h"
 #include <stb_image.h>
@@ -263,4 +264,5 @@ error_t cpymo_bg_command(
 
 	return CPYMO_ERR_SUCC;
 }
+
 

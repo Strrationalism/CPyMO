@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_image.h>
 #include <cpymo_backend_masktrans.h>
 #include <stdlib.h>
@@ -332,3 +333,4 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 
 	SDL_UnlockSurface(framebuffer);
 }
+

@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <stb_image_resize.h>
 #include <stb_image_write.h>
 #include <stb_image.h>
@@ -747,3 +748,4 @@ error_t cpymo_album_enter(
 }
 
 #endif
+

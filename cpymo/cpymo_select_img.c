@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_select_img.h"
 #include "cpymo_localization.h"
 #include "cpymo_engine.h"
@@ -637,3 +638,4 @@ void cpymo_select_img_configuare_end_select_text(
 	}
 #endif
 }
+

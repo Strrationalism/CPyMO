@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_assetloader.h"
 #include "cpymo_utils.h"
 #include <stdlib.h>
@@ -394,3 +395,4 @@ error_t cpymo_assetloader_load_icon(
 }
 #endif
 #endif
+

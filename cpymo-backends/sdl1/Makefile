@@ -25,6 +25,10 @@ else
 CFLAGS += -DNDEBUG -O3
 endif
 
+ifeq ($(LEAKCHECK), 1)
+CFLAGS += -DLEAKCHECK
+endif
+
 ifneq ($(strip $(SDL)), "")
 CFLAGS += -I$(SDL)/include
 LDFLAGS += -L$(SDL)/lib

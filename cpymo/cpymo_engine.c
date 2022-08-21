@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_engine.h"
 #include "cpymo_interpreter.h"
 #include <cpymo_backend_image.h>
@@ -317,3 +318,4 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_text_draw(engine);
 	cpymo_say_draw(engine);
 }
+

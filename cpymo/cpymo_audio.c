@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_audio.h"
 #include <assert.h>
 #include <cpymo_backend_audio.h>
@@ -792,3 +793,4 @@ void cpymo_audio_vo_stop(struct cpymo_engine *e) {}
 void cpymo_audio_play_video(struct cpymo_engine *e, const char *path) {}
 
 #endif
+

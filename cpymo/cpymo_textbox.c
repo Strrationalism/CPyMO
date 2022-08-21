@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_textbox.h"
 #include "cpymo_engine.h"
 #include <assert.h>
@@ -287,4 +288,5 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
 
     return go;
 }
+
 

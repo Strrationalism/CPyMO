@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_package.h"
 #include "cpymo_utils.h"
 
@@ -238,3 +239,4 @@ cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	cpymo_package_stream_reader_seek(0, &reader);
 	return reader;
 }
+

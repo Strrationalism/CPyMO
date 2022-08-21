@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_flash.h"
 #include "cpymo_engine.h"
 #include <cpymo_backend_image.h>
@@ -30,3 +31,4 @@ void cpymo_flash_draw(const cpymo_engine *engine)
 		cpymo_backend_image_fill_rects(xywh, 1, engine->flash.color, 1, cpymo_backend_image_draw_type_bg);
 	}
 }
+

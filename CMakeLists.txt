@@ -10,6 +10,7 @@ add_definitions (-D_CRT_SECURE_NO_WARNINGS)
 add_definitions (-DENABLE_TEXT_EXTRACT)
 add_definitions (-DENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD)
 add_definitions (-DENABLE_EXIT_CONFIRM)
+add_definitions (-DLEAKCHECK)
 
 find_package (FFMPEG REQUIRED)
 

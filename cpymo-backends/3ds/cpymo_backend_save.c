@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_save.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,3 +16,4 @@ FILE *cpymo_backend_write_save(const char * gamedir, const char * name)
 	sprintf(path, "%s/save/%s", gamedir, name);
 	return fopen(path, "wb");
 }
+

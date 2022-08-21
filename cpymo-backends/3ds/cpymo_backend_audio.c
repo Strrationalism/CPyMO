@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <3ds.h>
 #include <string.h>
 #include <stdio.h>
@@ -188,3 +189,4 @@ void cpymo_backend_audio_unlock()
 {
     LightLock_Unlock(&audio_lock);
 }
+

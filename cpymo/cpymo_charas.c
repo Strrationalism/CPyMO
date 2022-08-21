@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_charas.h"
 #include "cpymo_engine.h"
 #include <assert.h>
@@ -425,3 +426,4 @@ void cpymo_charas_play_anime(
 		&cpymo_charas_wait_for_anime,
 		&cpymo_charas_anime_finished_callback);
 }
+

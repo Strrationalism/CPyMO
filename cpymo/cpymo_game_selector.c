@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_game_selector.h"
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
@@ -445,3 +446,4 @@ void cpymo_game_selector_item_free_all(cpymo_game_selector_item * item)
 		free(cur);
 	}
 }
+

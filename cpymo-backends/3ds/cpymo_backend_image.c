@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_image.h>
 #include <cpymo_engine.h>
 #include <3ds.h>
@@ -337,3 +338,4 @@ error_t cpymo_backend_image_load_with_mask(
 }
 
 bool cpymo_backend_image_album_ui_writable() { return true; }
+

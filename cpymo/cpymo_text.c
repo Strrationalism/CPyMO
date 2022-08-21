@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_text.h"
 #include "cpymo_engine.h"
 #include <stdlib.h>
@@ -123,3 +124,4 @@ void cpymo_text_clear(cpymo_text *t)
 
 	t->ls = NULL;
 }
+

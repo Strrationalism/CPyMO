@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_image.h>
 #include <cpymo_backend_masktrans.h>
 #include <string.h>
@@ -332,3 +333,4 @@ error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_
 void cpymo_backend_masktrans_free(cpymo_backend_masktrans m){}
 
 void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fade_in){}
+

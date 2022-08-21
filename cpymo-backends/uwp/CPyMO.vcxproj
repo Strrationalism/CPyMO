@@ -331,6 +331,7 @@
     <ClInclude Include="..\..\cpymo\cpymo_music_box.h" />
     <ClInclude Include="..\..\cpymo\cpymo_package.h" />
     <ClInclude Include="..\..\cpymo\cpymo_parser.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_prelude.h" />
     <ClInclude Include="..\..\cpymo\cpymo_rmenu.h" />
     <ClInclude Include="..\..\cpymo\cpymo_save.h" />
     <ClInclude Include="..\..\cpymo\cpymo_save_global.h" />

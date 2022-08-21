@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_gameconfig.h"
 #include "cpymo_utils.h"
 #include "cpymo_parser.h"
@@ -242,3 +243,4 @@ error_t cpymo_gameconfig_parse_from_file(cpymo_gameconfig *out_config, const cha
 
 	return err;
 }
+

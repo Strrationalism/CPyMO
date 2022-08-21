@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_save.h"
 #include "cpymo_save_global.h"
 #include "cpymo_engine.h"
@@ -511,3 +512,4 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 
 	return CPYMO_ERR_SUCC;
 }
+

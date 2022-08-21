@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_hash_flags.h"
 #include <stdlib.h>
 #include <assert.h>
@@ -58,3 +59,4 @@ bool cpymo_hash_flags_check(cpymo_hash_flags *flags, cpymo_hash_flag f)
 
 	return false;
 }
+

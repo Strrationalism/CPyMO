@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_fade.h"
 #include "cpymo_engine.h"
 #include <cpymo_backend_image.h>
@@ -58,3 +59,4 @@ void cpymo_fade_start_fadein(cpymo_engine *engine, float time)
 		&cpymo_fade_waiter, 
 		&cpymo_fade_finish_callback);
 }
+

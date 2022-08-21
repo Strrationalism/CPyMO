@@ -19,6 +19,10 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
+ifeq ($(LEAKCHECK), 1)
+CFLAGS += -DLEAKCHECK
+endif
+
 LDFLAGS += -O3 -lm
 
 TARGET := cpymo-ascii-art

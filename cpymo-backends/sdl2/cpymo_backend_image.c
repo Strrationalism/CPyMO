@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_backend_image.h"
 #include "cpymo_import_sdl2.h"
 #include <assert.h>
@@ -393,4 +394,5 @@ error_t cpymo_assetloader_load_system_masktrans(
 }
 
 #endif
+
 

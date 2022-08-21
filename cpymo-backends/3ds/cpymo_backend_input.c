@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_input.h>
 #include <3ds.h>
 #include <stdlib.h>
@@ -78,3 +79,4 @@ cpymo_input cpymo_input_snapshot()
 
     return out;
 }
+

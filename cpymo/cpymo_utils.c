@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,3 +105,4 @@ void cpymo_utils_attach_mask_to_rgba_ex(void * rgba_, int w, int h, void * mask_
 		}
 	}
 }
+

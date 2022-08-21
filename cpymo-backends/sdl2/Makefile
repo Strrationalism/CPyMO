@@ -19,6 +19,10 @@ else
 CFLAGS += -O3 -DNDEBUG
 endif
 
+ifeq ($(LEAKCHECK), 1)
+CFLAGS += -DLEAKCHECK
+endif
+
 ifeq ($(ENABLE_EXIT_CONFIRM), 1)
 CFLAGS += -DENABLE_EXIT_CONFIRM
 endif

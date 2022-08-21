@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_parser.h"
 #include <ctype.h>
 #include <math.h>
@@ -398,3 +399,4 @@ void cpymo_parser_stream_span_hash_append_cstr(uint64_t *hash, const char *s)
 	while ('\0' != (ch = *s++))
 		cpymo_parser_stream_span_hash_step(hash, ch);
 }
+

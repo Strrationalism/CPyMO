@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #ifdef ENABLE_SDL_MIXER_AUDIO_BACKEND
 #include <cpymo_engine.h>
 #include <SDL/SDL_mixer.h>

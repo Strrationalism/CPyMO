@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_scroll.h"
 #include "cpymo_utils.h"
 #include "cpymo_engine.h"
@@ -73,4 +74,5 @@ error_t cpymo_scroll_start(cpymo_engine *e, cpymo_parser_stream_span bgname, flo
 
 	return CPYMO_ERR_SUCC;
 }
+
 

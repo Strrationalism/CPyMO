@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_localization.h"
 #include "cpymo_gameconfig.h"
 #include <stddef.h>
@@ -241,3 +242,4 @@ const cpymo_localization *cpymo_localization_get(struct cpymo_engine *e)
 {
 	return &DEFAULT_LANG;
 }
+

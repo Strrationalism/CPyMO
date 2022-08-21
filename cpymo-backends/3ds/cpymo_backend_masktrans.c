@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_masktrans.h>
 #include <stdio.h>
 #include <3ds.h>

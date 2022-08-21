@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_interpreter.h"
 #include "cpymo_engine.h"
 #include "cpymo_album.h"

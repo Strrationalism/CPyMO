@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_floating_hint.h"
 #include <assert.h>
 #include "cpymo_engine.h"
@@ -125,3 +126,4 @@ error_t cpymo_floating_hint_start(
 
 	return CPYMO_ERR_SUCC;
 }
+

@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_anime.h"
 #include "cpymo_engine.h"
 #include <stb_image.h>

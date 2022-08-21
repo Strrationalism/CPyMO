@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_backend_movie.h"
 #include "utils.h"
 #include <assert.h>
@@ -175,3 +176,4 @@ void cpymo_backend_movie_draw_surface()
 
     C2D_DrawImage(image, &p, &tint);
 }
+

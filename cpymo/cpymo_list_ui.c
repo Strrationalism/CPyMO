@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_list_ui.h"
 #include "cpymo_engine.h"
 #include <assert.h>
@@ -540,3 +541,4 @@ void cpymo_list_ui_enable_loop(cpymo_engine *e)
 	cpymo_list_ui_set_selecting_no_more_content_callback(e, 
 		&cpymo_list_ui_selecting_no_more_content_callback_looping);
 }
+

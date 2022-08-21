@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_ui.h"
 #include "cpymo_engine.h"
 #include <stdlib.h>
@@ -60,3 +61,4 @@ bool cpymo_ui_enabled(const cpymo_engine *e)
 {
 	return e->ui != NULL;
 }
+

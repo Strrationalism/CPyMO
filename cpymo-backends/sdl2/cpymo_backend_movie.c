@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_backend_movie.h"
 #include "cpymo_import_sdl2.h"
 #include <cpymo_engine.h>
@@ -59,3 +60,4 @@ void cpymo_backend_movie_draw_surface()
 {
 	SDL_RenderCopy(renderer, tex, NULL, NULL);
 }
+

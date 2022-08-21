@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_wait.h"
 #include "cpymo_engine.h"
 #include <assert.h>
@@ -56,3 +57,4 @@ void cpymo_wait_callback_nextframe(cpymo_wait *w, cpymo_wait_over_callback cb)
 {
 	cpymo_wait_register_with_callback(w, &cpymo_wait_dummy_wait, cb);
 }
+

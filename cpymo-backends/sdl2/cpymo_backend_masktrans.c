@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_masktrans.h>
 #include "cpymo_import_sdl2.h"
 #include <cpymo_backend_image.h>
@@ -105,3 +106,4 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 
 	SDL_RenderCopy(renderer, m->tex, NULL, &rect);
 }
+

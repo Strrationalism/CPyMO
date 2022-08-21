@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "include/cpymo_android.h"
 
 #include <jni.h>
@@ -39,3 +40,4 @@ void cpymo_android_play_sound(int sound_type)
     JNIEnv *env = SDL_AndroidGetJNIEnv();
     (*env)->CallStaticVoidMethod(env, mVisualHelperClass, midPlaySound, sound_type);
 }
+

@@ -1,3 +1,19 @@
+﻿#ifndef DISABLE_STB_IMAGE
+#define STBI_NO_PSD
+#define STBI_NO_TGA
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PNM
+
+#define FASTEST_FILTER STBIR_FILTER_BOX
+#define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
+#define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
+
+#ifdef LEAKCHECK
+#define STB_LEAKCHECK_IMPLEMENTATION
+#endif
+
+#include "cpymo_prelude.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <cpymo_error.h>
@@ -14,24 +30,14 @@
 #include <libavutil/log.h>
 #endif
 
-#ifndef DISABLE_STB_IMAGE
-#define STBI_NO_PSD
-#define STBI_NO_TGA
-#define STBI_NO_HDR
-#define STBI_NO_PIC
-#define STBI_NO_PNM
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#define FASTEST_FILTER STBIR_FILTER_BOX
-#define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
-#define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
-
 #endif
 
 #include <cpymo_backend_audio.h>
@@ -621,5 +627,10 @@ EXIT:
 	_CrtDumpMemoryLeaks();
 	#endif
 
+	#ifdef LEAKCHECK
+	stb_leakcheck_dumpmem();
+	#endif
+
 	return ret;
 }
+

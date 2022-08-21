@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_error.h"
 
 const char * cpymo_error_message(error_t err) {
@@ -13,3 +14,4 @@ const char * cpymo_error_message(error_t err) {
 	default: return "Unknown error.";
 	}
 }
+

@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_text.h>
 #include <cpymo_engine.h>
 #include <stb_truetype.h>
@@ -119,5 +120,6 @@ float cpymo_backend_text_width(
 
     return 2 * (float)w / window_size_w * engine.gameconfig.imagesize_w;
 }
+
 
 

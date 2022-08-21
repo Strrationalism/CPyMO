@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #ifndef DISABLE_STB_TRUETYPE
 
 #include <cpymo_error.h>

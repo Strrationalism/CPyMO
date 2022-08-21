@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include <cpymo_backend_text.h>
 #include <stdlib.h>
 #include <3ds.h>
@@ -156,3 +157,4 @@ void cpymo_backend_text_draw(cpymo_backend_text t, float x, float y, cpymo_color
         x + offset_3d_v, y, 0.0f,
         x_scale, y_scale, color);
 }
+

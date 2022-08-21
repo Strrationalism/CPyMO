@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #ifndef DISABLE_STB_TRUETYPE
 
 #include <cpymo_backend_text.h>
@@ -157,4 +158,5 @@ void cpymo_backend_text_extract(const char *text)
 #endif
 }
 #endif
+
 

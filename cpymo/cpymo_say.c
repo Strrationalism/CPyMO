@@ -1,3 +1,4 @@
+﻿#include "cpymo_prelude.h"
 #include "cpymo_say.h"
 #include "cpymo_rmenu.h"
 #include "cpymo_engine.h"
@@ -434,3 +435,4 @@ void cpymo_say_hidewindow_until_click(cpymo_engine * e)
 	e->say.hide_window = true;
 	cpymo_engine_request_redraw(e);
 }
+
