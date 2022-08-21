@@ -1,3 +1,4 @@
+﻿#include <cpymo_prelude.h>
 #include "cpymo_tool_image.h"
 #include <cpymo_utils.h>
 #include <cpymo_gameconfig.h>
@@ -339,3 +340,4 @@ int cpymo_tool_invoke_generate_album_ui(
 
     return cpymo_tool_generate_album_ui(gamedir, argv + 3, (size_t)(argc - 3));
 }
+

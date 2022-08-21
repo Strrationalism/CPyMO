@@ -1,3 +1,8 @@
+﻿#ifdef LEAKCHECK
+#define STB_LEAKCHECK_IMPLEMENTATION
+#endif
+
+#include <cpymo_prelude.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -58,20 +63,28 @@ int process_err(error_t e) {
 }
 
 int main(int argc, const char **argv) {
+	int ret = 0;
 	if (argc < 2) {
-		return help();
+		ret = help();
 	}
 	else {
 		if (strcmp(argv[1], "unpack") == 0)
-			return cpymo_tool_invoke_unpack(argc, argv);
+			ret = cpymo_tool_invoke_unpack(argc, argv);
 		else if (strcmp(argv[1], "pack") == 0)
-			return cpymo_tool_invoke_pack(argc, argv);
+			ret = cpymo_tool_invoke_pack(argc, argv);
 		else if (strcmp(argv[1], "resize") == 0)
-			return cpymo_tool_invoke_resize(argc, argv);
+			ret = cpymo_tool_invoke_resize(argc, argv);
 		else if (strcmp(argv[1], "pack-images") == 0)
-			return cpymo_tool_invoke_pack_images(argc, argv);
+			ret = cpymo_tool_invoke_pack_images(argc, argv);
 		else if (strcmp(argv[1], "gen-album-cache") == 0)
-			return cpymo_tool_invoke_generate_album_ui(argc, argv);
-		else return help();
+			ret = cpymo_tool_invoke_generate_album_ui(argc, argv);
+		else ret =help();
 	}
+
+	#ifdef LEAKCHECK
+	stb_leakcheck_dumpmem();
+	#endif	
+
+	return ret;
 }
+

@@ -1,3 +1,4 @@
+﻿#include <cpymo_prelude.h>
 #include "cpymo_tool_pack_images.h"
 #include "cpymo_tool_image.h"
 #include <cpymo_parser.h>
@@ -157,3 +158,4 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 	
 	return process_err(err);
 }
+

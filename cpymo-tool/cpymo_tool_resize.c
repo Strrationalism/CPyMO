@@ -1,3 +1,4 @@
+﻿#include <cpymo_prelude.h>
 #include "cpymo_tool_resize.h"
 #include <stdbool.h>
 #include <cpymo_error.h>
@@ -134,3 +135,4 @@ int cpymo_tool_invoke_resize(int argc, const char ** argv)
 		cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
 	return process_err(err);
 }
+

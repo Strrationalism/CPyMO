@@ -20,7 +20,7 @@ SRC_CPYMO := \
 OBJS := $(patsubst %.c, $(BUILD_DIR_CPYMO_TOOL)/%.o, $(SRC_TOOL)) \
 		$(patsubst %.c, $(BUILD_DIR_CPYMO)/%.o, $(notdir $(SRC_CPYMO)))
 
-CFLAGS := -O3 -DNDEBUG -DCPYMO_TOOL -I../cpymo -I../stb -I../endianness.h
+CFLAGS := -O3 -DNDEBUG -DCPYMO_TOOL -I../cpymo -I../stb -I../endianness.h -DLEAKCHECK
 
 CC = cc -c
 LD = cc
