@@ -129,7 +129,7 @@ static void cpymo_game_selector_item_load_info(cpymo_game_selector_item *item, f
         strcpy(item->gametitle_text, game_config.gametitle);
 #endif
 		cpymo_backend_text_create(&item->gametitle, &item->gametitle_w,
-			cpymo_parser_stream_span_pure(game_config.gametitle), 
+			cpymo_string_pure(game_config.gametitle), 
 			fontsize);
 
 		err = cpymo_assetloader_load_icon(
@@ -325,7 +325,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 		const cpymo_localization *l = cpymo_localization_get(e);
 
 		err = cpymo_backend_text_create(&ui->msg1, &ui->msg1_w,
-			cpymo_parser_stream_span_pure(l->game_selector_empty),
+			cpymo_string_pure(l->game_selector_empty),
 			font_size);
 
 		if (err != CPYMO_ERR_SUCC) {
@@ -335,7 +335,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 
 #if (!defined __PSP__ && !defined __UWP__)
 		err = cpymo_backend_text_create(&ui->msg2, &ui->msg2_w,
-			cpymo_parser_stream_span_pure(l->game_selector_empty_secondary),
+			cpymo_string_pure(l->game_selector_empty_secondary),
 			font_size / 1.3f);
 
 		if (err != CPYMO_ERR_SUCC) {

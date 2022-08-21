@@ -84,7 +84,7 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 
 static Mix_Music *bgm = NULL;
 static char *bgm_name = NULL;
-error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_string bgmname, bool loop)
 {
     if (!enabled) return CPYMO_ERR_SUCC;
 
@@ -109,7 +109,7 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
         assert(bgm_name == NULL);
         bgm_name = (char *)malloc(bgmname.len + 1);
         if (bgm_name)
-            cpymo_parser_stream_span_copy(bgm_name, bgmname.len + 1, bgmname);
+            cpymo_string_copy(bgm_name, bgmname.len + 1, bgmname);
     }
 
     return CPYMO_ERR_SUCC;
@@ -133,7 +133,7 @@ static char *se_data = NULL;
 static SDL_RWops *se_rwops = NULL;
 static Mix_Chunk *se = NULL;
 static char *se_name = NULL;
-error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sename, bool loop)
+error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_string sename, bool loop)
 {
     if (!enabled) return CPYMO_ERR_SUCC;
     cpymo_audio_se_stop(e);
@@ -181,7 +181,7 @@ error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sen
         assert(se_name == NULL);
         se_name = (char *)malloc(sename.len + 1);
         if (se_name) {
-            cpymo_parser_stream_span_copy(se_name, sename.len + 1, sename);
+            cpymo_string_copy(se_name, sename.len + 1, sename);
         }
     }
 
@@ -215,7 +215,7 @@ void cpymo_audio_se_stop(struct cpymo_engine *e)
 static char *vo_data = NULL;
 static SDL_RWops *vo_rwops = NULL;
 static Mix_Chunk *vo = NULL;
-error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname)
+error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_string voname)
 {
     if (!enabled) return CPYMO_ERR_SUCC;
     cpymo_audio_vo_stop(e);

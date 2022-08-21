@@ -57,20 +57,20 @@ const extern bool drawing_bottom_screen;
 
 const static float text_scale_divisor = 28.0f;
 
-float cpymo_backend_text_width(cpymo_parser_stream_span text, float logic_size)
+float cpymo_backend_text_width(cpymo_string text, float logic_size)
 {
     cpymo_backend_text t = NULL;
     float w;
     error_t err = cpymo_backend_text_create(&t, &w, text, logic_size);
     if (err != CPYMO_ERR_SUCC) {
-        return logic_size * cpymo_parser_stream_span_utf8_len(text) / 1.35f;
+        return logic_size * cpymo_string_utf8_len(text) / 1.35f;
     }
 
     cpymo_backend_text_free(t);
     return w;
 }
 
-error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_parser_stream_span utf8_string, float single_character_size_in_logical_screen)
+error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_string utf8_string, float single_character_size_in_logical_screen)
 {
     struct cpymo_backend_text *t = (struct cpymo_backend_text *)malloc(sizeof(struct cpymo_backend_text));
     if(t == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -84,7 +84,7 @@ error_t cpymo_backend_text_create(cpymo_backend_text *out, float *out_w, cpymo_p
     t->single_character_size_in_logical_screen = single_character_size_in_logical_screen;
 
     char *strbuf = alloca(utf8_string.len + 1);
-    cpymo_parser_stream_span_copy(strbuf, utf8_string.len + 1, utf8_string);
+    cpymo_string_copy(strbuf, utf8_string.len + 1, utf8_string);
     if(C2D_TextFontParse(&t->text, font, t->text_buf, strbuf) == NULL) {
         C2D_TextBufDelete(t->text_buf);
         free(t);

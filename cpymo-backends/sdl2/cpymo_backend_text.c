@@ -23,15 +23,15 @@ typedef struct {
 } cpymo_backend_text_internal;
 
 
-void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline);
+void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_string text, float scale, float baseline);
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out,
     float *out_width,
-    cpymo_parser_stream_span utf8_string,
+    cpymo_string utf8_string,
     float single_character_size_in_logical_screen)
 {
-    cpymo_parser_stream_span text = utf8_string;
+    cpymo_string text = utf8_string;
     if (text.len == 0) 
         return CPYMO_ERR_INVALID_ARG;
 
@@ -129,7 +129,7 @@ void cpymo_backend_text_draw(
         draw_type);
 }
 
-float cpymo_backend_text_width(cpymo_parser_stream_span t, float single_character_size_in_logical_screen)
+float cpymo_backend_text_width(cpymo_string t, float single_character_size_in_logical_screen)
 {
     float scale = stbtt_ScaleForPixelHeight(&font, single_character_size_in_logical_screen);
     int ascent;

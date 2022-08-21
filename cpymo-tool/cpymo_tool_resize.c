@@ -37,7 +37,7 @@ static error_t cpymo_tool_resize_image(
         }
     }
 
-    return cpymo_tool_image_save_to_file_with_mask(&img, output_file, cpymo_parser_stream_span_pure(out_format), create_mask);
+    return cpymo_tool_image_save_to_file_with_mask(&img, output_file, cpymo_string_pure(out_format), create_mask);
 }
 
 extern int help();
@@ -53,16 +53,16 @@ int cpymo_tool_invoke_resize(int argc, const char ** argv)
 	const char *out_format = NULL;
 
 	for (int i = 2; i < argc; ++i) {
-		cpymo_parser_stream_span a = cpymo_parser_stream_span_pure(argv[i]);
-		cpymo_parser_stream_span_trim(&a);
+		cpymo_string a = cpymo_string_pure(argv[i]);
+		cpymo_string_trim(&a);
 
-		if (cpymo_parser_stream_span_equals_str(a, "")) continue;
-		else if (cpymo_parser_stream_span_starts_with_str_ignore_case(a, "--")) {
-			if (cpymo_parser_stream_span_equals_str(a, "--load-mask"))
+		if (cpymo_string_equals_str(a, "")) continue;
+		else if (cpymo_string_starts_with_str_ignore_case(a, "--")) {
+			if (cpymo_string_equals_str(a, "--load-mask"))
 				load_mask = true;
-			else if (cpymo_parser_stream_span_equals_str(a, "--create-mask"))
+			else if (cpymo_string_equals_str(a, "--create-mask"))
 				create_mask = true;
-			else if (cpymo_parser_stream_span_equals_str(a, "--out-format")) {
+			else if (cpymo_string_equals_str(a, "--out-format")) {
 				++i;
 
 				if (argc <= i) {
@@ -126,7 +126,7 @@ int cpymo_tool_invoke_resize(int argc, const char ** argv)
 		error_t err = cpymo_tool_image_load_from_file(&img, src_file, load_mask);
 		if (err != CPYMO_ERR_SUCC) return process_err(err);
 
-		err = cpymo_tool_image_save_to_file_with_mask(&img, dst_file, cpymo_parser_stream_span_pure(out_format), create_mask);
+		err = cpymo_tool_image_save_to_file_with_mask(&img, dst_file, cpymo_string_pure(out_format), create_mask);
 		cpymo_tool_image_free(img);
 		return process_err(err);
 	}

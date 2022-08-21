@@ -78,7 +78,7 @@ static error_t cpymo_text_callback_read(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_text_new(cpymo_engine *e, float x1, float y1, float x2, float y2, cpymo_color col, float fontsize, cpymo_parser_stream_span text, bool immediately)
+error_t cpymo_text_new(cpymo_engine *e, float x1, float y1, float x2, float y2, cpymo_color col, float fontsize, cpymo_string text, bool immediately)
 {
 	struct cpymo_textbox_list *node = (struct cpymo_textbox_list *)malloc(sizeof(struct cpymo_textbox_list));
 	if (node == NULL) return CPYMO_ERR_OUT_OF_MEM;

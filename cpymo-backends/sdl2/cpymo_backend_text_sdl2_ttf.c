@@ -83,11 +83,11 @@ typedef struct {
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
     float *out_width,
-    cpymo_parser_stream_span utf8_string, 
+    cpymo_string utf8_string, 
     float single_character_size_in_logical_screen)
 {
     char *str = alloca(utf8_string.len + 1);
-    cpymo_parser_stream_span_copy(str, utf8_string.len + 1, utf8_string);
+    cpymo_string_copy(str, utf8_string.len + 1, utf8_string);
 
     cpymo_backend_font_update_size(single_character_size_in_logical_screen);
 
@@ -172,19 +172,19 @@ void cpymo_backend_text_draw(
 }
 
 float cpymo_backend_text_width(
-    cpymo_parser_stream_span s,
+    cpymo_string s,
     float single_character_size_in_logical_screen)
 {
     cpymo_backend_font_update_size(single_character_size_in_logical_screen);
 
     char *str = alloca(s.len + 1);
-    cpymo_parser_stream_span_copy(str, s.len + 1, s);
+    cpymo_string_copy(str, s.len + 1, s);
 
     int w;
 
     if (TTF_SizeUTF8(font, str, &w, NULL) != 0) {
         return 
-            cpymo_parser_stream_span_utf8_len(s) 
+            cpymo_string_utf8_len(s) 
             * single_character_size_in_logical_screen;
     }
 

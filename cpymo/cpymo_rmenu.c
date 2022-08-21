@@ -164,7 +164,7 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	case 6: 
 		cpymo_msgbox_ui_enter(
 			e, 
-			cpymo_parser_stream_span_pure(
+			cpymo_string_pure(
 				cpymo_localization_get(e)->rmenu_restat_game_confirm_message), 
 			&cpymo_rmenu_restart_game, 
 			NULL);
@@ -206,7 +206,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		&rmenu->bg,
 		&rmenu->bg_w,
 		&rmenu->bg_h,
-		cpymo_parser_stream_span_pure("menu"),
+		cpymo_string_pure("menu"),
 		&e->assetloader,
 		true);
 
@@ -230,7 +230,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 	err = cpymo_select_img_configuare_begin(
 		&rmenu->menu,
 		8,
-		cpymo_parser_stream_span_pure(""),
+		cpymo_string_pure(""),
 		&e->assetloader,
 		&e->gameconfig);
 	if (err != CPYMO_ERR_SUCC) {
@@ -246,7 +246,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 			&e->assetloader, \
 			&e->gameconfig, \
 			&e->flags, \
-			cpymo_parser_stream_span_pure(TEXT), \
+			cpymo_string_pure(TEXT), \
 			ENABLED, \
 			cpymo_select_img_selection_nohint, \
 			0xFFFFFFFFFFFFFFFF, \

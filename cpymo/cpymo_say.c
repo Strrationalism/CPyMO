@@ -30,7 +30,7 @@ static void cpymo_say_lazy_init(cpymo_say *out, cpymo_assetloader *loader)
 			&out->msg_cursor,
 			&out->msg_cursor_w,
 			&out->msg_cursor_h,
-			cpymo_parser_stream_span_pure("message_cursor"),
+			cpymo_string_pure("message_cursor"),
 			loader,
 			true);
 
@@ -168,14 +168,14 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 	}
 }
 
-static inline error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_stream_span name, cpymo_assetloader *l)
+static inline error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_string name, cpymo_assetloader *l)
 {
 	if (say->msgbox) cpymo_backend_image_free(say->msgbox);
 	say->msgbox = NULL;
 
 	char *msgbox_name = (char *)realloc(say->msgbox_name, name.len + 1);
 	if (msgbox_name) {
-		cpymo_parser_stream_span_copy(msgbox_name, name.len + 1, name);
+		cpymo_string_copy(msgbox_name, name.len + 1, name);
 		say->msgbox_name = msgbox_name;
 	}
 
@@ -192,14 +192,14 @@ static inline error_t cpymo_say_load_msgbox_image(cpymo_say *say, cpymo_parser_s
 	return err;
 }
 
-static inline error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_stream_span name, cpymo_assetloader *l)
+static inline error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_string name, cpymo_assetloader *l)
 {
 	if (say->namebox) cpymo_backend_image_free(say->namebox);
 	say->namebox = NULL;
 
 	char *namebox_name = (char *)realloc(say->namebox_name, name.len + 1);
 	if (namebox_name) {
-		cpymo_parser_stream_span_copy(namebox_name, name.len + 1, name);
+		cpymo_string_copy(namebox_name, name.len + 1, name);
 		say->namebox_name = namebox_name;
 	}
 
@@ -216,7 +216,7 @@ static inline error_t cpymo_say_load_namebox_image(cpymo_say *say, cpymo_parser_
 	return err;
 }
 
-error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_parser_stream_span msgbox, cpymo_parser_stream_span namebox, cpymo_assetloader *l)
+error_t cpymo_say_load_msgbox_and_namebox_image(cpymo_say *say, cpymo_string msgbox, cpymo_string namebox, cpymo_assetloader *l)
 {
 	cpymo_say_lazy_init(say, l);
 	error_t err = cpymo_say_load_namebox_image(say, namebox, l);
@@ -359,14 +359,14 @@ static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_parser_stream_span text)
+error_t cpymo_say_start(cpymo_engine *e, cpymo_string name, cpymo_string text)
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
 
 	if (name.len > 0) {
 		char *current_name = (char *)realloc(e->say.current_name, name.len + 1);
 		if (current_name) {
-			cpymo_parser_stream_span_copy(current_name, name.len + 1, name);
+			cpymo_string_copy(current_name, name.len + 1, name);
 			e->say.current_name = current_name;
 		}
 	}
@@ -377,7 +377,7 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 
 	char *current_text = (char *)realloc(e->say.current_text, text.len + 1);
 	if (current_text) {
-		cpymo_parser_stream_span_copy(current_text, text.len + 1, text);
+		cpymo_string_copy(current_text, text.len + 1, text);
 		e->say.current_text = current_text;
 	}
 
@@ -387,7 +387,7 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_parser_stream_span name, cpymo_pa
 	cpymo_say *say = &e->say;
 	RESET_NAME(say);
 
-	cpymo_parser_stream_span_trim(&name);
+	cpymo_string_trim(&name);
 	if (name.len > 0) {
 		error_t err = cpymo_backend_text_create(&say->name, &say->name_width, name, fontsize);
 		if (err != CPYMO_ERR_SUCC) say->name = NULL;

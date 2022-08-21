@@ -190,8 +190,8 @@ static bool cpymo_bg_wait_for_progression_fade(cpymo_engine *engine, float delta
 error_t cpymo_bg_command(
 	cpymo_engine *engine,
 	cpymo_bg *bg,
-	cpymo_parser_stream_span bgname,
-	cpymo_parser_stream_span transition,
+	cpymo_string bgname,
+	cpymo_string transition,
 	float x,
 	float y,
 	float time)
@@ -203,7 +203,7 @@ error_t cpymo_bg_command(
 
 	char *next_bg_name = (char *)realloc(bg->current_bg_name, bgname.len + 1);
 	if (next_bg_name) {
-		cpymo_parser_stream_span_copy(next_bg_name, bgname.len + 1, bgname);
+		cpymo_string_copy(next_bg_name, bgname.len + 1, bgname);
 		bg->current_bg_name = next_bg_name;
 	}
 
@@ -225,13 +225,13 @@ error_t cpymo_bg_command(
 	}
 
 #ifdef LOW_FRAME_RATE
-	transition = cpymo_parser_stream_span_pure("BG_NOFADE");
+	transition = cpymo_string_pure("BG_NOFADE");
 #endif
 
-	if (cpymo_parser_stream_span_equals_str(transition, "BG_NOFADE")) {
+	if (cpymo_string_equals_str(transition, "BG_NOFADE")) {
 		cpymo_bg_transfer(engine);
 	}
-	else if (cpymo_parser_stream_span_equals_str(transition, "BG_ALPHA")) {
+	else if (cpymo_string_equals_str(transition, "BG_ALPHA")) {
 		bg->transform_progression = cpymo_tween_create(time);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_alpha;
 		cpymo_wait_register_with_callback(
@@ -240,7 +240,7 @@ error_t cpymo_bg_command(
 			&cpymo_bg_progression_over_callback);
 	}
 	else {
-		if (!cpymo_parser_stream_span_equals_str(transition, "BG_FADE")) {
+		if (!cpymo_string_equals_str(transition, "BG_FADE")) {
 			cpymo_backend_masktrans trans;
 			if (cpymo_assetloader_load_system_masktrans(
 				&trans, 

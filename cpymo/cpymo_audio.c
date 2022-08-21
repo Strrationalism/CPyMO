@@ -572,8 +572,8 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 
 static error_t cpymo_audio_high_level_play(
 	cpymo_engine *e,
-	cpymo_parser_stream_span filename,
-	error_t(*get_path)(char **, cpymo_parser_stream_span, const cpymo_assetloader *),
+	cpymo_string filename,
+	error_t(*get_path)(char **, cpymo_string, const cpymo_assetloader *),
 	const cpymo_package *package,
 	int channel,
 	bool loop)
@@ -623,7 +623,7 @@ void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol
 	s->channels[cid].volume = vol;
 }
 
-error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_string bgmname, bool loop)
 {
 	if (e->audio.bgm_name) {
 		free(e->audio.bgm_name);
@@ -633,7 +633,7 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_parser_stream_span bgmname, 
 	if (loop) {
 		char *bgm_name = (char *)realloc(e->audio.bgm_name, bgmname.len + 1);
 		if (bgm_name) {
-			cpymo_parser_stream_span_copy(bgm_name, bgmname.len + 1, bgmname);
+			cpymo_string_copy(bgm_name, bgmname.len + 1, bgmname);
 			e->audio.bgm_name = bgm_name;
 		}
 	}
@@ -656,7 +656,7 @@ void cpymo_audio_bgm_stop(cpymo_engine * engine)
 	}
 }
 
-error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_parser_stream_span sename, bool loop)
+error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_string sename, bool loop)
 {
 	if (e->audio.se_name) {
 		free(e->audio.se_name);
@@ -666,7 +666,7 @@ error_t cpymo_audio_se_play(cpymo_engine * e, cpymo_parser_stream_span sename, b
 	if (loop) {
 		char *se_name = (char *)realloc(e->audio.se_name, sename.len + 1);
 		if (se_name) {
-			cpymo_parser_stream_span_copy(se_name, sename.len + 1, sename);
+			cpymo_string_copy(se_name, sename.len + 1, sename);
 			e->audio.se_name = se_name;
 		}
 	}
@@ -690,7 +690,7 @@ void cpymo_audio_se_stop(cpymo_engine *e)
 	}
 }
 
-error_t cpymo_audio_vo_play(cpymo_engine * e, cpymo_parser_stream_span voname)
+error_t cpymo_audio_vo_play(cpymo_engine * e, cpymo_string voname)
 {
 	return cpymo_audio_high_level_play(
 		e, voname, &cpymo_assetloader_get_vo_path,
@@ -775,17 +775,17 @@ struct cpymo_engine;
 bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 { return true; }
 
-error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_parser_stream_span bgmname, bool loop)
+error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_string bgmname, bool loop)
 { return CPYMO_ERR_SUCC; }
 
 void cpymo_audio_bgm_stop(struct cpymo_engine *e) {}
 
-error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_parser_stream_span sename, bool loop)
+error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_string sename, bool loop)
 { return CPYMO_ERR_SUCC; }
 
 void cpymo_audio_se_stop(struct cpymo_engine *e) {}
 
-error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_parser_stream_span voname)
+error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_string voname)
 { return CPYMO_ERR_SUCC; }
 
 void cpymo_audio_vo_stop(struct cpymo_engine *e) {}

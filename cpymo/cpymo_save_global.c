@@ -72,7 +72,7 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 		READ(&val_abs, sizeof(val_abs), 1);
 		val_abs = end_le16toh(val_abs);
 
-		cpymo_parser_stream_span var_name;
+		cpymo_string var_name;
 		var_name.begin = buf;
 		var_name.len = var_name_len;
 

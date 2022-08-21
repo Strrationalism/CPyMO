@@ -114,7 +114,7 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 	error_t err = cpymo_backend_text_create(
 		&item->show_value, 
 		&item->show_value_width, 
-		cpymo_parser_stream_span_pure(val_str), 
+		cpymo_string_pure(val_str), 
 		ui->font_size);
 
 	if (err != CPYMO_ERR_SUCC)
@@ -262,7 +262,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		err = cpymo_backend_text_create( \
 			&ui->items[ITEM_ID].show_name, \
 			&width, \
-			cpymo_parser_stream_span_pure(TEXT), \
+			cpymo_string_pure(TEXT), \
 			ui->font_size); \
 		if (err != CPYMO_ERR_SUCC) { \
 			cpymo_ui_exit(e); \

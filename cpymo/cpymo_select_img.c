@@ -19,7 +19,7 @@ static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, ui
 
 	error_t err = cpymo_vars_set(
 		&e->vars,
-		cpymo_parser_stream_span_pure("FSEL"),
+		cpymo_string_pure("FSEL"),
 		sel);
 
 	if (err != CPYMO_ERR_SUCC) return err;
@@ -61,7 +61,7 @@ void cpymo_select_img_reset(cpymo_select_img *img)
 
 error_t cpymo_select_img_configuare_begin(
 	cpymo_select_img *sel, size_t selections,
-	cpymo_parser_stream_span image_name_or_empty_when_select_imgs,
+	cpymo_string image_name_or_empty_when_select_imgs,
 	cpymo_assetloader *loader, cpymo_gameconfig *gameconfig)
 {
 	sel->selections =
@@ -116,7 +116,7 @@ void cpymo_select_img_configuare_select_img_selection(cpymo_engine *e, float x, 
 	sel->has_selected = cpymo_hash_flags_check(&e->flags, hash);
 }
 
-error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo_parser_stream_span image_name, float x, float y, bool enabled, uint64_t hash)
+error_t cpymo_select_img_configuare_select_imgs_selection(cpymo_engine *e, cpymo_string image_name, float x, float y, bool enabled, uint64_t hash)
 {
 	assert(e->select_img.selections);
 	assert(e->select_img.all_selections);
@@ -486,7 +486,7 @@ void cpymo_select_img_draw(const cpymo_select_img *o, int logical_screen_w, int 
 
 error_t cpymo_select_img_configuare_select_text(
 	cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
-	cpymo_parser_stream_span text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode, 
+	cpymo_string text, bool enabled, enum cpymo_select_img_selection_hint_state hint_mode, 
 	uint64_t hash, float fontsize)
 {
 	if (sel->sel_highlight == NULL) {
@@ -494,7 +494,7 @@ error_t cpymo_select_img_configuare_select_text(
 			&sel->sel_highlight,
 			&sel->sel_highlight_w,
 			&sel->sel_highlight_h,
-			cpymo_parser_stream_span_pure("sel_highlight"),
+			cpymo_string_pure("sel_highlight"),
 			loader,
 			true);
 
@@ -531,13 +531,13 @@ error_t cpymo_select_img_configuare_select_text(
 #ifdef ENABLE_TEXT_EXTRACT
 	s->original_text = (char *)malloc(text.len + 1);
 	if (s->original_text)
-		cpymo_parser_stream_span_copy(s->original_text, text.len + 1, text);
+		cpymo_string_copy(s->original_text, text.len + 1, text);
 #endif
 
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpymo_parser_stream_span hint)
+void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpymo_string hint)
 {
 	if (engine->gameconfig.hint == 0) return;
 
@@ -554,7 +554,7 @@ void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpy
 
 	bool is_all_succ = true;
 	for (size_t i = 0; i < 4; ++i) {
-		cpymo_parser_stream_span_copy(hint_pic_name, hint.len + 2, hint);
+		cpymo_string_copy(hint_pic_name, hint.len + 2, hint);
 		hint_pic_name[hint.len] = (char)('0' + i);
 		hint_pic_name[hint.len + 1] = '\0';
 
@@ -562,7 +562,7 @@ void cpymo_select_img_configuare_select_text_hint_pic(cpymo_engine * engine, cpy
 			&engine->select_img.hint[i],
 			&engine->select_img.hint_w[i],
 			&engine->select_img.hint_h[i],
-			cpymo_parser_stream_span_pure(hint_pic_name),
+			cpymo_string_pure(hint_pic_name),
 			&engine->assetloader,
 			true);
 		
@@ -614,7 +614,7 @@ void cpymo_select_img_configuare_end_select_text(
 			&sel->option_background,
 			&sel->option_background_w,
 			&sel->option_background_h,
-			cpymo_parser_stream_span_pure("option"),
+			cpymo_string_pure("option"),
 			&e->assetloader,
 			true);
 

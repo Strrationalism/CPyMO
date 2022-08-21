@@ -28,7 +28,7 @@ void cpymo_scroll_draw(const cpymo_scroll * s);
 
 error_t cpymo_scroll_start(
 	struct cpymo_engine *,
-	cpymo_parser_stream_span bgname,
+	cpymo_string bgname,
 	float sx, float sy,
 	float ex, float ey,
 	float time);

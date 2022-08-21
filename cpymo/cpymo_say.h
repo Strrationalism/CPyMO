@@ -35,12 +35,12 @@ void cpymo_say_free(cpymo_say *);
 void cpymo_say_draw(const struct cpymo_engine *);
 
 error_t cpymo_say_load_msgbox_and_namebox_image(
-	cpymo_say *, cpymo_parser_stream_span msgbox, cpymo_parser_stream_span namebox, cpymo_assetloader *);
+	cpymo_say *, cpymo_string msgbox, cpymo_string namebox, cpymo_assetloader *);
 
 error_t cpymo_say_start(
 	struct cpymo_engine *,
-	cpymo_parser_stream_span name, 
-	cpymo_parser_stream_span text);
+	cpymo_string name, 
+	cpymo_string text);
 
 void cpymo_say_hidewindow_until_click(struct cpymo_engine *e);
 

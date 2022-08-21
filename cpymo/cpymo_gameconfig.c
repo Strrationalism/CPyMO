@@ -16,11 +16,11 @@ bool cpymo_pymo_version_compatible(cpymo_pymo_version v)
 	return false;
 }
 
-static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_span key, cpymo_parser *parser) 
+static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_string key, cpymo_parser *parser) 
 {
 	size_t magic_key_len;
-	#define SPAN cpymo_parser_stream_span
-	#define SETUP(FIELD, SPAN) cpymo_parser_stream_span_copy(o->FIELD, sizeof(o->FIELD), SPAN)
+	#define SPAN cpymo_string
+	#define SETUP(FIELD, SPAN) cpymo_string_copy(o->FIELD, sizeof(o->FIELD), SPAN)
 	#define SETUP_EXT(FIELD, SPAN) if(SPAN.begin[0] == '.') { SPAN.begin++; SPAN.len--; } SETUP(FIELD, SPAN)
 	#define POP cpymo_parser_curline_pop_commacell(parser)
 	#define D(KEY) magic_key_len = strlen(KEY); if (magic_key_len == key.len && 0 == strncmp(KEY,key.begin , magic_key_len))
@@ -33,14 +33,14 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	}
 
 	D("engineversion") {
-		cpymo_parser_stream_span major = 
+		cpymo_string major = 
 			cpymo_parser_curline_readuntil(parser, '.');
 
-		cpymo_parser_stream_span minor = 
+		cpymo_string minor = 
 			cpymo_parser_curline_readuntil(parser, '.');
 
-		o->engineversion.major = cpymo_parser_stream_span_atoi(major);
-		o->engineversion.minor = cpymo_parser_stream_span_atoi(minor);
+		o->engineversion.major = cpymo_string_atoi(major);
+		o->engineversion.minor = cpymo_string_atoi(minor);
 
 		return;
 	}
@@ -82,37 +82,37 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	}
 
 	D("fontsize") {
-		o->fontsize = cpymo_utils_clamp(cpymo_parser_stream_span_atoi(POP), 4, 1024);
+		o->fontsize = cpymo_utils_clamp(cpymo_string_atoi(POP), 4, 1024);
 		return;
 	}
 
 	D("hint") {
-		o->hint = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
+		o->hint = cpymo_string_atoi(POP) > 0 ? 1 : 0;
 		return;
 	}
 
 	D("grayselected") {
-		o->hint = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
+		o->hint = cpymo_string_atoi(POP) > 0 ? 1 : 0;
 		return;
 	}
 
 	D("playvideo") {
-		o->playvideo = cpymo_parser_stream_span_atoi(POP) > 0 ? 1 : 0;
+		o->playvideo = cpymo_string_atoi(POP) > 0 ? 1 : 0;
 		return;
 	}
 
 	D("textspeed") {
-		o->textspeed = cpymo_utils_clamp(cpymo_parser_stream_span_atoi(POP), 0, 5);
+		o->textspeed = cpymo_utils_clamp(cpymo_string_atoi(POP), 0, 5);
 		return;
 	}
 
 	D("bgmvolume") {
-		o->bgmvolume = cpymo_utils_clamp(cpymo_parser_stream_span_atoi(POP), 0, 10);
+		o->bgmvolume = cpymo_utils_clamp(cpymo_string_atoi(POP), 0, 10);
 		return;
 	}
 
 	D("vovolume") {
-		o->vovolume = cpymo_utils_clamp(cpymo_parser_stream_span_atoi(POP), 0, 10);
+		o->vovolume = cpymo_utils_clamp(cpymo_string_atoi(POP), 0, 10);
 		return;
 	}
 
@@ -123,8 +123,8 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	}
 
 	D("nameboxorig") {
-		o->nameboxorg_x = cpymo_utils_clamp(cpymo_parser_stream_span_atoi(POP), -1024, 1024);
-		o->nameboxorg_y = cpymo_utils_clamp(cpymo_parser_stream_span_atoi(POP), -1024, 1024);
+		o->nameboxorg_x = cpymo_utils_clamp(cpymo_string_atoi(POP), -1024, 1024);
+		o->nameboxorg_y = cpymo_utils_clamp(cpymo_string_atoi(POP), -1024, 1024);
 		return;
 	}
 
@@ -135,19 +135,19 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	}
 
 	D("textcolor") {
-		o->textcolor = cpymo_parser_stream_span_as_color(POP);
+		o->textcolor = cpymo_string_as_color(POP);
 		return;
 	}
 
 	D("msgtb") {
-		o->msgtb_t = cpymo_parser_stream_span_atoi(POP);
-		o->msgtb_b = cpymo_parser_stream_span_atoi(POP);
+		o->msgtb_t = cpymo_string_atoi(POP);
+		o->msgtb_b = cpymo_string_atoi(POP);
 		return;
 	}
 
 	D("msglr") {
-		o->msglr_l = cpymo_parser_stream_span_atoi(POP);
-		o->msglr_r = cpymo_parser_stream_span_atoi(POP);
+		o->msglr_l = cpymo_string_atoi(POP);
+		o->msglr_r = cpymo_string_atoi(POP);
 		return;
 	}
 
@@ -161,8 +161,8 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	}
 
 	D("imagesize") {
-		o->imagesize_w = cpymo_parser_stream_span_atoi(POP);
-		o->imagesize_h = cpymo_parser_stream_span_atoi(POP);
+		o->imagesize_w = cpymo_string_atoi(POP);
+		o->imagesize_h = cpymo_string_atoi(POP);
 
 		if (o->imagesize_w == 0) o->imagesize_w = 800;
 		if (o->imagesize_h == 0) o->imagesize_h = 600;
@@ -171,15 +171,15 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_parser_stream_s
 	}
 
 	D("platform") {
-		cpymo_parser_stream_span plat = POP;
-		cpymo_parser_stream_span_trim(&plat);
+		cpymo_string plat = POP;
+		cpymo_string_trim(&plat);
 		SETUP(platform, plat);
 		return;
 	}
 
 	D("scripttype") {
-		cpymo_parser_stream_span s = POP;
-		cpymo_parser_stream_span_trim(&s);
+		cpymo_string s = POP;
+		cpymo_string_trim(&s);
 		SETUP(scripttype, s);
 		return;
 	}
@@ -220,7 +220,7 @@ error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream,
 	cpymo_parser_init(&parser, stream, len);
 
 	do {
-		cpymo_parser_stream_span key = cpymo_parser_curline_pop_commacell(&parser);
+		cpymo_string key = cpymo_parser_curline_pop_commacell(&parser);
 		cpymo_dispatch_gameconfig(out_config, key, &parser);
 
 	} while (cpymo_parser_next_line(&parser));

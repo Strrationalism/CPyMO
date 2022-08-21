@@ -17,12 +17,12 @@ extern size_t window_size_w, window_size_h;
 extern uint8_t *framebuffer;
 
 extern stbtt_fontinfo font;
-extern void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_parser_stream_span text, float scale, float baseline);
+extern void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_string text, float scale, float baseline);
 
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
     float *out_width,
-    cpymo_parser_stream_span utf8_string, 
+    cpymo_string utf8_string, 
     float single_character_size_in_logical_screen)
 {
     float height_norm = single_character_size_in_logical_screen / engine.gameconfig.imagesize_h;
@@ -106,7 +106,7 @@ void cpymo_backend_text_draw(
 }
 
 float cpymo_backend_text_width(
-    cpymo_parser_stream_span s,
+    cpymo_string s,
     float single_character_size_in_logical_screen)
 { 
     float height_norm = single_character_size_in_logical_screen / engine.gameconfig.imagesize_h;

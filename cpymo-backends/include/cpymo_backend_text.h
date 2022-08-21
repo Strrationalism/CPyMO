@@ -11,7 +11,7 @@ typedef void *cpymo_backend_text;
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
     float *out_width,
-    cpymo_parser_stream_span utf8_string, 
+    cpymo_string utf8_string, 
     float single_character_size_in_logical_screen);
 
 void cpymo_backend_text_free(cpymo_backend_text);
@@ -23,7 +23,7 @@ void cpymo_backend_text_draw(
     enum cpymo_backend_image_draw_type draw_type);
 
 float cpymo_backend_text_width(
-    cpymo_parser_stream_span,
+    cpymo_string,
     float single_character_size_in_logical_screen);
 
 #ifdef ENABLE_TEXT_EXTRACT

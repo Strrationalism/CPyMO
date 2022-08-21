@@ -21,7 +21,7 @@ void cpymo_anime_draw(const cpymo_anime *anime)
 error_t cpymo_anime_on(
 	struct cpymo_engine *engine,
 	int frames,
-	cpymo_parser_stream_span filename_span,
+	cpymo_string filename_span,
 	float x,
 	float y,
 	float interval,
@@ -53,7 +53,7 @@ error_t cpymo_anime_on(
 	if (loop) {
 		char *anime_name = (char *)realloc(engine->anime.anime_name, filename_span.len + 1);
 		if (anime_name) {
-			cpymo_parser_stream_span_copy(anime_name, filename_span.len + 1, filename_span);
+			cpymo_string_copy(anime_name, filename_span.len + 1, filename_span);
 			engine->anime.anime_name = anime_name;
 		}
 	}

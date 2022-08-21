@@ -68,8 +68,8 @@ static error_t cpymo_floating_hint_finish(cpymo_engine *e)
 
 error_t cpymo_floating_hint_start(
 	cpymo_engine *engine,
-	cpymo_parser_stream_span text,
-	cpymo_parser_stream_span background,
+	cpymo_string text,
+	cpymo_string background,
 	float x, float y, 
 	cpymo_color col,
 	float fontscale)

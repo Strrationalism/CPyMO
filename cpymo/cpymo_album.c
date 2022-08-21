@@ -25,8 +25,8 @@ extern bool fill_screen_enabled;
 #ifndef DISABLE_STB_IMAGE
 error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
-	cpymo_parser_stream_span album_list_text, 
-	cpymo_parser_stream_span output_cache_ui_file_name,
+	cpymo_string album_list_text, 
+	cpymo_string output_cache_ui_file_name,
 	size_t page, 
 	cpymo_assetloader* loader,
 	size_t *ref_w, size_t *ref_h)
@@ -69,19 +69,19 @@ error_t cpymo_album_generate_album_ui_image_pixels(
 	const size_t thumb_height = (size_t)(0.17 * (double)*ref_h);
 
 	do {
-		cpymo_parser_stream_span page_str = cpymo_parser_curline_pop_commacell(&album_list_parser);
-		cpymo_parser_stream_span_trim(&page_str);
+		cpymo_string page_str = cpymo_parser_curline_pop_commacell(&album_list_parser);
+		cpymo_string_trim(&page_str);
 
 		if (page_str.len <= 0) continue;
-		if (cpymo_parser_stream_span_atoi(page_str) != (int)page + 1) continue;
+		if (cpymo_string_atoi(page_str) != (int)page + 1) continue;
 
 		const size_t id = next_id++;
 
-		cpymo_parser_stream_span thumb_count_str = 
+		cpymo_string thumb_count_str = 
 			cpymo_parser_curline_pop_commacell(&album_list_parser);
-		cpymo_parser_stream_span_trim(&thumb_count_str);
+		cpymo_string_trim(&thumb_count_str);
 		if (thumb_count_str.len <= 0) continue;
-		const int thumb_count = cpymo_parser_stream_span_atoi(thumb_count_str);
+		const int thumb_count = cpymo_string_atoi(thumb_count_str);
 
 		if (thumb_count < 1) continue;
 
@@ -100,9 +100,9 @@ error_t cpymo_album_generate_album_ui_image_pixels(
 		void *thumb_pixels = NULL;
 		for (int i = 0; i < thumb_count; ++i) {
 			// Try load ONE thumb.
-			cpymo_parser_stream_span bgname_span = 
+			cpymo_string bgname_span = 
 				cpymo_parser_curline_pop_commacell(&album_list_parser);
-			cpymo_parser_stream_span_trim(&bgname_span);
+			cpymo_string_trim(&bgname_span);
 		
 			error_t err = cpymo_assetloader_load_bg_pixels(
 				&thumb_pixels, &cg_w, &cg_h, bgname_span, loader);
@@ -143,8 +143,8 @@ error_t cpymo_album_generate_album_ui_image_pixels(
 #else
 static error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
-	cpymo_parser_stream_span album_list_text, 
-	cpymo_parser_stream_span output_cache_ui_file_name,
+	cpymo_string album_list_text, 
+	cpymo_string output_cache_ui_file_name,
 	size_t page, 
 	cpymo_assetloader* loader,
 	size_t *ref_w, size_t *ref_h)
@@ -161,8 +161,8 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 
 static error_t cpymo_album_generate_album_ui_image(
 	cpymo_backend_image *out_image, 
-	cpymo_parser_stream_span album_list_text, 
-	cpymo_parser_stream_span output_cache_ui_file_name,
+	cpymo_string album_list_text, 
+	cpymo_string output_cache_ui_file_name,
 	size_t page, 
 	cpymo_assetloader* loader,
 	size_t *ref_w, size_t *ref_h)
@@ -193,8 +193,8 @@ static error_t cpymo_album_generate_album_ui_image(
 
 static error_t cpymo_album_load_ui_image(
 	cpymo_backend_image *out_image,
-	cpymo_parser_stream_span album_list_text,
-	cpymo_parser_stream_span ui_file_name,
+	cpymo_string album_list_text,
+	cpymo_string ui_file_name,
 	size_t page,
 	cpymo_assetloader *loader,
 	size_t *ref_w, size_t *ref_h) 
@@ -202,7 +202,7 @@ static error_t cpymo_album_load_ui_image(
 	char *assetname = (char *)malloc(ui_file_name.len + 16);
 	if (assetname == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	cpymo_parser_stream_span_copy(assetname, ui_file_name.len + 16, ui_file_name);
+	cpymo_string_copy(assetname, ui_file_name.len + 16, ui_file_name);
 	char page_str[4];
 	snprintf(page_str, sizeof(page_str), "%d", (int)page);
 	strcat(assetname, "_");
@@ -210,7 +210,7 @@ static error_t cpymo_album_load_ui_image(
 
 	int w, h;
 	error_t err = cpymo_assetloader_load_system_image(
-		out_image, &w, &h, cpymo_parser_stream_span_pure(assetname), loader, false);
+		out_image, &w, &h, cpymo_string_pure(assetname), loader, false);
 	free(assetname);
 
 	if (err != CPYMO_ERR_SUCC) {
@@ -239,7 +239,7 @@ typedef struct {
 	size_t current_ui_w, current_ui_h, cv_thumb_cover_w, cv_thumb_cover_h;
 
 	size_t current_page, page_count, cg_count;
-	cpymo_parser_stream_span album_list_name, album_ui_name;
+	cpymo_string album_list_name, album_ui_name;
 
 	int current_cg_selection;
 
@@ -261,22 +261,22 @@ typedef struct {
 	cpymo_key_hold key_mouse_button;
 } cpymo_album;
 
-uint64_t cpymo_album_cg_name_hash(cpymo_parser_stream_span cg_filename)
+uint64_t cpymo_album_cg_name_hash(cpymo_string cg_filename)
 {
 	uint64_t hash;
-	cpymo_parser_stream_span_hash_init(&hash);
-	cpymo_parser_stream_span_hash_append_cstr(&hash, "CG:");
+	cpymo_string_hash_init(&hash);
+	cpymo_string_hash_append_cstr(&hash, "CG:");
 
 	for (size_t j = 0; j < cg_filename.len && j < 61; ++j)
-		cpymo_parser_stream_span_hash_step(
+		cpymo_string_hash_step(
 			&hash, (char)toupper(cg_filename.begin[j]));
 
 	return hash;
 }
 
-error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_parser_stream_span cg_filename)
+error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_string cg_filename)
 {
-	if (!cpymo_parser_stream_span_starts_with_str_ignore_case(cg_filename, e->gameconfig.cgprefix))
+	if (!cpymo_string_starts_with_str_ignore_case(cg_filename, e->gameconfig.cgprefix))
 		return CPYMO_ERR_SUCC;
 
 	return cpymo_hash_flags_add(&e->flags, cpymo_album_cg_name_hash(cg_filename));
@@ -308,28 +308,28 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 	do {
 		if (a->cg_count >= CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE) break;
 
-		cpymo_parser_stream_span page_str = cpymo_parser_curline_pop_commacell(&album_list);
-		cpymo_parser_stream_span_trim(&page_str);
+		cpymo_string page_str = cpymo_parser_curline_pop_commacell(&album_list);
+		cpymo_string_trim(&page_str);
 
 		if (page_str.len <= 0) continue;
-		if (cpymo_parser_stream_span_atoi(page_str) != (int)a->current_page + 1) continue;
+		if (cpymo_string_atoi(page_str) != (int)a->current_page + 1) continue;
 
 		cpymo_album_cg_info *cg_info = &a->cg_infos[a->cg_count++];
 
-		cpymo_parser_stream_span thumb_count_str =
+		cpymo_string thumb_count_str =
 			cpymo_parser_curline_pop_commacell(&album_list);
-		cpymo_parser_stream_span_trim(&thumb_count_str);
+		cpymo_string_trim(&thumb_count_str);
 
 		if (thumb_count_str.len <= 0) continue;
-		const int thumb_count = cpymo_parser_stream_span_atoi(thumb_count_str);
+		const int thumb_count = cpymo_string_atoi(thumb_count_str);
 
 		if (thumb_count < 1) continue;
 
 		cg_info->cg_count = (size_t)thumb_count;
 
-		cpymo_parser_stream_span cg_title =
+		cpymo_string cg_title =
 			cpymo_parser_curline_pop_commacell(&album_list);
-		cpymo_parser_stream_span_trim(&cg_title);
+		cpymo_string_trim(&cg_title);
 
 		if (cg_title.len > 0) {
 			error_t err = cpymo_backend_text_create(
@@ -348,9 +348,9 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 		cg_info->preview_unlocked = false;
 
 		for (int i = 0; i < thumb_count; ++i) {
-			cpymo_parser_stream_span cg_filename = 
+			cpymo_string cg_filename = 
 				cpymo_parser_curline_pop_commacell(&album_list);
-			cpymo_parser_stream_span_trim(&cg_filename);
+			cpymo_string_trim(&cg_filename);
 			uint64_t cg_hash = cpymo_album_cg_name_hash(cg_filename);
 
 			if (cg_info->preview_unlocked == false) {
@@ -359,9 +359,9 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 			}
 		}
 
-		cpymo_parser_stream_span force_unlock_all_flag = cpymo_parser_curline_pop_commacell(&album_list);
-		cpymo_parser_stream_span_trim(&force_unlock_all_flag);
-		cg_info->force_unlock_all = cpymo_parser_stream_span_equals_str(force_unlock_all_flag, "1");
+		cpymo_string force_unlock_all_flag = cpymo_parser_curline_pop_commacell(&album_list);
+		cpymo_string_trim(&force_unlock_all_flag);
+		cg_info->force_unlock_all = cpymo_string_equals_str(force_unlock_all_flag, "1");
 
 		if (cg_info->force_unlock_all)
 			cg_info->preview_unlocked = true;
@@ -370,7 +370,7 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 
 	assert(a->cg_count <= CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE);
 
-	cpymo_parser_stream_span span;
+	cpymo_string span;
 	span.begin = a->album_list_text;
 	span.len = a->album_list_text_size;
 
@@ -454,9 +454,9 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 		cpymo_album_exit_showing_cg(e, a);
 	}
 	else {
-		cpymo_parser_stream_span filename =
+		cpymo_string filename =
 			cpymo_parser_curline_pop_commacell(&a->showing_cg_filename_parser);
-		cpymo_parser_stream_span_trim(&filename);
+		cpymo_string_trim(&filename);
 		uint64_t cghash = cpymo_album_cg_name_hash(filename);
 		if (cpymo_hash_flags_check(&e->flags, cghash)) {
 			error_t err = cpymo_assetloader_load_bg_image(
@@ -673,8 +673,8 @@ static void cpymo_album_deleter(cpymo_engine *e, void *a)
 
 error_t cpymo_album_enter(
 	cpymo_engine *e, 
-	cpymo_parser_stream_span album_list_name,
-	cpymo_parser_stream_span album_ui_name,
+	cpymo_string album_list_name,
+	cpymo_string album_ui_name,
 	size_t page)
 {
 	cpymo_album *album = NULL;
@@ -709,7 +709,7 @@ error_t cpymo_album_enter(
 		&album->cv_thumb_cover,
 		&w,
 		&h,
-		cpymo_parser_stream_span_pure("cvThumb"),
+		cpymo_string_pure("cvThumb"),
 		&e->assetloader,
 		false);
 
@@ -723,7 +723,7 @@ error_t cpymo_album_enter(
 	}
 
 	char script_name[128];
-	cpymo_parser_stream_span_copy(script_name, sizeof(script_name), album_list_name);
+	cpymo_string_copy(script_name, sizeof(script_name), album_list_name);
 
 	album->album_list_text = NULL;
 	err = cpymo_assetloader_load_script(
@@ -734,10 +734,10 @@ error_t cpymo_album_enter(
 	cpymo_parser parser;
 	cpymo_parser_init(&parser, album->album_list_text, album->album_list_text_size);
 	do {
-		cpymo_parser_stream_span span = cpymo_parser_curline_pop_commacell(&parser);
-		cpymo_parser_stream_span_trim(&span);
+		cpymo_string span = cpymo_parser_curline_pop_commacell(&parser);
+		cpymo_string_trim(&span);
 		if (span.len > 0) {
-			size_t page_id = (size_t)cpymo_parser_stream_span_atoi(span);
+			size_t page_id = (size_t)cpymo_string_atoi(span);
 			if (page_id > album->page_count) album->page_count = page_id;
 		}
 	} while (cpymo_parser_next_line(&parser));

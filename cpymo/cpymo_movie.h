@@ -6,6 +6,6 @@
 
 struct cpymo_engine;
 
-error_t cpymo_movie_play(struct cpymo_engine *e, cpymo_parser_stream_span videoname);
+error_t cpymo_movie_play(struct cpymo_engine *e, cpymo_string videoname);
 
 #endif

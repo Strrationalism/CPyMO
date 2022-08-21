@@ -64,7 +64,7 @@ void cpymo_package_close(cpymo_package * package)
 	fclose(package->stream);
 }
 
-error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package * package, cpymo_parser_stream_span filename)
+error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package * package, cpymo_string filename)
 {
 	if (filename.len > 31) {
 		filename.len = 31;
@@ -75,7 +75,7 @@ error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package 
 	}
 
 	for (uint32_t i = 0; i < package->file_count; ++i) {
-		if (cpymo_parser_stream_span_equals_str_ignore_case(filename, package->files[i].file_name)) {
+		if (cpymo_string_equals_str_ignore_case(filename, package->files[i].file_name)) {
 			*out_index = package->files[i];
 			return CPYMO_ERR_SUCC;
 		}
@@ -95,7 +95,7 @@ error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_package_read_file(char **out_buffer, size_t *sz, const cpymo_package *package, cpymo_parser_stream_span filename)
+error_t cpymo_package_read_file(char **out_buffer, size_t *sz, const cpymo_package *package, cpymo_string filename)
 {
 	assert(*out_buffer == NULL);
 	cpymo_package_index idx;
@@ -171,7 +171,7 @@ error_t cpymo_package_read_image_from_index(void ** pixels, int * w, int * h, in
 #endif
 }
 
-error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, cpymo_parser_stream_span filename)
+error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels, const cpymo_package * pkg, cpymo_string filename)
 {
 	cpymo_package_index i;
 	error_t err = cpymo_package_find(&i, pkg, filename);
@@ -181,7 +181,7 @@ error_t cpymo_package_read_image(void ** pixels, int * w, int * h, int channels,
 }
 #endif
 
-error_t cpymo_package_stream_reader_find_create(cpymo_package_stream_reader * r, const cpymo_package * package, cpymo_parser_stream_span filename)
+error_t cpymo_package_stream_reader_find_create(cpymo_package_stream_reader * r, const cpymo_package * package, cpymo_string filename)
 {	
 	cpymo_package_index index;
 	error_t err = cpymo_package_find(&index, package, filename);

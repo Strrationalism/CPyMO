@@ -37,8 +37,8 @@ void cpymo_floating_hint_draw(const cpymo_floating_hint *);
 
 error_t cpymo_floating_hint_start(
 	struct cpymo_engine *,
-	cpymo_parser_stream_span text,
-	cpymo_parser_stream_span background,
+	cpymo_string text,
+	cpymo_string background,
 	float x,
 	float y,
 	cpymo_color col,

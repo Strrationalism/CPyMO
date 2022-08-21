@@ -15,6 +15,7 @@ SRC_CPYMO := \
 	../cpymo/cpymo_color.c \
 	../cpymo/cpymo_gameconfig.c \
 	../cpymo/cpymo_assetloader.c \
+	../cpymo/cpymo_string.c \
 	../cpymo/cpymo_album.c
 
 OBJS := $(patsubst %.c, $(BUILD_DIR_CPYMO_TOOL)/%.o, $(SRC_TOOL)) \

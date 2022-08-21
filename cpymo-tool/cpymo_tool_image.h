@@ -19,7 +19,7 @@ void cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, i
 error_t cpymo_tool_image_save_to_file_with_mask(
 	const cpymo_tool_image *img,
 	const char *filename,
-	cpymo_parser_stream_span format,
+	cpymo_string format,
 	bool create_mask);
 
 error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename);

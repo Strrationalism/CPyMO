@@ -70,9 +70,9 @@ void cpymo_backlog_free(cpymo_backlog *b)
 #endif
 }
 
-void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_parser_stream_span vo)
+void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_string vo)
 {
-	cpymo_parser_stream_span_copy(
+	cpymo_string_copy(
 		b->pending_vo_filename, sizeof(b->pending_vo_filename), vo);
 }
 
@@ -149,7 +149,7 @@ static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)
 {
 	const cpymo_backlog_record *rec = &e->backlog.records[DEC(selected)];
 	if (rec->vo_filename[0]) {
-		return cpymo_audio_vo_play(e, cpymo_parser_stream_span_pure(rec->vo_filename));
+		return cpymo_audio_vo_play(e, cpymo_string_pure(rec->vo_filename));
 	}
 
 	return CPYMO_ERR_SUCC;

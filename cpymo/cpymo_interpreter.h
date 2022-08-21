@@ -27,7 +27,7 @@ error_t cpymo_interpreter_init_boot(cpymo_interpreter *out, const char *start_sc
 error_t cpymo_interpreter_init_script(cpymo_interpreter *out, const char *script_name, const cpymo_assetloader *loader);
 void cpymo_interpreter_free(cpymo_interpreter *interpreter);
 
-error_t cpymo_interpreter_goto_label(cpymo_interpreter *interpreter, cpymo_parser_stream_span label);
+error_t cpymo_interpreter_goto_label(cpymo_interpreter *interpreter, cpymo_string label);
 error_t cpymo_interpreter_execute_step(cpymo_interpreter *interpreter, struct cpymo_engine *engine);
 
 void cpymo_interpreter_checkpoint(cpymo_interpreter *interpreter);

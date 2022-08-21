@@ -8,7 +8,7 @@
 #include <cpymo_android.h>
 #endif
 
-error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, float height, float character_size, cpymo_color col, cpymo_parser_stream_span text)
+error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, float height, float character_size, cpymo_color col, cpymo_string text)
 {
     o->x = x;
     o->y = y;
@@ -105,7 +105,7 @@ void cpymo_textbox_draw(
 
 static bool cpymo_textbox_line_full(cpymo_textbox * tb)
 {
-    cpymo_parser_stream_span span;
+    cpymo_string span;
     span.begin = tb->text_curline_and_remaining.begin;
     span.len = tb->text_curline_size;
     float cur_w = cpymo_backend_text_width(span, tb->character_size) + tb->character_size;
@@ -120,7 +120,7 @@ void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
 {
     if (tb->active_line >= tb->max_lines) return;
 
-    cpymo_parser_stream_span span;
+    cpymo_string span;
     span.begin = tb->text_curline_and_remaining.begin;
     span.len = tb->text_curline_size;
 
@@ -163,23 +163,23 @@ void cpymo_textbox_show_next_char(cpymo_textbox *tb)
     assert(!cpymo_textbox_all_finished(tb));
     assert(tb->text_curline_size <= tb->text_curline_and_remaining.len);
 
-    cpymo_parser_stream_span span = tb->text_curline_and_remaining;
+    cpymo_string span = tb->text_curline_and_remaining;
     span.begin += tb->text_curline_size;
     span.len -= tb->text_curline_size;
-    cpymo_parser_stream_span next_char = 
-        cpymo_parser_stream_span_utf8_try_head(&span);
+    cpymo_string next_char = 
+        cpymo_string_utf8_try_head(&span);
 
     tb->text_curline_size += next_char.len;
 
-    if (cpymo_parser_stream_span_equals_str(next_char, "\\")) {
-        next_char = cpymo_parser_stream_span_utf8_try_head(&span);
-        if (cpymo_parser_stream_span_equals_str(next_char, "n")
-            || cpymo_parser_stream_span_equals_str(next_char, "r")) {
+    if (cpymo_string_equals_str(next_char, "\\")) {
+        next_char = cpymo_string_utf8_try_head(&span);
+        if (cpymo_string_equals_str(next_char, "n")
+            || cpymo_string_equals_str(next_char, "r")) {
             tb->text_curline_size += next_char.len;
             cpymo_textbox_show_next_line(tb);
         }
     }
-    else if (cpymo_parser_stream_span_equals_str(next_char, "\n") || cpymo_textbox_line_full(tb)) {
+    else if (cpymo_string_equals_str(next_char, "\n") || cpymo_textbox_line_full(tb)) {
         cpymo_textbox_show_next_line(tb);
     }
 }

@@ -86,7 +86,7 @@ void cpymo_assetloader_free(cpymo_assetloader * loader)
 
 error_t cpymo_assetloader_get_fs_path(
 	char **out_str,
-	cpymo_parser_stream_span asset_name,
+	cpymo_string asset_name,
 	const char *asset_type,
 	const char *asset_ext,
 	const cpymo_assetloader *l)
@@ -118,7 +118,7 @@ static error_t cpymo_assetloader_load_filesystem_file(
 	char **out_buffer,
 	size_t *buf_size,
 	const char *asset_type,
-	cpymo_parser_stream_span asset_name,
+	cpymo_string asset_name,
 	const char *asset_ext_name,
 	const cpymo_assetloader *assetloader) 
 {
@@ -145,7 +145,7 @@ static error_t cpymo_assetloader_load_filesystem_image_pixels(
 	int *h,
 	int c,
 	const char *asset_type,
-	cpymo_parser_stream_span asset_name,
+	cpymo_string asset_name,
 	const char *asset_ext_name,
 	const cpymo_assetloader *l)
 {
@@ -168,7 +168,7 @@ static error_t cpymo_assetloader_load_image_pixels(
 	int *h,
 	int c,
 	const char *asset_type,
-	cpymo_parser_stream_span asset_name,
+	cpymo_string asset_name,
 	const char *asset_ext_name,
 	bool using_pkg,
 	const cpymo_package *pkg,
@@ -188,7 +188,7 @@ static error_t cpymo_assetloader_load_image_pixels(
 }
 
 
-error_t cpymo_assetloader_load_bg_pixels(void ** px, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+error_t cpymo_assetloader_load_bg_pixels(void ** px, int * w, int * h, cpymo_string name, const cpymo_assetloader * loader)
 {
 	return cpymo_assetloader_load_image_pixels(
 		px, w, h, 3, "bg", name,
@@ -196,7 +196,7 @@ error_t cpymo_assetloader_load_bg_pixels(void ** px, int * w, int * h, cpymo_par
 }
 
 #ifndef CPYMO_TOOL
-error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int * h, cpymo_parser_stream_span name, const cpymo_assetloader * loader)
+error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int * h, cpymo_string name, const cpymo_assetloader * loader)
 {
 	void *pixels = NULL;
 	error_t err = cpymo_assetloader_load_bg_pixels(&pixels, w, h, name, loader);
@@ -220,7 +220,7 @@ error_t cpymo_assetloader_load_bg_image(cpymo_backend_image * img, int * w, int 
 
 static error_t cpymo_assetloader_load_image_with_mask(
 	cpymo_backend_image *img, int *w, int *h, 
-	cpymo_parser_stream_span name, 
+	cpymo_string name, 
 	const char *asset_type,
 	const char *asset_ext,
 	const char *mask_ext,
@@ -247,7 +247,7 @@ static error_t cpymo_assetloader_load_image_with_mask(
 		int mw, mh;
 		err = cpymo_assetloader_load_image_pixels(
 			&mask, &mw, &mh, 1,
-			asset_type, cpymo_parser_stream_span_pure(filename), mask_ext,
+			asset_type, cpymo_string_pure(filename), mask_ext,
 			use_pkg, pkg, loader);
 		free(filename);
 		if (err == CPYMO_ERR_SUCC) {
@@ -272,7 +272,7 @@ static error_t cpymo_assetloader_load_image_with_mask(
 #ifndef CPYMO_TOOL
 error_t cpymo_assetloader_load_image_with_mask(
 	cpymo_backend_image *img, int *w, int *h, 
-	cpymo_parser_stream_span name, 
+	cpymo_string name, 
 	const char *asset_type,
 	const char *asset_ext,
 	const char *mask_ext,
@@ -284,7 +284,7 @@ error_t cpymo_assetloader_load_image_with_mask(
 #endif
 
 #ifndef CPYMO_TOOL
-error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_parser_stream_span name, const cpymo_assetloader *loader)
+error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_string name, const cpymo_assetloader *loader)
 {
 	return cpymo_assetloader_load_image_with_mask(
 		img, w, h,
@@ -296,7 +296,7 @@ error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int
 error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, const char * script_name, const cpymo_assetloader * loader)
 {
 	error_t err = cpymo_assetloader_load_filesystem_file(
-		out_buffer, buf_size, "script", cpymo_parser_stream_span_pure(script_name),
+		out_buffer, buf_size, "script", cpymo_string_pure(script_name),
 		"txt", loader);
 
 	if (err != CPYMO_ERR_SUCC) return CPYMO_ERR_SCRIPT_FILE_NOT_FOUND;
@@ -309,7 +309,7 @@ error_t cpymo_assetloader_load_script(char ** out_buffer, size_t * buf_size, con
 #ifndef CPYMO_TOOL
 #ifndef DISABLE_STB_IMAGE
 error_t cpymo_assetloader_load_system_masktrans(
-	cpymo_backend_masktrans *out, cpymo_parser_stream_span name, 
+	cpymo_backend_masktrans *out, cpymo_string name, 
 	const cpymo_assetloader * loader)
 {
 	void *px = NULL;
@@ -328,22 +328,22 @@ error_t cpymo_assetloader_load_system_masktrans(
 #endif
 #endif
 
-error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_parser_stream_span bgm_name, const cpymo_assetloader *loader)
+error_t cpymo_assetloader_get_bgm_path(char ** out_str, cpymo_string bgm_name, const cpymo_assetloader *loader)
 {
 	return cpymo_assetloader_get_fs_path(out_str, bgm_name, "bgm", loader->game_config->bgmformat, loader);
 }
 
-error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
+error_t cpymo_assetloader_get_vo_path(char **out_str, cpymo_string vo_name, const cpymo_assetloader *l)
 {
 	return cpymo_assetloader_get_fs_path(out_str, vo_name, "voice", l->game_config->voiceformat, l);
 }
 
-error_t cpymo_assetloader_get_video_path(char ** out_str, cpymo_parser_stream_span movie_name, const cpymo_assetloader * l)
+error_t cpymo_assetloader_get_video_path(char ** out_str, cpymo_string movie_name, const cpymo_assetloader * l)
 {
 	return cpymo_assetloader_get_fs_path(out_str, movie_name, "video", "mp4", l);
 }
 
-error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span vo_name, const cpymo_assetloader *l)
+error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_string vo_name, const cpymo_assetloader *l)
 {
 	return cpymo_assetloader_get_fs_path(out_str, vo_name, "se", l->game_config->seformat, l);
 }
@@ -353,7 +353,7 @@ error_t cpymo_assetloader_get_se_path(char **out_str, cpymo_parser_stream_span v
 error_t cpymo_assetloader_load_system_image(
 	cpymo_backend_image * out_image, 
 	int *out_width, int *out_height,
-	cpymo_parser_stream_span filename_span,
+	cpymo_string filename_span,
 	const cpymo_assetloader * loader,
 	bool load_mask)
 {
@@ -369,7 +369,7 @@ error_t cpymo_assetloader_load_icon_pixels(
 	cpymo_assetloader l;
 	l.gamedir = gamedir;
 	error_t e = cpymo_assetloader_load_filesystem_image_pixels(
-		px, w, h, 4, ".", cpymo_parser_stream_span_pure("icon"), 
+		px, w, h, 4, ".", cpymo_string_pure("icon"), 
 		"png", &l);
 
 	CPYMO_THROW(e);
