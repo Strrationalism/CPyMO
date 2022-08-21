@@ -2,6 +2,7 @@
 #define INCLUDE_CPYMO_BACKEND_AUDIO
 
 #include <stdbool.h>
+#include <stddef.h>
 
 // The data described by the sample format is always in native-endian order. 
 typedef enum {
