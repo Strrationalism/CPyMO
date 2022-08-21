@@ -280,7 +280,7 @@ static error_t cpymo_msgbox_ui_default_confirm(struct cpymo_engine *e, void *dat
 
 error_t cpymo_msgbox_ui_enter(
 	cpymo_engine *e, 
-	cpymo_string message, 
+	cpymo_str message, 
 	error_t(*confirm)(cpymo_engine *e, void *data), 
 	void * confirm_data)
 {
@@ -318,7 +318,7 @@ error_t cpymo_msgbox_ui_enter(
 	err = cpymo_backend_text_create(
 		&ui->confirm_btn, 
 		&ui->confirm_btn_width, 
-		cpymo_string_pure(l->msgbox_ok), 
+		cpymo_str_pure(l->msgbox_ok), 
 		fontsize);
 	if (err != CPYMO_ERR_SUCC) {
 		cpymo_ui_exit(e);
@@ -329,7 +329,7 @@ error_t cpymo_msgbox_ui_enter(
 		err = cpymo_backend_text_create(
 			&ui->cancel_btn,
 			&ui->cancel_btn_width,
-			cpymo_string_pure(l->msgbox_cancel),
+			cpymo_str_pure(l->msgbox_cancel),
 			fontsize);
 		if (err != CPYMO_ERR_SUCC) {
 			cpymo_ui_exit(e);
@@ -343,7 +343,7 @@ error_t cpymo_msgbox_ui_enter(
 #ifdef ENABLE_TEXT_EXTRACT
 	char *msg = (char *)malloc(message.len + strlen(l->msgbox_cancel) + 1);
 	if (msg) {
-		cpymo_string_copy(msg, message.len + strlen(l->msgbox_cancel) + 1, message);
+		cpymo_str_copy(msg, message.len + strlen(l->msgbox_cancel) + 1, message);
 		if (confirm) {
 			strcat(msg, l->msgbox_cancel);
 		}

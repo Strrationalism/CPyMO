@@ -229,15 +229,15 @@ static error_t cpymo_tool_get_file_list(char *** files, size_t * count, const ch
 
 	*count = 0;
 	do {
-		cpymo_string line = cpymo_parser_curline_readuntil(&parser, '\n');
-		cpymo_string_trim(&line);
+		cpymo_str line = cpymo_parser_curline_readuntil(&parser, '\n');
+		cpymo_str_trim(&line);
 
 		if (line.len) {
 			char **cur = *files + *count;
 			*cur = (char *)malloc(line.len + 1);
 			if (*cur == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-			cpymo_string_copy(*cur, line.len + 1, line);
+			cpymo_str_copy(*cur, line.len + 1, line);
 			++*count;
 		}
 	} while (cpymo_parser_next_line(&parser));

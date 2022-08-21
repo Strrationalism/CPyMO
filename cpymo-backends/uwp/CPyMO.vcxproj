@@ -279,7 +279,7 @@
     <ClCompile Include="..\..\cpymo\cpymo_say.c" />
     <ClCompile Include="..\..\cpymo\cpymo_scroll.c" />
     <ClCompile Include="..\..\cpymo\cpymo_select_img.c" />
-    <ClCompile Include="..\..\cpymo\cpymo_string.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_str.c" />
     <ClCompile Include="..\..\cpymo\cpymo_text.c" />
     <ClCompile Include="..\..\cpymo\cpymo_textbox.c" />
     <ClCompile Include="..\..\cpymo\cpymo_ui.c" />
@@ -340,7 +340,7 @@
     <ClInclude Include="..\..\cpymo\cpymo_say.h" />
     <ClInclude Include="..\..\cpymo\cpymo_scroll.h" />
     <ClInclude Include="..\..\cpymo\cpymo_select_img.h" />
-    <ClCompile Include="..\..\cpymo\cpymo_string.h" />
+    <ClCompile Include="..\..\cpymo\cpymo_str.h" />
     <ClInclude Include="..\..\cpymo\cpymo_text.h" />
     <ClInclude Include="..\..\cpymo\cpymo_textbox.h" />
     <ClInclude Include="..\..\cpymo\cpymo_tween.h" />

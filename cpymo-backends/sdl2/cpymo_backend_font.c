@@ -176,13 +176,13 @@ error_t cpymo_backend_font_init(const char *gamedir)
 #endif
 
 
-void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_string text, float scale, float baseline) {
+void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_str text, float scale, float baseline) {
 	float xpos = 0;
 
 	int width = 0, height = 0;
 	float y_base = 0;
 	while (text.len > 0) {
-		uint32_t codepoint = cpymo_string_utf8_try_head_to_utf32(&text);
+		uint32_t codepoint = cpymo_str_utf8_try_head_to_utf32(&text);
 		int x0, y0, x1, y1;
 
 		int advance_width, lsb;
@@ -206,8 +206,8 @@ void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_string t
 
 		xpos += (advance_width * scale);
 
-		cpymo_string text2 = text;
-		uint32_t next_char = cpymo_string_utf8_try_head_to_utf32(&text2);
+		cpymo_str text2 = text;
+		uint32_t next_char = cpymo_str_utf8_try_head_to_utf32(&text2);
 		if (next_char) {
 			xpos += scale * stbtt_GetCodepointKernAdvance(&font, codepoint, next_char);
 		}

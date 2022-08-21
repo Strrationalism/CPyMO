@@ -47,7 +47,7 @@ void cpymo_charas_draw(const struct cpymo_engine *);
 
 error_t cpymo_charas_new_chara(
 	struct cpymo_engine *, struct cpymo_chara **out,
-	cpymo_string filename,
+	cpymo_str filename,
 	int chara_id, int layer,
 	int coord_mode,
 	float x, float y,

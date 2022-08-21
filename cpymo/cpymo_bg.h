@@ -58,8 +58,8 @@ void cpymo_bg_draw_transform_effect(const struct cpymo_engine *);
 error_t cpymo_bg_command(
 	struct cpymo_engine *engine,
 	cpymo_bg *,
-	cpymo_string bgname,
-	cpymo_string transition,
+	cpymo_str bgname,
+	cpymo_str transition,
 	float x,
 	float y,
 	float time);

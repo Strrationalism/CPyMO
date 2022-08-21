@@ -351,8 +351,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 
 		cpymo_say_load_msgbox_and_namebox_image(
 			&e->say,
-			cpymo_string_pure(msgbox),
-			cpymo_string_pure(namebox),
+			cpymo_str_pure(msgbox),
+			cpymo_str_pure(namebox),
 			&e->assetloader);
 
 		free(namebox);
@@ -362,13 +362,13 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	// BGM
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
-	if (*strbuf) cpymo_audio_bgm_play(e, cpymo_string_pure(strbuf), true);
+	if (*strbuf) cpymo_audio_bgm_play(e, cpymo_str_pure(strbuf), true);
 	
 	
 	// SE
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
-	if (*strbuf) cpymo_audio_se_play(e, cpymo_string_pure(strbuf), true);
+	if (*strbuf) cpymo_audio_se_play(e, cpymo_str_pure(strbuf), true);
 	
 
 	// FADEOUT
@@ -411,8 +411,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		cpymo_bg_command(
 			e,
 			&e->bg,
-			cpymo_string_pure(strbuf),
-			cpymo_string_pure("BG_NOFADE"),
+			cpymo_str_pure(strbuf),
+			cpymo_str_pure("BG_NOFADE"),
 			0, 0, 0);
 
 		e->bg.current_bg_x = (float)CAST(int32_t, bg_params[0]);
@@ -437,7 +437,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		cpymo_charas_new_chara(
 			e,
 			&c,
-			cpymo_string_pure(strbuf),
+			cpymo_str_pure(strbuf),
 			cid,
 			layer,
 			0,
@@ -459,7 +459,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		int32_t x = CAST(int32_t, anime_params[2]);
 		int32_t y = CAST(int32_t, anime_params[3]);
 
-		cpymo_anime_on(e, all_frames, cpymo_string_pure(strbuf), (float)x, (float)y, interval, true);
+		cpymo_anime_on(e, all_frames, cpymo_str_pure(strbuf), (float)x, (float)y, interval, true);
 	}
 
 	// LOCAL VARS
@@ -471,7 +471,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		READ_PARAMS(val, 1);
 		cpymo_vars_set(
 			&e->vars,
-			cpymo_string_pure(strbuf),
+			cpymo_str_pure(strbuf),
 			(int)CAST(int32_t, val[0]));
 	}
 

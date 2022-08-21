@@ -78,7 +78,7 @@ void cpymo_select_img_reset(cpymo_select_img *img);
 
 error_t cpymo_select_img_configuare_begin(
 	cpymo_select_img *sel, size_t selections,
-	cpymo_string image_name_or_empty_when_select_imgs,
+	cpymo_str image_name_or_empty_when_select_imgs,
 	cpymo_assetloader *loader, cpymo_gameconfig *gameconfig);
 
 static inline void cpymo_select_img_configuare_set_ok_callback(cpymo_select_img *sel, cpymo_select_img_ok_callback ok) {
@@ -89,7 +89,7 @@ void cpymo_select_img_configuare_select_img_selection(
 	struct cpymo_engine *engine, float x, float y, bool enabled, uint64_t hash);
 
 error_t cpymo_select_img_configuare_select_imgs_selection(
-	struct cpymo_engine *engine, cpymo_string image_name, float x, float y, bool enabled, uint64_t hash);
+	struct cpymo_engine *engine, cpymo_str image_name, float x, float y, bool enabled, uint64_t hash);
 
 void cpymo_select_img_configuare_end(
 	cpymo_select_img *sel, cpymo_wait *wait,
@@ -122,12 +122,12 @@ static inline void cpymo_select_img_free(cpymo_select_img *img)
 
 error_t cpymo_select_img_configuare_select_text(
 	cpymo_select_img *sel, cpymo_assetloader *loader, cpymo_gameconfig *gc, cpymo_hash_flags *flags,
-	cpymo_string text, bool enabled, 
+	cpymo_str text, bool enabled, 
 	enum cpymo_select_img_selection_hint_state hint_mode,
 	uint64_t hash, float fontsize);
 
 void cpymo_select_img_configuare_select_text_hint_pic(
-	struct cpymo_engine *engine, cpymo_string hint);
+	struct cpymo_engine *engine, cpymo_str hint);
 
 void cpymo_select_img_configuare_end_select_text(
 	cpymo_select_img *sel,

@@ -77,19 +77,19 @@ char cpymo_parser_curline_peek(cpymo_parser * parser)
 	return ch;
 }
 
-cpymo_string cpymo_parser_curline_readuntil(cpymo_parser * parser, char until)
+cpymo_str cpymo_parser_curline_readuntil(cpymo_parser * parser, char until)
 {
 	return cpymo_parser_curline_readuntil_or(parser, until, '\0');
 }
 
-cpymo_string cpymo_parser_curline_readuntil_or(cpymo_parser * parser, char until1, char until2)
+cpymo_str cpymo_parser_curline_readuntil_or(cpymo_parser * parser, char until1, char until2)
 {
 	return cpymo_parser_curline_readuntil_or3(parser, until1, until2, '\0');
 }
 
-cpymo_string cpymo_parser_curline_readuntil_or3(cpymo_parser * parser, char until1, char until2, char until3)
+cpymo_str cpymo_parser_curline_readuntil_or3(cpymo_parser * parser, char until1, char until2, char until3)
 {
-	cpymo_string span;
+	cpymo_str span;
 	span.begin = parser->stream.begin + parser->cur_pos;
 	span.len = 0;
 
@@ -102,25 +102,25 @@ cpymo_string cpymo_parser_curline_readuntil_or3(cpymo_parser * parser, char unti
 	return span;
 }
 
-cpymo_string cpymo_parser_curline_pop_commacell(cpymo_parser * parser)
+cpymo_str cpymo_parser_curline_pop_commacell(cpymo_parser * parser)
 {
-	cpymo_string span = cpymo_parser_curline_readuntil(parser, ',');
-	cpymo_string_trim(&span);
+	cpymo_str span = cpymo_parser_curline_readuntil(parser, ',');
+	cpymo_str_trim(&span);
 
 	return span;
 }
 
-cpymo_string cpymo_parser_curline_pop_command(cpymo_parser * parser)
+cpymo_str cpymo_parser_curline_pop_command(cpymo_parser * parser)
 {
-	cpymo_string before_command = cpymo_parser_curline_readuntil(parser, '#');
-	cpymo_string_trim(&before_command);
+	cpymo_str before_command = cpymo_parser_curline_readuntil(parser, '#');
+	cpymo_str_trim(&before_command);
 	if (before_command.len == 0) {
-		cpymo_string command = cpymo_parser_curline_readuntil_or(parser, ' ', '\t');
-		cpymo_string_trim(&command);
+		cpymo_str command = cpymo_parser_curline_readuntil_or(parser, ' ', '\t');
+		cpymo_str_trim(&command);
 		return command;
 	} 
 	else {
-		cpymo_string ret;
+		cpymo_str ret;
 		ret.begin = NULL;
 		ret.len = 0;
 		return ret;

@@ -17,7 +17,7 @@ extern SDL_Surface *framebuffer;
 
 extern void cpymo_backend_font_render(
     void *out_or_null, int *w, int *h, 
-    cpymo_string text, float scale, float baseline);
+    cpymo_str text, float scale, float baseline);
 
 typedef struct {
     float baseline;
@@ -28,7 +28,7 @@ typedef struct {
 error_t cpymo_backend_text_create(
     cpymo_backend_text *out, 
     float *out_width,
-    cpymo_string s, 
+    cpymo_str s, 
     float height)
 {
     float scale = stbtt_ScaleForPixelHeight(&font, height);
@@ -132,7 +132,7 @@ void cpymo_backend_text_draw(
 }
 
 float cpymo_backend_text_width(
-    cpymo_string s,
+    cpymo_str s,
     float height)
 { 
     float scale = stbtt_ScaleForPixelHeight(&font, height);

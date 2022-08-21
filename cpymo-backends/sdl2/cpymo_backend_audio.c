@@ -133,8 +133,8 @@ void cpymo_backend_audio_init()
 	SDL_LockAudio();
 	SDL_PauseAudio(0);
 
-	cpymo_string_hash_init(&current_audio_driver);
-	cpymo_string_hash_append_cstr(
+	cpymo_str_hash_init(&current_audio_driver);
+	cpymo_str_hash_append_cstr(
 		&current_audio_driver, SDL_GetCurrentAudioDriver());
 }
 
@@ -154,8 +154,8 @@ void cpymo_backend_audio_reset()
 {
 	if (audio_enabled) {
 		uint64_t current_audio_driver_hash;
-		cpymo_string_hash_init(&current_audio_driver_hash);
-		cpymo_string_hash_append_cstr(
+		cpymo_str_hash_init(&current_audio_driver_hash);
+		cpymo_str_hash_append_cstr(
 			&current_audio_driver_hash, SDL_GetCurrentAudioDriver());
 
 		if (current_audio_driver == current_audio_driver_hash) return;

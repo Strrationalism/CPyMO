@@ -34,7 +34,7 @@ void cpymo_vars_clear_locals(cpymo_vars * vars)
 	vars->locals = NULL;
 }
 
-int *cpymo_vars_access(cpymo_vars * vars, cpymo_string name, bool modify)
+int *cpymo_vars_access(cpymo_vars * vars, cpymo_str name, bool modify)
 {
 	assert(name.len >= 1);
 	bool is_global_var = name.begin[0] == 'S';
@@ -43,7 +43,7 @@ int *cpymo_vars_access(cpymo_vars * vars, cpymo_string name, bool modify)
 	vars->globals_dirty |= is_global_var && modify;
 
 	while (var) {
-		if (cpymo_string_equals_str(name, var->name))
+		if (cpymo_str_equals_str(name, var->name))
 			return &var->val;
 		else var = var->next;
 	}
@@ -51,7 +51,7 @@ int *cpymo_vars_access(cpymo_vars * vars, cpymo_string name, bool modify)
 	return NULL;
 }
 
-error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_string name, int **ptr_to_val)
+error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_str name, int **ptr_to_val)
 {
 	assert(*ptr_to_val == NULL);
 
@@ -68,7 +68,7 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_string name, int **ptr
 			return CPYMO_ERR_OUT_OF_MEM;
 		}
 
-		cpymo_string_copy(var->name, name.len + 1, name);
+		cpymo_str_copy(var->name, name.len + 1, name);
 
 		struct cpymo_var **parent = name.begin[0] == 'S' ? &vars->globals : &vars->locals;
 
@@ -80,7 +80,7 @@ error_t cpymo_vars_access_create(cpymo_vars * vars, cpymo_string name, int **ptr
 	}
 }
 
-bool cpymo_vars_is_constant(cpymo_string expr)
+bool cpymo_vars_is_constant(cpymo_str expr)
 {
 	for (size_t i = 0; i < expr.len; ++i) {
 		if (!isdigit((int)expr.begin[i]) && expr.begin[i] != '-') {
@@ -91,9 +91,9 @@ bool cpymo_vars_is_constant(cpymo_string expr)
 	return true;
 }
 
-int cpymo_vars_eval(cpymo_vars * vars, cpymo_string expr)
+int cpymo_vars_eval(cpymo_vars * vars, cpymo_str expr)
 {
-	if (cpymo_vars_is_constant(expr)) return cpymo_string_atoi(expr);
+	if (cpymo_vars_is_constant(expr)) return cpymo_str_atoi(expr);
 	else return cpymo_vars_get(vars, expr);
 }
 

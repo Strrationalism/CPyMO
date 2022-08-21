@@ -42,14 +42,14 @@ static error_t cpymo_scroll_callback(cpymo_engine *e)
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_scroll_start(cpymo_engine *e, cpymo_string bgname, float sx, float sy, float ex, float ey, float time)
+error_t cpymo_scroll_start(cpymo_engine *e, cpymo_str bgname, float sx, float sy, float ex, float ey, float time)
 {
 	cpymo_bg_reset(&e->bg);
 	cpymo_charas_fast_kill_all(&e->charas);
 
 	char *next_bg_name = (char *)realloc(e->bg.current_bg_name, bgname.len + 1);
 	if (next_bg_name) {
-		cpymo_string_copy(next_bg_name, bgname.len + 1, bgname);
+		cpymo_str_copy(next_bg_name, bgname.len + 1, bgname);
 		e->bg.current_bg_name = next_bg_name;
 	}
 

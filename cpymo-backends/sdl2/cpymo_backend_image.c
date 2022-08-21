@@ -215,7 +215,7 @@ error_t cpymo_assetloader_load_icon(
 }
 
 static SDL_Surface *cpymo_package_sdl2_load_surface(
-	const cpymo_package *package, cpymo_string filename)
+	const cpymo_package *package, cpymo_str filename)
 {
 	cpymo_package_index index;
 	error_t err = cpymo_package_find(&index, package, filename);
@@ -236,22 +236,22 @@ static void cpymo_assetloader_sdl2_attach_mask(
 	const cpymo_package *pkg, bool use_pkg,
 	const cpymo_assetloader *loader,
 	const char *asset_type,
-	cpymo_string asset_name,
+	cpymo_str asset_name,
 	const char *mask_ext)
 {
 	SDL_Surface *mask = NULL;
 	char *name = alloca(asset_name.len + 8);
-	cpymo_string_copy(name, asset_name.len + 8, asset_name);
+	cpymo_str_copy(name, asset_name.len + 8, asset_name);
 	strcat(name, "_mask");
 
 	if (use_pkg) {
 		mask = cpymo_package_sdl2_load_surface(
-			pkg, cpymo_string_pure(name));
+			pkg, cpymo_str_pure(name));
 	}
 	else {
 		char *path = NULL;
 		error_t err = cpymo_assetloader_get_fs_path(
-			&path, cpymo_string_pure(name),
+			&path, cpymo_str_pure(name),
 			asset_type, mask_ext, loader);
 		
 		if (err != CPYMO_ERR_SUCC) return;
@@ -307,7 +307,7 @@ static void cpymo_assetloader_sdl2_attach_mask(
 
 error_t cpymo_assetloader_load_image_with_mask(
 	cpymo_backend_image *img, int *w, int *h, 
-	cpymo_string name, 
+	cpymo_str name, 
 	const char *asset_type,
 	const char *asset_ext,
 	const char *mask_ext,
@@ -357,12 +357,12 @@ error_t cpymo_assetloader_load_image_with_mask(
 
 error_t cpymo_assetloader_load_bg_pixels(
 	void ** px, int * w, int * h, 
-	cpymo_string name, const cpymo_assetloader * loader)
+	cpymo_str name, const cpymo_assetloader * loader)
 { return CPYMO_ERR_UNSUPPORTED; }
 
 error_t cpymo_assetloader_load_bg_image(
 	cpymo_backend_image * img, int * w, int * h, 
-	cpymo_string name, const cpymo_assetloader * loader)
+	cpymo_str name, const cpymo_assetloader * loader)
 {
 	return cpymo_assetloader_load_image_with_mask(
 		img, w, h, name, "bg", loader->game_config->bgformat, "",
@@ -370,7 +370,7 @@ error_t cpymo_assetloader_load_bg_image(
 }
 
 error_t cpymo_assetloader_load_system_masktrans(
-	cpymo_backend_masktrans *out, cpymo_string name, 
+	cpymo_backend_masktrans *out, cpymo_str name, 
 	const cpymo_assetloader *loader)
 { 
 	char *path = NULL;

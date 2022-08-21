@@ -15,7 +15,7 @@ static error_t cpymo_tool_pack_images(
 	bool create_mask,
 	const char *output_file,
 	size_t cols,
-	cpymo_string output_format,
+	cpymo_str output_format,
 	const char **input_files,
 	size_t input_file_count) 
 {
@@ -72,7 +72,7 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 	bool create_mask = false;
 	const char *output_file = NULL;
 	const char *num_of_cols = NULL;
-	cpymo_string output_format;
+	cpymo_str output_format;
 	output_format.begin = NULL;
 	output_format.len = 0;
 
@@ -81,16 +81,16 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 	if (input_files == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	for (int i = 2; i < argc; ++i) {
-		cpymo_string a = cpymo_string_pure(argv[i]);
-		cpymo_string_trim(&a);
+		cpymo_str a = cpymo_str_pure(argv[i]);
+		cpymo_str_trim(&a);
 
-		if (cpymo_string_equals_str(a, "")) continue;
-		else if (cpymo_string_starts_with_str_ignore_case(a, "--")) {
-			if (cpymo_string_equals_str_ignore_case(a, "--load-mask"))
+		if (cpymo_str_equals_str(a, "")) continue;
+		else if (cpymo_str_starts_with_str_ignore_case(a, "--")) {
+			if (cpymo_str_equals_str_ignore_case(a, "--load-mask"))
 				load_mask = true;
-			else if (cpymo_string_equals_str_ignore_case(a, "--create-mask"))
+			else if (cpymo_str_equals_str_ignore_case(a, "--create-mask"))
 				create_mask = true;
-			else if (cpymo_string_equals_str_ignore_case(a, "--out-format")) {
+			else if (cpymo_str_equals_str_ignore_case(a, "--out-format")) {
 				++i;
 
 				if (argc <= i) {
@@ -99,7 +99,7 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 					return -1;
 				}
 
-				output_format = cpymo_string_pure(argv[i]);
+				output_format = cpymo_str_pure(argv[i]);
 			}
 			else {
 				printf("[Error] Unknown option: %s\n", argv[i]);

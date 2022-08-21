@@ -87,21 +87,21 @@ void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 	free(interpreter->script_content);
 }
 
-error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_string label)
+error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_str label)
 {
 	bool retring = false;
 	uint64_t cur_line_num = interpreter->script_parser.cur_line;
 
 RETRY:
 	while (1) {
-		cpymo_string command = 
+		cpymo_str command = 
 			cpymo_parser_curline_pop_command(&interpreter->script_parser);
 
-		if (cpymo_string_equals_str(command, "label")) {
-			cpymo_string cur_label = 
+		if (cpymo_str_equals_str(command, "label")) {
+			cpymo_str cur_label = 
 				cpymo_parser_curline_pop_commacell(&interpreter->script_parser);
 
-			if (cpymo_string_equals(cur_label, label)) {
+			if (cpymo_str_equals(cur_label, label)) {
 				cpymo_parser_next_line(&interpreter->script_parser);
 				return CPYMO_ERR_SUCC;
 			}
@@ -110,7 +110,7 @@ RETRY:
 			if (!cpymo_parser_next_line(&interpreter->script_parser)) {
 				if (retring) {
 					char label_name[32];
-					cpymo_string_copy(label_name, sizeof(label_name), label);
+					cpymo_str_copy(label_name, sizeof(label_name), label);
 					printf("[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
 					return cpymo_interpreter_goto_line(interpreter, cur_line_num);
 				}
@@ -124,7 +124,7 @@ RETRY:
 	}
 }
 
-static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont);
+static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont);
 
 #define CPYMO_EXEC_CONTVAL_OK 1
 #define CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED 2
@@ -140,7 +140,7 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	default: return CPYMO_ERR_INVALID_ARG;
 	}
 
-	cpymo_string command =
+	cpymo_str command =
 		cpymo_parser_curline_pop_command(&interpreter->script_parser);
 
 	error_t err = cpymo_interpreter_dispatch(command, interpreter, engine, cont);
@@ -175,21 +175,21 @@ void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
 }
 
 #define D(CMD) \
-	else if (cpymo_string_equals_str(command, CMD))
+	else if (cpymo_str_equals_str(command, CMD))
 
 #define POP_ARG(X) \
-	cpymo_string X = cpymo_parser_curline_pop_commacell(&interpreter->script_parser); \
-	cpymo_string_trim(&X)
+	cpymo_str X = cpymo_parser_curline_pop_commacell(&interpreter->script_parser); \
+	cpymo_str_trim(&X)
 
 #define IS_EMPTY(X) \
-	cpymo_string_equals_str(X, "")
+	cpymo_str_equals_str(X, "")
 	
 #define ENSURE(X) \
 	{ if (IS_EMPTY(X)) return CPYMO_ERR_INVALID_ARG; }
 
 #define POS(OUT_X, OUT_Y, IN_X, IN_Y) \
-	float OUT_X = cpymo_string_atof(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
-	float OUT_Y = cpymo_string_atof(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
+	float OUT_X = cpymo_str_atof(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
+	float OUT_Y = cpymo_str_atof(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
 
 #define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }
 
@@ -198,7 +198,7 @@ void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
 		{ longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }	\
 	else return CPYMO_ERR_NO_MORE_CONTENT; }
 
-static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
+static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
 {
 	error_t err;
 
@@ -231,7 +231,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 #endif
 
 		if (IS_EMPTY(text)) {
-			text = cpymo_string_pure(" ");
+			text = cpymo_str_pure(" ");
 		}
 
 		cpymo_text_clear(&engine->text);
@@ -248,13 +248,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(y2_str); ENSURE(y2_str);
 		POS(x2, y2, x2_str, y2_str);
 		POP_ARG(col_str); ENSURE(col_str);
-		cpymo_color col = cpymo_string_as_color(col_str);
+		cpymo_color col = cpymo_str_as_color(col_str);
 		POP_ARG(fontsize_str); ENSURE(fontsize_str);
 		float fontsize = 
-			cpymo_string_atof(fontsize_str) * 
+			cpymo_str_atof(fontsize_str) * 
 			engine->gameconfig.imagesize_h / 240.0f * 1.2f;
 		POP_ARG(show_immediately_str);
-		bool show_immediately = cpymo_string_atoi(show_immediately_str) != 0;
+		bool show_immediately = cpymo_str_atoi(show_immediately_str) != 0;
 
 #ifdef ENABLE_TEXT_EXTRACT
 		char *full_text = (char *)malloc(content.len + 1);
@@ -289,7 +289,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		free(engine->title);
 		engine->title = buf;
-		cpymo_string_copy(engine->title, title.len + 1, title);
+		cpymo_str_copy(engine->title, title.len + 1, title);
 		
 		CONT_NEXTLINE;
 	}
@@ -304,8 +304,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		return cpymo_floating_hint_start(
 			engine,
-			cpymo_string_pure(engine->title),
-			cpymo_string_pure(""),
+			cpymo_str_pure(engine->title),
+			cpymo_str_pure(""),
 			2 * cpymo_gameconfig_font_size(&engine->gameconfig),
 			cpymo_gameconfig_font_size(&engine->gameconfig),
 			cpymo_color_white,
@@ -319,7 +319,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		int chara_ids[CHARA_BUF_SIZE];
 		int layers[CHARA_BUF_SIZE];
 		float pos_x_s[CHARA_BUF_SIZE];
-		cpymo_string filenames[CHARA_BUF_SIZE];
+		cpymo_str filenames[CHARA_BUF_SIZE];
 		size_t command_buffer_size = 0;
 
 		float time = 0.3f;
@@ -329,7 +329,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			POP_ARG(pos_x_str);
 			POP_ARG(layer_str);
 
-			int chara_id_or_time = cpymo_string_atoi(chara_id_or_time_str);
+			int chara_id_or_time = cpymo_str_atoi(chara_id_or_time_str);
 			
 			if (IS_EMPTY(filename) && IS_EMPTY(pos_x_str) && IS_EMPTY(layer_str)) {
 				time = (float)chara_id_or_time / 1000.0f;
@@ -347,16 +347,16 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			} 
 			else {
 				chara_ids[command_buffer_size] = chara_id;
-				layers[command_buffer_size] = cpymo_string_atoi(layer_str);
+				layers[command_buffer_size] = cpymo_str_atoi(layer_str);
 				pos_x_s[command_buffer_size] =
-					(float)cpymo_string_atoi(pos_x_str) / 100.0f * (float)engine->gameconfig.imagesize_w;
+					(float)cpymo_str_atoi(pos_x_str) / 100.0f * (float)engine->gameconfig.imagesize_w;
 				filenames[command_buffer_size] = filename;
 				command_buffer_size++;
 			}
 		}
 
 		for (size_t i = 0; i < command_buffer_size; ++i) {
-			if (cpymo_string_equals_str(filenames[i], "NULL")) {
+			if (cpymo_str_equals_str(filenames[i], "NULL")) {
 				cpymo_charas_kill(engine, chara_ids[i], time);
 			}
 			else {
@@ -385,10 +385,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(id_str); ENSURE(id_str);
 		POP_ARG(time_str);
 
-		float time = IS_EMPTY(time_str) ? 0.3f : (float)cpymo_string_atoi(time_str) / 1000.0f;
-		if (cpymo_string_equals_str(id_str, "a"))
+		float time = IS_EMPTY(time_str) ? 0.3f : (float)cpymo_str_atoi(time_str) / 1000.0f;
+		if (cpymo_str_equals_str(id_str, "a"))
 			cpymo_charas_kill_all(engine, time);
-		else cpymo_charas_kill(engine, cpymo_string_atoi(id_str), time);
+		else cpymo_charas_kill(engine, cpymo_str_atoi(id_str), time);
 
 		cpymo_charas_wait(engine);
 		return CPYMO_ERR_SUCC;
@@ -400,10 +400,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(y_str); ENSURE(y_str);
 		POP_ARG(coord_mode_str);
 
-		int id = cpymo_string_atoi(id_str);
+		int id = cpymo_str_atoi(id_str);
 		POS(x, y, x_str, y_str);
 
-		int coord_mode = IS_EMPTY(coord_mode_str) ? 5 : cpymo_string_atoi(coord_mode_str);
+		int coord_mode = IS_EMPTY(coord_mode_str) ? 5 : cpymo_str_atoi(coord_mode_str);
 
 		cpymo_charas_pos(engine, id, coord_mode, x, y);
 		return CPYMO_ERR_SUCC;
@@ -420,18 +420,18 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		cpymo_album_cg_unlock(engine, bg_name);
 
-		if (cpymo_string_equals_str(time_str, "BG_VERYFAST")) time = 0.1f;
-		if (cpymo_string_equals_str(time_str, "BG_FAST")) time = 0.175f;
-		else if (cpymo_string_equals_str(time_str, "BG_NORMAL")) time = 0.25f;
-		else if (cpymo_string_equals_str(time_str, "BG_SLOW")) time = 0.5f;
-		else if (cpymo_string_equals_str(time_str, "BG_VERYSLOW")) time = 1.0f;
+		if (cpymo_str_equals_str(time_str, "BG_VERYFAST")) time = 0.1f;
+		if (cpymo_str_equals_str(time_str, "BG_FAST")) time = 0.175f;
+		else if (cpymo_str_equals_str(time_str, "BG_NORMAL")) time = 0.25f;
+		else if (cpymo_str_equals_str(time_str, "BG_SLOW")) time = 0.5f;
+		else if (cpymo_str_equals_str(time_str, "BG_VERYSLOW")) time = 1.0f;
 		else if (!IS_EMPTY(time_str))
-			time = (float)cpymo_string_atoi(time_str) / 1000.0f;
+			time = (float)cpymo_str_atoi(time_str) / 1000.0f;
 		else time = 0.3f;
 		
 
-		if (IS_EMPTY(x_str)) x = 0.0f; else x = (float)cpymo_string_atoi(x_str);
-		if (IS_EMPTY(y_str)) y = 0.0f; else y = (float)cpymo_string_atoi(y_str);
+		if (IS_EMPTY(x_str)) x = 0.0f; else x = (float)cpymo_str_atoi(x_str);
+		if (IS_EMPTY(y_str)) y = 0.0f; else y = (float)cpymo_str_atoi(y_str);
 
 		if (IS_EMPTY(transition)) {
 			transition.begin = "BG_ALPHA";
@@ -455,8 +455,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(col_str); ENSURE(col_str);
 		POP_ARG(time_str); ENSURE(time_str);
 
-		cpymo_color col = cpymo_string_as_color(col_str);
-		float time = cpymo_string_atoi(time_str) / 1000.0f;
+		cpymo_color col = cpymo_str_as_color(col_str);
+		float time = cpymo_str_atoi(time_str) / 1000.0f;
 
 		cpymo_flash_start(engine, col, time);
 
@@ -477,8 +477,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(col_str); ENSURE(col_str);
 		POP_ARG(time_str); ENSURE(time_str);
 
-		cpymo_color col = cpymo_string_as_color(col_str);
-		float time = cpymo_string_atoi(time_str) / 1000.0f;
+		cpymo_color col = cpymo_str_as_color(col_str);
+		float time = cpymo_str_atoi(time_str) / 1000.0f;
 
 		cpymo_fade_start_fadeout(engine, time, col);
 		return CPYMO_ERR_SUCC;
@@ -486,7 +486,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 	D("fade_in") {
 		POP_ARG(time_str); ENSURE(time_str);
-		float time = cpymo_string_atoi(time_str) / 1000.0f;
+		float time = cpymo_str_atoi(time_str) / 1000.0f;
 		cpymo_fade_start_fadein(engine, time);
 		return CPYMO_ERR_SUCC;
 	}
@@ -531,7 +531,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 				POP_ARG(id); \
 				if (IS_EMPTY(id)) break; \
 				\
-				cpymo_charas_set_play_anime(&engine->charas, cpymo_string_atoi(id)); \
+				cpymo_charas_set_play_anime(&engine->charas, cpymo_str_atoi(id)); \
 			} \
 			\
 			return CPYMO_ERR_SUCC; \
@@ -547,7 +547,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(peroid_str); ENSURE(peroid_str);
 		POP_ARG(loop_str); ENSURE(loop_str);
 
-		int loops = cpymo_string_atoi(loop_str);
+		int loops = cpymo_str_atoi(loop_str);
 
 		float *buffer = (float *)malloc(64 * sizeof(float));
 		if (buffer == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -560,8 +560,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			POP_ARG(y_str); 
 			if (IS_EMPTY(y_str)) break;
 
-			float x = (float)cpymo_string_atoi(x_str);
-			float y = (float)cpymo_string_atoi(y_str);
+			float x = (float)cpymo_str_atoi(x_str);
+			float y = (float)cpymo_str_atoi(y_str);
 			buffer[offsets * 2] = x;
 			buffer[offsets * 2 + 1] = y;
 			offsets++;
@@ -570,13 +570,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		if (offsets > 0 || loops <= 0) {
 			cpymo_charas_play_anime(
 				engine,
-				(float)cpymo_string_atoi(peroid_str) / 1000.0f,
+				(float)cpymo_str_atoi(peroid_str) / 1000.0f,
 				loops,
 				buffer,
 				offsets,
 				true);
 
-			cpymo_charas_set_play_anime(&engine->charas, cpymo_string_atoi(id_str));
+			cpymo_charas_set_play_anime(&engine->charas, cpymo_str_atoi(id_str));
 
 			return CPYMO_ERR_SUCC;
 		}
@@ -600,11 +600,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		cpymo_album_cg_unlock(engine, filename);
 
-		float sx = (float)cpymo_string_atoi(sx_str);
-		float sy = (float)cpymo_string_atoi(sy_str);
-		float ex = (float)cpymo_string_atoi(ex_str);
-		float ey = (float)cpymo_string_atoi(ey_str);
-		float time = (float)cpymo_string_atoi(time_str) / 1000.0f;
+		float sx = (float)cpymo_str_atoi(sx_str);
+		float sy = (float)cpymo_str_atoi(sy_str);
+		float ex = (float)cpymo_str_atoi(ex_str);
+		float ey = (float)cpymo_str_atoi(ey_str);
+		float time = (float)cpymo_str_atoi(time_str) / 1000.0f;
 
 		return cpymo_scroll_start(engine, filename, sx, sy, ex, ey, time);
 	}
@@ -614,11 +614,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		int layers[CHARA_BUF_SIZE];
 		float pos_x_s[CHARA_BUF_SIZE];
 		float pos_y_s[CHARA_BUF_SIZE];
-		cpymo_string filenames[CHARA_BUF_SIZE];
+		cpymo_str filenames[CHARA_BUF_SIZE];
 		size_t command_buffer_size = 0;
 
 		POP_ARG(coord_mode_str); ENSURE(coord_mode_str);
-		int coord_mode = cpymo_string_atoi(coord_mode_str);
+		int coord_mode = cpymo_str_atoi(coord_mode_str);
 
 		float time = 0.3f;
 		while (true) {
@@ -628,7 +628,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			POP_ARG(pos_y_str);
 			POP_ARG(layer_str);
 
-			int chara_id_or_time = cpymo_string_atoi(chara_id_or_time_str);
+			int chara_id_or_time = cpymo_str_atoi(chara_id_or_time_str);
 
 			if (IS_EMPTY(filename) && IS_EMPTY(pos_x_str) && IS_EMPTY(pos_y_str) && IS_EMPTY(layer_str)) {
 				time = (float)chara_id_or_time / 1000.0f;
@@ -647,7 +647,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			}
 			else {
 				chara_ids[command_buffer_size] = chara_id;
-				layers[command_buffer_size] = cpymo_string_atoi(layer_str);
+				layers[command_buffer_size] = cpymo_str_atoi(layer_str);
 				POS(pos_x, pos_y, pos_x_str, pos_y_str);
 				pos_x_s[command_buffer_size] = pos_x;
 				pos_y_s[command_buffer_size] = pos_y;
@@ -657,7 +657,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		}
 
 		for (size_t i = 0; i < command_buffer_size; ++i) {
-			if (cpymo_string_equals_str(filenames[i], "NULL")) {
+			if (cpymo_str_equals_str(filenames[i], "NULL")) {
 				cpymo_charas_kill(engine, chara_ids[i], time);
 			}
 			else {
@@ -690,8 +690,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(starty_str_or_time); ENSURE(starty_str_or_time);
 		POP_ARG(endx_str);
 
-		int coord_mode = cpymo_string_atoi(coord_mode_str);
-		int chara_id = cpymo_string_atoi(chara_id_str);
+		int coord_mode = cpymo_str_atoi(coord_mode_str);
+		int chara_id = cpymo_str_atoi(chara_id_str);
 
 		if (!IS_EMPTY(endx_str)) {
 
@@ -702,9 +702,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 			POS(startx, starty, startx_str_or_endy, starty_str_or_time);
 			POS(endx, endy, endx_str, endy_str);
-			int layer = cpymo_string_atoi(layer_str);
-			float begin_alpha = 1.0f - (float)cpymo_string_atoi(begin_alpha_str) / 255.0f;
-			float time = (float)cpymo_string_atoi(time_str) / 1000.0f;
+			int layer = cpymo_str_atoi(layer_str);
+			float begin_alpha = 1.0f - (float)cpymo_str_atoi(begin_alpha_str) / 255.0f;
+			float time = (float)cpymo_str_atoi(time_str) / 1000.0f;
 
 			struct cpymo_chara *c = NULL;
 			err = cpymo_charas_new_chara(
@@ -727,7 +727,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		}
 		else {
 			POS(endx, endy, filename_or_endx, startx_str_or_endy);
-			float time = (float)cpymo_string_atoi(starty_str_or_time) / 1000.0f;
+			float time = (float)cpymo_str_atoi(starty_str_or_time) / 1000.0f;
 
 			struct cpymo_chara *c = NULL;
 			err = cpymo_charas_find(
@@ -763,17 +763,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(interval_str); ENSURE(interval_str);
 		POP_ARG(is_loop_s); ENSURE(is_loop_s);
 
-		int frames = cpymo_string_atoi(frames_str);
+		int frames = cpymo_str_atoi(frames_str);
 		
-		float interval = cpymo_string_atoi(interval_str) / 1000.0f;
-		bool is_loop = cpymo_string_atoi(is_loop_s) != 0;
+		float interval = cpymo_str_atoi(interval_str) / 1000.0f;
+		bool is_loop = cpymo_str_atoi(is_loop_s) != 0;
 
 		POS(x, y, x_str, y_str);
 
 		err = cpymo_anime_on(engine, frames, filename, x, y, interval, is_loop);
 		if (err != CPYMO_ERR_SUCC) {
 			char anime_name[16];
-			cpymo_string_copy(anime_name, sizeof(anime_name), filename);
+			cpymo_str_copy(anime_name, sizeof(anime_name), filename);
 			printf("[Warning] Can not load anime %s in script %s(%u).\n", 
 				anime_name, interpreter->script_name, (unsigned)interpreter->script_parser.cur_line);
 		}
@@ -846,7 +846,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		ENSURE(script_name_span);
 
 		char script_name[sizeof(interpreter->script_name)];
-		cpymo_string_copy(script_name, sizeof(script_name), script_name_span);
+		cpymo_str_copy(script_name, sizeof(script_name), script_name_span);
 
 		cpymo_interpreter_free(interpreter);
 		err = cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader);
@@ -861,7 +861,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		cpymo_parser parser;
 		cpymo_parser_init(&parser, condition.begin, condition.len);
 
-		cpymo_string left;
+		cpymo_str left;
 		left.begin = condition.begin;
 		left.len = 0;
 
@@ -874,7 +874,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		if (left.len >= condition.len) goto BAD_EXPRESSION;
 
-		cpymo_string op;
+		cpymo_str op;
 		op.begin = left.begin + left.len;
 		op.len = 1;
 
@@ -898,13 +898,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			}
 		}
 
-		cpymo_string right;
+		cpymo_str right;
 		right.begin = op.begin + op.len;
 		right.len = condition.len - op.len - left.len;
 
-		cpymo_string_trim(&left);
-		cpymo_string_trim(&op);
-		cpymo_string_trim(&right);
+		cpymo_str_trim(&left);
+		cpymo_str_trim(&op);
+		cpymo_str_trim(&right);
 
 		if (IS_EMPTY(left) || IS_EMPTY(right) || IS_EMPTY(op)) 
 			goto BAD_EXPRESSION;
@@ -913,7 +913,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		int rv;
 		if (cpymo_vars_is_constant(right)) {
-			rv = cpymo_string_atoi(right);
+			rv = cpymo_str_atoi(right);
 		}
 		else {
 			const int *var = cpymo_vars_access(&engine->vars, right, false);
@@ -924,17 +924,17 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		}
 
 		bool run_sub_command;
-		if (cpymo_string_equals_str(op, "="))
+		if (cpymo_str_equals_str(op, "="))
 			run_sub_command = lv == rv;
-		else if (cpymo_string_equals_str(op, "!=") || cpymo_string_equals_str(op, "<>"))
+		else if (cpymo_str_equals_str(op, "!=") || cpymo_str_equals_str(op, "<>"))
 			run_sub_command = lv != rv;
-		else if (cpymo_string_equals_str(op, ">"))
+		else if (cpymo_str_equals_str(op, ">"))
 			run_sub_command = lv > rv;
-		else if (cpymo_string_equals_str(op, ">="))
+		else if (cpymo_str_equals_str(op, ">="))
 			run_sub_command = lv >= rv;
-		else if (cpymo_string_equals_str(op, "<"))
+		else if (cpymo_str_equals_str(op, "<"))
 			run_sub_command = lv < rv;
-		else if (cpymo_string_equals_str(op, "<="))
+		else if (cpymo_str_equals_str(op, "<="))
 			run_sub_command = lv <= rv;
 		else goto BAD_EXPRESSION;
 
@@ -947,10 +947,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 				else break;
 			}
 
-			cpymo_string sub_command =
+			cpymo_str sub_command =
 				cpymo_parser_curline_readuntil_or(&interpreter->script_parser, ' ', '\t');
 
-			cpymo_string_trim(&sub_command);
+			cpymo_str_trim(&sub_command);
 			return cpymo_interpreter_dispatch(sub_command, interpreter, engine, cont);
 		}
 		
@@ -960,7 +960,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		BAD_EXPRESSION: {
 			char *condition_str = (char *)malloc(condition.len + 1);
 			if (condition_str == NULL) return CPYMO_ERR_OUT_OF_MEM;
-			cpymo_string_copy(condition_str, condition.len + 1, condition);
+			cpymo_str_copy(condition_str, condition.len + 1, condition);
 			printf( 
 				"[Error] Bad if expression \"%s\" in script %s(%u).\n", 
 				condition_str,
@@ -977,7 +977,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		//cpymo_parser_next_line(&interpreter->script_parser);
 
 		char script_name[sizeof(interpreter->script_name)];
-		cpymo_string_copy(script_name, sizeof(script_name), script_name_span);
+		cpymo_str_copy(script_name, sizeof(script_name), script_name_span);
 
 		cpymo_interpreter *callee = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
 		if (callee == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -1015,7 +1015,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		cpymo_interpreter_checkpoint(interpreter);
 
 		POP_ARG(choices_str); ENSURE(choices_str);
-		int choices = cpymo_string_atoi(choices_str);
+		int choices = cpymo_str_atoi(choices_str);
 
 		POP_ARG(hint_pic);
 
@@ -1023,7 +1023,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			cpymo_select_img_configuare_begin(
 				&engine->select_img,
 				(size_t)choices,
-				cpymo_string_pure(""),
+				cpymo_str_pure(""),
 				&engine->assetloader,
 				&engine->gameconfig);
 		CPYMO_THROW(err);
@@ -1033,28 +1033,28 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		
 		for (int i = 0; i < choices; ++i) {
 			cpymo_parser_next_line(&interpreter->script_parser);
-			cpymo_string text =
+			cpymo_str text =
 				cpymo_parser_curline_readuntil(&interpreter->script_parser, '\n');
 
 			uint64_t hash;
-			cpymo_string_hash_init(&hash);
-			cpymo_string_hash_append_cstr(&hash, "SEL: ");
-			cpymo_string_hash_append_cstr(
+			cpymo_str_hash_init(&hash);
+			cpymo_str_hash_append_cstr(&hash, "SEL: ");
+			cpymo_str_hash_append_cstr(
 				&hash, interpreter->script_name);
-			cpymo_string_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append_cstr(&hash, "/");
 
 			char buf[32];
 			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
-			cpymo_string_hash_append_cstr(&hash, buf);
-			cpymo_string_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append_cstr(&hash, buf);
+			cpymo_str_hash_append_cstr(&hash, "/");
 			sprintf(buf, "%d", i);
-			cpymo_string_hash_append_cstr(&hash, buf);
-			cpymo_string_hash_append_cstr(&hash, "/");
-			cpymo_string_hash_append(&hash, text);
+			cpymo_str_hash_append_cstr(&hash, buf);
+			cpymo_str_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append(&hash, text);
 
 			enum cpymo_select_img_selection_hint_state hint_mode = cpymo_select_img_selection_nohint;
 			if (!(IS_EMPTY(hint_pic))) {
-				uint32_t first_char = cpymo_string_utf8_try_head_to_utf32(&text);
+				uint32_t first_char = cpymo_str_utf8_try_head_to_utf32(&text);
 
 				if (first_char == 0x25cb) hint_mode = cpymo_select_img_selection_hint01;
 				else if (first_char == 0x00D7) hint_mode = cpymo_select_img_selection_hint23;
@@ -1084,29 +1084,29 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		cpymo_interpreter_checkpoint(interpreter);
 
 		POP_ARG(choices_str); ENSURE(choices_str); 
-		const int choices = cpymo_string_atoi(choices_str); 
+		const int choices = cpymo_str_atoi(choices_str); 
 		error_t err = cpymo_select_img_configuare_begin(
-			&engine->select_img, (size_t)choices, cpymo_string_pure(""),
+			&engine->select_img, (size_t)choices, cpymo_str_pure(""),
 			&engine->assetloader, &engine->gameconfig); 
 		CPYMO_THROW(err); 
 		
 		for (int i = 0; i < choices; ++i) { 
 			POP_ARG(text); ENSURE(text); 
 			uint64_t hash;
-			cpymo_string_hash_init(&hash);
-			cpymo_string_hash_append_cstr(&hash, "SELECT_TEXT: ");
-			cpymo_string_hash_append_cstr(
+			cpymo_str_hash_init(&hash);
+			cpymo_str_hash_append_cstr(&hash, "SELECT_TEXT: ");
+			cpymo_str_hash_append_cstr(
 				&hash, interpreter->script_name);
-			cpymo_string_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append_cstr(&hash, "/");
 
 			char buf[32];
 			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
-			cpymo_string_hash_append_cstr(&hash, buf);
-			cpymo_string_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append_cstr(&hash, buf);
+			cpymo_str_hash_append_cstr(&hash, "/");
 			sprintf(buf, "%d", i);
-			cpymo_string_hash_append_cstr(&hash, buf);
-			cpymo_string_hash_append_cstr(&hash, "/");
-			cpymo_string_hash_append(&hash, text);
+			cpymo_str_hash_append_cstr(&hash, buf);
+			cpymo_str_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append(&hash, text);
 
 			err = cpymo_select_img_configuare_select_text(
 				&engine->select_img, &engine->assetloader, 
@@ -1128,8 +1128,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		
 		cpymo_select_img_configuare_end_select_text( 
 			&engine->select_img, &engine->wait, engine, x1, y1, x2, y2,  
-			cpymo_string_as_color(col), 
-			cpymo_string_atoi(init_pos),
+			cpymo_str_as_color(col), 
+			cpymo_str_atoi(init_pos),
 			false); 
 		
 		return CPYMO_ERR_SUCC;
@@ -1139,9 +1139,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		cpymo_interpreter_checkpoint(interpreter);
 
 		POP_ARG(choices_str); ENSURE(choices_str);
-		const int choices = cpymo_string_atoi(choices_str);
+		const int choices = cpymo_str_atoi(choices_str);
 		error_t err = cpymo_select_img_configuare_begin(
-			&engine->select_img, (size_t)choices, cpymo_string_pure(""),
+			&engine->select_img, (size_t)choices, cpymo_str_pure(""),
 			&engine->assetloader, &engine->gameconfig);
 		CPYMO_THROW(err);
 
@@ -1150,19 +1150,19 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			POP_ARG(expr); ENSURE(expr);
 
 			uint64_t hash;
-			cpymo_string_hash_init(&hash);
-			cpymo_string_hash_append_cstr(&hash, "SELECT_VAR: ");
-			cpymo_string_hash_append_cstr(
+			cpymo_str_hash_init(&hash);
+			cpymo_str_hash_append_cstr(&hash, "SELECT_VAR: ");
+			cpymo_str_hash_append_cstr(
 				&hash, interpreter->script_name);
-			cpymo_string_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append_cstr(&hash, "/");
 			char buf[32];
 			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
-			cpymo_string_hash_append_cstr(&hash, buf);
-			cpymo_string_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append_cstr(&hash, buf);
+			cpymo_str_hash_append_cstr(&hash, "/");
 			sprintf(buf, "%d", i);
-			cpymo_string_hash_append_cstr(&hash, buf);
-			cpymo_string_hash_append_cstr(&hash, "/");
-			cpymo_string_hash_append(&hash, text);
+			cpymo_str_hash_append_cstr(&hash, buf);
+			cpymo_str_hash_append_cstr(&hash, "/");
+			cpymo_str_hash_append(&hash, text);
 
 			err = cpymo_select_img_configuare_select_text(
 				&engine->select_img, &engine->assetloader, &engine->gameconfig, &engine->flags,
@@ -1182,8 +1182,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		cpymo_select_img_configuare_end_select_text(
 			&engine->select_img, &engine->wait, engine, x1, y1, x2, y2,
-			cpymo_string_as_color(col),
-			cpymo_string_atoi(init_pos),
+			cpymo_str_as_color(col),
+			cpymo_str_atoi(init_pos),
 			false);
 
 		return CPYMO_ERR_SUCC;
@@ -1195,7 +1195,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(choices_str); ENSURE(choices_str);
 		POP_ARG(filename); ENSURE(filename);
 
-		size_t choices = (size_t)cpymo_string_atoi(choices_str);
+		size_t choices = (size_t)cpymo_str_atoi(choices_str);
 		if (choices) {
 			error_t err = cpymo_select_img_configuare_begin(
 				&engine->select_img, choices, filename, 
@@ -1210,25 +1210,25 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 				POS(x, y, x_str, y_str);
 
 				uint64_t hash;
-				cpymo_string_hash_init(&hash);
-				cpymo_string_hash_append_cstr(&hash, "SELECT_IMG: ");
-				cpymo_string_hash_append_cstr(
+				cpymo_str_hash_init(&hash);
+				cpymo_str_hash_append_cstr(&hash, "SELECT_IMG: ");
+				cpymo_str_hash_append_cstr(
 					&hash, interpreter->script_name);
-				cpymo_string_hash_append_cstr(&hash, "/");
+				cpymo_str_hash_append_cstr(&hash, "/");
 				char buf[32];
 				sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
-				cpymo_string_hash_append_cstr(&hash, buf);
-				cpymo_string_hash_append_cstr(&hash, "/");
+				cpymo_str_hash_append_cstr(&hash, buf);
+				cpymo_str_hash_append_cstr(&hash, "/");
 				sprintf(buf, "%d", (int)i);
-				cpymo_string_hash_append_cstr(&hash, buf);
-				cpymo_string_hash_append_cstr(&hash, "/");
-				cpymo_string_hash_append(&hash, filename);
+				cpymo_str_hash_append_cstr(&hash, buf);
+				cpymo_str_hash_append_cstr(&hash, "/");
+				cpymo_str_hash_append(&hash, filename);
 
 				cpymo_select_img_configuare_select_img_selection(engine, x, y, enabled, hash);
 			}
 
 			POP_ARG(init_position);
-			int init_position_i = cpymo_string_atoi(init_position);
+			int init_position_i = cpymo_str_atoi(init_position);
 
 			cpymo_select_img_configuare_end(&engine->select_img, &engine->wait, engine, init_position_i);
 		}
@@ -1242,10 +1242,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 
 		POP_ARG(choices_str); ENSURE(choices_str);
 
-		size_t choices = (size_t)cpymo_string_atoi(choices_str);
+		size_t choices = (size_t)cpymo_str_atoi(choices_str);
 		if (choices) {
 			error_t err = cpymo_select_img_configuare_begin(
-				&engine->select_img, choices, cpymo_string_pure(""),
+				&engine->select_img, choices, cpymo_str_pure(""),
 				&engine->assetloader, &engine->gameconfig);
 			if (err != CPYMO_ERR_SUCC) return err;
 
@@ -1258,26 +1258,26 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 				POS(x, y, x_str, y_str);
 
 				uint64_t hash;
-				cpymo_string_hash_init(&hash);
-				cpymo_string_hash_append_cstr(&hash, "SELECT_IMGS: ");
-				cpymo_string_hash_append_cstr(&hash, interpreter->script_name);
-				cpymo_string_hash_append_cstr(&hash, "/");
+				cpymo_str_hash_init(&hash);
+				cpymo_str_hash_append_cstr(&hash, "SELECT_IMGS: ");
+				cpymo_str_hash_append_cstr(&hash, interpreter->script_name);
+				cpymo_str_hash_append_cstr(&hash, "/");
 				
 				char buf[32];
 				sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
-				cpymo_string_hash_append_cstr(&hash, buf);
-				cpymo_string_hash_append_cstr(&hash, "/");
+				cpymo_str_hash_append_cstr(&hash, buf);
+				cpymo_str_hash_append_cstr(&hash, "/");
 				sprintf(buf, "%d", (int)i);
-				cpymo_string_hash_append_cstr(&hash, buf);
-				cpymo_string_hash_append_cstr(&hash, "/");
-				cpymo_string_hash_append(&hash, filename);
+				cpymo_str_hash_append_cstr(&hash, buf);
+				cpymo_str_hash_append_cstr(&hash, "/");
+				cpymo_str_hash_append(&hash, filename);
 
 
 				cpymo_select_img_configuare_select_imgs_selection(engine, filename, x, y, enabled, hash);
 			}
 
 			POP_ARG(init_position);
-			int init_position_i = cpymo_string_atoi(init_position);
+			int init_position_i = cpymo_str_atoi(init_position);
 
 			cpymo_select_img_configuare_end(&engine->select_img, &engine->wait, engine, init_position_i);
 		}
@@ -1291,7 +1291,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		ENSURE(wait_ms_str);
 
 		cpymo_engine_request_redraw(engine);
-		float wait_sec = (float)cpymo_string_atoi(wait_ms_str) / 1000.0f;
+		float wait_sec = (float)cpymo_str_atoi(wait_ms_str) / 1000.0f;
 		cpymo_wait_for_seconds(&engine->wait, wait_sec);
 		return CPYMO_ERR_SUCC;
 	}
@@ -1311,8 +1311,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(min_val_str); ENSURE(min_val_str);
 		POP_ARG(max_val_str); ENSURE(max_val_str);
 
-		int min_val = cpymo_string_atoi(min_val_str);
-		int max_val = cpymo_string_atoi(max_val_str);
+		int min_val = cpymo_str_atoi(min_val_str);
+		int max_val = cpymo_str_atoi(max_val_str);
 
 		if (max_val - min_val <= 0) {
 			printf(
@@ -1334,7 +1334,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(filename); ENSURE(filename);
 		POP_ARG(isloop_s);
 
-		bool isloop = !cpymo_string_equals_str(isloop_s, "0");
+		bool isloop = !cpymo_str_equals_str(isloop_s, "0");
 
 		error_t err = cpymo_audio_bgm_play(engine, filename, isloop);
 		CPYMO_THROW(err);
@@ -1353,7 +1353,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POP_ARG(isloop_s);
 
 		bool isloop = false;
-		if (cpymo_string_equals_str(isloop_s, "1"))
+		if (cpymo_str_equals_str(isloop_s, "1"))
 			isloop = true;
 
 		cpymo_audio_se_stop(engine);
@@ -1395,7 +1395,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 			return cpymo_save_ui_enter(engine, true);
 		}
 		else {
-			unsigned short save_id = (unsigned short)cpymo_string_atoi(save_id_x);
+			unsigned short save_id = (unsigned short)cpymo_str_atoi(save_id_x);
 			FILE *file = cpymo_save_open_read(engine, save_id);
 			if (file) {
 				error_t err = cpymo_save_load_savedata(engine, file);
@@ -1416,11 +1416,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 	D("album") {
 		POP_ARG(list_name);
 
-		cpymo_string ui_name;
+		cpymo_str ui_name;
 
 		if (IS_EMPTY(list_name)) {
-			list_name = cpymo_string_pure("album_list");
-			ui_name = cpymo_string_pure("albumbg");
+			list_name = cpymo_str_pure("album_list");
+			ui_name = cpymo_str_pure("albumbg");
 		} 
 		else {
 			ui_name = list_name;
@@ -1434,8 +1434,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 	}
 
 	D("date") {
-		int fmonth = cpymo_vars_get(&engine->vars, cpymo_string_pure("FMONTH"));
-		int fdate = cpymo_vars_get(&engine->vars, cpymo_string_pure("FDATE"));
+		int fmonth = cpymo_vars_get(&engine->vars, cpymo_str_pure("FMONTH"));
+		int fdate = cpymo_vars_get(&engine->vars, cpymo_str_pure("FDATE"));
 		char *str = NULL;
 
 		const cpymo_localization *l = cpymo_localization_get(engine);
@@ -1451,11 +1451,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 		POS(x, y, x_str, y_str);
 
 		cpymo_color col =
-			cpymo_string_as_color(col_str);
+			cpymo_str_as_color(col_str);
 
 		err = cpymo_floating_hint_start(
 			engine,
-			cpymo_string_pure(str),
+			cpymo_str_pure(str),
 			date_bg,
 			x, y, col, 1.5f);
 
@@ -1469,7 +1469,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_string command, cpymo_interprete
 	
 	else {
 		char buf[32];
-		cpymo_string_copy(buf, 32, command);
+		cpymo_str_copy(buf, 32, command);
 
 		printf(
 			"[Warning] Unknown command \"%s\" in script %s(%u).\n",

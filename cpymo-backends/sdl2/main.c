@@ -524,7 +524,7 @@ int main(int argc, char **argv)
 
 				err = cpymo_msgbox_ui_enter(
 					&engine,
-					cpymo_string_pure(
+					cpymo_str_pure(
 						cpymo_localization_get(&engine)->exit_confirm),
 					&cpymo_exit_confirm,
 					NULL);

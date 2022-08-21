@@ -14,7 +14,7 @@ typedef struct {
 	char *music_list;
 
 	uintptr_t music_count;
-	cpymo_string *music_filename;
+	cpymo_str *music_filename;
 	cpymo_backend_text *music_title;
 
 #ifdef ENABLE_TEXT_EXTRACT
@@ -124,9 +124,9 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	box->music_count = 0;
 
 	do {
-		cpymo_string music_file =
+		cpymo_str music_file =
 			cpymo_parser_curline_pop_commacell(&p);
-		cpymo_string_trim(&music_file);
+		cpymo_str_trim(&music_file);
 		if (music_file.len) box->music_count++;
 	} while (cpymo_parser_next_line(&p));
 
@@ -139,8 +139,8 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	cpymo_parser_reset(&p);
 
 	box->music_filename = 
-		(cpymo_string *)malloc(
-			(sizeof(cpymo_string) + sizeof(cpymo_backend_text)) * box->music_count);
+		(cpymo_str *)malloc(
+			(sizeof(cpymo_str) + sizeof(cpymo_backend_text)) * box->music_count);
 
 	if (box->music_filename == NULL) {
 		free(box->music_list);
@@ -163,14 +163,14 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 #endif
 
 	do {
-		cpymo_string music_file =
+		cpymo_str music_file =
 			cpymo_parser_curline_pop_commacell(&p);
 
-		cpymo_string music_title =
+		cpymo_str music_title =
 			cpymo_parser_curline_pop_commacell(&p);
 
-		cpymo_string_trim(&music_file);
-		cpymo_string_trim(&music_title);
+		cpymo_str_trim(&music_file);
+		cpymo_str_trim(&music_title);
 
 		if (music_file.len == 0) continue;
 
@@ -180,7 +180,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 		if (box->music_title_text) {
 			box->music_title_text[i] = (char *)malloc(music_title.len + 1);
 			if (box->music_title_text[i]) {
-				cpymo_string_copy(box->music_title_text[i], music_title.len + 1, music_title);
+				cpymo_str_copy(box->music_title_text[i], music_title.len + 1, music_title);
 			}
 		}
 #endif

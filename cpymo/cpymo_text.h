@@ -24,7 +24,7 @@ error_t cpymo_text_new(
 	struct cpymo_engine *,
 	float x1, float y1, float x2, float y2,
 	cpymo_color col, float fontsize,
-	cpymo_string text,
+	cpymo_str text,
 	bool immediately);
 
 void cpymo_text_clear(cpymo_text *);

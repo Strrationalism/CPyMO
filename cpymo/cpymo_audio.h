@@ -90,13 +90,13 @@ bool cpymo_audio_enabled(struct cpymo_engine *e);
 
 bool cpymo_audio_wait_se(struct cpymo_engine *, float);
 
-error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_string bgmname, bool loop);
+error_t cpymo_audio_bgm_play(struct cpymo_engine *e, cpymo_str bgmname, bool loop);
 void cpymo_audio_bgm_stop(struct cpymo_engine *e);
 
-error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_string sename, bool loop);
+error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_str sename, bool loop);
 void cpymo_audio_se_stop(struct cpymo_engine *e);
 
-error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_string voname);
+error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_str voname);
 void cpymo_audio_vo_stop(struct cpymo_engine *e);
 
 void cpymo_audio_play_video(struct cpymo_engine *e, const char *path);

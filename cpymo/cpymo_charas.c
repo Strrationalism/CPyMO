@@ -140,14 +140,14 @@ error_t cpymo_chara_convert_to_mode0_pos(
 error_t cpymo_charas_new_chara(
 	cpymo_engine *e, 
 	struct cpymo_chara **out, 
-	cpymo_string filename, 
+	cpymo_str filename, 
 	int chara_id, int layer, 
 	int coord_mode, float x, float y, 
 	float begin_alpha, float time)
 {
 	char *chara_name = (char *)malloc(filename.len + 1);
 	if (chara_name == NULL) return CPYMO_ERR_OUT_OF_MEM;
-	cpymo_string_copy(chara_name, filename.len + 1, filename);
+	cpymo_str_copy(chara_name, filename.len + 1, filename);
 
 	struct cpymo_chara *ch = NULL;
 	error_t err = cpymo_charas_find(&e->charas, &ch, chara_id);
@@ -169,7 +169,7 @@ error_t cpymo_charas_new_chara(
 
 		if (err == CPYMO_ERR_NOT_FOUND || err == CPYMO_ERR_CAN_NOT_OPEN_FILE) {
 			char name[32];
-			cpymo_string_copy(name, sizeof(name), filename);
+			cpymo_str_copy(name, sizeof(name), filename);
 			printf("[Error] Can not load chara \"%s\".", name);
 			return CPYMO_ERR_SUCC;
 		}

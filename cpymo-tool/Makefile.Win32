@@ -13,7 +13,7 @@ SRC = \
 	../cpymo/cpymo_color.c \
 	../cpymo/cpymo_gameconfig.c \
 	../cpymo/cpymo_assetloader.c \
-	../cpymo/cpymo_string.c \
+	../cpymo/cpymo_str.c \
 	../cpymo/cpymo_album.c
 
 build: $(TARGET)

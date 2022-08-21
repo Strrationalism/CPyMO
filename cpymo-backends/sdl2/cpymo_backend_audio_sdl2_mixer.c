@@ -134,7 +134,7 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 	else return true;
 }
 
-error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_string bgmname, bool loop)
+error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_str bgmname, bool loop)
 {
 	if (!enabled) return CPYMO_ERR_SUCC;
 	cpymo_audio_bgm_stop(e);
@@ -169,7 +169,7 @@ error_t cpymo_audio_bgm_play(cpymo_engine *e, cpymo_string bgmname, bool loop)
 	if (loop) {
 		bgm_name = (char *)malloc(bgmname.len + 1);
 		if (bgm_name)
-			cpymo_string_copy(bgm_name, bgmname.len + 1, bgmname);
+			cpymo_str_copy(bgm_name, bgmname.len + 1, bgmname);
 	}
 
 	return CPYMO_ERR_SUCC;
@@ -190,7 +190,7 @@ void cpymo_audio_bgm_stop(struct cpymo_engine *e)
 	bgm_name = NULL;
 }
 
-error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_string sename, bool loop)
+error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_str sename, bool loop)
 {
 	if (!enabled) return CPYMO_ERR_SUCC;
 #ifdef __PSP__
@@ -250,7 +250,7 @@ error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_string sename, bool lo
 	if (loop) {
 		se_name = (char *)malloc(sename.len + 1);
 		if (se_name)
-			cpymo_string_copy(se_name, sename.len + 1, sename);
+			cpymo_str_copy(se_name, sename.len + 1, sename);
 	}
 
 	se_looping = loop;
@@ -273,7 +273,7 @@ void cpymo_audio_se_stop(struct cpymo_engine *e)
 	se_data = NULL;
 }
 
-error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_string voname)
+error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_str voname)
 {
 	if (!enabled) return CPYMO_ERR_SUCC;
 #ifdef __PSP__

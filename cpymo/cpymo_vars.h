@@ -21,17 +21,17 @@ void cpymo_vars_free(cpymo_vars *to_free);
 
 void cpymo_vars_clear_locals(cpymo_vars *vars);
 
-int *cpymo_vars_access(cpymo_vars *vars, cpymo_string name, bool modify);
+int *cpymo_vars_access(cpymo_vars *vars, cpymo_str name, bool modify);
 
-static inline int cpymo_vars_get(cpymo_vars * vars, cpymo_string name)
+static inline int cpymo_vars_get(cpymo_vars * vars, cpymo_str name)
 {
 	int *v = cpymo_vars_access(vars, name, false);
 	return v == NULL ? 0 : *v;
 }
 
-error_t cpymo_vars_access_create(cpymo_vars *vars, cpymo_string name, int **ptr_to_val);
+error_t cpymo_vars_access_create(cpymo_vars *vars, cpymo_str name, int **ptr_to_val);
 
-static inline error_t cpymo_vars_set(cpymo_vars *vars, cpymo_string name, int v) {
+static inline error_t cpymo_vars_set(cpymo_vars *vars, cpymo_str name, int v) {
 	int *p = NULL;
 	error_t err = cpymo_vars_access_create(vars, name, &p);
 	if (err != CPYMO_ERR_SUCC) return err;
@@ -40,8 +40,8 @@ static inline error_t cpymo_vars_set(cpymo_vars *vars, cpymo_string name, int v)
 	return CPYMO_ERR_SUCC;
 }
 
-bool cpymo_vars_is_constant(cpymo_string expr);
+bool cpymo_vars_is_constant(cpymo_str expr);
 
-int cpymo_vars_eval(cpymo_vars *vars, cpymo_string expr);
+int cpymo_vars_eval(cpymo_vars *vars, cpymo_str expr);
 
 #endif

@@ -480,7 +480,7 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 ### 视频播放器
 
-使用宏`DISABLE_FFMPEG_MOVIE`可关闭视频播放器对FFmpeg的依赖，你可以替换为自己的`error_t cpymo_movie_play(cpymo_engine * e, cpymo_string videoname)`函数进行视频播放。
+使用宏`DISABLE_FFMPEG_MOVIE`可关闭视频播放器对FFmpeg的依赖，你可以替换为自己的`error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)`函数进行视频播放。
 
 使用宏`DISABLE_MOVIE`可完全关闭视频播放功能。
 

@@ -44,7 +44,7 @@ void cpymo_backlog_free(cpymo_backlog *);
 
 void cpymo_backlog_record_write_vo(
 	cpymo_backlog *,
-	cpymo_string vo);
+	cpymo_str vo);
 
 #ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backlog_record_write_full_text(

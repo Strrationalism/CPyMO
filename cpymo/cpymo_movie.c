@@ -187,7 +187,7 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 	if (m->current_bgm_name) {
 		cpymo_audio_bgm_play(
 			e, 
-			cpymo_string_pure(m->current_bgm_name), 
+			cpymo_str_pure(m->current_bgm_name), 
 			true);
 		free(m->current_bgm_name);
 	}
@@ -199,7 +199,7 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 	if (m->backend_inited) cpymo_backend_movie_free_surface();
 }
 
-error_t cpymo_movie_play(cpymo_engine * e, cpymo_string videoname)
+error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 {
 	char *current_bgm_name = NULL;
 
@@ -329,7 +329,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_string videoname)
 #endif
 
 #ifdef DISABLE_MOVIE
-error_t cpymo_movie_play(cpymo_engine * e, cpymo_string videoname)
+error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 {
 	return CPYMO_ERR_SUCC;
 }

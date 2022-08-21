@@ -26,7 +26,7 @@ void cpymo_anime_draw(const cpymo_anime *);
 error_t cpymo_anime_on(
 	struct cpymo_engine *engine,
 	int frames, 
-	cpymo_string filename, 
+	cpymo_str filename, 
 	float x, 
 	float y, 
 	float interval, 

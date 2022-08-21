@@ -132,16 +132,16 @@ void cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, i
     }
 }
 
-static error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const char *filename, cpymo_string format)
+static error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const char *filename, cpymo_str format)
 {
     int e = 0;
-    if (cpymo_string_equals_str_ignore_case(format, "jpg")) {
+    if (cpymo_str_equals_str_ignore_case(format, "jpg")) {
         e = stbi_write_jpg(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels, 100);
     }
-    else if (cpymo_string_equals_str_ignore_case(format, "bmp")) {
+    else if (cpymo_str_equals_str_ignore_case(format, "bmp")) {
         e = stbi_write_bmp(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels);
     }
-    else if (cpymo_string_equals_str_ignore_case(format, "png")) {
+    else if (cpymo_str_equals_str_ignore_case(format, "png")) {
         e = stbi_write_png(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels, 0);
     }
     else {
@@ -152,7 +152,7 @@ static error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const 
     else return CPYMO_ERR_UNKNOWN;
 }
 
-error_t cpymo_tool_image_save_to_file_with_mask(const cpymo_tool_image * img, const char * filename, cpymo_string format, bool create_mask)
+error_t cpymo_tool_image_save_to_file_with_mask(const cpymo_tool_image * img, const char * filename, cpymo_str format, bool create_mask)
 {
     if (!create_mask) {
         MASK_FAILED:
@@ -216,7 +216,7 @@ error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename)
 bool cpymo_backend_image_album_ui_writable(void) { return true; }
 
 static size_t cpymo_tool_generate_album_ui_get_max_page_id(
-    cpymo_string album_list_content_text)
+    cpymo_str album_list_content_text)
 {
     size_t max_id = 0;
 
@@ -227,11 +227,11 @@ static size_t cpymo_tool_generate_album_ui_get_max_page_id(
         album_list_content_text.len);
     
     do {
-        cpymo_string page_id_str = 
+        cpymo_str page_id_str = 
             cpymo_parser_curline_pop_commacell(&parser);
-        cpymo_string_trim(&page_id_str);
+        cpymo_str_trim(&page_id_str);
         if (page_id_str.len == 0) continue;
-        size_t page_id = (size_t)cpymo_string_atoi(page_id_str);
+        size_t page_id = (size_t)cpymo_str_atoi(page_id_str);
         if (page_id > max_id) max_id = page_id;
     } while (cpymo_parser_next_line(&parser));
 
@@ -240,8 +240,8 @@ static size_t cpymo_tool_generate_album_ui_get_max_page_id(
 
 extern error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
-	cpymo_string album_list_text, 
-	cpymo_string output_cache_ui_file_name,
+	cpymo_str album_list_text, 
+	cpymo_str output_cache_ui_file_name,
 	size_t page, 
 	cpymo_assetloader* loader,
 	size_t *ref_w, size_t *ref_h);
@@ -264,7 +264,7 @@ static void cpymo_tool_generate_album_ui_generate(
         return;
     }
 
-    cpymo_string album_list_content = {
+    cpymo_str album_list_content = {
         album_list_text,
         album_list_text_size 
     };
@@ -281,7 +281,7 @@ static void cpymo_tool_generate_album_ui_generate(
         err = cpymo_album_generate_album_ui_image_pixels(
             &pixels,
             album_list_content,
-            cpymo_string_pure(
+            cpymo_str_pure(
                 is_default_album_list ? "albumbg" : album_list_name),
             page - 1,
             loader,

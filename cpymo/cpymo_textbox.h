@@ -14,7 +14,7 @@ typedef struct {
 	cpymo_backend_text *lines;
 	size_t active_line;
 	float active_line_current_width;
-	cpymo_string text_curline_and_remaining;
+	cpymo_str text_curline_and_remaining;
 	size_t text_curline_size;
 	cpymo_color color;
 
@@ -28,7 +28,7 @@ error_t cpymo_textbox_init(
 	float width, float height,
 	float character_size,
 	cpymo_color col,
-	cpymo_string text);
+	cpymo_str text);
 
 void cpymo_textbox_free(
 	cpymo_textbox *, cpymo_backlog *write_to_backlog);

@@ -34,7 +34,7 @@ static void cpymo_logo() {
 static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) {
 	const cpymo_localization *l = cpymo_localization_get(e);
 	cpymo_msgbox_ui_enter(
-		e, cpymo_string_pure(l->mo2pymo_required), NULL, NULL);
+		e, cpymo_str_pure(l->mo2pymo_required), NULL, NULL);
 	return CPYMO_ERR_SUCC;
 }
 
@@ -47,7 +47,7 @@ static error_t cpymo_engine_version_warning(cpymo_engine *e) {
 
 	cpymo_msgbox_ui_enter(
 		e,
-		cpymo_string_pure(out),
+		cpymo_str_pure(out),
 		NULL,
 		NULL);
 	free(out);

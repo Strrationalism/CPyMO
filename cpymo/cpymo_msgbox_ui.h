@@ -8,7 +8,7 @@ struct cpymo_engine;
 
 error_t cpymo_msgbox_ui_enter(
 	struct cpymo_engine *,
-	cpymo_string message,
+	cpymo_str message,
 	error_t (*confirm)(struct cpymo_engine *e, void *data),
 	void *confirm_data);
 

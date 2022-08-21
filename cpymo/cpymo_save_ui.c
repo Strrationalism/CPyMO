@@ -56,7 +56,7 @@ static error_t cpymo_save_confirm(cpymo_engine *e, void *data)
 
 	err = cpymo_msgbox_ui_enter(
 		e,
-		cpymo_string_pure(msg),
+		cpymo_str_pure(msg),
 		NULL,
 		NULL);
 
@@ -83,7 +83,7 @@ static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
 		CPYMO_THROW(err);
 		err = cpymo_msgbox_ui_enter(
 			e,
-			cpymo_string_pure(msg),
+			cpymo_str_pure(msg),
 			&cpymo_save_confirm,
 			selected);
 		free(msg);
@@ -207,9 +207,9 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 
 			strcat(tmp_str, title.say_text);
 
-			cpymo_string say_preview_text_tail = cpymo_string_pure(tmp_str);
-			cpymo_string say_preview_text = 
-				cpymo_string_split(&say_preview_text_tail, characters);
+			cpymo_str say_preview_text_tail = cpymo_str_pure(tmp_str);
+			cpymo_str say_preview_text = 
+				cpymo_str_split(&say_preview_text_tail, characters);
 
 			if (say_preview_text_tail.len > 0) {
 				*(char *)say_preview_text_tail.begin = '\0';
@@ -261,7 +261,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 
 		float w;
 		error_t err = cpymo_backend_text_create(
-			&ui->items[i].text, &w, cpymo_string_pure(text_buf), fontsize);
+			&ui->items[i].text, &w, cpymo_str_pure(text_buf), fontsize);
 
 #ifdef ENABLE_TEXT_EXTRACT
 		ui->items[i].orginal_text = (char *)malloc(strlen(text_buf) + 1);
@@ -301,7 +301,7 @@ error_t cpymo_save_ui_load_savedata_yesnobox(cpymo_engine * e, unsigned short sa
 
 	err = cpymo_msgbox_ui_enter(
 		e,
-		cpymo_string_pure(str ? str : l->save_are_you_sure_load_auto_save),
+		cpymo_str_pure(str ? str : l->save_are_you_sure_load_auto_save),
 		&cpymo_save_ui_load_savedata_yesnobox_confirm,
 		(void *)(uintptr_t)save_id);
 
