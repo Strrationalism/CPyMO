@@ -15,6 +15,7 @@ add_executable (cpymo-tool
 	"../cpymo/cpymo_gameconfig.c"
 	"../cpymo/cpymo_assetloader.c"
 	"../cpymo/cpymo_album.c"
+	"../cpymo/cpymo_str.c"
 	${CPYMO_COMPONENTS})
 
 
