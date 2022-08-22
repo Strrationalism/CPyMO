@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+#include "cpymo_prelude.h"
 #include "cpymo_localization.h"
 #include "cpymo_gameconfig.h"
 #include <stddef.h>

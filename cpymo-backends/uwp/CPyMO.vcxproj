@@ -340,7 +340,7 @@
     <ClInclude Include="..\..\cpymo\cpymo_say.h" />
     <ClInclude Include="..\..\cpymo\cpymo_scroll.h" />
     <ClInclude Include="..\..\cpymo\cpymo_select_img.h" />
-    <ClCompile Include="..\..\cpymo\cpymo_str.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_str.h" />
     <ClInclude Include="..\..\cpymo\cpymo_text.h" />
     <ClInclude Include="..\..\cpymo\cpymo_textbox.h" />
     <ClInclude Include="..\..\cpymo\cpymo_tween.h" />
