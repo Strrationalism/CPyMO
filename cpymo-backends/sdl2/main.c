@@ -260,13 +260,33 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 	const char *title = engine.gameconfig.gametitle;
 #endif
 
-	*window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
+	Uint32 window_flags =
 		SDL_WINDOW_ALLOW_HIGHDPI
-		| SDL_WINDOW_RESIZABLE
+		| SDL_WINDOW_RESIZABLE;
+
 #ifdef __ANDROID__
-		| SDL_WINDOW_FULLSCREEN
+		window_flags |= SDL_WINDOW_FULLSCREEN;
 #endif
-	);
+
+#if defined LIMIT_WINDOW_SIZE_TO_SCREEN
+	{
+		SDL_Rect screen_bound;
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+		int err = SDL_GetDisplayUsableBounds(0, &screen_bound);
+#else
+		int err = SDL_GetDisplayBounds(0, &screen_bound);
+#endif
+
+		if (err == 0) {
+			if (screen_bound.w < width || screen_bound.h < height)
+				window_flags |= SDL_WINDOW_MAXIMIZED;
+		}
+	}
+#endif
+
+	*window = SDL_CreateWindow(
+		title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+		width, height, window_flags);
 
 	if (*window == NULL) {
 		SDL_Log("[Error] Can not create window: %s.", SDL_GetError());
