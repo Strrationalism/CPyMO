@@ -12,6 +12,7 @@ OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND
 
 CFLAGS := \
 	-G0 -G0 -Wall -O3 \
+	-DCPYMO_BACKLOG_MAX_RECORDS=8 \
 	-I../include \
 	-I../../cpymo \
 	-I../../stb -I../../endianness.h \

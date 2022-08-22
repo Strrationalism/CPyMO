@@ -5,10 +5,6 @@
 #include "cpymo_error.h"
 #include <cpymo_backend_text.h>
 
-#ifdef __PSP__
-#define CPYMO_BACKLOG_MAX_RECORDS 8
-#endif
-
 #ifndef CPYMO_BACKLOG_MAX_RECORDS
 #define CPYMO_BACKLOG_MAX_RECORDS 64
 #endif
