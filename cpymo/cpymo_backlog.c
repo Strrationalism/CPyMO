@@ -6,8 +6,15 @@
 #include <string.h>
 #include <stddef.h>
 #include <assert.h>
-void cpymo_backlog_init(cpymo_backlog *b)
+
+#ifndef CPYMO_BACKLOG_MAX_RECORDS
+#define CPYMO_BACKLOG_MAX_RECORDS 64
+#endif
+
+error_t cpymo_backlog_init(cpymo_backlog *b)
 {
+	b->records = malloc(sizeof(b->records[0]) * CPYMO_BACKLOG_MAX_RECORDS);
+	if (b->records == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	b->next_record_to_write = 0;
 	b->pending_vo_filename[0] = '\0';
 	b->owning_name = false;
@@ -27,6 +34,8 @@ void cpymo_backlog_init(cpymo_backlog *b)
 		b->records[i].text = NULL;
 #endif
 	}
+
+	return CPYMO_ERR_SUCC;
 }
 
 static void cpymo_backlog_record_clean(cpymo_backlog_record *rec)
@@ -68,6 +77,8 @@ void cpymo_backlog_free(cpymo_backlog *b)
 #ifdef ENABLE_TEXT_EXTRACT
 	if (b->pending_text) free(b->pending_text);
 #endif
+
+	free(b->records);
 }
 
 void cpymo_backlog_record_write_vo(cpymo_backlog *b, cpymo_str vo)

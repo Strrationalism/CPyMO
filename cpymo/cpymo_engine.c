@@ -152,7 +152,15 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	out->ui = NULL;
 
 	// init backlog
-	cpymo_backlog_init(&out->backlog);
+	err = cpymo_backlog_init(&out->backlog);
+	if (err != CPYMO_ERR_SUCC) {
+		free(out->title);
+		cpymo_interpreter_free(out->interpreter);
+		free(out->interpreter);
+		cpymo_vars_free(&out->vars);
+		cpymo_assetloader_free(&out->assetloader);
+		return err;
+	}
 
 	// states
 	out->skipping = false;
