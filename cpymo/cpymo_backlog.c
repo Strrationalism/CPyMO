@@ -13,7 +13,7 @@
 
 error_t cpymo_backlog_init(cpymo_backlog *b)
 {
-	b->records = malloc(sizeof(b->records[0]) * CPYMO_BACKLOG_MAX_RECORDS);
+	b->records = (cpymo_backlog_record *)malloc(sizeof(b->records[0]) * CPYMO_BACKLOG_MAX_RECORDS);
 	if (b->records == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	b->next_record_to_write = 0;
 	b->pending_vo_filename[0] = '\0';
