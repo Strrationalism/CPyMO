@@ -42,6 +42,16 @@ void cpymo_str_copy(char *dst, size_t buffer_size, cpymo_str span)
 	dst[copy_count] = '\0';
 }
 
+char *cpymo_str_copy_malloc(cpymo_str str)
+{
+	char *cstr = (char *)malloc(str.len + 1);
+	if (cstr == NULL) return NULL;
+
+	memcpy(cstr, str.begin, str.len);
+	cstr[str.len] = '\0';
+	return cstr;
+}
+
 int cpymo_str_atoi(cpymo_str span)
 {
 	char buf[16];
