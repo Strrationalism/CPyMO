@@ -177,12 +177,8 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 		box->music_filename[i] = music_file;
 
 #ifdef ENABLE_TEXT_EXTRACT
-		if (box->music_title_text) {
-			box->music_title_text[i] = (char *)malloc(music_title.len + 1);
-			if (box->music_title_text[i]) {
-				cpymo_str_copy(box->music_title_text[i], music_title.len + 1, music_title);
-			}
-		}
+		if (box->music_title_text) 
+			box->music_title_text[i] = cpymo_str_copy_malloc(music_title);
 #endif
 
 		float width;

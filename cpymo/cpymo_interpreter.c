@@ -257,10 +257,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		bool show_immediately = cpymo_str_atoi(show_immediately_str) != 0;
 
 #ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = (char *)malloc(content.len + 1);
+		char *full_text = cpymo_str_copy_malloc(content);
 		if (full_text) {
-			memset(full_text, 0, content.len + 1);
-			strncpy(full_text, content.begin, content.len);
 			cpymo_backend_text_extract(full_text);
 			free(full_text);
 		}
@@ -284,12 +282,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	D("title") {
 		POP_ARG(title);
 
-		char *buf = (char *)malloc(title.len + 1);
+		char *buf = cpymo_str_copy_malloc(title);
 		if (buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 		free(engine->title);
 		engine->title = buf;
-		cpymo_str_copy(engine->title, title.len + 1, title);
 		
 		CONT_NEXTLINE;
 	}
@@ -958,9 +955,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		CONT_NEXTLINE;
 
 		BAD_EXPRESSION: {
-			char *condition_str = (char *)malloc(condition.len + 1);
+			char *condition_str = cpymo_str_copy_malloc(condition);
 			if (condition_str == NULL) return CPYMO_ERR_OUT_OF_MEM;
-			cpymo_str_copy(condition_str, condition.len + 1, condition);
 			printf( 
 				"[Error] Bad if expression \"%s\" in script %s(%u).\n", 
 				condition_str,

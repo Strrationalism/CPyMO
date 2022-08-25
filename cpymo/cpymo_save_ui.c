@@ -264,10 +264,8 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 			&ui->items[i].text, &w, cpymo_str_pure(text_buf), fontsize);
 
 #ifdef ENABLE_TEXT_EXTRACT
-		ui->items[i].orginal_text = (char *)malloc(strlen(text_buf) + 1);
-		if (ui->items[i].orginal_text) {
-			strcpy(ui->items[i].orginal_text, text_buf);
-		}
+		ui->items[i].orginal_text = 
+			cpymo_str_copy_malloc(cpymo_str_pure(text_buf));
 #endif
 
 		if (err != CPYMO_ERR_SUCC) {

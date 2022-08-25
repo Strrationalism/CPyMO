@@ -145,9 +145,8 @@ error_t cpymo_charas_new_chara(
 	int coord_mode, float x, float y, 
 	float begin_alpha, float time)
 {
-	char *chara_name = (char *)malloc(filename.len + 1);
+	char *chara_name = cpymo_str_copy_malloc(filename);
 	if (chara_name == NULL) return CPYMO_ERR_OUT_OF_MEM;
-	cpymo_str_copy(chara_name, filename.len + 1, filename);
 
 	struct cpymo_chara *ch = NULL;
 	error_t err = cpymo_charas_find(&e->charas, &ch, chara_id);

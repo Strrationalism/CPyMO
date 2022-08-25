@@ -141,10 +141,10 @@ static void cpymo_rmenu_delete(cpymo_engine *e, void *ui_data)
 
 error_t cpymo_rmenu_restart_game(cpymo_engine *e, void *data)
 {
-	char *gamedir = (char *)malloc(strlen(e->assetloader.gamedir) + 1);
+	char *gamedir = 
+		cpymo_str_copy_malloc(cpymo_str_pure(e->assetloader.gamedir));
 	if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	strcpy(gamedir, e->assetloader.gamedir);
 	cpymo_engine_free(e);
 	error_t err = cpymo_engine_init(e, gamedir);
 	free(gamedir);

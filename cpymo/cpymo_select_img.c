@@ -529,9 +529,7 @@ error_t cpymo_select_img_configuare_select_text(
 	s->has_selected = cpymo_hash_flags_check(flags, hash);
 
 #ifdef ENABLE_TEXT_EXTRACT
-	s->original_text = (char *)malloc(text.len + 1);
-	if (s->original_text)
-		cpymo_str_copy(s->original_text, text.len + 1, text);
+	s->original_text = cpymo_str_copy_malloc(text);
 #endif
 
 	return CPYMO_ERR_SUCC;
