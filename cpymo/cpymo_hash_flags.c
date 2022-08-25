@@ -36,13 +36,9 @@ error_t cpymo_hash_flags_add(cpymo_hash_flags *fs, cpymo_hash_flag f)
 bool cpymo_hash_flags_check(cpymo_hash_flags *fs, cpymo_hash_flag f)
 {
 	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)fs->flags;
-
 	cpymo_hash_flags_internal *ret = hmgetp_null(flags, f);
 	fs->flags = (void *)flags;
-
-	if (ret) 
-		return true;
-	else return false;
+	return ret != NULL;
 }
 
 size_t cpymo_hash_flags_count(cpymo_hash_flags *fs)
@@ -50,7 +46,6 @@ size_t cpymo_hash_flags_count(cpymo_hash_flags *fs)
 	cpymo_hash_flags_internal *f = (cpymo_hash_flags_internal *)fs->flags;
 	size_t len = hmlenu(f);
 	fs->flags = (void *)f;
-
 	return len;
 }
 
