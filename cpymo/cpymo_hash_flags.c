@@ -5,12 +5,7 @@
 #include <stb_ds.h>
 
 typedef struct {
-
-} cpymo_hash_flags_empty;
-
-typedef struct {
 	cpymo_hash_flag key;
-	cpymo_hash_flags_empty value;
 } cpymo_hash_flags_internal;
 
 void cpymo_hash_flags_init(cpymo_hash_flags *f)
