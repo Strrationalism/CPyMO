@@ -23,6 +23,9 @@
 #include <libavutil/log.h>
 #endif
 
+#define STB_DS_IMPLEMENTATION
+#include <stb_ds.h>
+
 #ifndef DISABLE_STB_IMAGE
 #define STBI_NO_PSD
 #define STBI_NO_TGA

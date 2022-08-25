@@ -19,6 +19,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
+#define STB_DS_IMPLEMENTATION
+#include <stb_ds.h>
+
 #include <cpymo_backend_text.h>
 #include <cpymo_backend_save.h>
 #include <cpymo_game_selector.h>

@@ -118,6 +118,10 @@ static uint64_t millis()
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+
+#define STB_DS_IMPLEMENTATION
+#include <stb_ds.h>
+
 #include <cpymo_engine.h>
 
 cpymo_engine engine;

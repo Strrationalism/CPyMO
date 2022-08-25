@@ -91,20 +91,10 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 	READ(&hash_flags_count, sizeof(hash_flags_count), 1);
 	hash_flags_count = end_le64toh(hash_flags_count);
 
-	error_t err = cpymo_hash_flags_reserve(&e->flags, (size_t)hash_flags_count);
-	if (err != CPYMO_ERR_SUCC) {
-		if (buf) free(buf);
-		fclose(file);
-		return err;
-	}
-
-	e->flags.flag_count = (size_t)hash_flags_count;
-	assert(e->flags.flag_count <= e->flags.flag_buf_size);
-
-	for (size_t i = 0; i < e->flags.flag_count; ++i) {
+	for (size_t i = 0; i < hash_flags_count; ++i) {
 		uint64_t flag;
 		READ(&flag, sizeof(flag), 1);
-		e->flags.flags[i] = end_le64toh(flag);
+		cpymo_hash_flags_add(&e->flags, flag);
 	}
 
 	if (buf) free(buf);
@@ -155,11 +145,12 @@ error_t cpymo_save_global_save(cpymo_engine *e)
 	WRITE(&end_flag, sizeof(end_flag), 1);
 
 	// Hash Flags
-	uint64_t hash_flags_count_le64 = end_htole64((uint64_t)e->flags.flag_count);
+	size_t hash_flags_count = cpymo_hash_flags_count(&e->flags);
+	uint64_t hash_flags_count_le64 = end_htole64((uint64_t)hash_flags_count);
 	WRITE(&hash_flags_count_le64, sizeof(hash_flags_count_le64), 1);
 
-	for (size_t i = 0; i < e->flags.flag_count; ++i) {
-		uint64_t flag = end_htole64(e->flags.flags[i]);
+	for (size_t i = 0; i < hash_flags_count; ++i) {
+		uint64_t flag = end_htole64(cpymo_hash_flags_get(&e->flags, i));
 		WRITE(&flag, sizeof(flag), 1);
 	}
 
@@ -222,6 +213,5 @@ error_t cpymo_save_config_load(cpymo_engine *e)
 
 	return CPYMO_ERR_SUCC;
 }
-
 
 

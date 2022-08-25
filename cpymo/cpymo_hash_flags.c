@@ -2,61 +2,66 @@
 #include "cpymo_hash_flags.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <stb_ds.h>
+
+typedef struct {
+
+} cpymo_hash_flags_empty;
+
+typedef struct {
+	cpymo_hash_flag key;
+	cpymo_hash_flags_empty value;
+} cpymo_hash_flags_internal;
 
 void cpymo_hash_flags_init(cpymo_hash_flags *f)
 {
 	f->flags = NULL;
-	f->flag_count = 0;
-	f->flag_buf_size = 0;
 	f->dirty = false;
 }
 
 void cpymo_hash_flags_free(cpymo_hash_flags *f)
 {
-	if (f->flags) free(f->flags);
+	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)f->flags;
+	if (flags) hmfree(flags);
 }
 
-error_t cpymo_hash_flags_reserve(cpymo_hash_flags *f, size_t size)
+error_t cpymo_hash_flags_add(cpymo_hash_flags *fs, cpymo_hash_flag f)
 {
-	if (size == 0) return CPYMO_ERR_SUCC;
-	else if (f->flags == NULL) {
-		size *= 2;
-		assert(f->flag_count == 0 && f->flag_buf_size == 0);
-		f->flags = (cpymo_hash_flag *)malloc(sizeof(cpymo_hash_flag) * size);
-		if (f->flags == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	if (cpymo_hash_flags_check(fs, f)) return CPYMO_ERR_SUCC;
 
-		f->flag_buf_size = size;
-	}
-	else if (f->flag_buf_size < size) {
-		assert(f->flag_buf_size != 0);
-		size *= 2;
-		cpymo_hash_flag *flags = (cpymo_hash_flag *)realloc(f->flags, size * sizeof(cpymo_hash_flag));
-		if (f->flags == NULL) return CPYMO_ERR_OUT_OF_MEM;
-		f->flags = flags;
-
-		f->flag_buf_size = size;
-	}
-
+	cpymo_hash_flags_empty empty;
+	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)fs->flags;
+	cpymo_hash_flags_internal kv;
+	kv.key = f;
+	hmputs(flags, kv);
+	fs->flags = (void *)flags;
+	fs->dirty = true;
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_hash_flags_add(cpymo_hash_flags *flags, cpymo_hash_flag f)
+bool cpymo_hash_flags_check(cpymo_hash_flags *fs, cpymo_hash_flag f)
 {
-	if (cpymo_hash_flags_check(flags, f) == true) return CPYMO_ERR_SUCC;
+	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)fs->flags;
 
-	error_t err = cpymo_hash_flags_reserve(flags, flags->flag_count + 1);
-	CPYMO_THROW(err);
+	cpymo_hash_flags_internal *ret = hmgetp_null(flags, f);
+	fs->flags = (void *)flags;
 
-	flags->flags[flags->flag_count++] = f;
-	flags->dirty = true;
-	return CPYMO_ERR_SUCC;
+	if (ret) 
+		return true;
+	else return false;
 }
 
-bool cpymo_hash_flags_check(cpymo_hash_flags *flags, cpymo_hash_flag f)
+size_t cpymo_hash_flags_count(cpymo_hash_flags *fs)
 {
-	for (size_t i = 0; i < flags->flag_count; ++i)
-		if (flags->flags[i] == f) return true;
+	cpymo_hash_flags_internal *f = (cpymo_hash_flags_internal *)fs->flags;
+	size_t len = hmlenu(f);
+	fs->flags = (void *)f;
 
-	return false;
+	return len;
 }
 
+uint64_t cpymo_hash_flags_get(cpymo_hash_flags *fs, size_t index)
+{
+	cpymo_hash_flags_internal *f = (cpymo_hash_flags_internal *)fs->flags;
+	return f[index].key;
+}
