@@ -282,7 +282,18 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 
 		if (err == 0) {
 			if (screen_bound.w < width || screen_bound.h < height)
+			{
 				window_flags |= SDL_WINDOW_MAXIMIZED;
+				
+				float ratio = (float)screen_bound.w / (float)width;
+				float ratio2 = (float)screen_bound.h / (float)height;
+				if (ratio2 < ratio) ratio = ratio2;
+
+				ratio *= 0.8f;
+
+				width = (int)(ratio * (float)width);
+				height = (int)(ratio * (float)height);
+			}
 		}
 	}
 #endif
