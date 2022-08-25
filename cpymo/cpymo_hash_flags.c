@@ -29,7 +29,6 @@ error_t cpymo_hash_flags_add(cpymo_hash_flags *fs, cpymo_hash_flag f)
 {
 	if (cpymo_hash_flags_check(fs, f)) return CPYMO_ERR_SUCC;
 
-	cpymo_hash_flags_empty empty;
 	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)fs->flags;
 	cpymo_hash_flags_internal kv;
 	kv.key = f;
