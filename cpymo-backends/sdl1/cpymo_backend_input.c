@@ -27,11 +27,13 @@ cpymo_input cpymo_input_snapshot()
     x.down = keystate[SDLK_DOWN];
 
     x.ok = 
-        keystate[SDLK_RETURN] | 
-        keystate[SDLK_KP_ENTER] | 
+        keystate[SDLK_RETURN] ||
+        keystate[SDLK_KP_ENTER] || 
         keystate[SDLK_SPACE];
 
-    x.cancel = keystate[SDLK_ESCAPE];
+    x.cancel = 
+        keystate[SDLK_ESCAPE] || 
+        keystate[SDLK_MENU];
 
     x.hide_window = 
         keystate[SDLK_LSHIFT] |
