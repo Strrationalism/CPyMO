@@ -1,6 +1,7 @@
 #include "cpymo_prelude.h"
 #include "cpymo_script.h"
 #include <string.h>
+#include <stdlib.h>
 
 error_t cpymo_script_load(
     cpymo_script **out, 
