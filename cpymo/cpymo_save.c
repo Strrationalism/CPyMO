@@ -167,17 +167,17 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 
 	// LOCAL VARS
 	{
-		struct cpymo_var *var = e->vars.locals;
-		while (var) {
-			WRITE_STR(var->name);
-			int32_t val = (int32_t)var->val;
+		size_t sz = cpymo_vars_count(&e->vars.locals);
+		for (size_t i = 0; i < sz; ++i) {
+			cpymo_val val;
+			const char *var_name = 
+				cpymo_vars_get_by_index(e->vars.locals, i, &val);
+			WRITE_STR(var_name);
 			uint32_t val_le = PACK32(val);
 			if (fwrite(&val_le, sizeof(val_le), 1, save) != 1) {
 				fclose(save);
 				return CPYMO_ERR_UNKNOWN;
 			}
-
-			var = var->next;
 		}
 
 		

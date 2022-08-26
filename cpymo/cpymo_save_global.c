@@ -127,17 +127,21 @@ error_t cpymo_save_global_save(cpymo_engine *e)
 		}
 
 	// Global Variables
-	for (struct cpymo_var *var = e->vars.globals; var != NULL; var = var->next) {
-		uint16_t var_name_len = (uint16_t)strlen(var->name);
+	size_t global_vars = cpymo_vars_count(&e->vars.globals);
+	for (size_t i = 0; i < global_vars; ++i) {
+		cpymo_val val;
+		const char *var_name = 
+			cpymo_vars_get_by_index(e->vars.globals, i, &val);
+		uint16_t var_name_len = (uint16_t)strlen(var_name);
 		uint16_t var_name_len_le16 = end_htole16(var_name_len);
 
-		char negative = var->val >= 0 ? 1 : 2;
+		char negative = val >= 0 ? 1 : 2;
 		WRITE(&negative, sizeof(negative), 1);
 
 		WRITE(&var_name_len_le16, sizeof(var_name_len_le16), 1);
-		WRITE(var->name, sizeof(var->name[0]), var_name_len);
+		WRITE(var_name, sizeof(var_name[0]), var_name_len);
 
-		uint32_t val_abs = end_htole32((uint32_t)abs(var->val));
+		uint32_t val_abs = end_htole32((uint32_t)abs(val));
 		WRITE(&val_abs, sizeof(val_abs), 1);
 	}
 
