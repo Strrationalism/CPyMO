@@ -18,7 +18,8 @@
 void cpymo_interpreter_init(
 	cpymo_interpreter *out, 
 	cpymo_script *script, 
-	bool own_script)
+	bool own_script,
+	cpymo_interpreter *caller)
 {
 	out->script = script;
 	out->own_script = own_script;
@@ -27,19 +28,20 @@ void cpymo_interpreter_init(
 		out->script->script_content, 
 		out->script->script_content_len);
 	out->no_more_content = false;
-	out->caller = NULL;
+	out->caller = caller;
 	out->checkpoint.cur_line = 0;
 }
 
 error_t cpymo_interpreter_init_script(
 	cpymo_interpreter *out, 
 	cpymo_str script_name, 
-	const cpymo_assetloader *loader)
+	const cpymo_assetloader *loader,
+	cpymo_interpreter *caller)
 {
 	error_t err = cpymo_script_load(&out->script, script_name, loader);
 	CPYMO_THROW(err);
 
-	cpymo_interpreter_init(out, out->script, true);
+	cpymo_interpreter_init(out, out->script, true, caller);
 
 	return CPYMO_ERR_SUCC;
 }
@@ -824,10 +826,16 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		bool own_script = interpreter->own_script;
 		interpreter->own_script = false;
 		cpymo_script *script = interpreter->script;
+		cpymo_interpreter *caller = interpreter->caller;
+		interpreter->caller = NULL;
 		cpymo_interpreter_free(interpreter);
-		err = cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader);
+		err = cpymo_interpreter_init_script(
+			interpreter, script_name, &engine->assetloader, caller);
 		if (own_script) cpymo_script_free(script);
-		CPYMO_THROW(err);
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_interpreter_free(caller);
+			return err;
+		}
 
 		CONT_WITH_CURRENT_CONTEXT;
 	}
@@ -951,10 +959,14 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(script_name);
 		ENSURE(script_name);
 
-		cpymo_interpreter *callee = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
+		cpymo_interpreter *callee = 
+			(cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
 		if (callee == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-		if ((err = cpymo_interpreter_init_script(callee, script_name, &engine->assetloader)) != CPYMO_ERR_SUCC) {
+		err = cpymo_interpreter_init_script(
+			callee, script_name, &engine->assetloader, interpreter);
+
+		if (err != CPYMO_ERR_SUCC) {
 			free(callee);
 			return err;
 		}
@@ -962,7 +974,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		assert(engine->interpreter == interpreter);
 
 		engine->interpreter = callee;
-		callee->caller = interpreter;
 
 		longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
 		return CPYMO_ERR_UNKNOWN;

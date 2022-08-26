@@ -102,7 +102,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		return err;
 	}
 
-	cpymo_interpreter_init(out->interpreter, boot_script, true);
+	cpymo_interpreter_init(out->interpreter, boot_script, true, NULL);
 
 	// create title
 	out->title = (char *)malloc(1);
