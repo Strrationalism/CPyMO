@@ -4,12 +4,14 @@
 #include "cpymo_parser.h"
 #include "cpymo_error.h"
 #include "cpymo_assetloader.h"
+#include "cpymo_script.h"
 
 struct cpymo_engine;
 
 struct cpymo_interpreter {
-	char script_name[64];
-	char *script_content;
+	cpymo_script *script;
+	bool own_script;
+
 	cpymo_parser script_parser;
 
 	bool no_more_content;
@@ -23,8 +25,16 @@ struct cpymo_interpreter {
 
 typedef struct cpymo_interpreter cpymo_interpreter;
 
-error_t cpymo_interpreter_init_boot(cpymo_interpreter *out, const char *start_script_name);
-error_t cpymo_interpreter_init_script(cpymo_interpreter *out, const char *script_name, const cpymo_assetloader *loader);
+void cpymo_interpreter_init(
+	cpymo_interpreter *out, 
+	cpymo_script *script, 
+	bool own_script);
+	
+error_t cpymo_interpreter_init_script(
+	cpymo_interpreter *out, 
+	cpymo_str script_name, 
+	const cpymo_assetloader *loader);
+
 void cpymo_interpreter_free(cpymo_interpreter *interpreter);
 
 error_t cpymo_interpreter_goto_label(cpymo_interpreter *interpreter, cpymo_str label);

@@ -277,6 +277,7 @@
     <ClCompile Include="..\..\cpymo\cpymo_save_global.c" />
     <ClCompile Include="..\..\cpymo\cpymo_save_ui.c" />
     <ClCompile Include="..\..\cpymo\cpymo_say.c" />
+    <ClCompile Include="..\..\cpymo\cpymo_script.c" />
     <ClCompile Include="..\..\cpymo\cpymo_scroll.c" />
     <ClCompile Include="..\..\cpymo\cpymo_select_img.c" />
     <ClCompile Include="..\..\cpymo\cpymo_str.c" />
@@ -338,6 +339,7 @@
     <ClInclude Include="..\..\cpymo\cpymo_save_global.h" />
     <ClInclude Include="..\..\cpymo\cpymo_save_ui.h" />
     <ClInclude Include="..\..\cpymo\cpymo_say.h" />
+    <ClCompile Include="..\..\cpymo\cpymo_script.h" />
     <ClInclude Include="..\..\cpymo\cpymo_scroll.h" />
     <ClInclude Include="..\..\cpymo\cpymo_select_img.h" />
     <ClInclude Include="..\..\cpymo\cpymo_str.h" />

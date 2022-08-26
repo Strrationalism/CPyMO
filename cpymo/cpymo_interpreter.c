@@ -15,31 +15,32 @@
 #include <assert.h>
 #include <ctype.h>
 
-error_t cpymo_interpreter_init_boot(cpymo_interpreter * out, const char * start_script_name)
+void cpymo_interpreter_init(
+	cpymo_interpreter *out, 
+	cpymo_script *script, 
+	bool own_script)
 {
-	const char *script_format =
-		"#textbox message,name\n"
-		"#bg logo1\n"
-		"#bg logo2\n"
-		"#change %s";
-
-	out->script_name[0] = '\0';
+	out->script = script;
+	out->own_script = own_script;
+	cpymo_parser_init(
+		&out->script_parser, 
+		out->script->script_content, 
+		out->script->script_content_len);
+	out->no_more_content = false;
 	out->caller = NULL;
 	out->checkpoint.cur_line = 0;
-	out->no_more_content = false;
-	
-	size_t script_len = strlen(script_format) + 64;
-	out->script_content = (char *)malloc(script_len);
+}
 
-	if (out->script_content == NULL || strlen(start_script_name) >= 63)
-		return CPYMO_ERR_OUT_OF_MEM;
+error_t cpymo_interpreter_init_script(
+	cpymo_interpreter *out, 
+	cpymo_str script_name, 
+	const cpymo_assetloader *loader)
+{
+	error_t err = cpymo_script_load(&out->script, script_name, loader);
+	CPYMO_THROW(err);
 
-	if (sprintf(out->script_content, script_format, start_script_name) < 0) {
-		free(out->script_content);
-		return CPYMO_ERR_UNKNOWN;
-	}
+	cpymo_interpreter_init(out, out->script, true);
 
-	cpymo_parser_init(&out->script_parser, out->script_content, strlen(out->script_content));
 	return CPYMO_ERR_SUCC;
 }
 
@@ -52,27 +53,6 @@ error_t cpymo_interpreter_goto_line(cpymo_interpreter * interpreter, uint64_t li
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_interpreter_init_script(cpymo_interpreter * out, const char * script_name, const cpymo_assetloader *loader)
-{
-	if (strlen(script_name) >= 63) return CPYMO_ERR_OUT_OF_MEM;
-	strcpy(out->script_name, script_name);
-
-	out->caller = NULL;
-
-	out->script_content = NULL;
-	out->checkpoint.cur_line = 0;
-	out->no_more_content = false;
-	size_t script_len = 0;
-
-	error_t err =
-		cpymo_assetloader_load_script(&out->script_content, &script_len, script_name, loader);
-
-	if (err != CPYMO_ERR_SUCC) return err;
-
-	cpymo_parser_init(&out->script_parser, out->script_content, script_len);
-	return CPYMO_ERR_SUCC;
-}
-
 void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 {
 	cpymo_interpreter *caller = interpreter->caller;
@@ -80,11 +60,13 @@ void cpymo_interpreter_free(cpymo_interpreter * interpreter)
 		cpymo_interpreter *to_free = caller;
 		caller = caller->caller;
 
-		free(to_free->script_content);
+		if (to_free->own_script)
+			cpymo_script_free(to_free->script);
 		free(to_free);
 	}
 
-	free(interpreter->script_content);
+	if (interpreter->own_script)
+		cpymo_script_free(interpreter->script);
 }
 
 error_t cpymo_interpreter_goto_label(cpymo_interpreter * interpreter, cpymo_str label)
@@ -111,7 +93,8 @@ RETRY:
 				if (retring) {
 					char label_name[32];
 					cpymo_str_copy(label_name, sizeof(label_name), label);
-					printf("[Error] Can not find label %s in script %s.\n", label_name, interpreter->script_name);
+					printf("[Error] Can not find label %s in script %s.\n", 
+						label_name, interpreter->script->script_name);
 					return cpymo_interpreter_goto_line(interpreter, cur_line_num);
 				}
 				else {
@@ -152,7 +135,7 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 	case CPYMO_ERR_INVALID_ARG:
 	case CPYMO_ERR_UNKNOWN:
 		printf("[Error] In script \'%s\'(%d): %s\n",
-			interpreter->script_name,
+			interpreter->script->script_name,
 			(int)interpreter->script_parser.cur_line,
 			cpymo_error_message(err));
 		break;
@@ -581,7 +564,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			free(buffer);
 			printf(
 				"[Error] chara_anime has invalid argument in script %s(%u)\n",
-				interpreter->script_name,
+				interpreter->script->script_name,
 				(unsigned)interpreter->script_parser.cur_line);
 			CONT_NEXTLINE;
 		}
@@ -772,7 +755,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			char anime_name[16];
 			cpymo_str_copy(anime_name, sizeof(anime_name), filename);
 			printf("[Warning] Can not load anime %s in script %s(%u).\n", 
-				anime_name, interpreter->script_name, (unsigned)interpreter->script_parser.cur_line);
+				anime_name, interpreter->script->script_name, (unsigned)interpreter->script_parser.cur_line);
 		}
 
 		CONT_NEXTLINE;
@@ -839,14 +822,15 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	}
 
 	D("change") {
-		POP_ARG(script_name_span);
-		ENSURE(script_name_span);
+		POP_ARG(script_name);
+		ENSURE(script_name);
 
-		char script_name[sizeof(interpreter->script_name)];
-		cpymo_str_copy(script_name, sizeof(script_name), script_name_span);
-
+		bool own_script = interpreter->own_script;
+		interpreter->own_script = false;
+		cpymo_script *script = interpreter->script;
 		cpymo_interpreter_free(interpreter);
 		err = cpymo_interpreter_init_script(interpreter, script_name, &engine->assetloader);
+		if (own_script) cpymo_script_free(script);
 		CPYMO_THROW(err);
 
 		CONT_WITH_CURRENT_CONTEXT;
@@ -960,7 +944,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			printf( 
 				"[Error] Bad if expression \"%s\" in script %s(%u).\n", 
 				condition_str,
-				interpreter->script_name,
+				interpreter->script->script_name,
 				(unsigned)interpreter->script_parser.cur_line);
 			free(condition_str);
 			return CPYMO_ERR_INVALID_ARG;
@@ -968,12 +952,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	}
 
 	D("call") {
-		POP_ARG(script_name_span);
-		ENSURE(script_name_span);
-		//cpymo_parser_next_line(&interpreter->script_parser);
-
-		char script_name[sizeof(interpreter->script_name)];
-		cpymo_str_copy(script_name, sizeof(script_name), script_name_span);
+		POP_ARG(script_name);
+		ENSURE(script_name);
 
 		cpymo_interpreter *callee = (cpymo_interpreter *)malloc(sizeof(cpymo_interpreter));
 		if (callee == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -1000,7 +980,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		// cpymo_interpreter *caller = interpreter->caller;
 
 		engine->interpreter = interpreter->caller;
-		free(interpreter->script_content);
+		if (interpreter->own_script)
+			cpymo_script_free(interpreter->script);
 		free(interpreter);
 
 		longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
@@ -1036,7 +1017,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			cpymo_str_hash_init(&hash);
 			cpymo_str_hash_append_cstr(&hash, "SEL: ");
 			cpymo_str_hash_append_cstr(
-				&hash, interpreter->script_name);
+				&hash, interpreter->script->script_name);
 			cpymo_str_hash_append_cstr(&hash, "/");
 
 			char buf[32];
@@ -1092,7 +1073,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			cpymo_str_hash_init(&hash);
 			cpymo_str_hash_append_cstr(&hash, "SELECT_TEXT: ");
 			cpymo_str_hash_append_cstr(
-				&hash, interpreter->script_name);
+				&hash, interpreter->script->script_name);
 			cpymo_str_hash_append_cstr(&hash, "/");
 
 			char buf[32];
@@ -1149,7 +1130,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			cpymo_str_hash_init(&hash);
 			cpymo_str_hash_append_cstr(&hash, "SELECT_VAR: ");
 			cpymo_str_hash_append_cstr(
-				&hash, interpreter->script_name);
+				&hash, interpreter->script->script_name);
 			cpymo_str_hash_append_cstr(&hash, "/");
 			char buf[32];
 			sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
@@ -1209,7 +1190,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 				cpymo_str_hash_init(&hash);
 				cpymo_str_hash_append_cstr(&hash, "SELECT_IMG: ");
 				cpymo_str_hash_append_cstr(
-					&hash, interpreter->script_name);
+					&hash, interpreter->script->script_name);
 				cpymo_str_hash_append_cstr(&hash, "/");
 				char buf[32];
 				sprintf(buf, "%u", (unsigned)interpreter->script_parser.cur_line);
@@ -1256,7 +1237,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 				uint64_t hash;
 				cpymo_str_hash_init(&hash);
 				cpymo_str_hash_append_cstr(&hash, "SELECT_IMGS: ");
-				cpymo_str_hash_append_cstr(&hash, interpreter->script_name);
+				cpymo_str_hash_append_cstr(&hash, interpreter->script->script_name);
 				cpymo_str_hash_append_cstr(&hash, "/");
 				
 				char buf[32];
@@ -1313,7 +1294,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		if (max_val - min_val <= 0) {
 			printf(
 				"[Error] In script %s(%u), max value must bigger than min value for rand command.\n",
-				interpreter->script_name,
+				interpreter->script->script_name,
 				(unsigned)interpreter->script_parser.cur_line);
 
 			return CPYMO_ERR_INVALID_ARG;
@@ -1470,7 +1451,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		printf(
 			"[Warning] Unknown command \"%s\" in script %s(%u).\n",
 			buf,
-			interpreter->script_name,
+			interpreter->script->script_name,
 			(unsigned)interpreter->script_parser.cur_line + 1);
 
 		CONT_NEXTLINE;
