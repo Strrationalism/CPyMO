@@ -11,7 +11,6 @@ void cpymo_charas_free(cpymo_charas *c)
 		struct cpymo_chara *to_free = c->chara;
 		c->chara = c->chara->next;
 
-		if (to_free->chara_name) free(to_free->chara_name);
 		cpymo_backend_image_free(to_free->img);
 		free(to_free);
 	}
@@ -52,7 +51,6 @@ static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 			*ppcur = pnext;
 
 			cpymo_backend_image_free(pcur->img);
-			if (pcur->chara_name) free(pcur->chara_name);
 			free(pcur);
 		}
 		else {
@@ -145,9 +143,6 @@ error_t cpymo_charas_new_chara(
 	int coord_mode, float x, float y, 
 	float begin_alpha, float time)
 {
-	char *chara_name = cpymo_str_copy_malloc(filename);
-	if (chara_name == NULL) return CPYMO_ERR_OUT_OF_MEM;
-
 	struct cpymo_chara *ch = NULL;
 	error_t err = cpymo_charas_find(&e->charas, &ch, chara_id);
 	if (err == CPYMO_ERR_SUCC) {
@@ -155,15 +150,13 @@ error_t cpymo_charas_new_chara(
 		cpymo_tween_to(&ch->alpha, 0, time);
 	}
 
-	ch = (struct cpymo_chara *)malloc(sizeof(struct cpymo_chara));
-	if (ch == NULL) {
-		free(chara_name);
-		return CPYMO_ERR_OUT_OF_MEM;
-	}
+	ch = (struct cpymo_chara *)malloc(
+		sizeof(struct cpymo_chara) + filename.len + 1);
+	if (ch == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	cpymo_str_copy(ch->chara_name, filename.len + 1, filename);
 
 	err = cpymo_assetloader_load_chara_image(&ch->img, &ch->img_w, &ch->img_h, filename, &e->assetloader);
 	if (err != CPYMO_ERR_SUCC) {
-		free(chara_name);
 		free(ch);
 
 		if (err == CPYMO_ERR_NOT_FOUND || err == CPYMO_ERR_CAN_NOT_OPEN_FILE) {
@@ -178,13 +171,11 @@ error_t cpymo_charas_new_chara(
 
 	err = cpymo_chara_convert_to_mode0_pos(e, ch, coord_mode, &x, &y);
 	if (err != CPYMO_ERR_SUCC) {
-		free(chara_name);
 		cpymo_backend_image_free(ch->img);
 		free(ch);
 		return err;
 	}
 
-	ch->chara_name = chara_name;
 	ch->play_anime = false;
 	ch->chara_id = chara_id;
 	ch->layer = layer;

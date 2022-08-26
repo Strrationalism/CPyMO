@@ -188,7 +188,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	{
 		cpymo_interpreter *interpreter = e->interpreter;
 		while (interpreter) {
-			WRITE_STR(interpreter->script_name);
+			WRITE_STR(interpreter->script->script_name);
 			uint32_t cur_pos = (uint32_t)interpreter->script_parser.cur_pos;
 			uint32_t cur_line = (uint32_t)interpreter->script_parser.cur_line;
 			uint32_t line_end = (uint32_t)interpreter->script_parser.is_line_end;
@@ -489,7 +489,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 			THROW;
 		}
 
-		err = cpymo_interpreter_init_script(*slot, strbuf, &e->assetloader);
+		err = cpymo_interpreter_init_script(
+			*slot, cpymo_str_pure(strbuf), &e->assetloader);
 		FAIL{ THROW; };
 
 		READ_PARAMS(interpreter_params, 4);

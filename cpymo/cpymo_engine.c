@@ -93,13 +93,16 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		return CPYMO_ERR_OUT_OF_MEM;
 	}
 
-	err = cpymo_interpreter_init_boot(out->interpreter, out->gameconfig.startscript);
+	cpymo_script *boot_script;
+	err = cpymo_script_create_bootloader(&boot_script, out->gameconfig.startscript);
 	if (err != CPYMO_ERR_SUCC) {
 		free(out->interpreter);
 		cpymo_vars_free(&out->vars);
 		cpymo_assetloader_free(&out->assetloader);
 		return err;
 	}
+
+	cpymo_interpreter_init(out->interpreter, boot_script, true);
 
 	// create title
 	out->title = (char *)malloc(1);
