@@ -33,7 +33,8 @@ cpymo_input cpymo_input_snapshot()
 			keyboard[SDL_SCANCODE_ESCAPE] || 
 			keyboard[SDL_SCANCODE_CANCEL] || 
 			keyboard[SDL_SCANCODE_AC_BACK] ||
-			keyboard[SDL_SCANCODE_MENU];
+			keyboard[SDL_SCANCODE_MENU] ||
+			keyboard[SDL_SCANCODE_APPLICATION];
 		out.skip = 
 			keyboard[SDL_SCANCODE_LCTRL] || 
 			keyboard[SDL_SCANCODE_RCTRL];
