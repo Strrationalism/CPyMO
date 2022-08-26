@@ -28,12 +28,14 @@ typedef struct cpymo_interpreter cpymo_interpreter;
 void cpymo_interpreter_init(
 	cpymo_interpreter *out, 
 	cpymo_script *script, 
-	bool own_script);
+	bool own_script,
+	cpymo_interpreter *caller);
 	
 error_t cpymo_interpreter_init_script(
 	cpymo_interpreter *out, 
 	cpymo_str script_name, 
-	const cpymo_assetloader *loader);
+	const cpymo_assetloader *loader,
+	cpymo_interpreter *caller);
 
 void cpymo_interpreter_free(cpymo_interpreter *interpreter);
 

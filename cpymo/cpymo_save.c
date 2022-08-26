@@ -477,6 +477,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 
 	// INTERPRETER
 	cpymo_interpreter **slot = &e->interpreter;
+	cpymo_interpreter *caller = NULL;
 	while (true) {
 		err = cpymo_save_read_string(&strbuf, save);
 		FAIL{ THROW; };
@@ -490,7 +491,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		}
 
 		err = cpymo_interpreter_init_script(
-			*slot, cpymo_str_pure(strbuf), &e->assetloader);
+			*slot, cpymo_str_pure(strbuf), &e->assetloader, caller);
 		FAIL{ THROW; };
 
 		READ_PARAMS(interpreter_params, 4);
@@ -500,6 +501,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		(*slot)->checkpoint.cur_line = interpreter_params[3];
 
 		slot = &(*slot)->caller;
+		caller = *slot;
 	}
 
 	if (strbuf) free(strbuf);
