@@ -916,7 +916,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			rv = cpymo_str_atoi(right);
 		}
 		else {
-			const int *var = cpymo_vars_access(&engine->vars, right);
+			const cpymo_val *var = cpymo_vars_access(&engine->vars, right);
 			if (var == NULL) { CONT_NEXTLINE; }
 			else {
 				rv = *var;
