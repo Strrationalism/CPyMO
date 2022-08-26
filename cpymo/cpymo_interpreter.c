@@ -37,11 +37,25 @@ error_t cpymo_interpreter_init_script(
 	cpymo_str script_name, 
 	const cpymo_assetloader *loader,
 	cpymo_interpreter *caller)
-{
-	error_t err = cpymo_script_load(&out->script, script_name, loader);
-	CPYMO_THROW(err);
+{	out->script = NULL;
+	out->own_script = true;
 
-	cpymo_interpreter_init(out, out->script, true, caller);
+	cpymo_interpreter *find_script = caller;
+	while (find_script) {
+		if (cpymo_str_equals_str(script_name, find_script->script->script_name)) {
+			out->script = find_script->script;
+			out->own_script = false;
+			break;
+		}
+		find_script = find_script->caller;
+	}
+
+	if (out->script == NULL) {
+		error_t err = cpymo_script_load(&out->script, script_name, loader);
+		CPYMO_THROW(err);
+	}
+
+	cpymo_interpreter_init(out, out->script, out->own_script, caller);
 
 	return CPYMO_ERR_SUCC;
 }
