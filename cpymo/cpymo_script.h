@@ -6,9 +6,9 @@
 #include "cpymo_assetloader.h"
 
 typedef struct {
-    char *script_name;
     char *script_content;
     size_t script_content_len;
+    char script_name[];
 } cpymo_script;
 
 error_t cpymo_script_load(
