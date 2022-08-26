@@ -803,11 +803,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(name); ENSURE(name);
 		POP_ARG(value); ENSURE(value);
 
-		int *v = NULL;
-		err = cpymo_vars_access_create(&engine->vars, name, &v);
+		err = cpymo_vars_add(&engine->vars, name, 
+			cpymo_vars_eval(&engine->vars, value));
 		CPYMO_THROW(err);
-
-		*v += cpymo_vars_eval(&engine->vars, value);
 
 		CONT_NEXTLINE;
 	}
@@ -816,11 +814,9 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(name); ENSURE(name);
 		POP_ARG(value); ENSURE(value);
 
-		int *v = NULL;
-		err = cpymo_vars_access_create(&engine->vars, name, &v);
+		err = cpymo_vars_add(&engine->vars, name, 
+			-cpymo_vars_eval(&engine->vars, value));
 		CPYMO_THROW(err);
-
-		*v -= cpymo_vars_eval(&engine->vars, value);
 
 		CONT_NEXTLINE;
 	}
