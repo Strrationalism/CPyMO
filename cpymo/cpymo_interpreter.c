@@ -37,7 +37,8 @@ error_t cpymo_interpreter_init_script(
 	cpymo_str script_name, 
 	const cpymo_assetloader *loader,
 	cpymo_interpreter *caller)
-{	out->script = NULL;
+{	
+	out->script = NULL;
 	out->own_script = true;
 
 	cpymo_interpreter *find_script = caller;
