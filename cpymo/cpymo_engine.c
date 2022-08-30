@@ -168,6 +168,10 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// states
 	out->skipping = false;
 	out->redraw = true;
+	out->ignore_next_mouse_button_flag = false;
+
+	// default config
+	out->config_skip_already_read_only = true;
 
 	// load config
 	err = cpymo_save_config_load(out);
@@ -236,6 +240,18 @@ void cpymo_engine_free(cpymo_engine *engine)
 	cpymo_assetloader_free(&engine->assetloader);
 	if (engine->title) free(engine->title);
 	cpymo_audio_free(&engine->audio);
+}
+
+bool cpymo_engine_skipping(cpymo_engine *e)
+{
+	bool skipping = e->input.skip || e->skipping;
+	if (e->config_skip_already_read_only) {
+		if (!e->say.current_say_is_already_read) {
+			e->skipping = false;
+			return false;
+		}
+	}
+	return skipping;
 }
 
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)

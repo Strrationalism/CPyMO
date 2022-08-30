@@ -53,6 +53,7 @@ void cpymo_say_init(cpymo_say *out)
 
 	out->current_name = NULL;
 	out->current_text = NULL;
+	out->current_say_is_already_read = true;
 }
 
 void cpymo_say_free(cpymo_say *say)
@@ -362,6 +363,23 @@ static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
+
+	uint64_t hash;
+	cpymo_str_hash_init(&hash);
+	cpymo_str_hash_append_cstr(&hash, "say:");
+	cpymo_str_hash_append_cstr(&hash, e->interpreter->script->script_name);
+	char buf[32];
+	sprintf(buf, "%u:%u:", 
+		(unsigned)e->interpreter->script_parser.cur_pos,
+		(unsigned)e->interpreter->script_parser.cur_line);
+	cpymo_str_hash_append_cstr(&hash, buf);
+	cpymo_str_hash_append(&hash, name);
+	cpymo_str_hash_append(&hash, text);
+
+	e->say.current_say_is_already_read = 
+		cpymo_hash_flags_check(&e->flags, hash);
+	if (!e->say.current_say_is_already_read)
+		cpymo_hash_flags_add(&e->flags, hash);
 
 	if (name.len > 0) {
 		char *current_name = (char *)realloc(e->say.current_name, name.len + 1);

@@ -50,6 +50,8 @@ struct cpymo_engine {
 
 	bool redraw;
 	bool ignore_next_mouse_button_flag;
+
+	bool config_skip_already_read_only;
 };
 
 typedef struct cpymo_engine cpymo_engine;
@@ -59,8 +61,7 @@ void cpymo_engine_free(cpymo_engine *engine);
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool *redraw);
 void cpymo_engine_draw(const cpymo_engine *engine);
 
-static inline bool cpymo_engine_skipping(cpymo_engine *engine)
-{ return engine->input.skip || engine->skipping; }
+bool cpymo_engine_skipping(cpymo_engine *engine);
 
 static inline void cpymo_engine_request_redraw(cpymo_engine *engine)
 { engine->redraw = true; }

@@ -25,8 +25,10 @@ typedef struct {
 		*config_vovol,
 		*config_sayspeed,
 		*config_fontsize,
+		*config_skip_mode,
 
-		*config_sayspeeds[6];
+		*config_sayspeeds[6],
+		*config_skip_modes[2];
 
 	error_t (*save_already_save_to)(char **out_str, int save_id);
 	error_t (*save_failed)(char **out_str, error_t);
