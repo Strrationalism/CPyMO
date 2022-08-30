@@ -4,10 +4,6 @@
 #define STBI_NO_PIC
 #define STBI_NO_PNM
 
-#define FASTEST_FILTER STBIR_FILTER_BOX
-#define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
-#define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
-
 #ifdef LEAKCHECK
 #define STB_LEAKCHECK_IMPLEMENTATION
 #endif
@@ -20,6 +16,53 @@
 #include <cpymo_backend_image.h>
 #include <cpymo_backend_masktrans.h>
 #include <cpymo_backend_text.h>
+#include <cpymo_engine.h>
+
+cpymo_engine engine;
+
+error_t cpymo_assetloader_load_image_with_mask(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_str name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask)
+{
+    *w = engine.gameconfig.imagesize_w;
+    *h = engine.gameconfig.imagesize_h;
+    *img = (cpymo_backend_image)1;
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_bg_image(
+	cpymo_backend_image * img, int * w, int * h, 
+	cpymo_str name, const cpymo_assetloader * loader)
+{
+    *w = engine.gameconfig.imagesize_w;
+    *h = engine.gameconfig.imagesize_h;
+    *img = (cpymo_backend_image)1;
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_system_masktrans(
+	cpymo_backend_masktrans *out, cpymo_str name, 
+	const cpymo_assetloader *loader)
+{
+    *out = (cpymo_backend_masktrans)1;
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
+{
+    *w = engine.gameconfig.imagesize_w;
+    *h = engine.gameconfig.imagesize_h;
+    *out = (cpymo_backend_image)1;
+    return CPYMO_ERR_SUCC;
+}
 
 error_t cpymo_backend_image_load(cpymo_backend_image *out_image, void *pixels_moveintoimage, int width, int height, enum cpymo_backend_image_format f)
 {
@@ -110,21 +153,8 @@ static uint64_t millis()
 
 #endif
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image_resize.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
 #define STB_DS_IMPLEMENTATION
 #include <stb_ds.h>
-
-#include <cpymo_engine.h>
-
-cpymo_engine engine;
 
 static uint64_t prev;
 static float get_delta_time() {
