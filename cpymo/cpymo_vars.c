@@ -50,7 +50,7 @@ static cpymo_val *cpymo_vars_access_cstr(
     return r ? &r->value : NULL;
 }
 
-cpymo_val *cpymo_vars_access(cpymo_vars *vars, cpymo_str name)
+const cpymo_val *cpymo_vars_access(cpymo_vars *vars, cpymo_str name)
 {
     char *cstr = cpymo_str_copy_malloc(name);
     if (cstr == NULL) return NULL;
@@ -101,7 +101,7 @@ error_t cpymo_vars_set(cpymo_vars *vars, cpymo_str name, cpymo_val v)
 
 cpymo_val cpymo_vars_get(cpymo_vars *vars, cpymo_str name)
 {
-    cpymo_val *p = cpymo_vars_access(vars, name);
+    const cpymo_val *p = cpymo_vars_access(vars, name);
     return p ? *p : 0;
 }
 
