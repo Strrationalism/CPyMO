@@ -6,17 +6,19 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define ALREADY_READ_TEXT_ALPHA 0.6f
+
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
 		cpymo_textbox_free(&(SAY)->textbox, &e->backlog); \
 		SAY->textbox_usable = false; \
 	}
 
-#define ENABLE_TEXTBOX(SAY, X, Y, W, H, FONT_SIZE, COL, TEXT, ERR) \
+#define ENABLE_TEXTBOX(SAY, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT, ERR) \
 	{ \
 		DISABLE_TEXTBOX(SAY); \
 		ERR = cpymo_textbox_init( \
-			&(SAY)->textbox, X, Y, W, H, FONT_SIZE, COL, TEXT); \
+			&(SAY)->textbox, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT); \
 		if (ERR == CPYMO_ERR_SUCC) SAY->textbox_usable = true; \
 	}
 
@@ -160,7 +162,10 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 			cpymo_backend_text_draw(
 				e->say.name,
 				name_x, namebox_y + cpymo_gameconfig_font_size(&e->gameconfig),
-				e->gameconfig.textcolor, 1.0f, cpymo_backend_image_draw_type_text_say);
+				e->gameconfig.textcolor,
+				e->say.current_say_is_already_read ? 
+					ALREADY_READ_TEXT_ALPHA : 1, 
+				cpymo_backend_image_draw_type_text_say);
 		}
 
 		if (e->say.textbox_usable) {
@@ -433,8 +438,13 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
 	float h = msg_h - msgtb_t - msgtb_b;
 
+	const float text_alpha = 
+		e->say.current_say_is_already_read ? 
+			ALREADY_READ_TEXT_ALPHA : 1.0f;
+
 	error_t err;
-	ENABLE_TEXTBOX(say, x, y, w, h, fontsize, e->gameconfig.textcolor, text, err);
+	ENABLE_TEXTBOX(
+		say, x, y, w, h, fontsize, e->gameconfig.textcolor, text_alpha, text, err);
 
 	cpymo_engine_request_redraw(e);
 

@@ -17,6 +17,7 @@ typedef struct {
 	cpymo_str text_curline_and_remaining;
 	size_t text_curline_size;
 	cpymo_color color;
+	float alpha;
 
 	float timer;
 	bool msg_cursor_visible;
@@ -28,6 +29,7 @@ error_t cpymo_textbox_init(
 	float width, float height,
 	float character_size,
 	cpymo_color col,
+	float alpha,
 	cpymo_str text);
 
 void cpymo_textbox_free(
