@@ -29,6 +29,7 @@ error_t cpymo_backlog_init(cpymo_backlog *b)
 		b->records[i].owning_name = false;
 		b->records[i].name = NULL;
 		b->records[i].lines = NULL;
+		b->records[i].max_lines = 0;
 
 #ifdef ENABLE_TEXT_EXTRACT
 		b->records[i].text = NULL;
