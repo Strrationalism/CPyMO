@@ -14,7 +14,7 @@ typedef struct {
 void cpymo_vars_init(cpymo_vars *out);
 void cpymo_vars_free(cpymo_vars *to_free);
 
-cpymo_val *cpymo_vars_access(cpymo_vars * vars, cpymo_str name);
+const cpymo_val *cpymo_vars_access(cpymo_vars * vars, cpymo_str name);
 
 void cpymo_vars_clear_locals(cpymo_vars *vars);
 
