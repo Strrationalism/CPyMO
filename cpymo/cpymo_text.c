@@ -80,7 +80,8 @@ static error_t cpymo_text_callback_read(cpymo_engine *e)
 
 error_t cpymo_text_new(cpymo_engine *e, float x1, float y1, float x2, float y2, cpymo_color col, float fontsize, cpymo_str text, bool immediately)
 {
-	struct cpymo_textbox_list *node = (struct cpymo_textbox_list *)malloc(sizeof(struct cpymo_textbox_list));
+	struct cpymo_textbox_list *node = 
+		(struct cpymo_textbox_list *)malloc(sizeof(struct cpymo_textbox_list));
 	if (node == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	cpymo_text *t = &e->text;
@@ -88,7 +89,13 @@ error_t cpymo_text_new(cpymo_engine *e, float x1, float y1, float x2, float y2, 
 	node->next = t->ls;
 
 	error_t err = 
-		cpymo_textbox_init(&node->box, x1, y1, fabsf(x2 - x1), fabsf(y2 - y1), fontsize, col, text);
+		cpymo_textbox_init(
+			&node->box, 
+			x1, y1, 
+			fabsf(x2 - x1), 
+			fabsf(y2 - y1), 
+			fontsize, col, 1.0f, 
+			text);
 
 	if (err != CPYMO_ERR_SUCC) {
 		free(node);

@@ -176,7 +176,8 @@ error_t cpymo_save_config_save(const cpymo_engine *e)
 		(uint16_t)(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio) * UINT16_MAX),
 		(uint16_t)(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio) * UINT16_MAX),
 		(uint16_t)e->gameconfig.fontsize,
-		(uint16_t)e->gameconfig.textspeed
+		(uint16_t)e->gameconfig.textspeed,
+		(uint16_t)e->config_skip_already_read_only
 	};
 
 	for (size_t i = 0; i < sizeof(config) / sizeof(config[0]); ++i)
@@ -198,7 +199,7 @@ error_t cpymo_save_config_save(const cpymo_engine *e)
 
 error_t cpymo_save_config_load(cpymo_engine *e)
 {
-	uint16_t config[5];
+	uint16_t config[6];
 	FILE *file = cpymo_backend_read_save(e->assetloader.gamedir, "config.csav");
 	if (file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 
@@ -214,6 +215,7 @@ error_t cpymo_save_config_load(cpymo_engine *e)
 	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, config[2] / (float)UINT16_MAX);
 	e->gameconfig.fontsize = config[3];
 	e->gameconfig.textspeed = config[4];
+	e->config_skip_already_read_only = config[5] > 0;
 
 	return CPYMO_ERR_SUCC;
 }

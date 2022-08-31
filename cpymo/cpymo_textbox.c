@@ -8,7 +8,13 @@
 #include <cpymo_android.h>
 #endif
 
-error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, float height, float character_size, cpymo_color col, cpymo_str text)
+error_t cpymo_textbox_init(
+    cpymo_textbox *o, 
+    float x, float y, 
+    float width, float height, 
+    float character_size, 
+    cpymo_color col, float alpha, 
+    cpymo_str text)
 {
     o->x = x;
     o->y = y;
@@ -27,6 +33,7 @@ error_t cpymo_textbox_init(cpymo_textbox *o, float x, float y, float width, floa
     o->active_line = 0;
     o->text_curline_and_remaining = text;
     o->color = col;
+    o->alpha = alpha;
     o->active_line_current_width = 0;
     o->text_curline_size = 0;
 
@@ -68,7 +75,7 @@ void cpymo_textbox_draw(
                 tb->x,
                 tb->y + tb->character_size * (1 + i),
                 tb->color,
-                1.0f,
+                tb->alpha,
                 drawtype);
         }
     }
@@ -273,7 +280,8 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
 
     bool go =
         CPYMO_INPUT_JUST_RELEASED(e, ok) 
-        || e->input.skip 
+        || cpymo_engine_skipping(e)
+        || CPYMO_INPUT_JUST_PRESSED(e, skip) 
         || CPYMO_INPUT_JUST_RELEASED(e, mouse_button)
         || CPYMO_INPUT_JUST_RELEASED(e, down)
         || e->input.mouse_wheel_delta < 0;

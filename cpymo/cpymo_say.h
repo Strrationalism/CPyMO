@@ -27,6 +27,8 @@ typedef struct {
 	char *msgbox_name, *namebox_name;
 
 	char *current_name, *current_text;
+
+	bool current_say_is_already_read;
 } cpymo_say;
 
 void cpymo_say_init(cpymo_say *);

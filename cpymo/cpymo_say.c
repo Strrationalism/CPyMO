@@ -6,17 +6,19 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define ALREADY_READ_TEXT_ALPHA 0.6f
+
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
 		cpymo_textbox_free(&(SAY)->textbox, &e->backlog); \
 		SAY->textbox_usable = false; \
 	}
 
-#define ENABLE_TEXTBOX(SAY, X, Y, W, H, FONT_SIZE, COL, TEXT, ERR) \
+#define ENABLE_TEXTBOX(SAY, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT, ERR) \
 	{ \
 		DISABLE_TEXTBOX(SAY); \
 		ERR = cpymo_textbox_init( \
-			&(SAY)->textbox, X, Y, W, H, FONT_SIZE, COL, TEXT); \
+			&(SAY)->textbox, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT); \
 		if (ERR == CPYMO_ERR_SUCC) SAY->textbox_usable = true; \
 	}
 
@@ -53,6 +55,7 @@ void cpymo_say_init(cpymo_say *out)
 
 	out->current_name = NULL;
 	out->current_text = NULL;
+	out->current_say_is_already_read = true;
 }
 
 void cpymo_say_free(cpymo_say *say)
@@ -159,7 +162,10 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 			cpymo_backend_text_draw(
 				e->say.name,
 				name_x, namebox_y + cpymo_gameconfig_font_size(&e->gameconfig),
-				e->gameconfig.textcolor, 1.0f, cpymo_backend_image_draw_type_text_say);
+				e->gameconfig.textcolor,
+				e->say.current_say_is_already_read ? 
+					ALREADY_READ_TEXT_ALPHA : 1, 
+				cpymo_backend_image_draw_type_text_say);
 		}
 
 		if (e->say.textbox_usable) {
@@ -363,6 +369,23 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 {
 	cpymo_say_lazy_init(&e->say, &e->assetloader);
 
+	uint64_t hash;
+	cpymo_str_hash_init(&hash);
+	cpymo_str_hash_append_cstr(&hash, "say:");
+	cpymo_str_hash_append_cstr(&hash, e->interpreter->script->script_name);
+	char buf[32];
+	sprintf(buf, "%u:%u:", 
+		(unsigned)e->interpreter->script_parser.cur_pos,
+		(unsigned)e->interpreter->script_parser.cur_line);
+	cpymo_str_hash_append_cstr(&hash, buf);
+	cpymo_str_hash_append(&hash, name);
+	cpymo_str_hash_append(&hash, text);
+
+	e->say.current_say_is_already_read = 
+		cpymo_hash_flags_check(&e->flags, hash);
+	if (!e->say.current_say_is_already_read)
+		cpymo_hash_flags_add(&e->flags, hash);
+
 	if (name.len > 0) {
 		char *current_name = (char *)realloc(e->say.current_name, name.len + 1);
 		if (current_name) {
@@ -415,8 +438,13 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 	float y = (float)e->gameconfig.imagesize_h - msg_h + msgtb_t;
 	float h = msg_h - msgtb_t - msgtb_b;
 
+	const float text_alpha = 
+		e->say.current_say_is_already_read ? 
+			ALREADY_READ_TEXT_ALPHA : 1.0f;
+
 	error_t err;
-	ENABLE_TEXTBOX(say, x, y, w, h, fontsize, e->gameconfig.textcolor, text, err);
+	ENABLE_TEXTBOX(
+		say, x, y, w, h, fontsize, e->gameconfig.textcolor, text_alpha, text, err);
 
 	cpymo_engine_request_redraw(e);
 

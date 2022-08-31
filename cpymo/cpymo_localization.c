@@ -94,7 +94,9 @@ const cpymo_localization chs = {
 	"语音音量",
 	"文字速度",
 	"文字大小",
+	"快进模式",
 	{ "很慢", "慢", "中", "快", "很快", "瞬间" },
+	{ "全部", "仅已读" },
 
 	&F(chs, save_already_save_to),
 	&F(chs, save_failed),
@@ -155,7 +157,9 @@ const cpymo_localization cht = {
 	"語音音量",
 	"文字速度",
 	"文字大小",
+	"快進模式",
 	{ "很慢", "慢", "中", "快", "很快", "瞬間" },
+	{ "全部", "僅已讀" },
 
 	&F(cht, save_already_save_to),
 	&F(cht, save_failed),
@@ -214,7 +218,9 @@ const cpymo_localization enu = {
 	"Voice Volume",
 	"Text Speed",
 	"Font Size",
+	"Skip Mode",
 	{ "Very Slow", "Slow", "Normal", "Fast", "Very Fast", "Instant" },
+	{ "All", "Already read" },
 
 	&F(enu, save_already_save_to),
 	&F(enu, save_failed),
