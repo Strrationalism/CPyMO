@@ -4,36 +4,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifndef CPYMO_BACKEND_IMAGE_SOFTWARE_IMAGE_SAMPLER
-#define CPYMO_BACKEND_IMAGE_SOFTWARE_IMAGE_SAMPLER nearest
+#ifndef CPYMO_BACKEND_SOFTWARE_IMAGE_SAMPLER
+#define CPYMO_BACKEND_SOFTWARE_IMAGE_SAMPLER nearest
 #endif
 
-extern cpymo_backend_image_software_context 
-    *cpymo_backend_image_software_cur_context;
+extern cpymo_backend_software_context 
+    *cpymo_backend_software_cur_context;
 
-static void cpymo_backend_image_software_scale_on_load(
+static void cpymo_backend_software_scale_on_load(
     void **pixels, int *width, int *height, size_t channels)
 {
-    if (!cpymo_backend_image_software_cur_context->scale_on_load_image)
+    if (!cpymo_backend_software_cur_context->scale_on_load_image)
         return;
 
     int new_width = 
         *width 
-        * cpymo_backend_image_software_cur_context->scale_on_load_image_w_ratio;
+        * cpymo_backend_software_cur_context->scale_on_load_image_w_ratio;
         
     int new_height =
         *height
-        * cpymo_backend_image_software_cur_context->scale_on_load_image_h_ratio;
+        * cpymo_backend_software_cur_context->scale_on_load_image_h_ratio;
         
     uint8_t *new_pixel = (uint8_t *)malloc(new_height * new_width * channels);
     if (new_pixel == NULL) return;
 
     stbir_resize_uint8(
-        (uint8_t)*pixels, *width, *height, *width * channels, 
+        (uint8_t *)*pixels, *width, *height, *width * channels, 
         new_pixel, new_width, new_height, new_width * channels, channels);
 
     free(*pixels);
-    *pixels = *new_pixel;
+    *pixels = (void *)new_pixel;
     *width = new_width;
     *height = new_height;
 }
@@ -44,8 +44,8 @@ error_t cpymo_backend_image_load(
     int width, int height, 
     enum cpymo_backend_image_format format)
 {
-    cpymo_backend_image_software_image *img =
-        (cpymo_backend_image_software_image*)malloc(sizeof(*img));
+    cpymo_backend_software_image *img =
+        (cpymo_backend_software_image*)malloc(sizeof(*img));
     if (img == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
     switch (format) {
@@ -62,7 +62,7 @@ error_t cpymo_backend_image_load(
         abort();
     }
 
-    cpymo_backend_image_software_scale_on_load(
+    cpymo_backend_software_scale_on_load(
         &pixels_moveintoimage, &width, &height, img->pixel_stride);
 
     img->w = (size_t)width;
@@ -99,8 +99,8 @@ error_t cpymo_backend_image_load_with_mask(
 
 void cpymo_backend_image_free(cpymo_backend_image image)
 {
-    cpymo_backend_image_software_image *p = 
-        (cpymo_backend_image_software_image *)image;
+    cpymo_backend_software_image *p = 
+        (cpymo_backend_software_image *)image;
     free(p->pixels);
     free(p);
 }
