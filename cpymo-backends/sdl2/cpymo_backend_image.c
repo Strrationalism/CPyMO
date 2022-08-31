@@ -86,9 +86,16 @@ error_t cpymo_backend_image_load(
 error_t cpymo_backend_image_load_with_mask(
 	cpymo_backend_image *out_image, void *px_rgbx32_moveinto, void *mask_a8_moveinto, int w, int h, int mask_w, int mask_h)
 {
-	cpymo_utils_attach_mask_to_rgba_ex(px_rgbx32_moveinto, w, h, mask_a8_moveinto, mask_w, mask_h);
-	free(mask_a8_moveinto);
-	return cpymo_backend_image_load(out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
+	cpymo_utils_attach_mask_to_rgba_ex(
+        px_rgbx32_moveinto, w, h, mask_a8_moveinto, mask_w, mask_h);
+        
+	error_t err = cpymo_backend_image_load(
+        out_image, px_rgbx32_moveinto, w, h, cpymo_backend_image_format_rgba);
+
+    if (err == CPYMO_ERR_SUCC) 
+        free(mask_a8_moveinto);
+    
+    return err;
 }
 
 void cpymo_backend_image_free(cpymo_backend_image image)
