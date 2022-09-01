@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifndef CPYMO_BACKEND_SOFTWARE_IMAGE_SAMPLER
-#define CPYMO_BACKEND_SOFTWARE_IMAGE_SAMPLER nearest
-#endif
-
 extern cpymo_backend_software_context 
     *cpymo_backend_software_cur_context;
 
@@ -123,7 +119,47 @@ void cpymo_backend_image_draw(
 	cpymo_backend_image src,
 	int srcx, int srcy, int srcw, int srch, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
-{ abort(); }
+{ 
+    cpymo_backend_image_trans_pos(&dstx, &dsty);
+    cpymo_backend_image_trans_pos(&dstw, &dsth);
+
+    int render_target_w = 
+        (int)cpymo_backend_software_cur_context->render_target->w;
+
+    int render_target_h = 
+        (int)cpymo_backend_software_cur_context->render_target->h;
+
+    int x1 = (int)dstx;
+    int y1 = (int)dsty;
+    int x2 = (int)(dstw + dstx);
+    int y2 = (int)(dsth + dsty);
+
+    dstw = (float)(x2 - x1);
+    dsth = (float)(y2 - y1);
+
+    cpymo_backend_software_image *srci = (cpymo_backend_software_image *)src;
+
+    for (int draw_y = y1; draw_y < y2; ++draw_y) {
+        for (int draw_x = x1; draw_x < x2; ++draw_x) {
+            if (draw_x < 0) continue;
+            if (draw_x >= render_target_w) break;
+            if (draw_y < 0) break;
+            if (draw_y >= render_target_h) return;
+
+            float u = (float)(draw_x - x1) / dstw;
+            float v = (float)(draw_y - y1) / dsth;
+
+            float r, g, b, a;
+            cpymo_backend_software_image_sample_nearest(
+                srci, u, v, &r, &g, &b, &a);
+            
+            cpymo_backend_software_image_write_blend(
+                cpymo_backend_software_cur_context->render_target,
+                (size_t)draw_x, (size_t)draw_y,
+                r, g, b, a);
+        }
+    }
+}
 
 void cpymo_backend_image_fill_rects(
 	const float *xywh, size_t count,

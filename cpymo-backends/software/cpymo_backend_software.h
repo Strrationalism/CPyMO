@@ -16,6 +16,19 @@ typedef struct {
     ((Y) * (PIMAGE)->line_stride + (X) * (PIMAGE)->pixel_stride + \
     (PIMAGE)->CHANNEL##_offset + (PIMAGE)->pixels)
 
+typedef struct {
+    bool scale_on_load_image;
+    float scale_on_load_image_w_ratio, scale_on_load_image_h_ratio;
+
+    float logical_screen_w, logical_screen_h;
+
+    cpymo_backend_software_image *render_target;
+    // render target will not write to alpha channel.
+} cpymo_backend_software_context;
+
+void cpymo_backend_software_set_context(
+    cpymo_backend_software_context *context);
+
 static inline void cpymo_backend_software_image_write_blend(
     cpymo_backend_software_image *render_target,
     size_t x, size_t y,
@@ -30,17 +43,33 @@ static inline void cpymo_backend_software_image_write_blend(
     *dst_b = (uint8_t)((b * a + (float)*dst_b / 255.0f * (1.0f - a)) * 255.0f);
 }
 
-typedef struct {
-    bool scale_on_load_image;
-    float scale_on_load_image_w_ratio, scale_on_load_image_h_ratio;
+static inline void cpymo_backend_software_image_sample_nearest(
+    const cpymo_backend_software_image *img,
+    float u, float v,
+    float *r, float *g, float *b, float *a)
+{
+    float tex_w = (float)img->w;
+    float tex_h = (float)img->h;
 
-    float logical_screen_w, logical_screen_h;
+    size_t su = (size_t)(u * tex_w);
+    size_t sv = (size_t)(u * tex_h); 
 
-    cpymo_backend_software_image *render_target;
-    // render target will not write to alpha channel.
-} cpymo_backend_software_context;
+    *r = *CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(img, su, sv, r);
+    *r /= 255.0f;
 
-void cpymo_backend_software_set_context(
-    cpymo_backend_software_context *context);
+    *g = *CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(img, su, sv, g);
+    *g /= 255.0f;
+
+    *b = *CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(img, su, sv, b);
+    *b /= 255.0f;
+
+    if (img->has_alpha_channel) {
+        *a = *CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(img, su, sv, a);
+        *a /= 255.0f;
+    }
+    else {
+        *a = 1.0f;
+    }
+}
 
 #endif
