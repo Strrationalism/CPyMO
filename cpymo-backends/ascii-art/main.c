@@ -12,7 +12,7 @@
 #define STB_LEAKCHECK_IMPLEMENTATION
 #endif
 
-#include "cpymo_prelude.h"
+#include <cpymo_prelude.h>
 #include <stdio.h>
 #include <cpymo_engine.h>
 

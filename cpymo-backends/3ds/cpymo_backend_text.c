@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+﻿#include <cpymo_prelude.h>
 #include <cpymo_backend_text.h>
 #include <stdlib.h>
 #include <3ds.h>

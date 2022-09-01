@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+﻿#include <cpymo_prelude.h>
 #ifndef DISABLE_MOVIE
 #include <cpymo_backend_movie.h>
 #include <SDL/SDL.h>

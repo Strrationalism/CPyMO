@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+﻿#include <cpymo_prelude.h>
 #ifdef ENABLE_SDL2_TTF
 #include <cpymo_engine.h>
 #include <cpymo_utils.h>

@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+﻿#include <cpymo_prelude.h>
 
 #ifdef __WII__
 #define GAME_SELECTOR_DIR "sd:/pymogames/"

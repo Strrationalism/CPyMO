@@ -4,7 +4,7 @@
 #define STBI_NO_PIC
 #define STBI_NO_PNM
 
-#include "cpymo_prelude.h"
+#include <cpymo_prelude.h>
 #include <3ds.h>
 #include <stdio.h>
 #include <cpymo_engine.h>
