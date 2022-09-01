@@ -1,5 +1,6 @@
 #include "cpymo_backend_software.h"
 #include <cpymo_backend_image.h>
+#include <cpymo_utils.h>
 #include <stb_image_resize.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,7 +12,7 @@
 extern cpymo_backend_software_context 
     *cpymo_backend_software_cur_context;
 
-static void cpymo_backend_software_scale_on_load(
+static void cpymo_backend_image_scale_on_load(
     void **pixels, int *width, int *height, size_t channels)
 {
     if (!cpymo_backend_software_cur_context->scale_on_load_image)
@@ -62,7 +63,7 @@ error_t cpymo_backend_image_load(
         abort();
     }
 
-    cpymo_backend_software_scale_on_load(
+    cpymo_backend_image_scale_on_load(
         &pixels_moveintoimage, &width, &height, img->pixel_stride);
 
     img->w = (size_t)width;
@@ -105,6 +106,18 @@ void cpymo_backend_image_free(cpymo_backend_image image)
     free(p);
 }
 
+static inline void cpymo_backend_image_trans_pos(float *x, float *y)
+{
+    float game_w = cpymo_backend_software_cur_context->logical_screen_w;
+	float game_h = cpymo_backend_software_cur_context->logical_screen_h;
+
+	float scr_w = (float)cpymo_backend_software_cur_context->render_target->w;
+	float scr_h = (float)cpymo_backend_software_cur_context->render_target->h;
+
+	*x = *x / game_w * scr_w;
+	*y = *y / game_h * scr_h;
+}
+
 void cpymo_backend_image_draw(
 	float dstx, float dsty, float dstw, float dsth,
 	cpymo_backend_image src,
@@ -116,7 +129,50 @@ void cpymo_backend_image_fill_rects(
 	const float *xywh, size_t count,
 	cpymo_color color, float alpha,
 	enum cpymo_backend_image_draw_type draw_type)
-{ abort(); }
+{ 
+    float r = cpymo_utils_clampf((float)color.r / 255.0f, 0.0f, 1.0f);
+    float g = cpymo_utils_clampf((float)color.g / 255.0f, 0.0f, 1.0f);
+    float b = cpymo_utils_clampf((float)color.b / 255.0f, 0.0f, 1.0f);
+    alpha = cpymo_utils_clampf(alpha, 0.0f, 1.0f);
+
+    int render_target_w = 
+        (int)cpymo_backend_software_cur_context->render_target->w;
+
+    int render_target_h = 
+        (int)cpymo_backend_software_cur_context->render_target->h;
+
+    for (size_t i = 0; i < count; ++i) {
+        const float *rect = xywh + 4 * count;
+        float x = rect[0];
+        float y = rect[1];
+        float w = rect[2];
+        float h = rect[3];
+        cpymo_backend_image_trans_pos(&x, &y);
+        cpymo_backend_image_trans_pos(&w, &h);
+
+        int x1 = (int)x;
+        int y1 = (int)y;
+        int x2 = (int)(x + w);
+        int y2 = (int)(y + h);
+
+        for (int draw_y = y1; draw_y < y2; ++draw_y) {
+            for (int draw_x = x1; draw_x < x2; ++draw_x) {
+                if (draw_x < 0) continue;
+                if (draw_y < 0) break;
+                if (draw_x >= render_target_w) break;
+                if (draw_y >= render_target_h) goto STOP_DRAW_CUR_RECT;
+
+                cpymo_backend_software_image_write_blend(
+                    cpymo_backend_software_cur_context->render_target,
+                    (size_t)draw_x,
+                    (size_t)draw_y,
+                    r, g, b, alpha);
+            }
+        }
+
+        STOP_DRAW_CUR_RECT:
+    }
+}
 
 bool cpymo_backend_image_album_ui_writable()
 { 

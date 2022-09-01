@@ -16,6 +16,20 @@ typedef struct {
     ((Y) * (PIMAGE)->line_stride + (X) * (PIMAGE)->pixel_stride + \
     (PIMAGE)->CHANNEL##_offset + (PIMAGE)->pixels)
 
+static inline void cpymo_backend_software_image_write_blend(
+    cpymo_backend_software_image *render_target,
+    size_t x, size_t y,
+    float r, float g, float b, float a)
+{
+    uint8_t *dst_r = CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(render_target, x, y, r);
+    uint8_t *dst_g = CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(render_target, x, y, g);
+    uint8_t *dst_b = CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(render_target, x, y, b);
+
+    *dst_r = (uint8_t)((r * a + (float)*dst_r / 255.0f * (1.0f - a)) * 255.0f);
+    *dst_g = (uint8_t)((g * a + (float)*dst_g / 255.0f * (1.0f - a)) * 255.0f);
+    *dst_b = (uint8_t)((b * a + (float)*dst_b / 255.0f * (1.0f - a)) * 255.0f);
+}
+
 typedef struct {
     bool scale_on_load_image;
     float scale_on_load_image_w_ratio, scale_on_load_image_h_ratio;
