@@ -481,29 +481,49 @@ jobs:
             ./build/build/Release/cpymo-tool.exe
 
   build-ascii-art:
-    name: 'CPyMO ASCII ART'
+    name: 'CPyMO ASCII Art'
     runs-on: ${{ matrix.os }}
 
     strategy:
-      matrix: 
-        os: [ 'macos-latest', 'ubuntu-latest' ]
+      matrix:
+        os: [ 'windows-latest', 'ubuntu-latest', 'macos-latest' ]
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
 
-    - name: 'Build'
-      run: |
-        cd cpymo-backends/ascii-art/
-        make -j
-        strip ./cpymo-ascii-art
-        
-    - name: Upload
-      uses: actions/upload-artifact@v2.3.0
-      with:
-        name: CPyMO ASCII ART for ${{ runner.os }}
-        path: ./cpymo-backends/ascii-art/cpymo-ascii-art
+      - uses: msys2/setup-msys2@v2
+        if: ${{ runner.os == 'Windows' }}
+        with:
+          msystem: MINGW32
+          update: true
+          install: mingw-w64-i686-toolchain make
+
+      - name: 'Build'
+        if: ${{ runner.os != 'Windows' }}
+        run: |
+          cd cpymo-backends/ascii-art/
+          make -j
+          strip ./cpymo-ascii-art
+
+      - name: 'Build (Windows)'
+        shell: msys2 {0}
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          cd cpymo-backends/ascii-art/
+          make -j
+          strip ./cpymo-ascii-art.exe
+
+      - name: 'Upload'
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: CPyMO Text for ${{ runner.os }}
+          path: |
+            ./cpymo-backends/ascii-art/cpymo-ascii-art
+            ./cpymo-backends/ascii-art/cpymo-ascii-art.exe
+          
+
             
   build-text:
     name: 'CPyMO Text'
