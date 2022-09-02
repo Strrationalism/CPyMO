@@ -61,6 +61,9 @@ static error_t init_context(void)
     context.scale_on_load_image_h_ratio = 
         (float)render_target.h / context.logical_screen_h;
     context.render_target = &render_target;
+
+    extern stbtt_fontinfo font;
+    context.font = &font;
     
     cpymo_backend_software_set_context(&context);
     
@@ -101,6 +104,17 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    extern error_t cpymo_backend_font_init(const char *gamedir);
+    extern void cpymo_backend_font_free();
+
+    err = cpymo_backend_font_init(gamedir);
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] cpymo_backend_font_init: %s.\n", 
+            cpymo_error_message(err));
+        cpymo_engine_free(&engine);
+        return -1;
+    }
+
     ensure_save_dir(gamedir);
 
     printf("\033]0;%s\007", engine.gameconfig.gametitle);
@@ -108,6 +122,7 @@ int main(int argc, char **argv)
     err = init_context();
     if (err != CPYMO_ERR_SUCC) {
         cpymo_engine_free(&engine);
+        cpymo_backend_font_free();    
         printf("[Error] init_context: %s.\n", cpymo_error_message(err));
         return -1;
     }
@@ -150,6 +165,7 @@ int main(int argc, char **argv)
 // cleaning
     cpymo_engine_free(&engine);
     free_context();
+    cpymo_backend_font_free();
 
     extern void cpymo_backend_ascii_clean(void);
     cpymo_backend_ascii_clean();

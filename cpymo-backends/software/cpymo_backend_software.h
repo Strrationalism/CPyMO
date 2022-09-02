@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stb_truetype.h>
 
 typedef struct {
     size_t w, h, line_stride, pixel_stride;
@@ -24,6 +25,8 @@ typedef struct {
 
     cpymo_backend_software_image *render_target;
     // render target will not write to alpha channel.
+
+    stbtt_fontinfo *font;
 } cpymo_backend_software_context;
 
 void cpymo_backend_software_set_context(
