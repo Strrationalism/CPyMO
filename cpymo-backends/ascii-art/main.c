@@ -117,11 +117,7 @@ int main(int argc, char **argv)
 
     int ret = 0;
 
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+    printf("\033c");
 
     while(1) {
         bool redraw = false;
