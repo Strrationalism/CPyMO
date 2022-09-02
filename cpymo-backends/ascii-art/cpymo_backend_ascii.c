@@ -31,6 +31,10 @@ void cpymo_backend_ascii_clean(void)
     arrfree(framebuffer_ascii);
 }
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 void cpymo_backend_ascii_submit_framebuffer(
     const cpymo_backend_software_image *framebuffer)
 {
@@ -65,7 +69,18 @@ void cpymo_backend_ascii_submit_framebuffer(
 
     arrput(framebuffer_ascii, '\0');
 
+    #ifdef _WIN32
+    WriteConsoleA(
+        GetStdHandle(STD_OUTPUT_HANDLE), 
+        framebuffer_ascii, 
+        arrlenu(framebuffer_ascii) - 1, 
+        NULL, 
+        NULL);
+
+    #else
     printf("%s", framebuffer_ascii);
+    #endif
+
     printf("\033[%dA\033[%dD", 
         (int)framebuffer->w,
         (int)framebuffer->h);
