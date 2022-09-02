@@ -55,10 +55,10 @@ static error_t init_context(void)
     context.logical_screen_w = (float)engine.gameconfig.imagesize_w;
     context.logical_screen_h = (float)engine.gameconfig.imagesize_h;
 
-    context.scale_on_load_image = false;    // TODO: fix this
-    context.scale_on_load_image_w_ratio =
+    context.scale_on_load_image = true;
+    context.scale_on_load_image_w_ratio = 
         (float)render_target.w / context.logical_screen_w;
-    context.scale_on_load_image_h_ratio =
+    context.scale_on_load_image_h_ratio = 
         (float)render_target.h / context.logical_screen_h;
     context.render_target = &render_target;
     

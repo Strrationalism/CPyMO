@@ -138,11 +138,27 @@ void cpymo_backend_image_draw(
     dstw = (float)(x2 - x1);
     dsth = (float)(y2 - y1);
 
+    float scalex = 1.0f;
+    float scaley = 1.0f;
+
+    if (cpymo_backend_software_cur_context->scale_on_load_image) {
+        scalex = 
+            cpymo_backend_software_cur_context->scale_on_load_image_w_ratio;
+            
+        scaley =
+            cpymo_backend_software_cur_context->scale_on_load_image_h_ratio;
+    }
+
+    float fsrcx = scalex * (float)srcx;
+    float fsrcy = scaley * (float)srcy;
+    float fsrcw = scalex * (float)srcw;
+    float fsrch = scaley * (float)srch;
+
     cpymo_backend_software_image *srci = (cpymo_backend_software_image *)src;
-    float u_offset = (float)srcx / (float)srci->w;
-    float v_offset = (float)srcy / (float)srci->h;
-    float u_scale = (float)srcw / (float)srci->w;
-    float v_scale = (float)srch / (float)srci->h;
+    float u_offset = fsrcx / (float)srci->w;
+    float v_offset = fsrcy / (float)srci->h;
+    float u_scale = fsrcw / (float)srci->w;
+    float v_scale = fsrch / (float)srci->h;
 
     for (int draw_y = y1; draw_y < y2; ++draw_y) {
         for (int draw_x = x1; draw_x < x2; ++draw_x) {
