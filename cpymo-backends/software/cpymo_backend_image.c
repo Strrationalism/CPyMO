@@ -176,6 +176,8 @@ void cpymo_backend_image_draw(
             float r, g, b, a;
             cpymo_backend_software_image_sample_nearest(
                 srci, u, v, &r, &g, &b, &a);
+
+            a *= alpha;
             
             cpymo_backend_software_image_write_blend(
                 cpymo_backend_software_cur_context->render_target,

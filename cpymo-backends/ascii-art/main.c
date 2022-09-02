@@ -112,12 +112,12 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    extern float get_delta_time(void);
-    get_delta_time();
-
     int ret = 0;
 
     printf("\033c");
+
+    extern float get_delta_time(void);
+    get_delta_time();
 
     while(1) {
         bool redraw = false;
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
         if (redraw) {
             memset(
                 render_target.pixels, 
-                255, 
+                0, 
                 render_target.line_stride * render_target.h);
 
             cpymo_engine_draw(&engine);
