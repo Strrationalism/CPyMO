@@ -73,6 +73,20 @@ static void free_context(void)
     cpymo_backend_software_set_context(NULL);
 }
 
+#ifdef _WIN32
+#include <direct.h>
+#define mkdir(x, y) _mkdir(x)
+#else
+#include <sys/stat.h>
+#endif
+
+static void ensure_save_dir(const char *gamedir)
+{
+	char *save_dir = (char *)alloca(strlen(gamedir) + 8);
+	sprintf(save_dir, "%s/save", gamedir);
+	mkdir(save_dir, 0777);
+}
+
 int main(int argc, char **argv)
 {
     srand((unsigned)time(NULL));
@@ -86,6 +100,8 @@ int main(int argc, char **argv)
         printf("[Error] cpymo_engine_init: %s. \n", cpymo_error_message(err));
         return -1;
     }
+
+    ensure_save_dir(gamedir);
 
     printf("\033]0;%s\007", engine.gameconfig.gametitle);
 

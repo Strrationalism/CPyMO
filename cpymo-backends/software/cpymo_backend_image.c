@@ -169,8 +169,6 @@ void cpymo_backend_image_draw(
     }
 }
 
-
-// TODO: Fix this.
 void cpymo_backend_image_fill_rects(
 	const float *xywh, size_t count,
 	cpymo_color color, float alpha,
@@ -188,7 +186,7 @@ void cpymo_backend_image_fill_rects(
         (int)cpymo_backend_software_cur_context->render_target->h;
 
     for (size_t i = 0; i < count; ++i) {
-        const float *rect = xywh + 4 * count;
+        const float *rect = xywh + 4 * i;
         float x = rect[0];
         float y = rect[1];
         float w = rect[2];
