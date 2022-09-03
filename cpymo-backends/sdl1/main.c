@@ -52,10 +52,6 @@ extern int mouse_wheel;
 #define SCREEN_FLAGS (SDL_HWSURFACE | SDL_ASYNCBLIT | SDL_ANYFORMAT | SDL_HWPALETTE | SDL_DOUBLEBUF)
 #endif
 
-#ifdef __WII__
-#define GAME_SELECTOR_DIR "sd:/pymogames/"
-#endif
-
 extern error_t cpymo_backend_font_init(const char *gamedir);
 extern void cpymo_backend_font_free();
 
