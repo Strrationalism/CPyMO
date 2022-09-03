@@ -169,9 +169,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 }
 
-#ifdef __SWITCH__
-#define TEXT_LINE_Y_OFFSET 12
-#else
+#ifndef TEXT_LINE_Y_OFFSET
 #define TEXT_LINE_Y_OFFSET 0
 #endif
 
