@@ -1,4 +1,4 @@
-﻿#include <cpymo_prelude.h>
+#include <cpymo_prelude.h>
 #ifndef DISABLE_STB_TRUETYPE
 
 #include <cpymo_error.h>
@@ -133,6 +133,20 @@ error_t cpymo_backend_font_init(const char *gamedir)
 #endif
 
 #ifdef __APPLE__
+#ifdef __IOS__
+    extern const char *get_ios_directory();
+    const char *iosdir = get_ios_directory();
+    path = (char *) alloca(strlen(iosdir) + 24);
+    if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    sprintf(path, "%s/default.ttf", iosdir);
+    err = cpymo_backend_font_try_load_font(path);
+    if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
+
+    sprintf(path, "%s/default.otf", iosdir);
+    err = cpymo_backend_font_try_load_font(path);
+    if (err == CPYMO_ERR_SUCC) return CPYMO_ERR_SUCC;
+#else
 	const char *fonts[] = {
 		"/System/Library/Fonts/STHeiti Medium.ttc",
 		"/System/Library/Fonts/STHeiti Light.ttc"
@@ -141,6 +155,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 	for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i)
 		if (cpymo_backend_font_try_load_font(fonts[i]) == CPYMO_ERR_SUCC)
 			return CPYMO_ERR_SUCC;
+#endif
 #endif
 
 #ifdef __SWITCH__
