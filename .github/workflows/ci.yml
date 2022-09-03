@@ -518,7 +518,7 @@ jobs:
       - name: 'Upload'
         uses: actions/upload-artifact@v2.3.0
         with:
-          name: CPyMO Text for ${{ runner.os }}
+          name: CPyMO ASCII Art for ${{ runner.os }}
           path: |
             ./cpymo-backends/ascii-art/cpymo-ascii-art
             ./cpymo-backends/ascii-art/cpymo-ascii-art.exe
