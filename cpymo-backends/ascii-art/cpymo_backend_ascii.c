@@ -9,10 +9,13 @@
 #include <stdlib.h>
 #include <stb_ds.h>
 
-const static char ascii_table[70] = 
-	" .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8B@$";
+#ifndef ASCII_TABLE
+#define ASCII_TABLE " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8B@$"
+#endif
 
-const static size_t ascii_table_length = 69;
+const static char ascii_table[] = ASCII_TABLE;
+
+const static size_t ascii_table_length = CPYMO_ARR_COUNT(ascii_table) - 1;
 
 static char *framebuffer_ascii = NULL;
 
