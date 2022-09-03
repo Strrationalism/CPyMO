@@ -58,31 +58,3 @@ float get_delta_time(void)
     return delta;
 }
 
-
-/********** Unsupported ***************/
-// Text
-#include <cpymo_backend_text.h>
-error_t cpymo_backend_text_create(
-    cpymo_backend_text *out, 
-    float *out_width,
-    cpymo_str utf8_string, 
-    float single_character_size_in_logical_screen)
-{
-    *out = (cpymo_backend_text)1;
-    return CPYMO_ERR_SUCC;
-}
-
-void cpymo_backend_text_free(cpymo_backend_text t) {}
-
-void cpymo_backend_text_draw(
-    cpymo_backend_text t,
-    float x, float y_baseline,
-    cpymo_color col, float alpha,
-    enum cpymo_backend_image_draw_type draw_type) {}
-
-float cpymo_backend_text_width(
-    cpymo_str t,
-    float single_character_size_in_logical_screen) 
-{ return t.len * single_character_size_in_logical_screen; }
-
-
