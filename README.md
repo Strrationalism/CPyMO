@@ -653,9 +653,19 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
     - 扩展：定义`GAME_SELECTOR_RESET_SCREEN_SIZE_AFTER_START_GAME`后将允许在启动游戏后重设游戏画面大小。
 
 
-## CPyMO ASCII ART
+## Software Backend
+
+这是CPyMO软件渲染器的实现，如果你需要在不依赖外部组件的情况下进行渲染，可以将这里的代码与你的适配代码一起编译。
+
+你只需要创建`cpymo_backend_software_context`并使用`cpymo_backend_software_set_context`将它设置为当前渲染上下文即可将RGB24缓冲区渲染到指定的内存区域。
+
+详细例子可参考`CPyMO ASCII Art`。
+
+### CPyMO ASCII ART
 
 这是一个CPyMO变种，没有音频和视频播放器支持，它将会在控制台上输出画面，Just for fun!
+
+它依赖于Software Backend。
 
 ### 编译
 
