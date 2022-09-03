@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-bool kbhit()
+static bool kbhit()
 {
     struct termios term;
     tcgetattr(0, &term);
@@ -31,7 +31,7 @@ bool kbhit()
     return byteswaiting > 0;
 }
 
-char getch(void)
+static char getch(void)
 {
     struct termios oldt, newt;
     int ch;

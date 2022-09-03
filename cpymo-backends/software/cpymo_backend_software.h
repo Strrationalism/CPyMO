@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stb_truetype.h>
 
 typedef struct {
     size_t w, h, line_stride, pixel_stride;
@@ -24,6 +25,8 @@ typedef struct {
 
     cpymo_backend_software_image *render_target;
     // render target will not write to alpha channel.
+
+    stbtt_fontinfo *font;
 } cpymo_backend_software_context;
 
 void cpymo_backend_software_set_context(
@@ -51,8 +54,8 @@ static inline void cpymo_backend_software_image_sample_nearest(
     float tex_w = (float)img->w;
     float tex_h = (float)img->h;
 
-    size_t su = (size_t)(u * tex_w);
-    size_t sv = (size_t)(u * tex_h); 
+    size_t su = (size_t)(u * (tex_w - 1));
+    size_t sv = (size_t)(v * (tex_h - 1)); 
 
     *r = *CPYMO_BACKEND_SOFTWARE_IMAGE_PIXEL(img, su, sv, r);
     *r /= 255.0f;
