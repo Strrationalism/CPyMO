@@ -9,7 +9,7 @@
 extern cpymo_backend_software_context 
     *cpymo_backend_software_cur_context;
 
-static void cpymo_backend_image_scale_on_load(
+void cpymo_backend_image_scale_on_load(
     void **pixels, int *width, int *height, size_t channels)
 {
     if (!cpymo_backend_software_cur_context->scale_on_load_image)
