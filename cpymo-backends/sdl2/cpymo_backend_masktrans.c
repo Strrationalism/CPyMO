@@ -79,6 +79,7 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 		for (int x = 0; x < m->w; ++x) {
 			float mask =
 				(float)(((unsigned char*)m->mask)[y * m->w + x]) / 255;
+			mask = 1.0f - mask;
 
 			if (is_fade_in) mask = 1 - mask;
 

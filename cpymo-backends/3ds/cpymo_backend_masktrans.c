@@ -81,6 +81,7 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float progression, 
         for(u32 x = 0; x < t->w; x++) {
             MAKE_PTR_TEX(out, t->tex, x, y, 1, t->pw, t->ph);
             float mask = (float)*((u8*)t->mask + (y * t->w + x)) / 255.0f;
+			mask = 1.0f - mask;
 
 			if(is_fade_in) mask = 1 - mask;
 
