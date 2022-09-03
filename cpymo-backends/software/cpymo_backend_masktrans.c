@@ -69,6 +69,8 @@ void cpymo_backend_masktrans_draw(
                 (float)y / (float)render_target->h,
                 &mask, &dummy, &dummy, &dummy);
 
+            if (!is_fade_in) mask = 1.0f - mask;
+
             if (mask > t_top) mask = 1.0f;
 			else if (mask < t_bottom) mask = 0.0f;
 			else mask = (mask - t_bottom) / (2 * radius);
