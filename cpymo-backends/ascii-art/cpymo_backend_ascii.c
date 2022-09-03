@@ -67,6 +67,11 @@ void cpymo_backend_ascii_submit_framebuffer(
             cpymo_backend_ascii_write_string("\n");
     }
 
+    sprintf(buf, "\033[%dA\033[%dD", 
+        (int)framebuffer->w,
+        (int)framebuffer->h);
+    cpymo_backend_ascii_write_string(buf);
+
     arrput(framebuffer_ascii, '\0');
 
     #ifdef _WIN32
@@ -80,9 +85,5 @@ void cpymo_backend_ascii_submit_framebuffer(
     #else
     printf("%s", framebuffer_ascii);
     #endif
-
-    printf("\033[%dA\033[%dD", 
-        (int)framebuffer->w,
-        (int)framebuffer->h);
 }
 
