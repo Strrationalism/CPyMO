@@ -215,7 +215,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 
 
 
-#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__) && defined USE_GAME_SELECTOR)
+#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__ || defined __IOS__) && defined USE_GAME_SELECTOR)
 
 #include <dirent.h>
 cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
@@ -394,7 +394,14 @@ int main(int argc, char **argv)
 	error_t err = cpymo_engine_init(&engine, gamedir);
 #else
 	char *last_selected_game_dir = get_last_selected_game_dir();
+
+#ifdef __IOS__
+    extern const char* get_ios_directory();
+    const char *game_selector_dir = get_ios_directory();
+    cpymo_game_selector_item  *item = get_game_list(game_selector_dir);
+#else
 	cpymo_game_selector_item *item = get_game_list(GAME_SELECTOR_DIR);
+#endif
 
 #ifdef GAME_SELECTOR_DIR_2
 	{
@@ -432,6 +439,9 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+#ifdef __IOS__
+	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
+#endif
 
 
 #if (defined SCREEN_WIDTH && defined SCREEN_HEIGHT)
@@ -655,6 +665,7 @@ EXIT:
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
+    exit(0);
 
 	#if _WIN32 && !NDEBUG
 	_CrtDumpMemoryLeaks();

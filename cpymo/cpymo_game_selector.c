@@ -333,7 +333,7 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			return err;
 		}
 
-#if (!defined __PSP__ && !defined __UWP__)
+#if (!defined __PSP__ && !defined __UWP__ && !defined __IOS__)
 		err = cpymo_backend_text_create(&ui->msg2, &ui->msg2_w,
 			cpymo_str_pure(l->game_selector_empty_secondary),
 			font_size / 1.3f);

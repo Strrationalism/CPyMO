@@ -189,6 +189,44 @@ jobs:
         export AUDIO_BACKEND=ffmpeg
         make -f Makefile.Emscripten -j
         
+  build-ios:
+    name: 'iOS'
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Build FFmpeg
+        shell: bash
+        working-directory: ./cpymo-backends/ios/FFmpeg-iOS-build-script
+        run: |
+          chmod +x ./build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ./cpymo-backends/ios
+        run: cmake -S. -Bbuild -DCMAKE_TOOLCHAIN_FILE=./ios-cmake/ios.toolchain.cmake  -DENABLE_BITCODE=0 -DPLATFORM=OS64
+
+      - name: Build IPA
+        shell: bash
+        working-directory: ./cpymo-backends/ios
+        run: |
+          cmake --build build -j $(sysctl -n hw.physicalcpu) --config Release
+          cd ./build
+          mkdir Payload
+          mv cpymo.app Payload/
+          zip -r cpymo.ipa Payload
+          mv ./cpymo.ipa ../../../cpymo.ipa
+
+      - name: Upload
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: CPyMO for iOS
+          path: ./cpymo.ipa
+
   build-android:
     name: 'Android'
     runs-on: ubuntu-latest

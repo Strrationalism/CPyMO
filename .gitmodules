@@ -10,3 +10,9 @@
 [submodule "cpymo-backends/android/ffmpeg-android-maker"]
 	path = cpymo-backends/android/ffmpeg-android-maker
 	url = https://github.com/Javernaut/ffmpeg-android-maker.git
+[submodule "cpymo-backends/ios/FFmpeg-iOS-build-script"]
+	path = cpymo-backends/ios/FFmpeg-iOS-build-script
+	url = https://github.com/kewlbear/FFmpeg-iOS-build-script.git
+[submodule "cpymo-backends/ios/ios-cmake"]
+	path = cpymo-backends/ios/ios-cmake
+	url = https://github.com/leetal/ios-cmake.git
