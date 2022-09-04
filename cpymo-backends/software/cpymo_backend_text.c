@@ -12,6 +12,10 @@
 #define TEXT_LINE_Y_OFFSET 0
 #endif
 
+#ifndef TEXT_CHARACTER_W_SCALE
+#define TEXT_CHARACTER_W_SCALE 4
+#endif
+
 extern cpymo_backend_software_context 
     *cpymo_backend_software_cur_context;
 
@@ -131,14 +135,14 @@ static void cpymo_backend_text_draw_internal(cpymo_color col, float x, float y, 
     y *= window_size_h;
 
     for (uint16_t draw_rect_y = 0; draw_rect_y < t->h; ++draw_rect_y) {
-        for (uint16_t draw_rect_x = 0; draw_rect_x < t->w * 2; ++draw_rect_x) {
+        for (uint16_t draw_rect_x = 0; draw_rect_x < t->w * TEXT_CHARACTER_W_SCALE; ++draw_rect_x) {
             size_t draw_x = draw_rect_x + (size_t)x;
             size_t draw_y = draw_rect_y + (size_t)y;
 
             if (draw_x >= window_size_w || draw_y >= window_size_h) continue;
 
             float pixel_alpha = 
-                ((float)t->px[draw_rect_y * t->w + draw_rect_x / 2] / 255.0f);
+                ((float)t->px[draw_rect_y * t->w + draw_rect_x / TEXT_CHARACTER_W_SCALE] / 255.0f);
 
             cpymo_backend_software_image_write_blend(
                 render_target, 
@@ -186,5 +190,5 @@ float cpymo_backend_text_width(
     int w, h;
     cpymo_backend_text_render(NULL, &w, &h, s, scale, baseline);
 
-    return 2 * (float)w / win_w * game_w;
+    return TEXT_CHARACTER_W_SCALE * (float)w / win_w * game_w;
 }

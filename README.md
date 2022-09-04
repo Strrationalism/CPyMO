@@ -583,6 +583,7 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 定位到`cpymo_backend_font.c`中的函数`error_t cpymo_backend_font_init(const char *gamedir)`，向此函数添加用于加载系统字体的代码。
 
 定义`TEXT_LINE_Y_OFFSET`即可调整字体行Y坐标偏移量。
+定义`TEXT_CHARACTER_W_SCALE`即可调整字体宽度倍数。
 
 ### 选择帧缓存格式
 
