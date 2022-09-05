@@ -440,12 +440,11 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-
-#ifdef __IOS__
+#if defined __IOS__ && SDL_VERSION_ATLEAST(2, 0, 8)
 	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "1");
 #endif
 
+#if SDL_VERSION_ATLEAST(2, 0, 18)
 	SDL_SetHint(SDL_HINT_APP_NAME, "CPyMO");
 #endif
 
