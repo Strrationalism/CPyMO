@@ -36,6 +36,7 @@ Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | �
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
 Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体  | 视障帮助
 macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
+iOS             | SDL2 | FFmpeg   | FFmpeg             | 外置字体      | 游戏选择器
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
@@ -249,6 +250,16 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 * 图片格式：带透明通道的png，不要使用mask灰阶图片
 * platform参数：pygame
 * 视频格式：H264 MP4
+
+# iOS 平台
+
+## 安装
+
+可以通过Sideloady等侧载软件在iOS上侧载CPyMO for iOS。
+
+## 启动
+
+使用iTunes打开CPyMO文档目录，将default.ttf和游戏放入之后点击CPyMO图标即可启动。
 
 # Sony Playstation Portable 平台
 
