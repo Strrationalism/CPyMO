@@ -127,6 +127,28 @@ static void cpymo_list_ui_fix_key_scroll(cpymo_engine *e)
 	}
 }
 
+static bool cpymo_list_ui_is_last_node(cpymo_engine *e, void *ui_data)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
+	bool is_last_page = false;
+	void *node = ui->current_node;
+	for (size_t i = 0; i < ui->nodes_per_screen; ++i) {
+		if (node == NULL) {
+			is_last_page = true;
+			break;
+		}
+
+		node = ui->get_next(e, ui + 1, node);
+
+		if (node == NULL) {
+			is_last_page = true;
+			break;
+		}
+	}
+
+	return is_last_page;
+}
+
 static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 {
 	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
@@ -181,7 +203,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 				if (ui->current_y > 0)
 					ui->current_y = 0;
 
-			if (ui->get_next(e, ui + 1, ui->current_node) == NULL)
+			if (cpymo_list_ui_is_last_node(e, ui_data))
 				if (ui->current_y < 0)
 					ui->current_y = 0;
 		}
@@ -226,6 +248,8 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		else if (b) {
 			void *p = ui->get_next(e, ui + 1, ui->current_node);
 			if (p == NULL) ui->current_y = 0;
+
+			if (cpymo_list_ui_is_last_node(e, ui_data)) ui->current_y = 0;
 		}
 
 		while (ui->current_y >= ui->node_height) {
