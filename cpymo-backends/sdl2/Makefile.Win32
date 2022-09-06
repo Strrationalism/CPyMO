@@ -23,6 +23,14 @@ CFLAGS = $(CFLAGS) -DENABLE_TEXT_EXTRACT -DENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD
 CFLAGS = $(CFLAGS) -DENABLE_EXIT_CONFIRM
 !endif
 
+!if "$(DISABLE_VSYNC)" == "1"
+CFLAGS = $(CFLAGS) -DDISABLE_VSYNC
+!endif
+
+!if "$(LEAKCHECK)" == "1"
+CFLAGS = $(CFLAGS) -DLEAKCHECK
+!endif
+
 !ifdef FFMPEG
 CFLAGS = $(CFLAGS) -I$(FFMPEG)/include
 LD_FLAGS = $(LD_FLAGS) /LIBPATH:$(FFMPEG)/lib avcodec.lib avformat.lib swresample.lib avutil.lib

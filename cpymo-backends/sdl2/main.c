@@ -319,10 +319,15 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 	if (SDL_SetWindowDisplayMode(*window, &display_mode) != 0) {
 		SDL_Log("[Warning] Can not set window display mode.");
 	}
+#endif	
+
+#ifdef DISABLE_VSYNC
+	Uint32 renderer_flags = 0;
+#else
+	Uint32 renderer_flags = SDL_RENDERER_PRESENTVSYNC;
 #endif
 
-
-	*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_PRESENTVSYNC);
+	*renderer = SDL_CreateRenderer(*window, -1, 0);
 	if (*renderer == NULL) {
 		SDL_DestroyWindow(*window);
 		*window = NULL;
@@ -659,7 +664,10 @@ int main(int argc, char **argv)
 			SDL_RenderPresent(renderer);
 			if (redraw_by_event) redraw_by_event--;
 			//fps_counter++;
-		} else SDL_Delay(16);
+		}
+#ifndef DISABLE_VSYNC
+		else SDL_Delay(16);
+#endif
 	}
 
 EXIT:

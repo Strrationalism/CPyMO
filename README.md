@@ -111,6 +111,8 @@ brew install libxcb
 * 若`TARGET`环境变量存在或通过-a传入，则允许用户通过TARGET指定输出的可执行文件名称。
 * 若`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为1或通过-a传入1，则将会导出游戏文本到剪切板（用于视障玩家）。
 * 若`ENABLE_EXIT_CONFIRM`环境变量为1或通过-a传入1，则会在退出游戏时询问是否要退出。
+* 若`LEAKCHECK`环境变量为1或通过-a传入1，则会启动stb_leakcheck进行内存泄漏检查。
+* 若`DISABLE_VSYNC`环境变量为1或通过-a传入1，则禁用垂直同步并以最高可能帧率运行。
 
 之后启动Visual Studio开发人员命令提示符，使用cd命令进入`cpymo-backends/sdl2`目录，执行`nmake -f Makefile.Win32`即可构建CPyMO。
 
@@ -143,6 +145,8 @@ brew install libxcb
 * 使`NO_CONSOLE`环境变量为`1`可以禁止CPyMO创建控制台窗口。（仅Windows）
 * 使`ENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD`环境变量为`1`可将游戏文本复制到控制台上。（用于视障玩家）
 * 若`ENABLE_EXIT_CONFIRM`环境变量为1或通过-a传入1，则会在退出游戏时询问是否要退出。
+* 若`LEAKCHECK`环境变量为1或通过-a传入1，则会启动stb_leakcheck进行内存泄漏检查。
+* 若`DISABLE_VSYNC`环境变量为1或通过-a传入1，则禁用垂直同步并以最高可能帧率运行。
 
 
 # Nintendo 3DS 平台
@@ -608,6 +612,10 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 
 流式加载图片的性能在不同平台上可能会有不同表现，如果某些设备需要占用更小的内存空间或流式加载图片更快，可定义宏`STREAMING_LOAD_IMAGE`来流式加载图片。
 
+### 垂直同步
+
+使用`DISABLE_VSYNC`宏即可禁用垂直同步并以最高可能的帧率运行。
+
 ## SDL 1.2后端
 
 该后端用于兼容较为老旧的平台，位于`cpymo-backends/sdl1`中。
@@ -629,6 +637,7 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 * 若`ENABLE_EXIT_CONFIRM`环境变量为1，则会在退出游戏时询问是否要退出。
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
 * 设置`DEBUG`为1时，将会启动调试信息。
+* 设置`LEAKCHECK`为1时，将会启动stb_leakcheck进行内存泄漏检查。
 
 之后在`cpymo-backends/sdl1`中执行`make`即可编译。
 
