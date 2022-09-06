@@ -258,9 +258,23 @@ error_t cpymo_charas_kill(cpymo_engine *e, int chara_id, float time)
 	return CPYMO_ERR_SUCC;
 }
 
+static void cpymo_charas_stop_all_tween(cpymo_engine *e)
+{
+	struct cpymo_chara *chara = e->charas.chara;
+	while (chara) {
+		cpymo_tween_finish(&chara->pos_x);
+		cpymo_tween_finish(&chara->pos_y);
+		cpymo_tween_finish(&chara->alpha);
+		chara = chara->next;
+	}
+}
+
 void cpymo_charas_wait(cpymo_engine *e)
 {
-	cpymo_wait_register(&e->wait, &cpymo_charas_wait_all_tween);
+	if (cpymo_engine_skipping(e)) 
+		cpymo_charas_stop_all_tween(e);
+	else 
+		cpymo_wait_register(&e->wait, &cpymo_charas_wait_all_tween);
 }
 
 void cpymo_charas_kill_all(cpymo_engine *e, float time)

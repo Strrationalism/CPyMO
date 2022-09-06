@@ -350,7 +350,7 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 
 static error_t cpymo_say_autosave_and_next(cpymo_engine *e)
 {
-	if (!cpymo_engine_skipping(e)) cpymo_save_autosave(e);
+	cpymo_save_autosave(e);
 	cpymo_wait_register_with_callback(
 		&e->wait,
 		&cpymo_say_wait_text_reading,
@@ -361,7 +361,15 @@ static error_t cpymo_say_autosave_and_next(cpymo_engine *e)
 static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e)
 {
 	cpymo_key_hold_init(&e->say.key_mouse_button, e->input.mouse_button);
-	cpymo_wait_callback_nextframe(&e->wait, cpymo_say_autosave_and_next);
+	if (cpymo_engine_skipping(e)) {
+		cpymo_wait_register_with_callback(
+		&e->wait,
+		&cpymo_say_wait_text_reading,
+		&cpymo_say_wait_text_read_callback);
+	}
+	else {
+		cpymo_wait_callback_nextframe(&e->wait, cpymo_say_autosave_and_next);
+	}
 	return CPYMO_ERR_SUCC;
 }
 
@@ -450,10 +458,16 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 
 	e->say.active = true;
 
-	cpymo_wait_register_with_callback(
-		&e->wait,
-		&cpymo_say_wait_text_fadein,
-		&cpymo_say_wait_text_fadein_callback);
+	if (cpymo_engine_skipping(e)) {
+		cpymo_say_wait_text_read_callback(e);
+		cpymo_engine_request_redraw(e);
+	}
+	else {
+		cpymo_wait_register_with_callback(
+			&e->wait,
+			&cpymo_say_wait_text_fadein,
+			&cpymo_say_wait_text_fadein_callback);
+	}
 
 	return err;
 }
