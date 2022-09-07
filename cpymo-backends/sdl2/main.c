@@ -446,7 +446,7 @@ int main(int argc, char **argv)
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
 #if defined __IOS__ && SDL_VERSION_ATLEAST(2, 0, 8)
-	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "1");
+	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
 #endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 18)
