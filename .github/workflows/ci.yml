@@ -287,45 +287,44 @@ jobs:
         path: |
           ./cpymo-accessibility-signed.apk
 
-  build-uwp:
-    name: 'Universal Windows Platform'
-    runs-on: 'windows-latest'
+  # build-uwp:
+  #   name: 'Universal Windows Platform'
+  #   runs-on: 'windows-latest'
 
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: true
+  #   steps:
+  #   - uses: actions/checkout@v1
+  #     with:
+  #       submodules: true
 
-    - name: Find Visual Studio
-      uses: ilammy/msvc-dev-cmd@v1
+  #   - name: Find Visual Studio
+  #     uses: ilammy/msvc-dev-cmd@v1
         
-    - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.3.1
+  #   - name: Set up NASM
+  #     uses: ilammy/setup-nasm@v1.3.1
         
-    - name: Donwload vcpkg
-      run: |
-        git clone https://github.com/Cheney-W/vcpkg.git --depth 1 -b Dev/Cheney/26538
+  #   - name: Donwload vcpkg
+  #     run: git clone https://github.com/microsoft/vcpkg --depth 1
 
-    - name: Bootstrap vcpkg
-      run: |
-        ./vcpkg/bootstrap-vcpkg.bat
-        ./vcpkg/vcpkg integrate install
+  #   - name: Bootstrap vcpkg
+  #     run: |
+  #       ./vcpkg/bootstrap-vcpkg.bat
+  #       ./vcpkg/vcpkg integrate install
 
-    - name: Install FFmpeg
-      run: |
-        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp
+  #   - name: Install FFmpeg
+  #     run: |
+  #       ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp
 
-    - name: Build
-      run: |
-        pushd cpymo-backends/uwp
-        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
-        popd
+  #   - name: Build
+  #     run: |
+  #       pushd cpymo-backends/uwp
+  #       msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
+  #       popd
 
-    - name: Upload
-      uses: actions/upload-artifact@v2.3.0
-      with:
-        name: CPyMO for Universal Windows Platform
-        path: ./cpymo-backends/uwp/AppPackages/CPyMO/
+  #   - name: Upload
+  #     uses: actions/upload-artifact@v2.3.0
+  #     with:
+  #       name: CPyMO for Universal Windows Platform
+  #       path: ./cpymo-backends/uwp/AppPackages/CPyMO/
 
   build-SDL1-windows:
     name: 'Windows (SDL 1.2)'
@@ -408,7 +407,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ mac-x64, mac-arm64 ] #, win-arm64, win-arm, win-x64, linux-x64, win-x86 ]
+        tuple: [ mac-x64, mac-arm64, win-x86 ] #, win-arm64, win-arm, win-x64, linux-x64 ]
 
         include:
           # - tuple: win-x64
