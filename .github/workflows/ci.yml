@@ -300,7 +300,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
         
     - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
+      uses: ilammy/setup-nasm@v1.3.1
         
     - name: Donwload vcpkg
       run: git clone https://github.com/Cheney-W/vcpkg --depth 1
@@ -460,7 +460,7 @@ jobs:
         arch: ${{ matrix.arch }}
         
     - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
+      uses: ilammy/setup-nasm@v1.3.1
       if: ${{ runner.os != 'Windows' }}
         
     - name: Donwload vcpkg
