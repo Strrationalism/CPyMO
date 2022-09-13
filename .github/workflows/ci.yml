@@ -467,11 +467,15 @@ jobs:
       run: git clone https://github.com/microsoft/vcpkg --depth 1
 
     - name: Bootstrap vcpkg
-      run: ./vcpkg/bootstrap-vcpkg.sh
+      run: |
+        ./vcpkg/bootstrap-vcpkg.sh
+        ./vcpkg/vcpkg integrate install
       if: ${{ runner.os != 'Windows' }}
 
     - name: Bootstrap vcpkg (Windows)
-      run: ./vcpkg/bootstrap-vcpkg.bat
+      run: |
+        ./vcpkg/bootstrap-vcpkg.bat
+        ./vcpkg/vcpkg integrate install
       if: ${{ runner.os == 'Windows' }}
 
     - name: Install SDL2
@@ -485,7 +489,12 @@ jobs:
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
 
     - name: Configure CMake
+      if: ${{ runner.os != 'Windows' }}
       run: cmake "-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
+
+    - name: Configure CMake (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: cmake "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
