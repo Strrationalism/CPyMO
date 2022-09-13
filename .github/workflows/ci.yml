@@ -407,7 +407,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ mac-x64, mac-arm64 ] #, win-arm64, win-arm, win-x64, win-x86, linux-x64 ]
+        tuple: [ mac-x64, mac-arm64, win-x86 ] #, win-arm64, win-arm, win-x64, linux-x64 ]
 
         include:
           # - tuple: win-x64
@@ -416,12 +416,12 @@ jobs:
           #   arch: x64
           #   package-name: "Windows x64"
           #   cmake-flags: "-A x64 -DCMAKE_GENERATOR_PLATFORM=x64"
-          # - tuple: win-x86
-          #   os: windows-latest
-          #   triplet: x86-windows-static
-          #   arch: x86
-          #   package-name: "Windows x86"
-          #   cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
+          - tuple: win-x86
+            os: windows-latest
+            triplet: x86-windows-static
+            arch: x86
+            package-name: "Windows x86"
+            cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
           # - tuple: win-arm
           #   os: windows-latest
           #   triplet: arm-windows-static
@@ -485,12 +485,9 @@ jobs:
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
 
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake "-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
 
     - name: Build
-      # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Strip
