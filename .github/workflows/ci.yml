@@ -407,7 +407,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ win-x64, win-x86, win-arm64, win-arm, mac-x64, mac-arm64, linux-x64 ]
+        tuple: [ mac-x64, mac-arm64 ] #, win-x64, win-x86, win-arm64, win-arm, linux-x64 ]
 
         include:
           # - tuple: win-x64
