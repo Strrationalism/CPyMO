@@ -327,7 +327,7 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 	Uint32 renderer_flags = SDL_RENDERER_PRESENTVSYNC;
 #endif
 
-	*renderer = SDL_CreateRenderer(*window, -1, 0);
+	*renderer = SDL_CreateRenderer(*window, -1, renderer_flags);
 	if (*renderer == NULL) {
 		SDL_DestroyWindow(*window);
 		*window = NULL;
