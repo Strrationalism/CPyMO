@@ -478,7 +478,9 @@ jobs:
       run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
       
     - name: Install X11 for Linux
-      run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
+      run: |
+        sudo apt install libx11-dev libxft-dev libxext-dev
+        ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
       if: ${{ runner.os == 'Linux' }}
 
     - name: Install FFMPEG
