@@ -315,7 +315,7 @@ static int cpymo_tool_generate_album_ui(
 
         err = cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not init assetloader: %s.\n", 
+            printf("[Error] Can not init assetloader: %s %s.\n", 
                 path, cpymo_error_message(err));
             return err;
         }
