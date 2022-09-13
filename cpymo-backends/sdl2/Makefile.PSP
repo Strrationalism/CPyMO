@@ -46,7 +46,7 @@ LDFLAGS := \
 	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
 	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
 	-lpspnet_adhocmatching -lpspnet_adhoc \
-	-lpspnet_adhocctl -lm -lpspvram -Xlinker "-)" \
+	-lpspnet_adhocctl -lm -lpspvram -lbz2 -Xlinker "-)" \
 	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl
 
 CC := psp-gcc
