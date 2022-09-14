@@ -62,7 +62,7 @@ const cpymo_val *cpymo_vars_access(cpymo_vars *vars, cpymo_str name)
 
 void cpymo_vars_clear_locals(cpymo_vars *vars)
 {
-    struct cpymo_var *v = vars->locals;
+    struct cpymo_var *v = (struct cpymo_var *)vars->locals;
     shfree(v);
 
     v = NULL;

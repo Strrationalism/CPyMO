@@ -117,7 +117,7 @@ void cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, i
             int dstx = x + (int)srcx;
             int dsty = y + (int)srcy;
 
-            if (dstx < 0 || dstx >= dst->width || dsty < 0 || dsty >= dst->height)
+            if (dstx < 0 || dstx >= (int)dst->width || dsty < 0 || (int)dsty >= dst->height)
                 break;
 
             for (size_t channel = 0; channel < dst->channels; ++channel) {
