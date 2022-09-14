@@ -339,7 +339,7 @@
     <ClInclude Include="..\..\cpymo\cpymo_save_global.h" />
     <ClInclude Include="..\..\cpymo\cpymo_save_ui.h" />
     <ClInclude Include="..\..\cpymo\cpymo_say.h" />
-    <ClCompile Include="..\..\cpymo\cpymo_script.h" />
+    <ClInclude Include="..\..\cpymo\cpymo_script.h" />
     <ClInclude Include="..\..\cpymo\cpymo_scroll.h" />
     <ClInclude Include="..\..\cpymo\cpymo_select_img.h" />
     <ClInclude Include="..\..\cpymo\cpymo_str.h" />

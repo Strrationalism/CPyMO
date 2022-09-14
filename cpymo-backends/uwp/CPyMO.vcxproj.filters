@@ -134,6 +134,9 @@
     <ClCompile Include="..\..\cpymo\cpymo_say.c">
       <Filter>cpymo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_script.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\cpymo\cpymo_scroll.c">
       <Filter>cpymo</Filter>
     </ClCompile>
@@ -284,6 +287,9 @@
       <Filter>cpymo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cpymo\cpymo_say.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_script.h">
       <Filter>cpymo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cpymo\cpymo_scroll.h">
