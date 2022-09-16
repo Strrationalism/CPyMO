@@ -417,38 +417,45 @@ jobs:
             arch: x64
             package-name: "Windows x64"
             cmake-flags: "-A x64 -DCMAKE_GENERATOR_PLATFORM=x64"
+            vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: win-x86
             os: windows-latest
             triplet: x86-windows-static
             arch: x86
             package-name: "Windows x86"
             cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
+            vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
           # - tuple: win-arm
           #   os: windows-latest
           #   triplet: arm-windows-static
           #   arch: amd64_arm
           #   package-name: "Windows ARM"
           #   cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
+          #   vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
           # - tuple: win-arm64
           #   os: windows-latest
           #   triplet: arm64-windows-static
           #   arch: amd64_arm64
           #   package-name: "Windows ARM64"
           #   cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
+          #   vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: linux-x64
             os: ubuntu-latest
             triplet: x64-linux
             package-name: "Linux x64"
+            vcpkg-path: "/home/runner/work/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: mac-x64
             os: macos-latest
             triplet: x64-osx
             package-name: "macOS x64"
             cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64"
+            vcpkg-path: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: mac-arm64
             os: macos-latest
             triplet: arm64-osx
             package-name: "macOS Apple Silicon"
             cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=arm64"
+            vcpkg-path: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
             
     steps:
     - uses: actions/checkout@v2
@@ -490,12 +497,7 @@ jobs:
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
 
     - name: Configure CMake
-      if: ${{ runner.os != 'Windows' }}
-      run: cmake "-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
-
-    - name: Configure CMake (Windows)
-      if: ${{ runner.os == 'Windows' }}
-      run: cmake "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
+      run: cmake "-DCMAKE_TOOLCHAIN_FILE=${{ matrix.vcpkg-path }}" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
