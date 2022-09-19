@@ -33,9 +33,8 @@ static void cpymo_logo() {
 
 static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) {
 	const cpymo_localization *l = cpymo_localization_get(e);
-	cpymo_msgbox_ui_enter(
+	return cpymo_msgbox_ui_enter(
 		e, cpymo_str_pure(l->mo2pymo_required), NULL, NULL);
-	return CPYMO_ERR_SUCC;
 }
 
 static error_t cpymo_engine_version_warning(cpymo_engine *e) {
@@ -45,13 +44,14 @@ static error_t cpymo_engine_version_warning(cpymo_engine *e) {
 			&out, e->gameconfig.engineversion);
 	CPYMO_THROW(err);
 
-	cpymo_msgbox_ui_enter(
+	err = cpymo_msgbox_ui_enter(
 		e,
 		cpymo_str_pure(out),
 		NULL,
 		NULL);
 	free(out);
-	return CPYMO_ERR_SUCC;
+
+	return err;
 }
 
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
