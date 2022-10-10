@@ -196,8 +196,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	if (out->gameconfig.scripttype[0] != 'p'
 		|| out->gameconfig.scripttype[1] != 'y'
 		|| out->gameconfig.scripttype[2] != 'm'
-		|| out->gameconfig.scripttype[3] != '\0')
-	{
+		|| out->gameconfig.scripttype[3] != '\0') {
 		cpymo_wait_callback_after_seconds(&out->wait, 0, &cpymo_engine_non_pymo_warning);
 	}
 
