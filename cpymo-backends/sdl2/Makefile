@@ -9,6 +9,7 @@ INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h)
 LDFLAGS := 
 CFLAGS := \
 	-DLIMIT_WINDOW_SIZE_TO_SCREEN \
+	-DCPYMO_FEATURE_LEVEL=1 \
 	-I../../cpymo \
 	-I../../endianness.h \
 	-I../../stb \

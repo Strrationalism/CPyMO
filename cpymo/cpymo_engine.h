@@ -24,6 +24,7 @@
 #include "cpymo_backlog.h"
 
 struct cpymo_engine {
+	uint8_t feature_level;
 	cpymo_gameconfig gameconfig;
 	cpymo_assetloader assetloader;
 	cpymo_vars vars;

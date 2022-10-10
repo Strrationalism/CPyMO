@@ -27,7 +27,7 @@ typedef struct {
 	char bgmformat[4];			// without '.'
 	char seformat[4];			// without '.'
 	char voiceformat[4];		// without '.'
-	char platform[8];
+	char platform[12];
 	char scripttype[4];
 	uint16_t fontsize;
 	int16_t nameboxorg_x, nameboxorg_y;

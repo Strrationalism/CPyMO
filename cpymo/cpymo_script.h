@@ -17,7 +17,7 @@ error_t cpymo_script_load(
     const cpymo_assetloader *l);
 
 error_t cpymo_script_create_bootloader(
-    cpymo_script **out, char *startscript);
+    cpymo_script **out, char *startscript, uint8_t feature_level);
     
 void cpymo_script_free(cpymo_script *to_free);
 

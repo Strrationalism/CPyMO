@@ -56,6 +56,15 @@ static error_t cpymo_engine_version_warning(cpymo_engine *e)
 	return err;
 }
 
+static error_t cpymo_engine_feature_level_warning(cpymo_engine *e) 
+{
+	return cpymo_msgbox_ui_enter(
+		e,
+		cpymo_str_pure("CPyMO HD Feature Level is not compatible."),
+		NULL,
+		NULL);
+}
+
 error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 {
 	// init audio system
@@ -71,6 +80,16 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	error_t err = cpymo_gameconfig_parse_from_file(&out->gameconfig, path);
 	free(path);
 	if (err != CPYMO_ERR_SUCC) return err;
+
+	// get feature level
+	if (!strcmp(out->gameconfig.platform, "cpymohd1")) 
+		out->feature_level = 1;
+	else if (!strcmp(out->gameconfig.platform, "cpymohd2")) 
+		out->feature_level = 2;
+	else if (!strcmp(out->gameconfig.platform, "cpymohd3")) 
+		out->feature_level = 3;
+	else
+		out->feature_level = 0;
 
 	// set default volume for audio system
 	{
@@ -96,7 +115,8 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	}
 
 	cpymo_script *boot_script;
-	err = cpymo_script_create_bootloader(&boot_script, out->gameconfig.startscript);
+	err = cpymo_script_create_bootloader(
+		&boot_script, out->gameconfig.startscript, out->feature_level);
 	if (err != CPYMO_ERR_SUCC) {
 		free(out->interpreter);
 		cpymo_vars_free(&out->vars);
@@ -204,6 +224,12 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		cpymo_wait_callback_after_seconds(
 			&out->wait, 0, 
 			&cpymo_engine_version_warning);
+	}
+
+	if (out->feature_level > CPYMO_FEATURE_LEVEL) {
+		cpymo_wait_callback_after_seconds(
+			&out->wait, 0,
+			&cpymo_engine_feature_level_warning);
 	}
 
 	return CPYMO_ERR_SUCC;

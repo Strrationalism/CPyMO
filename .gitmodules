@@ -16,3 +16,6 @@
 [submodule "cpymo-backends/ios/ios-cmake"]
 	path = cpymo-backends/ios/ios-cmake
 	url = https://github.com/leetal/ios-cmake.git
+[submodule "lua"]
+	path = lua
+	url = https://github.com/lua/lua.git

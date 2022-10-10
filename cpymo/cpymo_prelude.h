@@ -5,4 +5,8 @@
 #include <stb_leakcheck.h>
 #endif
 
+#ifndef CPYMO_FEATURE_LEVEL
+#define CPYMO_FEATURE_LEVEL 0
+#endif
+
 #endif
