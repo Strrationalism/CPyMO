@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, cpymo-hd ]
+    branches: [ main, hd ]
   pull_request:
-    branches: [ main, cpymo-hd ]
+    branches: [ main, hd ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
