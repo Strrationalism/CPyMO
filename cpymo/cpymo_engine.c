@@ -31,13 +31,15 @@ static void cpymo_logo() {
 	puts("");
 }
 
-static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) {
+static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) 
+{
 	const cpymo_localization *l = cpymo_localization_get(e);
 	return cpymo_msgbox_ui_enter(
 		e, cpymo_str_pure(l->mo2pymo_required), NULL, NULL);
 }
 
-static error_t cpymo_engine_version_warning(cpymo_engine *e) {
+static error_t cpymo_engine_version_warning(cpymo_engine *e) 
+{
 	const cpymo_localization *l = cpymo_localization_get(e);
 	char *out = NULL;
 	error_t err = l->pymo_version_not_compatible_message(
