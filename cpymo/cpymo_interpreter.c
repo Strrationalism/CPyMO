@@ -177,6 +177,9 @@ void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
 #define D(CMD) \
 	else if (cpymo_str_equals_str(command, CMD))
 
+#define D_FEATURE_LEVEL(LEVEL, CMD) \
+	else if (engine->feature_level >= LEVEL && cpymo_str_equals_str(command, CMD))
+
 #define POP_ARG(X) \
 	cpymo_str X = cpymo_parser_curline_pop_commacell(&interpreter->script_parser); \
 	cpymo_str_trim(&X)
@@ -1465,6 +1468,23 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	D("config") {
 		return cpymo_config_ui_enter(engine);
 	}
+
+#if CPYMO_FEATURE_LEVEL >= 1
+	/* CPyMO HD Feature Level I */
+	D_FEATURE_LEVEL(1, "lua") {
+		cpymo_str lua_code = 
+			cpymo_parser_curline_readuntil(&interpreter->script_parser, '\0');
+
+		cpymo_str_trim(&lua_code);
+		error_t err = cpymo_lua_context_push_lua_code(&engine->lua, lua_code);
+		CPYMO_THROW(err);
+
+		err = cpymo_lua_context_execute(&engine->lua, 0, 0);
+		CPYMO_THROW(err);
+
+		CONT_NEXTLINE;
+	}
+#endif
 	
 	else {
 		char buf[32];

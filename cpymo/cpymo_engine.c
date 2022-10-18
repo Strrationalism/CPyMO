@@ -187,6 +187,20 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		return err;
 	}
 
+	// init lua
+	#if CPYMO_FEATURE_LEVEL >= 1
+	err = cpymo_lua_context_init(&out->lua, out->feature_level);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_backlog_free(&out->backlog);
+		free(out->title);
+		cpymo_interpreter_free(out->interpreter);
+		free(out->interpreter);
+		cpymo_vars_free(&out->vars);
+		cpymo_assetloader_free(&out->assetloader);
+		return err;
+	}
+	#endif
+
 	// states
 	out->skipping = false;
 	out->redraw = true;
@@ -248,6 +262,10 @@ void cpymo_engine_free(cpymo_engine *engine)
 		if (err != CPYMO_ERR_SUCC)
 			printf("[Error] Can not save config. %s\n", cpymo_error_message(err));
 	}
+
+	#if CPYMO_FEATURE_LEVEL >= 1
+	cpymo_lua_context_free(&engine->lua);
+	#endif
 	
 	cpymo_hash_flags_free(&engine->flags);
 	cpymo_text_free(&engine->text);
