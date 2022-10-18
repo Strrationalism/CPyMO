@@ -1496,6 +1496,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			interpreter->script->script_name,
 			(unsigned)interpreter->script_parser.cur_line + 1);
 
-		CONT_NEXTLINE;
+		if (engine->redraw) {
+			return CPYMO_ERR_SUCC;
+		}
+		else {
+			CONT_NEXTLINE;
+		}
 	}
 }
