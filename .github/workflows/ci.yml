@@ -443,7 +443,7 @@ jobs:
             os: ubuntu-latest
             triplet: x64-linux
             package-name: "Linux x64"
-            vcpkg-path: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            vcpkg-path: "/home/runner/work/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: mac-x64
             os: macos-latest
             triplet: x64-osx
