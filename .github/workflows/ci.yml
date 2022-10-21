@@ -417,14 +417,14 @@ jobs:
             arch: x64
             package-name: "Windows x64"
             cmake-flags: "-A x64 -DCMAKE_GENERATOR_PLATFORM=x64"
-            vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: win-x86
             os: windows-latest
             triplet: x86-windows-static
             arch: x86
             package-name: "Windows x86"
             cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
-            vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           # - tuple: win-arm
           #   os: windows-latest
           #   triplet: arm-windows-static
