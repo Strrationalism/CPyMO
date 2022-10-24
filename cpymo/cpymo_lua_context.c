@@ -56,11 +56,8 @@ error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
 void cpymo_lua_context_free(cpymo_lua_context *l)
 {
     if (l->lua_state) {
-        cpymo_lua_tree_boardcast(
-            l,
-            cpymo_lua_actor_children_table_name,
-            "free", NULL, NULL,
-            "late_free", NULL, NULL);
+        cpymo_lua_get_main_actor(l);
+        cpymo_lua_actor_free(l);
         lua_close(l->lua_state);
     } 
 }
@@ -192,6 +189,26 @@ error_t cpymo_lua_actor_update(
         (void *)&delta_time);
 }
 
+void cpymo_lua_actor_draw(
+    const cpymo_lua_context *l)
+{
+    cpymo_lua_tree_boardcast(
+        (cpymo_lua_context *)l,
+        cpymo_lua_actor_children_table_name,
+        "draw", NULL, NULL,
+        "late_draw", NULL, NULL);
+}
+
+void cpymo_lua_actor_free(
+    cpymo_lua_context *l)
+{
+    cpymo_lua_tree_boardcast(
+        l,
+        cpymo_lua_actor_children_table_name,
+        "free", NULL, NULL,
+        "late_free", NULL, NULL);
+}
+
 void cpymo_lua_get_main_actor(cpymo_lua_context *l)
 {
     lua_getglobal(l->lua_state, "main");
@@ -201,6 +218,7 @@ error_t cpymo_lua_actor_update_main(
     cpymo_lua_context *l,
     float delta_time)
 {
+    if (l->lua_state == NULL) return CPYMO_ERR_SUCC;
     cpymo_lua_get_main_actor(l);
     error_t err = cpymo_lua_actor_update(l, delta_time);
     #ifdef LEAKCHECK
@@ -211,9 +229,23 @@ error_t cpymo_lua_actor_update_main(
     return err;
 }
 
+void cpymo_lua_actor_draw_main(
+    const cpymo_lua_context *l)
+{
+    if (l->lua_state == NULL) return;
+    cpymo_lua_get_main_actor((cpymo_lua_context *)l);
+    cpymo_lua_actor_draw(l);
+    #ifdef LEAKCHECK
+    lua_pop(l->lua_state, 1);
+    #else
+    lua_pop(l->lua_state, -1);
+    #endif
+}
+
 #ifdef LEAKCHECK
 void cpymo_lua_context_leakcheck(cpymo_lua_context *l)
 {
+    if (l->lua_state == NULL) return;
     int num = lua_gettop(l->lua_state);
     if (!num) return;
 

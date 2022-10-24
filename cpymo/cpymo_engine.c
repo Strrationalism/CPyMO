@@ -386,6 +386,12 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	cpymo_bg_draw(engine);
 	cpymo_scroll_draw(&engine->scroll);
 	cpymo_charas_draw(engine);
+
+	#if CPYMO_FEATURE_LEVEL >= 1
+	if (engine->feature_level >= 1)
+		cpymo_lua_actor_draw_main(&engine->lua);
+	#endif
+
 	cpymo_anime_draw(&engine->anime);
 	cpymo_select_img_draw(
 		&engine->select_img, 
@@ -400,5 +406,9 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 
 	cpymo_text_draw(engine);
 	cpymo_say_draw(engine);
+
+	#if CPYMO_FEATURE_LEVEL >= 1 && defined LEAKCHECK
+	cpymo_lua_context_leakcheck((cpymo_lua_context *)&engine->lua);
+	#endif
 }
 

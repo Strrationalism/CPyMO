@@ -41,11 +41,20 @@ error_t cpymo_lua_actor_update(
     cpymo_lua_context *l,
     float delta_time);
 
+void cpymo_lua_actor_draw(
+    const cpymo_lua_context *l);
+
+void cpymo_lua_actor_free(
+    cpymo_lua_context *l);
+
 void cpymo_lua_get_main_actor(cpymo_lua_context *l);
 
 error_t cpymo_lua_actor_update_main(
     cpymo_lua_context *l,
     float delta_time);
+    
+void cpymo_lua_actor_draw_main(
+    const cpymo_lua_context *l);
 
 #ifdef LEAKCHECK
 void cpymo_lua_context_leakcheck(cpymo_lua_context *l);
