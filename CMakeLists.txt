@@ -13,6 +13,7 @@ add_definitions (-DENABLE_EXIT_CONFIRM)
 add_definitions (-DLEAKCHECK)
 add_definitions (-DLIMIT_WINDOW_SIZE_TO_SCREEN)
 add_definitions (-DCPYMO_FEATURE_LEVEL=1)
+add_definitions (-DLINK_WITH_ONELUA)
 
 find_package (FFMPEG REQUIRED)
 
