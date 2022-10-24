@@ -189,7 +189,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 	// init lua
 	#if CPYMO_FEATURE_LEVEL >= 1
-	err = cpymo_lua_context_init(&out->lua, out->feature_level);
+	err = cpymo_lua_context_init(&out->lua, out);
 	if (err != CPYMO_ERR_SUCC) {
 		cpymo_backlog_free(&out->backlog);
 		free(out->title);
@@ -335,6 +335,13 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 		return err;
 	}
 
+#if CPYMO_FEATURE_LEVEL >= 1
+	if (engine->feature_level >= 1) {
+		err = cpymo_lua_actor_update_main(&engine->lua, delta_time_sec);
+		CPYMO_THROW(err);
+	}
+#endif
+
 	err = cpymo_bg_update(&engine->bg, redraw);
 	CPYMO_THROW(err);
 
@@ -361,6 +368,10 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 	*redraw |= engine->redraw;
 	engine->redraw = false;
+
+	#if CPYMO_FEATURE_LEVEL >= 1 && defined LEAKCHECK
+	cpymo_lua_context_leakcheck(&engine->lua);
+	#endif
 
 	return CPYMO_ERR_SUCC;
 }
