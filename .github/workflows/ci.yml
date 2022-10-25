@@ -408,7 +408,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ mac-x64, mac-arm64, linux-x64, win-x86, win-x64 ] #, win-arm64, win-arm ]
+        tuple: [ mac-x64, mac-arm64, linux-x64, win-x86, win-x64, win-arm64 ] # , win-arm ]
 
         include:
           - tuple: win-x64
@@ -431,14 +431,14 @@ jobs:
           #   arch: amd64_arm
           #   package-name: "Windows ARM"
           #   cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
-          #   vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-          # - tuple: win-arm64
-          #   os: windows-latest
-          #   triplet: arm64-windows-static
-          #   arch: amd64_arm64
-          #   package-name: "Windows ARM64"
-          #   cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
-          #   vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          #   vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          - tuple: win-arm64
+            os: windows-latest
+            triplet: arm64-windows-static
+            arch: amd64_arm64
+            package-name: "Windows ARM64"
+            cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
+            vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: linux-x64
             os: ubuntu-latest
             triplet: x64-linux
