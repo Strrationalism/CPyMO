@@ -100,6 +100,7 @@ error_t cpymo_lua_context_execute(
     if (err != CPYMO_ERR_SUCC) {
         const char *errstr = lua_tostring(l->lua_state, -1);
         puts(errstr);
+        lua_pop(l->lua_state, 1);
         return err;
     }
     
@@ -165,6 +166,8 @@ error_t cpymo_lua_tree_boardcast(
     else {
         lua_pop(l, 1);
     }
+
+    return CPYMO_ERR_SUCC;
 }
 
 static int cpymo_lua_actor_update_arg_setter(
