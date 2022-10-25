@@ -17,7 +17,10 @@ typedef struct {
 error_t cpymo_lua_context_init(
     cpymo_lua_context *l, 
     struct cpymo_engine *e);
+
 void cpymo_lua_context_free(cpymo_lua_context *l);
+
+struct cpymo_engine *cpymo_lua_state_get_engine(lua_State *l);
 
 error_t cpymo_lua_context_push_lua_code(
     cpymo_lua_context *l, cpymo_str lua_code);
@@ -55,6 +58,12 @@ error_t cpymo_lua_actor_update_main(
     
 void cpymo_lua_actor_draw_main(
     const cpymo_lua_context *l);
+
+#define CPYMO_LUA_THROW(L, X) \
+    if ((X) != CPYMO_ERR_SUCC) { \
+        luaL_error(L, cpymo_error_message(X)); \
+        return 0; \
+    }
 
 #ifdef LEAKCHECK
 void cpymo_lua_context_leakcheck(cpymo_lua_context *l);

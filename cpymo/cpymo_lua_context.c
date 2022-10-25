@@ -34,6 +34,12 @@ static void cpymo_lua_context_create_cpymo_package(
     lua_pushnumber(l, (lua_Number)0);
     lua_setfield(l, -2, "delta_time");
 
+    void cpymo_lua_api_render_register(lua_State *);
+    cpymo_lua_api_render_register(l);
+
+    void cpymo_lua_api_asset_register(lua_State *l);
+    cpymo_lua_api_asset_register(l);
+
     lua_setglobal(l, "cpymo");
 }
 
@@ -60,6 +66,15 @@ void cpymo_lua_context_free(cpymo_lua_context *l)
         cpymo_lua_actor_free(l);
         lua_close(l->lua_state);
     } 
+}
+
+cpymo_engine *cpymo_lua_state_get_engine(lua_State *l)
+{
+    lua_getglobal(l, "cpymo");
+    lua_getfield(l, -1, "engine");
+    void *e = lua_touserdata(l, -1);
+    lua_pop(l, 1);
+    return (cpymo_engine *)e;
 }
 
 error_t cpymo_lua_error_conv(int lua_error)

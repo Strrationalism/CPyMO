@@ -683,7 +683,6 @@ EXIT:
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
-    exit(0);
 
 	#if _WIN32 && !NDEBUG
 	_CrtDumpMemoryLeaks();
