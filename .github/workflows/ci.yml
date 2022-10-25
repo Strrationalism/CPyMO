@@ -438,7 +438,7 @@ jobs:
             arch: amd64_arm64
             package-name: "Windows ARM64"
             cmake-flags: "-A arm64 -DCMAKE_GENERATOR_PLATFORM=arm64"
-            vcpkg-path: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: linux-x64
             os: ubuntu-latest
             triplet: x64-linux
