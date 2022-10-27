@@ -318,7 +318,7 @@ jobs:
       run: |
         pushd cpymo-backends/uwp
         # msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
-        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
+        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
         popd
 
     - name: Upload
@@ -408,7 +408,7 @@ jobs:
     
     strategy:
       matrix:
-        tuple: [ mac-x64, mac-arm64, linux-x64, win-x86, win-x64, win-arm64, win-arm ]
+        tuple: [ mac-x64, mac-arm64, linux-x64, win-x86, win-x64, win-arm64 ] #, win-arm ]
 
         include:
           - tuple: win-x64
@@ -425,13 +425,13 @@ jobs:
             package-name: "Windows x86"
             cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
             vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
-          - tuple: win-arm
-            os: windows-latest
-            triplet: arm-windows-static
-            arch: amd64_arm
-            package-name: "Windows ARM"
-            cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
-            vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          # - tuple: win-arm
+          #   os: windows-latest
+          #   triplet: arm-windows-static
+          #   arch: amd64_arm
+          #   package-name: "Windows ARM"
+          #   cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
+          #   vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: win-arm64
             os: windows-latest
             triplet: arm64-windows-static
