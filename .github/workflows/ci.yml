@@ -312,7 +312,7 @@ jobs:
 
     - name: Install FFmpeg
       run: |
-        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp # ffmpeg:arm-uwp
+        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp
 
     - name: Build
       run: |
