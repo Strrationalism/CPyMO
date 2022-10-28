@@ -312,13 +312,12 @@ jobs:
 
     - name: Install FFmpeg
       run: |
-        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp
+        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp ffmpeg:arm64-uwp
 
     - name: Build
       run: |
         pushd cpymo-backends/uwp
-        # msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
-        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
+        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm|arm64" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx -p:PackageCertificatePassword=CPyMO CPyMO.vcxproj
         popd
 
     - name: Upload
