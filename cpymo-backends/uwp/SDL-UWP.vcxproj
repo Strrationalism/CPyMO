@@ -195,12 +195,20 @@
     <ClCompile Include="..\sdl2\SDL\src\audio\SDL_mixer.c" />
     <ClCompile Include="..\sdl2\SDL\src\audio\SDL_wave.c" />
     <ClCompile Include="..\sdl2\SDL\src\audio\wasapi\SDL_wasapi.c" />
-    <ClCompile Include="..\sdl2\SDL\src\audio\wasapi\SDL_wasapi_winrt.cpp" />
+    <ClCompile Include="..\sdl2\SDL\src\audio\wasapi\SDL_wasapi_winrt.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\sdl2\SDL\src\core\windows\SDL_windows.c" />
     <ClCompile Include="..\sdl2\SDL\src\core\windows\SDL_xinput.c" />
-    <ClCompile Include="..\sdl2\SDL\src\core\winrt\SDL_winrtapp_common.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\core\winrt\SDL_winrtapp_direct3d.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\core\winrt\SDL_winrtapp_xaml.cpp" />
+    <ClCompile Include="..\sdl2\SDL\src\core\winrt\SDL_winrtapp_common.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\core\winrt\SDL_winrtapp_direct3d.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\core\winrt\SDL_winrtapp_xaml.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\sdl2\SDL\src\cpuinfo\SDL_cpuinfo.c" />
     <ClCompile Include="..\sdl2\SDL\src\dynapi\SDL_dynapi.c" />
     <ClCompile Include="..\sdl2\SDL\src\events\SDL_clipboardevents.c" />
@@ -213,7 +221,9 @@
     <ClCompile Include="..\sdl2\SDL\src\events\SDL_quit.c" />
     <ClCompile Include="..\sdl2\SDL\src\events\SDL_touch.c" />
     <ClCompile Include="..\sdl2\SDL\src\events\SDL_windowevents.c" />
-    <ClCompile Include="..\sdl2\SDL\src\filesystem\winrt\SDL_sysfilesystem.cpp" />
+    <ClCompile Include="..\sdl2\SDL\src\filesystem\winrt\SDL_sysfilesystem.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\sdl2\SDL\src\file\SDL_rwops.c" />
     <ClCompile Include="..\sdl2\SDL\src\haptic\dummy\SDL_syshaptic.c" />
     <ClCompile Include="..\sdl2\SDL\src\haptic\SDL_haptic.c" />
@@ -233,11 +243,15 @@
     <ClCompile Include="..\sdl2\SDL\src\locale\SDL_locale.c" />
     <ClCompile Include="..\sdl2\SDL\src\locale\winrt\SDL_syslocale.c" />
     <ClCompile Include="..\sdl2\SDL\src\misc\SDL_url.c" />
-    <ClCompile Include="..\sdl2\SDL\src\misc\winrt\SDL_sysurl.cpp" />
+    <ClCompile Include="..\sdl2\SDL\src\misc\winrt\SDL_sysurl.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\sdl2\SDL\src\power\SDL_power.c" />
     <ClCompile Include="..\sdl2\SDL\src\power\winrt\SDL_syspower.cpp" />
     <ClCompile Include="..\sdl2\SDL\src\render\direct3d11\SDL_render_d3d11.c" />
-    <ClCompile Include="..\sdl2\SDL\src\render\direct3d11\SDL_render_winrt.cpp" />
+    <ClCompile Include="..\sdl2\SDL\src\render\direct3d11\SDL_render_winrt.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\sdl2\SDL\src\render\direct3d11\SDL_shaders_d3d11.c" />
     <ClCompile Include="..\sdl2\SDL\src\render\opengles2\SDL_render_gles2.c" />
     <ClCompile Include="..\sdl2\SDL\src\render\opengles2\SDL_shaders_gles2.c" />
@@ -299,14 +313,30 @@
     <ClCompile Include="..\sdl2\SDL\src\video\SDL_surface.c" />
     <ClCompile Include="..\sdl2\SDL\src\video\SDL_video.c" />
     <ClCompile Include="..\sdl2\SDL\src\video\SDL_yuv.c" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtevents.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtgamebar.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtkeyboard.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtmessagebox.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtmouse.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtopengles.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtpointerinput.cpp" />
-    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtvideo.cpp" />
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtevents.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtgamebar.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtkeyboard.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtmessagebox.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtmouse.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtopengles.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtpointerinput.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\sdl2\SDL\src\video\winrt\SDL_winrtvideo.cpp">
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\sdl2\SDL\src\video\yuv2rgb\yuv_rgb.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
