@@ -487,10 +487,6 @@ jobs:
 
     - name: Install SDL2
       run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
-      
-    # - name: Install X11 for Linux
-    #   run: ./vcpkg/vcpkg install SDL2[x11]:${{ matrix.triplet }} --recurse
-    #   if: ${{ runner.os == 'Linux' }}
 
     - name: Install FFMPEG
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
