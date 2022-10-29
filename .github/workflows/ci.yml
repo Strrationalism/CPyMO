@@ -424,13 +424,13 @@ jobs:
             package-name: "Windows x86"
             cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
             vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
-          # - tuple: win-arm
-          #   os: windows-latest
-          #   triplet: arm-windows-static
-          #   arch: amd64_arm
-          #   package-name: "Windows ARM"
-          #   cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
-          #   vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          - tuple: win-arm
+            os: windows-latest
+            triplet: arm-windows-static
+            arch: amd64_arm
+            package-name: "Windows ARM"
+            cmake-flags: "-A arm -DCMAKE_GENERATOR_PLATFORM=arm"
+            vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: win-arm64
             os: windows-latest
             triplet: arm64-windows-static
