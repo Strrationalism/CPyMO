@@ -282,7 +282,8 @@ static void cpymo_msgbox_ui_delete(struct cpymo_engine *e, void *ui_data)
 {
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
 	
-	ui->on_closed(ui->is_confirmed, ui->on_closed_userdata);
+	if (ui->on_closed)
+		ui->on_closed(ui->is_confirmed, ui->on_closed_userdata);
 	if (ui->message) cpymo_backend_text_free(ui->message);
 	if (ui->confirm_btn) cpymo_backend_text_free(ui->confirm_btn);
 	if (ui->cancel_btn) cpymo_backend_text_free(ui->cancel_btn);
