@@ -13,11 +13,7 @@ typedef void(*cpymo_ui_drawer)(const struct cpymo_engine *, const void *ui_data)
 
 typedef void(*cpymo_ui_deleter)(struct cpymo_engine *, void *ui_data);
 
-typedef struct {
-	cpymo_ui_updater update;
-	cpymo_ui_drawer draw;
-	cpymo_ui_deleter deleter;
-} cpymo_ui;
+struct cpymo_ui;
 
 error_t cpymo_ui_enter(
 	void **out_uidata, 

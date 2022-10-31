@@ -11,6 +11,19 @@
 #define CPYMO_BACKLOG_MAX_RECORDS 64
 #endif
 
+typedef struct cpymo_backlog_record {
+	bool owning_name;
+	cpymo_backend_text name, *lines;
+	size_t max_lines;
+
+	char vo_filename[32];
+
+#ifdef ENABLE_TEXT_EXTRACT
+	char *text;
+#endif
+
+} cpymo_backlog_record;
+
 error_t cpymo_backlog_init(cpymo_backlog *b)
 {
 	b->records = (cpymo_backlog_record *)malloc(sizeof(b->records[0]) * CPYMO_BACKLOG_MAX_RECORDS);

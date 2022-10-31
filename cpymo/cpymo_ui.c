@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <assert.h>
 
+typedef struct cpymo_ui {
+	cpymo_ui_updater update;
+	cpymo_ui_drawer draw;
+	cpymo_ui_deleter deleter;
+} cpymo_ui;
+
 error_t cpymo_ui_enter(void ** out_uidata, cpymo_engine *e, size_t ui_data_size, cpymo_ui_updater u, cpymo_ui_drawer d, cpymo_ui_deleter deleter)
 {
 	if (e->ui != NULL) cpymo_ui_exit(e);
