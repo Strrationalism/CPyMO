@@ -577,20 +577,31 @@ int main(int argc, char **argv)
 #ifndef __ANDROID__
 			else if (event.type == SDL_QUIT) {
 				#ifdef ENABLE_EXIT_CONFIRM
-				
-				if (cpymo_ui_enabled(&engine))
-                	cpymo_ui_exit(&engine);
 
-				err = cpymo_msgbox_ui_enter(
-					&engine,
-					cpymo_str_pure(
-						cpymo_localization_get(&engine)->exit_confirm),
-					&cpymo_exit_confirm,
-					NULL);
-				if (err != CPYMO_ERR_SUCC) {
-					SDL_Log("[Error] Can not show message box: %s", 
-						cpymo_error_message(err));
+				const SDL_MessageBoxButtonData buttons[2] = {
+					{ 0, 0, "Yes" },
+					{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 1, "No" }
+				};
+
+				const SDL_MessageBoxData msgbox = {
+					SDL_MESSAGEBOX_WARNING,
+					window,
+					"Warning",
+					cpymo_localization_get(&engine)->exit_confirm,
+					CPYMO_ARR_COUNT(buttons),
+					buttons,
+					NULL
+				};
+
+				int button_clicked;
+				if (SDL_ShowMessageBox(&msgbox, &button_clicked) < 0) {
+					SDL_Log(SDL_GetError());
+					goto EXIT;
 				}
+
+				if (button_clicked == 0)
+					goto EXIT;
+
 				#else
 				goto EXIT;
 				#endif
@@ -683,12 +694,12 @@ EXIT:
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
-    exit(0);
 
 	#if _WIN32 && !NDEBUG
 	_CrtDumpMemoryLeaks();
 	#endif
 
+	stb_leakcheck_dumpmem();
 	#ifdef LEAKCHECK
 	stb_leakcheck_dumpmem();
 	extern void cpymo_backend_image_leakcheck(void);

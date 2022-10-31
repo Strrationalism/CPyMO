@@ -295,6 +295,8 @@ error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save)
 
 error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 {
+	while (e->ui) cpymo_ui_exit(e);
+	
 	// reset states
 	cpymo_vars_clear_locals(&e->vars);
 
