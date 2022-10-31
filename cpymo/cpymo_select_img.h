@@ -15,6 +15,7 @@
 struct cpymo_engine;
 
 enum cpymo_select_img_selection_hint_state {
+
 	cpymo_select_img_selection_nohint = 0,
 	cpymo_select_img_selection_hint01,
 	cpymo_select_img_selection_hint23
@@ -23,26 +24,10 @@ enum cpymo_select_img_selection_hint_state {
 struct cpymo_select_img;
 typedef error_t (*cpymo_select_img_ok_callback)(struct cpymo_engine *, int, uint64_t, bool save_enabled);
 
-typedef struct {
-	cpymo_backend_image image;
-	cpymo_backend_text or_text;
-	cpymo_color text_color;
-	float x, y;
-	int w, h;
-	bool enabled : 1;
-
-	uint64_t hash;
-	bool has_selected;
-
-#ifdef ENABLE_TEXT_EXTRACT
-	char *original_text;
-#endif
-
-	enum cpymo_select_img_selection_hint_state hint_state : 3;
-} cpymo_select_img_selection;
+struct cpymo_select_img_selection;
 
 struct cpymo_select_img {
-	cpymo_select_img_selection *selections;
+	struct cpymo_select_img_selection *selections;
 
 	cpymo_backend_image select_img_image;
 	int select_img_image_w, select_img_image_h;
