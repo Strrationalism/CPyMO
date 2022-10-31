@@ -225,11 +225,13 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	return CPYMO_ERR_SUCC;
 }
 
+#ifndef DISABLE_AUTOSAVE
 void cpymo_save_autosave(cpymo_engine *e)
 {
 	cpymo_save_write(e, 0);
 	cpymo_save_global_save(e);
 }
+#endif
 
 FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id)
 {

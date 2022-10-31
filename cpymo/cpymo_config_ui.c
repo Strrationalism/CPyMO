@@ -301,6 +301,8 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	INIT_ITEM(ITEM_FONT_SIZE, l->config_fontsize, 12, 32, (int)e->gameconfig.fontsize);
 	INIT_ITEM(ITEM_SKIP_ALREADY_READ_ONLY, l->config_skip_mode, 0, 1, (int)e->config_skip_already_read_only);
 	
+	#undef MIN_SAY_SPEED
+	#undef INIT_ITEM
 
 	return CPYMO_ERR_SUCC;
 }

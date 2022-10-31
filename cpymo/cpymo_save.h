@@ -7,7 +7,12 @@
 struct cpymo_engine;
 
 error_t cpymo_save_write(struct cpymo_engine *e, unsigned short save_id);
+
+#ifndef DISABLE_AUTOSAVE
 void cpymo_save_autosave(struct cpymo_engine *e);
+#else
+#define cpymo_save_autosave(e)
+#endif
 
 FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id);
 

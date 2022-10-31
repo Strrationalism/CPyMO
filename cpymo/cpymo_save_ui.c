@@ -24,6 +24,12 @@ typedef struct {
 	bool is_load_ui;
 } cpymo_save_ui;
 
+#ifdef DISABLE_AUTOSAVE
+#define SAVE_UI_FIRST_SLOT 0
+#else
+#define SAVE_UI_FIRST_SLOT 1
+#endif
+
 static void cpymo_save_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
 	const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data_const(e);
@@ -117,7 +123,7 @@ static void* cpymo_save_ui_get_prev(const cpymo_engine *e, const void *ui_data, 
 	const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data_const(e);
 
 	uintptr_t i = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
-	if (i == (ui->is_load_ui ? 0 : 1)) return NULL;
+	if (i == (ui->is_load_ui ? 0 : SAVE_UI_FIRST_SLOT)) return NULL;
 	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(i - 1);
 }
 
@@ -136,7 +142,7 @@ static error_t cpymo_save_ui_visual_impaired_selection_changed(cpymo_engine *e, 
 error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 {
 	cpymo_save_ui *ui = NULL;
-	uintptr_t first = is_load_ui ? 0 : 1;
+	uintptr_t first = is_load_ui ? 0 : SAVE_UI_FIRST_SLOT;
 	error_t err = cpymo_list_ui_enter(
 		e,
 		(void **)&ui,
@@ -169,7 +175,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 	size_t characters = (size_t)((float)e->gameconfig.imagesize_w / fontsize * 1.3f);
 
 	char text_buf[1024];
-	for (size_t i = is_load_ui ? 0 : 1; i < MAX_SAVES; ++i) {
+	for (size_t i = is_load_ui ? 0 : SAVE_UI_FIRST_SLOT; i < MAX_SAVES; ++i) {
 		FILE *save = cpymo_save_open_read(e, (unsigned short)i);
 		cpymo_save_title title;
 		title.say_name = NULL;
@@ -225,8 +231,12 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 
 			char *str = NULL;
 			error_t err;
-			if (i == 0)  err = l->save_auto_title(&str, title.title);
-			else err = l->save_title(&str, (int)i, title.title);
+
+			#ifndef DISABLE_AUTOSAVE
+			if (i == 0) err = l->save_auto_title(&str, title.title);
+			else 
+			#endif
+				err = l->save_title(&str, (int)i, title.title);
 
 			if (err != CPYMO_ERR_SUCC) {
 				free(tmp_str);
@@ -251,8 +261,12 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 			error_t err;
 			const cpymo_localization *l = cpymo_localization_get(e);
 			char *msg = NULL;
+
+			#ifndef DISABLE_AUTOSAVE
 			if (i == 0) err = l->save_auto_title(&msg, "");
-			else err = l->save_title(&msg, (int)i, "");
+			else 
+			#endif
+				err = l->save_title(&msg, (int)i, "");
 
 			CPYMO_THROW(err);
 			strncpy(text_buf, msg, sizeof(text_buf) - 1);
