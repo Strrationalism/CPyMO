@@ -225,11 +225,13 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	return CPYMO_ERR_SUCC;
 }
 
+#ifndef DISABLE_AUTOSAVE
 void cpymo_save_autosave(cpymo_engine *e)
 {
 	cpymo_save_write(e, 0);
 	cpymo_save_global_save(e);
 }
+#endif
 
 FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id)
 {
@@ -295,6 +297,8 @@ error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save)
 
 error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 {
+	while (e->ui) cpymo_ui_exit(e);
+	
 	// reset states
 	cpymo_vars_clear_locals(&e->vars);
 

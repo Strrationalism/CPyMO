@@ -251,7 +251,7 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 
 void cpymo_engine_free(cpymo_engine *engine)
 {
-	if (engine->ui) cpymo_ui_exit(engine);
+	while (engine->ui) cpymo_ui_exit(engine);
 
 	if (engine->assetloader.gamedir) {
 		error_t err = cpymo_save_global_save(engine);
