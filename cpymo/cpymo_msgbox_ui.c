@@ -26,7 +26,21 @@ typedef struct {
 	error_t(*confirm)(cpymo_engine *e, void *data);
 	void *confirm_data;
 	cpymo_key_hold mouse_button;
+
+	cpymo_msgbox_ui_on_closed on_closed;
+	void *on_closed_userdata;
+	bool is_confirmed;
 } cpymo_msgbox_ui;
+
+void cpymo_msgbox_ui_set_on_closed(
+	struct cpymo_engine *e,
+	cpymo_msgbox_ui_on_closed on_closed,
+	void *userdata)
+{
+	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)cpymo_ui_data(e);
+	ui->on_closed = on_closed;
+	ui->on_closed_userdata = userdata;
+}
 
 static error_t cpymo_msgbox_ui_confirm(cpymo_engine *e)
 {
@@ -268,6 +282,7 @@ static void cpymo_msgbox_ui_delete(struct cpymo_engine *e, void *ui_data)
 {
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
 	
+	ui->on_closed(ui->is_confirmed, ui->on_closed_userdata);
 	if (ui->message) cpymo_backend_text_free(ui->message);
 	if (ui->confirm_btn) cpymo_backend_text_free(ui->confirm_btn);
 	if (ui->cancel_btn) cpymo_backend_text_free(ui->cancel_btn);
@@ -303,6 +318,9 @@ error_t cpymo_msgbox_ui_enter(
 	ui->confirm = confirm;
 	ui->confirm_data = confirm_data;
 	ui->selection = confirm ? -1 : 0;
+	ui->on_closed = NULL;
+	ui->on_closed_userdata = NULL;
+	ui->is_confirmed = false;
 	cpymo_key_hold_init(&ui->mouse_button, e->input.mouse_button);
 
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);

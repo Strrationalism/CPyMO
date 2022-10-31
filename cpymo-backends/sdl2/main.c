@@ -344,6 +344,11 @@ static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
 {
 	return CPYMO_ERR_NO_MORE_CONTENT;
 }
+
+void cpymo_exit_msgbox_on_closed(bool is_confirmed, void *userdata)
+{
+	*(bool *)userdata = false;
+}
 #endif
 
 
@@ -531,6 +536,10 @@ int main(int argc, char **argv)
 		SDL_UnlockAudio();
 	}
 
+	#ifdef ENABLE_EXIT_CONFIRM
+	bool exit_msgbox_opened = false;
+	#endif
+
 	size_t redraw_by_event = 30;
 	while (
 		1
@@ -577,30 +586,25 @@ int main(int argc, char **argv)
 #ifndef __ANDROID__
 			else if (event.type == SDL_QUIT) {
 				#ifdef ENABLE_EXIT_CONFIRM
+				if (!exit_msgbox_opened) {
+					err = cpymo_msgbox_ui_enter(
+						&engine,
+						cpymo_str_pure(
+							cpymo_localization_get(&engine)->exit_confirm),
+						&cpymo_exit_confirm,
+						NULL);
 
-				const SDL_MessageBoxButtonData buttons[2] = {
-					{ 0, 0, "Yes" },
-					{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 1, "No" }
-				};
+					if (err != CPYMO_ERR_SUCC) {
+						SDL_Log("[Error] Can not show message box: %s", 
+							cpymo_error_message(err));
+					}
 
-				const SDL_MessageBoxData msgbox = {
-					SDL_MESSAGEBOX_WARNING,
-					window,
-					"Warning",
-					cpymo_localization_get(&engine)->exit_confirm,
-					CPYMO_ARR_COUNT(buttons),
-					buttons,
-					NULL
-				};
-
-				int button_clicked;
-				if (SDL_ShowMessageBox(&msgbox, &button_clicked) < 0) {
-					SDL_Log(SDL_GetError());
-					goto EXIT;
+					exit_msgbox_opened = true;
+					cpymo_msgbox_ui_set_on_closed(
+						&engine,
+						&cpymo_exit_msgbox_on_closed, 
+						(void *)&exit_msgbox_opened);
 				}
-
-				if (button_clicked == 0)
-					goto EXIT;
 
 				#else
 				goto EXIT;
