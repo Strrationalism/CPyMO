@@ -345,7 +345,7 @@ static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
 	return CPYMO_ERR_NO_MORE_CONTENT;
 }
 
-void cpymo_exit_msgbox_on_closed(bool is_confirmed, void *userdata)
+static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
 {
 	*(bool *)userdata = false;
 }
@@ -600,9 +600,9 @@ int main(int argc, char **argv)
 					}
 
 					exit_msgbox_opened = true;
-					cpymo_msgbox_ui_set_on_closed(
+					cpymo_msgbox_ui_set_on_closing(
 						&engine,
-						&cpymo_exit_msgbox_on_closed, 
+						&cpymo_exit_msgbox_on_closing, 
 						(void *)&exit_msgbox_opened);
 				}
 

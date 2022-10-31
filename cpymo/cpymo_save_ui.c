@@ -60,6 +60,8 @@ static error_t cpymo_save_confirm(cpymo_engine *e, void *data)
 	
 	if (errstr != CPYMO_ERR_SUCC) return errstr;
 
+	cpymo_ui_exit(e);
+
 	err = cpymo_msgbox_ui_enter(
 		e,
 		cpymo_str_pure(msg),
