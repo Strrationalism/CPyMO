@@ -338,3 +338,85 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 	SDL_UnlockSurface(framebuffer);
 }
 
+#define ENABLE_SDL_IMAGE
+#ifdef ENABLE_SDL_IMAGE
+#include <cpymo_package.h>
+#include <cpymo_assetloader.h>
+#include <SDL/SDL_image.h>
+
+error_t cpymo_assetloader_load_icon_pixels(
+	void **px, int *w, int *h, const char *gamedir)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
+{
+	char *filename = (char *)alloca(strlen(gamedir) + 10);
+	sprintf(filename, "%s/icon.png", gamedir);
+	SDL_Surface *sur = IMG_Load(filename);
+	if (sur == NULL) 
+		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	*w = sur->w;
+	*h = sur->h;
+
+	SDL_Surface *sur_optimized = SDL_DisplayFormat(sur);
+	if (sur_optimized == NULL) {
+		out = (cpymo_backend_image)sur;
+		return CPYMO_ERR_SUCC;
+	}
+
+	SDL_FreeSurface(sur);
+	out = (cpymo_backend_image)sur_optimized;
+	return CPYMO_ERR_SUCC;
+}
+
+static void cpymo_assetloader_sdl2_attach_mask(
+	SDL_Surface **img,
+	const cpymo_package *pkg, bool use_pkg,
+	const cpymo_assetloader *loader,
+	const char *asset_type,
+	cpymo_str asset_name,
+	const char *mask_ext)
+{
+
+}
+
+error_t cpymo_assetloader_load_image_with_mask(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_str name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+error_t cpymo_assetloader_load_bg_pixels(
+	void ** px, int * w, int * h, 
+	cpymo_str name, const cpymo_assetloader * loader)
+{ return CPYMO_ERR_UNSUPPORTED; }
+
+error_t cpymo_assetloader_load_bg_image(
+	cpymo_backend_image * img, int * w, int * h, 
+	cpymo_str name, const cpymo_assetloader * loader)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+error_t cpymo_assetloader_load_system_masktrans(
+	cpymo_backend_masktrans *out, cpymo_str name, 
+	const cpymo_assetloader *loader)
+{ 
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+#endif
+
+

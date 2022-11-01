@@ -278,6 +278,10 @@ static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
 }
 #endif
 
+#ifdef __PSP__
+#define main SDL_main
+#endif
+
 int main(int argc, char **argv) 
 {
     srand((unsigned)time(NULL));
@@ -296,6 +300,9 @@ int main(int argc, char **argv)
             SDL_INIT_VIDEO
 #ifndef DISABLE_AUDIO
             | SDL_INIT_AUDIO
+#endif
+#ifdef __PSP__
+            | SDL_INIT_JOYSTICK
 #endif
         ) < 0) {
         printf("[Error] SDL_Init: %s\n", SDL_GetError());
@@ -444,7 +451,7 @@ int main(int argc, char **argv)
         bool redraw = false;
         Uint32 cur_time = SDL_GetTicks();
 #ifdef REDRAW_WHAT_EVER
-        cpymo_engine_request_redraw(engine);
+        cpymo_engine_request_redraw(&engine);
 #endif
         err = cpymo_engine_update(
             &engine, 
