@@ -5,6 +5,11 @@
 #include <math.h>
 #include <assert.h>
 
+struct cpymo_textbox_list {
+	struct cpymo_textbox_list *next;
+	cpymo_textbox box;
+};
+
 void cpymo_text_init(cpymo_text *out)
 {
 	out->ls = NULL;

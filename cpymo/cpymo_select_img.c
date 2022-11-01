@@ -12,6 +12,24 @@
 #include <cpymo_android.h>
 #endif
 
+typedef struct cpymo_select_img_selection{
+	cpymo_backend_image image;
+	cpymo_backend_text or_text;
+	cpymo_color text_color;
+	float x, y;
+	int w, h;
+	bool enabled : 1;
+
+	uint64_t hash;
+	bool has_selected;
+
+#ifdef ENABLE_TEXT_EXTRACT
+	char *original_text;
+#endif
+
+	enum cpymo_select_img_selection_hint_state hint_state : 3;
+} cpymo_select_img_selection;
+
 static error_t cpymo_select_img_ok_callback_default(cpymo_engine *e, int sel, uint64_t hash, bool save_enabled)
 {
 	if (save_enabled)

@@ -286,15 +286,23 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 
 	const cpymo_localization *l = cpymo_localization_get(e);
 
-	
+	#ifdef LOW_FRAME_RATE
+	#define MIN_SAY_SPEED 5
+	e->gameconfig.textspeed = 5;
+	#else
+	#define MIN_SAY_SPEED 0
+	#endif
+
 		
 	INIT_ITEM(ITEM_BGM_VOL, l->config_bgmvol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio) * 10));
 	INIT_ITEM(ITEM_SE_VOL, l->config_sevol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio) * 10));
 	INIT_ITEM(ITEM_VO_VOL, l->config_vovol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio) * 10));
-	INIT_ITEM(ITEM_TEXT_SPEED, l->config_sayspeed, 0, 5, (int)e->gameconfig.textspeed);
+	INIT_ITEM(ITEM_TEXT_SPEED, l->config_sayspeed, MIN_SAY_SPEED, 5, (int)e->gameconfig.textspeed);
 	INIT_ITEM(ITEM_FONT_SIZE, l->config_fontsize, 12, 32, (int)e->gameconfig.fontsize);
 	INIT_ITEM(ITEM_SKIP_ALREADY_READ_ONLY, l->config_skip_mode, 0, 1, (int)e->config_skip_already_read_only);
 	
+	#undef MIN_SAY_SPEED
+	#undef INIT_ITEM
 
 	return CPYMO_ERR_SUCC;
 }

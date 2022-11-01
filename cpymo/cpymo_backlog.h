@@ -5,21 +5,10 @@
 #include "cpymo_error.h"
 #include <cpymo_backend_text.h>
 
-typedef struct {
-	bool owning_name;
-	cpymo_backend_text name, *lines;
-	size_t max_lines;
-
-	char vo_filename[32];
-
-#ifdef ENABLE_TEXT_EXTRACT
-	char *text;
-#endif
-
-} cpymo_backlog_record;
+struct cpymo_backlog_record;
 
 typedef struct {
-	cpymo_backlog_record *records;
+	struct cpymo_backlog_record *records;
 	size_t next_record_to_write;
 	char pending_vo_filename[32];
 

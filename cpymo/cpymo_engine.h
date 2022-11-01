@@ -41,7 +41,7 @@ struct cpymo_engine {
 	cpymo_say say;
 	cpymo_text text;
 	cpymo_hash_flags flags;
-	cpymo_ui *ui;
+	struct cpymo_ui *ui;
 	cpymo_audio_system audio;
 	cpymo_backlog backlog;
 
