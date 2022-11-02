@@ -410,17 +410,14 @@ error_t cpymo_assetloader_load_icon(
 	return CPYMO_ERR_SUCC;
 }
 
-static error_t cpymo_assetloader_load_image_with_mask_ex(
-	cpymo_backend_image *img, int *w, int *h, 
-	cpymo_str name, 
+static error_t cpymo_assetloader_load_image_surface(
+	SDL_Surface **out,
+	cpymo_str name,
 	const char *asset_type,
 	const char *asset_ext,
-	const char *mask_ext,
 	bool use_pkg,
 	const cpymo_package *pkg,
-	const cpymo_assetloader *loader,
-	bool load_mask,
-	SDL_Surface *(*display_format_converter)(SDL_Surface *))
+	const cpymo_assetloader *loader)
 {
 	SDL_Surface *sur;
 	if (use_pkg) {
@@ -468,6 +465,59 @@ static error_t cpymo_assetloader_load_image_with_mask_ex(
 	}
 
 	if (sur == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	*out = sur;
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_assetloader_load_image_with_mask_ex(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_str name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask,
+	SDL_Surface *(*display_format_converter)(SDL_Surface *))
+{
+	SDL_Surface *sur;
+	error_t err = cpymo_assetloader_load_image_surface(
+		&sur, name, asset_type, asset_ext, use_pkg, pkg, loader);
+	CPYMO_THROW(err);
+
+	if (sur == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+/*	if (load_mask) {
+		char *mask_name = (char *)malloc(name.len + 6);
+		if (mask_name) {
+			cpymo_str_copy(mask_name, name.len + 6, name);
+			strcat(mask_name, "_mask");
+
+			SDL_Surface *mask;
+			error_t errmask = cpymo_assetloader_load_image_surface(
+				&mask, cpymo_str_pure(mask_name), asset_type, mask_ext, 
+				use_pkg, pkg, loader);
+			free(mask_name);
+
+			SDL_CreateRGBSurface(
+				0, sur->w, sur->h, 32, 
+			)
+
+			if (errmask == CPYMO_ERR_SUCC) {
+				 for (int y = 0; y < sur->h; ++y) {
+					for (int x = 0; x < sur->w; ++x) {
+						cpymo_color maskp = getpixel(sur, x, y);
+						cpymo_color maskc = getpixel(
+							mask, 
+							(int)((float)x / (float)sur->w * (mask->w - 1)),
+							(int)((float)y / (float)sur->h * (mask->h - 1)));
+						
+					}
+				 }
+			}
+		}
+	}*/
 
 	*w = sur->w;
 	*h = sur->h;
