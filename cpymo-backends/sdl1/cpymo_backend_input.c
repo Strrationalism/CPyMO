@@ -79,17 +79,17 @@ cpymo_input cpymo_input_snapshot()
         pspctrl = SDL_JoystickOpen(0);
     
     if (pspctrl) {
-        x.skip = SDL_JoystickGetButton(pspctrl, 0);
-        x.ok = SDL_JoystickGetButton(pspctrl, 1);
-        x.cancel = SDL_JoystickGetButton(pspctrl, 2);
-        x.hide_window = SDL_JoystickGetButton(pspctrl, 3);
-        x.ok = SDL_JoystickGetButton(pspctrl, 4);
-        x.ok = SDL_JoystickGetButton(pspctrl, 5);
+        x.skip |= SDL_JoystickGetButton(pspctrl, 0);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 1);
+        x.cancel |= SDL_JoystickGetButton(pspctrl, 2);
+        x.hide_window |= SDL_JoystickGetButton(pspctrl, 3);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 4);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 5);
 
-        x.down = SDL_JoystickGetButton(pspctrl, 6);
-        x.up = SDL_JoystickGetButton(pspctrl, 8);
-        x.left = SDL_JoystickGetButton(pspctrl, 7);
-        x.right = SDL_JoystickGetButton(pspctrl, 9);
+        x.down |= SDL_JoystickGetButton(pspctrl, 6);
+        x.up |= SDL_JoystickGetButton(pspctrl, 8);
+        x.left |= SDL_JoystickGetButton(pspctrl, 7);
+        x.right |= SDL_JoystickGetButton(pspctrl, 9);
     }
 #endif
 
