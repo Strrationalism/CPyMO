@@ -5,8 +5,44 @@
 #include <SDL/SDL.h>
 #include <cpymo_engine.h>
 
+#define ENABLE_SDL_IMAGE
+#ifdef ENABLE_SDL_IMAGE
+#include <SDL/SDL_image.h>
+#endif
+
 const extern cpymo_engine engine;
 extern SDL_Surface *framebuffer;
+
+error_t cpymo_backend_image_init(void)
+{
+	#ifdef ENABLE_SDL_IMAGE
+	int flags =
+		IMG_INIT_JPG |
+		IMG_INIT_PNG |
+		IMG_INIT_TIF |
+		IMG_INIT_WEBP;
+
+	int result = IMG_Init(flags);
+
+	if (0 == result) {
+		printf("[Error] IMG_Init: %s\n", IMG_GetError());
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	if (flags != result) 
+		printf("[Warning] IMG_Init(%d): %s\n", result, IMG_GetError());
+
+	#endif
+
+	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_backend_image_quit(void)
+{
+	#ifdef ENABLE_SDL_IMAGE
+	IMG_Quit();
+	#endif
+}
 
 cpymo_color getpixel(SDL_Surface *surface, int x, int y)
 {
@@ -338,11 +374,9 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 	SDL_UnlockSurface(framebuffer);
 }
 
-#define ENABLE_SDL_IMAGE
 #ifdef ENABLE_SDL_IMAGE
 #include <cpymo_package.h>
 #include <cpymo_assetloader.h>
-#include <SDL/SDL_image.h>
 
 error_t cpymo_assetloader_load_icon_pixels(
 	void **px, int *w, int *h, const char *gamedir)
@@ -353,35 +387,84 @@ error_t cpymo_assetloader_load_icon_pixels(
 error_t cpymo_assetloader_load_icon(
 	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
 {
-	char *filename = (char *)alloca(strlen(gamedir) + 10);
+	char *filename = (char *)malloc(strlen(gamedir) + 10);
+	if (filename == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	sprintf(filename, "%s/icon.png", gamedir);
 	SDL_Surface *sur = IMG_Load(filename);
+	free(filename);
 	if (sur == NULL) 
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 
 	*w = sur->w;
 	*h = sur->h;
-
+	
 	SDL_Surface *sur_optimized = SDL_DisplayFormat(sur);
 	if (sur_optimized == NULL) {
-		out = (cpymo_backend_image)sur;
+		*out = (cpymo_backend_image)sur;
 		return CPYMO_ERR_SUCC;
 	}
 
 	SDL_FreeSurface(sur);
-	out = (cpymo_backend_image)sur_optimized;
+	*out = (cpymo_backend_image)sur_optimized;
+
 	return CPYMO_ERR_SUCC;
 }
 
-static void cpymo_assetloader_sdl2_attach_mask(
-	SDL_Surface **img,
-	const cpymo_package *pkg, bool use_pkg,
-	const cpymo_assetloader *loader,
+static error_t cpymo_assetloader_load_image_with_mask_ex(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_str name, 
 	const char *asset_type,
-	cpymo_str asset_name,
-	const char *mask_ext)
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask,
+	SDL_Surface *(*display_format_converter)(SDL_Surface *))
 {
+	SDL_Surface *sur;
+	if (use_pkg) {
+		char *buf;
+		size_t len;
+		error_t err = cpymo_package_read_file(&buf, &len, pkg, name);
+		CPYMO_THROW(err);
 
+		SDL_RWops *rwops = SDL_RWFromConstMem(buf, (int)len);
+		if (rwops == NULL) {
+			free(buf);
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+
+		sur = IMG_Load_RW(rwops, 0);
+		SDL_RWclose(rwops);
+		free(buf);
+	}
+	else {
+		char *path;
+		error_t err = cpymo_assetloader_get_fs_path(
+			&path,
+			name,
+			asset_type,
+			asset_ext,
+			loader);
+		CPYMO_THROW(err);
+
+		sur = IMG_Load(path);
+		free(path);
+	}
+
+	*w = sur->w;
+	*h = sur->h;
+
+	SDL_Surface *sur_optimized = display_format_converter(sur);
+	if (sur_optimized) {
+		SDL_FreeSurface(sur);
+		sur = sur_optimized;
+	}
+
+	*img = (cpymo_backend_image)sur;
+
+	return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_assetloader_load_image_with_mask(
@@ -395,7 +478,9 @@ error_t cpymo_assetloader_load_image_with_mask(
 	const cpymo_assetloader *loader,
 	bool load_mask)
 {
-	return CPYMO_ERR_UNSUPPORTED;
+	return cpymo_assetloader_load_image_with_mask_ex(
+		img, w, h, name, asset_type, asset_ext, mask_ext, use_pkg, pkg, loader,
+		load_mask, &SDL_DisplayFormatAlpha);
 }
 
 error_t cpymo_assetloader_load_bg_pixels(
@@ -407,7 +492,10 @@ error_t cpymo_assetloader_load_bg_image(
 	cpymo_backend_image * img, int * w, int * h, 
 	cpymo_str name, const cpymo_assetloader * loader)
 {
-	return CPYMO_ERR_UNSUPPORTED;
+	return cpymo_assetloader_load_image_with_mask_ex(
+		img, w, h, name, "bg", loader->game_config->bgformat,
+		NULL, loader->use_pkg_bg, &loader->pkg_bg, loader,
+		false, &SDL_DisplayFormat);
 }
 
 error_t cpymo_assetloader_load_system_masktrans(

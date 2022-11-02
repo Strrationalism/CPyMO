@@ -19,6 +19,7 @@ CFLAGS := \
 	-I. \
 	-I$(PSPDEV)/psp/include \
 	-I$(PSPDEV)/psp/sdk/include \
+	-DFAST_FILL_RECT \
 	-DDISABLE_AUDIO \
 	-DDISABLE_MOVIE \
 	-DDEFAULT_FULLSCREEN \
