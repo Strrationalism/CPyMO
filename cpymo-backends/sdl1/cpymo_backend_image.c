@@ -424,7 +424,21 @@ static error_t cpymo_assetloader_load_image_with_mask_ex(
 {
 	SDL_Surface *sur;
 	if (use_pkg) {
-		char *buf;
+		cpymo_package_stream_reader r;
+		error_t err = cpymo_package_stream_reader_find_create(&r, pkg, name);
+		CPYMO_THROW(err);
+
+		SDL_RWops *rwops = SDL_RWFromFP(r.stream, 0);
+		if (rwops == NULL) {
+			cpymo_package_stream_reader_close(&r);
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+
+		sur = IMG_Load_RW(rwops, 0);
+		SDL_RWclose(rwops);
+		cpymo_package_stream_reader_close(&r);
+		
+		/*char *buf;
 		size_t len;
 		error_t err = cpymo_package_read_file(&buf, &len, pkg, name);
 		CPYMO_THROW(err);
@@ -437,7 +451,7 @@ static error_t cpymo_assetloader_load_image_with_mask_ex(
 
 		sur = IMG_Load_RW(rwops, 0);
 		SDL_RWclose(rwops);
-		free(buf);
+		free(buf);*/
 	}
 	else {
 		char *path;
@@ -452,6 +466,8 @@ static error_t cpymo_assetloader_load_image_with_mask_ex(
 		sur = IMG_Load(path);
 		free(path);
 	}
+
+	if (sur == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	*w = sur->w;
 	*h = sur->h;
