@@ -72,7 +72,6 @@ cpymo_input cpymo_input_snapshot()
     if (pressed & WPAD_BUTTON_2) x.skip |= true;
 #endif
 
-#define __PSP__
 #ifdef __PSP__
     static SDL_Joystick *pspctrl = NULL;
     if (pspctrl == NULL) 
