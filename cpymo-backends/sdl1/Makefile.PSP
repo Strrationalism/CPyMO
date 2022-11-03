@@ -20,7 +20,11 @@ CFLAGS := \
 	-I$(PSPDEV)/psp/include \
 	-I$(PSPDEV)/psp/sdk/include \
 	-DFAST_FILL_RECT \
-	-DDISABLE_AUDIO \
+	-DDISABLE_FFMPEG_AUDIO \
+	-DDISABLE_AUTOSAVE \
+	-DENABLE_SDL_MIXER_AUDIO_BACKEND \
+	-DSDL_MIXER_CHUNKSIZE=16384 \
+	-DSDL_MIXER_FREQ=22050 \
 	-DDISABLE_MOVIE \
 	-DDEFAULT_FULLSCREEN \
 	-DSCREEN_BPP=32 \
@@ -45,8 +49,9 @@ LDFLAGS := \
 	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
 	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
 	-lpspnet_adhocmatching -lpspnet_adhoc \
-	-lpspnet_adhocctl -lm -lpspvram -lbz2 -Xlinker "-)" \
-	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl
+	-lpspnet_adhocctl -lm -lpspvram -lbz2 -lmikmod -logg -lvorbis \
+	-Xlinker "-)" \
+	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl \
 
 CC := psp-gcc
 
