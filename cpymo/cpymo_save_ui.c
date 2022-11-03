@@ -308,7 +308,10 @@ error_t cpymo_save_ui_load_savedata_yesnobox(cpymo_engine * e, unsigned short sa
 	error_t err = CPYMO_ERR_SUCC;
 	const cpymo_localization *l = cpymo_localization_get(e);
 
-	if (save_id) {
+	#ifndef DISABLE_AUTOSAVE
+	if (save_id) 
+	#endif
+	{
 		err = l->save_are_you_sure_load(&str, (int)save_id);
 		CPYMO_THROW(err);
 	}
