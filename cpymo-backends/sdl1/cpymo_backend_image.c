@@ -568,7 +568,42 @@ error_t cpymo_assetloader_load_system_masktrans(
 	cpymo_backend_masktrans *out, cpymo_str name, 
 	const cpymo_assetloader *loader)
 { 
-	return CPYMO_ERR_UNSUPPORTED;
+	char *filename;
+	error_t err = cpymo_assetloader_get_fs_path(
+		&filename,
+		name,
+		"system",
+		"png",
+		loader);		
+	CPYMO_THROW(err);
+
+	SDL_Surface *mask = IMG_Load(filename);
+	free(filename);
+	if (mask == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	Uint8 *mask_surface = (Uint8 *)malloc(
+		engine.gameconfig.imagesize_w * engine.gameconfig.imagesize_h);
+	if (mask_surface == NULL) {
+		SDL_FreeSurface(mask);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	for (Uint16 y = 0; y < engine.gameconfig.imagesize_h; ++y) {
+		for (Uint16 x = 0; x < engine.gameconfig.imagesize_w; ++x) {
+			float xf = (float)x / (float)engine.gameconfig.imagesize_w;
+			float yf = (float)y / (float)engine.gameconfig.imagesize_h;
+
+			int xm = (int)(xf * (mask->w - 1));
+			int ym = (int)(yf * (mask->h - 1));
+			cpymo_color col = getpixel(mask, xm, ym);
+			mask_surface[y * engine.gameconfig.imagesize_w + x] = col.r;
+		}
+	}
+
+	SDL_FreeSurface(mask);
+	*out = (cpymo_backend_masktrans)mask_surface;
+	
+	return CPYMO_ERR_SUCC;
 }
 
 #endif
