@@ -134,31 +134,29 @@ jobs:
   build-psp:
     name: 'Sony PSP'
     runs-on: ubuntu-latest
-    container: pspdev/pspdev:latest
 
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: true
     
-    # - name: Install PSPDEV
-      # run: |
-        # git clone https://github.com/pspdev/pspdev.git --depth 1
-        # cd pspdev
-        # sudo apt-get update
-        # sudo ./prepare-debian-ubuntu.sh
-        # export PSPDEV=/usr/local/pspdev
-        # sudo mkdir -p $PSPDEV
-        # sudo chown -R $USER: $PSPDEV
-        # export PATH=$PATH:$PSPDEV/bin
-        # ./build-all.sh
-        
+    - name: Install PSPDEV
+      run: |
+        git clone https://github.com/pspdev/pspdev.git --depth 1
+        cd pspdev
+        sudo apt-get update
+        sudo ./prepare-debian-ubuntu.sh
+        export PSPDEV=/usr/local/pspdev
+        sudo mkdir -p $PSPDEV
+        sudo chown -R $USER: $PSPDEV
+        export PATH=$PATH:$PSPDEV/bin
+        ./build-all.sh
+        psp-pacman -Syu
 
     - name: Build SDL2 Backend
       run: |
         export PSPDEV=/usr/local/pspdev
         export PATH=$PATH:$PSPDEV/bin
-        psp-pacman -Syu
         psp-pacman -S sdl2 sdl2-mixer sdl2-image sdl2-ttf --noconfirm
         cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
