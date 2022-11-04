@@ -24,11 +24,10 @@ CFLAGS := \
 	-DDISABLE_AUTOSAVE \
 	-DENABLE_SDL_MIXER_AUDIO_BACKEND \
 	-DSDL_MIXER_CHUNKSIZE=1024 \
-	-DSDL_MIXER_FREQ=22050 \
+	-DSDL_MIXER_FREQ=44100 \
 	-DDISABLE_MOVIE \
 	-DDEFAULT_FULLSCREEN \
 	-DSCREEN_BPP=16 \
-	-DREDRAW_WHAT_EVER \
 	-DNDEBUG -D__PSP__ \
 	-DSCREEN_WIDTH=480 -DSCREEN_HEIGHT=272 \
 	-DUSE_GAME_SELECTOR \
@@ -37,7 +36,8 @@ CFLAGS := \
 	-DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
 	-DGAME_SELECTOR_DIR="\"./\"" \
 	-D_PSP_FW_VERSION=150 \
-	-DENABLE_SDL_IMAGE -DDISABLE_STB_IMAGE -DSCREEN_FLAGS=SDL_SWSURFACE
+	-DENABLE_SDL_IMAGE -DDISABLE_STB_IMAGE \
+	-DSCREEN_FLAGS="(SDL_SWSURFACE | SDL_ASYNCBLIT)"
 
 LDFLAGS := \
 	-Wl,-zmax-page-size=128 \
@@ -51,7 +51,7 @@ LDFLAGS := \
 	-lpspnet_adhocmatching -lpspnet_adhoc \
 	-lpspnet_adhocctl -lm -lpspvram -lbz2 -lmikmod -logg -lvorbis \
 	-Xlinker "-)" \
-	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl \
+	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl
 
 CC := psp-gcc
 

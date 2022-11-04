@@ -1,4 +1,6 @@
 ﻿#include <cpymo_prelude.h>
+
+#ifndef ENABLE_SDL_TTF
 #include <cpymo_backend_text.h>
 #include <SDL/SDL.h>
 #include <stb_truetype.h>
@@ -148,3 +150,4 @@ float cpymo_backend_text_width(
 }
 
 
+#endif
