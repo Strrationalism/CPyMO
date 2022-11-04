@@ -280,10 +280,16 @@ static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
 
 #ifdef __PSP__
 #define main SDL_main
+#include <psppower.h>
 #endif
 
 int main(int argc, char **argv) 
 {
+#ifdef __PSP__    
+    scePowerSetCpuClockFrequency(333);
+    scePowerSetBusClockFrequency(167);
+#endif
+
     srand((unsigned)time(NULL));
 
 #if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))

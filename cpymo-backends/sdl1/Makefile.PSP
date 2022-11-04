@@ -46,12 +46,12 @@ LDFLAGS := \
 	-lSDL_image -lSDL_ttf -lSDL_mixer -lxmp -lSDL -lSDLmain -lGL \
 	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
 	-lpspumd -lpsprtc -lpng -ljpeg \
-	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
+	-lpspgum -lpspgu -lpspaudiolib \
 	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
 	-lpspnet_adhocmatching -lpspnet_adhoc \
 	-lpspnet_adhocctl -lm -lpspvram -lbz2 -lmikmod -logg -lvorbis \
 	-Xlinker "-)" \
-	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl
+	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl -lpsppower 
 
 CC := psp-gcc
 
