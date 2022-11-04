@@ -5,7 +5,6 @@
 #include <SDL/SDL.h>
 #include <cpymo_engine.h>
 
-#define ENABLE_SDL_IMAGE
 #ifdef ENABLE_SDL_IMAGE
 #include <SDL/SDL_image.h>
 #endif

@@ -359,7 +359,7 @@ int main(int argc, char **argv)
 
     load_game_icon(gamedir);
 
-    error_t err = cpymo_engine_init(&engine, gamedir);
+    err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_engine_init: %s\n", cpymo_error_message(err));
         cpymo_backend_image_quit();
