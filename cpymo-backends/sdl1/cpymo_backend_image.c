@@ -82,12 +82,12 @@ cpymo_color getpixel(SDL_Surface *surface, int x, int y)
 	return col;
 }
 
-void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col)
+void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col, Uint8 alpha)
 {
     int bpp = surface->format->BytesPerPixel;
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-	Uint32 pixel = SDL_MapRGB(surface->format, col.r, col.g, col.b);
+	Uint32 pixel = SDL_MapRGBA(surface->format, col.r, col.g, col.b, alpha);
 
     switch(bpp) {
     case 1:
@@ -116,6 +116,18 @@ void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col)
     }
 }
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	#define RMASK 0xff000000
+	#define GMASK 0x00ff0000
+	#define BMASK 0x0000ff00
+	#define AMASK 0x000000ff
+#else
+	#define RMASK 0x000000ff
+	#define GMASK 0x0000ff00
+	#define BMASK 0x00ff0000
+	#define AMASK 0xff000000
+#endif
+
 error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, 
 	void *pixels_moveintoimage, 
@@ -123,20 +135,7 @@ error_t cpymo_backend_image_load(
 	int height, 
 	enum cpymo_backend_image_format format)
 {
-	Uint32 rmask, gmask, bmask, amask;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#else
-	rmask = 0x000000ff;
-	gmask = 0x0000ff00;
-	bmask = 0x00ff0000;
-	amask = 0xff000000;
-#endif
-
+	Uint32 rmask = RMASK, gmask = GMASK, bmask = BMASK, amask = AMASK;
 #ifdef __WII__
 	if (format == cpymo_backend_image_format_rgb) {
 		rmask >>= 8;
@@ -308,7 +307,7 @@ void cpymo_backend_image_fill_rects(
 				dst.r = (Uint8)(dst_r * 255);
 				dst.g = (Uint8)(dst_g * 255);
 				dst.b = (Uint8)(dst_b * 255);
-				putpixel(framebuffer, x, y, dst);
+				putpixel(framebuffer, x, y, dst, 255);
 			}
 		}
 	}
@@ -367,7 +366,7 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 			col.r = (uint8_t)(col.r * mask);
 			col.g = (uint8_t)(col.g * mask);
 			col.b = (uint8_t)(col.b * mask);
-			putpixel(framebuffer, px_x, px_y, col);
+			putpixel(framebuffer, px_x, px_y, col, 255);
 		}
 	}
 
@@ -488,7 +487,7 @@ static error_t cpymo_assetloader_load_image_with_mask_ex(
 
 	if (sur == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-/*	if (load_mask) {
+	if (load_mask) {
 		char *mask_name = (char *)malloc(name.len + 6);
 		if (mask_name) {
 			cpymo_str_copy(mask_name, name.len + 6, name);
@@ -500,24 +499,37 @@ static error_t cpymo_assetloader_load_image_with_mask_ex(
 				use_pkg, pkg, loader);
 			free(mask_name);
 
-			SDL_CreateRGBSurface(
-				0, sur->w, sur->h, 32, 
-			)
-
 			if (errmask == CPYMO_ERR_SUCC) {
-				 for (int y = 0; y < sur->h; ++y) {
-					for (int x = 0; x < sur->w; ++x) {
-						cpymo_color maskp = getpixel(sur, x, y);
-						cpymo_color maskc = getpixel(
-							mask, 
-							(int)((float)x / (float)sur->w * (mask->w - 1)),
-							(int)((float)y / (float)sur->h * (mask->h - 1)));
-						
+				SDL_Surface *masked_image = SDL_CreateRGBSurface(
+					0, 
+					sur->w, 
+					sur->h, 
+					32, 
+					RMASK, 
+					GMASK, 
+					BMASK, 
+					AMASK);
+				
+				if (masked_image) {
+					for (int y = 0; y < sur->h; ++y) {
+						for (int x = 0; x < sur->w; ++x) {
+							cpymo_color maskp = getpixel(sur, x, y);
+							cpymo_color maskc = getpixel(
+								mask, 
+								(int)((float)x / (float)sur->w * (mask->w - 1)),
+								(int)((float)y / (float)sur->h * (mask->h - 1)));
+							putpixel(masked_image, x, y, maskp, maskc.r);
+						}
 					}
-				 }
+
+					SDL_FreeSurface(sur);
+					sur = masked_image;
+				}
+
+				SDL_FreeSurface(mask);
 			}
 		}
-	}*/
+	}
 
 	*w = sur->w;
 	*h = sur->h;
