@@ -243,6 +243,8 @@ static error_t cpymo_tool_get_file_list(char *** files, size_t * count, const ch
 		}
 	} while (cpymo_parser_next_line(&parser));
 
+	free(ls_buf);
+
 	return CPYMO_ERR_SUCC;
 }
 
