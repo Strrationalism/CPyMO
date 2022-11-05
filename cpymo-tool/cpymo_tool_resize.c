@@ -24,20 +24,18 @@ static error_t cpymo_tool_resize_image(
 {
     cpymo_tool_image img;
     error_t err = cpymo_tool_image_load_from_file(&img, input_file, load_mask);
+	CPYMO_THROW(err);
 
-    {
-        cpymo_tool_image resized;
-        err = cpymo_tool_image_resize(&resized, &img, (size_t)(ratio_w * img.width), (size_t)(ratio_h * img.height));
-        cpymo_tool_image_free(img);
-        img = resized;
+    
+	cpymo_tool_image resized;
+	err = cpymo_tool_image_resize(&resized, &img, (size_t)(ratio_w * img.width), (size_t)(ratio_h * img.height));
+	cpymo_tool_image_free(img);
+	CPYMO_THROW(err);
 
-        if (err != CPYMO_ERR_SUCC) {
-            cpymo_tool_image_free(img);
-            return err;
-        }
-    }
-
-    return cpymo_tool_image_save_to_file_with_mask(&img, output_file, cpymo_str_pure(out_format), create_mask);
+    err = cpymo_tool_image_save_to_file_with_mask(
+		&resized, output_file, cpymo_str_pure(out_format), create_mask);
+	cpymo_tool_image_free(resized);
+	return err;
 }
 
 extern int help();
