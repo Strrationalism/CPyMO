@@ -6,21 +6,17 @@
 
 struct cpymo_engine;
 
-typedef struct {
-	float x, y;
-	float width;
-	float character_size;
-	size_t max_lines;
-	cpymo_backend_text *lines;
-	size_t active_line;
-	float active_line_current_width;
-	cpymo_str text_curline_and_remaining;
-	size_t text_curline_size;
-	cpymo_color color;
-	float alpha;
+struct cpymo_textbox_line;
 
-	float timer;
-	bool msg_cursor_visible;
+typedef struct {
+	size_t chars_pool_max_size, chars_pool_size, max_lines;
+	cpymo_backend_text *chars_pool;
+	float *chars_x_pool;
+	struct cpymo_textbox_line *lines;
+	size_t active_line;
+	float x, y, w, h, char_size, alpha, typing_x;
+	cpymo_color col;
+	cpymo_str remain_text, text_showing;
 } cpymo_textbox;
 
 error_t cpymo_textbox_init(
@@ -43,7 +39,7 @@ void cpymo_textbox_draw(
 error_t cpymo_textbox_clear_page(cpymo_textbox *, cpymo_backlog *write_to_backlog);
 
 static inline bool cpymo_textbox_all_finished(cpymo_textbox *tb)
-{ return tb->text_curline_and_remaining.len == tb->text_curline_size; }
+{ return tb->remain_text.len == 0; }
 
 void cpymo_textbox_finalize(cpymo_textbox *tb);
 

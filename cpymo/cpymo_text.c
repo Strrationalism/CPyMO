@@ -74,7 +74,7 @@ static error_t cpymo_text_callback_read(cpymo_engine *e)
 			&cpymo_text_callback_fadein);
 	}
 	else {
-		t->active_box->msg_cursor_visible = false;
+		//TODO: t->active_box->msg_cursor_visible = false;
 		t->active_box = NULL;
 	}
 
