@@ -133,7 +133,7 @@ jobs:
 
   build-psp:
     name: 'Sony PSP'
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -148,7 +148,7 @@ jobs:
         git clone https://github.com/pspdev/pspdev.git --depth 1
         cd pspdev
         sudo apt-get update
-        sudo ./prepare-debian-ubuntu.sh
+        sudo ./prepare-mac-os.sh
         export PSPDEV=/usr/local/pspdev
         sudo mkdir -p $PSPDEV
         sudo chown -R $USER: $PSPDEV
