@@ -8,6 +8,9 @@
 #include <cpymo_android.h>
 #endif
 
+static inline bool cpymo_textbox_page_full(cpymo_textbox *tb)
+{ return tb->active_line >= tb->max_lines; }
+
 error_t cpymo_textbox_init(
     cpymo_textbox *o, 
     float x, float y, 
@@ -123,7 +126,7 @@ static bool cpymo_textbox_line_full(cpymo_textbox * tb)
     return cur_w > tb->width;
 }
 
-void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
+static void cpymo_textbox_refresh_curline(cpymo_textbox *tb)
 {
     if (tb->active_line >= tb->max_lines) return;
 
@@ -165,7 +168,7 @@ static void cpymo_textbox_show_next_line(cpymo_textbox *tb)
     tb->text_curline_size = 0;
 }
 
-void cpymo_textbox_show_next_char(cpymo_textbox *tb)
+static void cpymo_textbox_show_next_char(cpymo_textbox *tb)
 {
     assert(!cpymo_textbox_all_finished(tb));
     assert(tb->text_curline_size <= tb->text_curline_and_remaining.len);
