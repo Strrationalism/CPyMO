@@ -17,6 +17,9 @@ typedef struct {
 	float x, y, w, h, char_size, alpha, typing_x;
 	cpymo_color col;
 	cpymo_str remain_text, text_showing;
+
+	float timer;
+	bool draw_cursor;
 } cpymo_textbox;
 
 error_t cpymo_textbox_init(

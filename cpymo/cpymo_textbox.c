@@ -62,6 +62,13 @@ error_t cpymo_textbox_init(
         o->lines[i].y = o->y + o->char_size * (i + 1);
     }
 
+    o->timer = 0;
+    o->draw_cursor = false;
+
+    #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
+    cpymo_android_play_sound(SOUND_ENTER);
+    #endif
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -84,6 +91,9 @@ void cpymo_textbox_free(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
 {
     cpymo_textbox_clear_chars_pool_and_lines(tb);
     if (tb->chars_pool) free((void *)tb->chars_pool);
+    tb->lines = NULL;
+    tb->chars_pool = NULL;
+    tb->chars_x_pool = NULL;
 }
 
 void cpymo_textbox_draw(
@@ -93,6 +103,23 @@ void cpymo_textbox_draw(
 {
     if (tb->lines == NULL || tb->chars_pool == NULL || tb->chars_x_pool == NULL) 
         return;
+
+    if (tb->draw_cursor && e->say.msg_cursor) {
+        float x = tb->w;
+        float y = tb->lines[tb->max_lines - 1].y;
+        float w = tb->char_size;
+        float h = tb->char_size;
+        
+        float x1 = w / 2 - e->say.msg_cursor_w / 2.0f;
+        float y1 = h / 2 - e->say.msg_cursor_h / 2.0f;
+
+        cpymo_backend_image_draw(
+            x - x1, y - y1, 
+            (float)e->say.msg_cursor_w, (float)e->say.msg_cursor_h,
+            e->say.msg_cursor,
+            0, 0, e->say.msg_cursor_w, e->say.msg_cursor_h,
+            1.0f, drawtype);
+    }
 
     for (size_t line_id = 0; line_id <= tb->active_line; ++line_id) {
         const cpymo_textbox_line *line = tb->lines + line_id;
@@ -134,19 +161,29 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     assert(tb->chars_x_pool);
     if (tb->remain_text.len == 0) return CPYMO_ERR_NO_MORE_CONTENT;
 
-    if (cpymo_str_starts_with_str(tb->remain_text, "\n") || 
-        cpymo_str_starts_with_str(tb->remain_text, "\\n") ||
-        cpymo_str_starts_with_str(tb->remain_text, "\\r")) {
-        return cpymo_textbox_nextline(tb) ?
-                CPYMO_ERR_SUCC :
-                CPYMO_ERR_NO_MORE_CONTENT;
-    }
+    #define EAT_NEWLINE(NEW_LINE_HEADER) \
+        if (cpymo_str_starts_with_str(tb->remain_text, NEW_LINE_HEADER)) { \
+            tb->remain_text.begin += sizeof(NEW_LINE_HEADER) - 1; \
+            tb->remain_text.len -= sizeof(NEW_LINE_HEADER) - 1; \
+            return cpymo_textbox_nextline(tb) ? \
+                CPYMO_ERR_SUCC : \
+                CPYMO_ERR_NO_MORE_CONTENT; \
+        }
+
+    EAT_NEWLINE("\n");
+    EAT_NEWLINE("\\n");
+    EAT_NEWLINE("\\r");
 
     cpymo_str remain_text = tb->remain_text;
     cpymo_str ch = cpymo_str_utf8_try_head(&remain_text);
 
     float ch_w = cpymo_backend_text_width(ch, tb->char_size);
-    if (tb->x + tb->w - tb->typing_x < ch_w) {
+
+    float tbw = tb->w;
+    if (tb->active_line == tb->max_lines - 1)
+        tbw -= tb->char_size;
+    
+    if (tb->x + tbw - tb->typing_x < ch_w) {
         if (!cpymo_textbox_nextline(tb)) 
             return CPYMO_ERR_NO_MORE_CONTENT;
 
@@ -170,13 +207,57 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
 void cpymo_textbox_finalize(cpymo_textbox *tb)
 {
     while (cpymo_textbox_add_char(tb) == CPYMO_ERR_SUCC);
+    tb->timer = 0;
+    tb->draw_cursor = true;
 }
 
 bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *which_textbox)
 {
+#ifdef LOW_FRAME_RATE
     cpymo_textbox_finalize(which_textbox);
     cpymo_engine_request_redraw(e);
+    which_textbox->draw_cursor = true;
     return true;
+#else 
+    if (cpymo_engine_skipping(e)) {
+        cpymo_textbox_finalize(which_textbox);
+        cpymo_engine_request_redraw(e);
+        return true;
+    }
+
+    which_textbox->timer += dt;
+    float speed = 0.05f;
+    switch (e->gameconfig.textspeed) {
+    case 0: speed = 0.1f; break;
+    case 1: speed = 0.075f; break;
+    case 2: speed = 0.05f; break;
+    case 3: speed = 0.025f; break;
+    case 4: speed = 0.0125f; break;
+    default: speed = 0.0f; break;
+    };
+
+    error_t err = CPYMO_ERR_SUCC;
+    while (which_textbox->timer >= speed) {
+        which_textbox->timer -= speed;
+        err = cpymo_textbox_add_char(which_textbox);
+        if (err != CPYMO_ERR_SUCC) break;
+        cpymo_engine_request_redraw(e);
+    }
+
+    if (cpymo_input_foward_key_just_released(e)) {
+        cpymo_engine_request_redraw(e);
+        cpymo_textbox_finalize(which_textbox);
+    }
+
+    if (err == CPYMO_ERR_NO_MORE_CONTENT) {
+        cpymo_engine_request_redraw(e);
+        which_textbox->timer = 0;
+        which_textbox->draw_cursor = true;
+        return true;
+    }
+
+    return false;
+#endif
 }
 
 bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *tb)
@@ -188,6 +269,20 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
         || CPYMO_INPUT_JUST_RELEASED(e, mouse_button)
         || CPYMO_INPUT_JUST_RELEASED(e, down)
         || e->input.mouse_wheel_delta < 0;
+
+#ifndef LOW_FRAME_RATE
+    tb->timer += dt;
+    while (tb->timer >= 0.5f) {
+        tb->timer -= 0.5f;
+        tb->draw_cursor = !tb->draw_cursor;
+        cpymo_engine_request_redraw(e);
+    }
+#endif
+
+    if (go) {
+        tb->timer = 0;
+        tb->draw_cursor = false;
+    }
 
     return go;
 }
