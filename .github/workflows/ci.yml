@@ -475,13 +475,17 @@ jobs:
 
     - name: Bootstrap vcpkg
       run: |
-        ./vcpkg/bootstrap-vcpkg.sh
+        ./vcpkg/bootstrap-vcpkg.sh --disable-metrics
         ./vcpkg/vcpkg integrate install
       if: ${{ runner.os != 'Windows' }}
 
+    - name: Magic Shit for Linux
+      run: sudo mkdir /home/runner/.vcpkg
+      if: ${{ runner.os != 'Linux' }}
+
     - name: Bootstrap vcpkg (Windows)
       run: |
-        ./vcpkg/bootstrap-vcpkg.bat
+        ./vcpkg/bootstrap-vcpkg.bat --disable-metrics
         ./vcpkg/vcpkg integrate install
       if: ${{ runner.os == 'Windows' }}
 
