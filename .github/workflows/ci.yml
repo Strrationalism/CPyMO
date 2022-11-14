@@ -475,7 +475,7 @@ jobs:
 
     - name: Bootstrap vcpkg
       run: |
-        ./vcpkg/bootstrap-vcpkg.sh --disable-metrics
+        ./vcpkg/bootstrap-vcpkg.sh
         ./vcpkg/vcpkg integrate install
       if: ${{ runner.os != 'Windows' }}
 
@@ -485,7 +485,7 @@ jobs:
 
     - name: Bootstrap vcpkg (Windows)
       run: |
-        ./vcpkg/bootstrap-vcpkg.bat --disable-metrics
+        ./vcpkg/bootstrap-vcpkg.bat
         ./vcpkg/vcpkg integrate install
       if: ${{ runner.os == 'Windows' }}
 
