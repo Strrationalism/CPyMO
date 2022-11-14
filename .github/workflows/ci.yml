@@ -480,9 +480,7 @@ jobs:
       if: ${{ runner.os != 'Windows' }}
 
     - name: Magic Shit for Linux
-      run: |
-        mkdir /home/runner
-        mkdir /home/runner/.vcpkg
+      run: sudo mkdir /home/runner/.vcpkg
       if: ${{ runner.os != 'Linux' }}
 
     - name: Bootstrap vcpkg (Windows)
