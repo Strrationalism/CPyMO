@@ -46,6 +46,8 @@ error_t cpymo_backend_text_create(
     cpymo_backend_font_render(NULL, &t->width, &t->height, text, t->scale, t->baseline);
     
     assert(t->width > 0 && t->height > 0);
+
+    t->height += 4; // MAGIC FOR MORE MEMORY
     
     void *screen = malloc(t->width * t->height);
     if (screen == NULL) {
@@ -57,8 +59,6 @@ error_t cpymo_backend_text_create(
 
     int w = t->width, h = t->height;
     cpymo_backend_font_render(screen, &w, &h, text, t->scale, t->baseline);
-
-    assert(w == t->width && h == t->height);
 
     void *screen2 = malloc(t->width * t->height * 4);
     if (screen2 == NULL) {
