@@ -27,10 +27,18 @@ error_t cpymo_textbox_init(
     o->chars_pool_max_size = text.len;
     o->chars_pool_size = 0;
 
+    o->backlog_buf_size = 0;
+    o->backlog_buf_max_size = text.len + o->max_lines + 5;
+    o->backlog_buf = (char *)malloc(o->backlog_buf_max_size);
+    if (o->backlog_buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
     uint8_t *mem = (uint8_t *)malloc(
         o->max_lines * sizeof(cpymo_textbox_line) +
         o->chars_pool_max_size * (sizeof(cpymo_backend_text) + sizeof(float)));
-    if (mem == NULL) return CPYMO_ERR_OUT_OF_MEM;
+    if (mem == NULL) {
+        free(o->backlog_buf);
+        return CPYMO_ERR_OUT_OF_MEM;
+    }
 
     o->chars_pool = (cpymo_backend_text *)mem;
     o->chars_x_pool = (float *)
@@ -52,8 +60,6 @@ error_t cpymo_textbox_init(
     o->typing_x = x;
     o->col = col;
     o->remain_text = text;
-    o->text_showing.begin = o->remain_text.begin;
-    o->text_showing.len = 0;
 
     o->lines[0].begin_pool_index = 0;
     o->lines[0].pool_slice_size = 0;
@@ -72,7 +78,7 @@ error_t cpymo_textbox_init(
     return CPYMO_ERR_SUCC;
 }
 
-static inline void cpymo_textbox_clear_chars_pool_and_lines(cpymo_textbox *tb)
+static void cpymo_textbox_clear_chars_pool_and_lines(cpymo_textbox *tb)
 {
     for (size_t i = 0; i < tb->chars_pool_size; ++i)
         if (tb->chars_pool[i])
@@ -91,6 +97,8 @@ void cpymo_textbox_free(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
 {
     cpymo_textbox_clear_chars_pool_and_lines(tb);
     if (tb->chars_pool) free((void *)tb->chars_pool);
+    if (tb->backlog_buf) free(tb->backlog_buf);
+    tb->backlog_buf = NULL;
     tb->lines = NULL;
     tb->chars_pool = NULL;
     tb->chars_x_pool = NULL;
@@ -137,12 +145,10 @@ void cpymo_textbox_draw(
 error_t cpymo_textbox_clear_page(cpymo_textbox *tb, cpymo_backlog *write_to_backlog)
 {
     cpymo_textbox_clear_chars_pool_and_lines(tb);
-    tb->text_showing.begin = tb->remain_text.begin;
-    tb->text_showing.len = 0;
     return CPYMO_ERR_SUCC;
 }
 
-static inline bool cpymo_textbox_nextline(cpymo_textbox *tb)
+static bool cpymo_textbox_nextline(cpymo_textbox *tb)
 {
     if (tb->active_line >= tb->max_lines - 1) return false;
     const cpymo_textbox_line *last_line = tb->lines + tb->active_line;
@@ -151,7 +157,33 @@ static inline bool cpymo_textbox_nextline(cpymo_textbox *tb)
         last_line->begin_pool_index + last_line->pool_slice_size;
     tb->lines[tb->active_line].pool_slice_size = 0;
     tb->typing_x = tb->x;
+
+    cpymo_str_copy(
+        tb->backlog_buf + tb->backlog_buf_size, 
+        tb->backlog_buf_max_size - tb->backlog_buf_size, 
+        cpymo_str_pure("\n"));
+    tb->backlog_buf_size++;
+    if (tb->backlog_buf_size > tb->backlog_buf_max_size)
+        tb->backlog_buf_size = tb->backlog_buf_max_size;
+
     return true;
+}
+
+static char *cpymo_textbox_get_backlog_text(cpymo_textbox *tb)
+{
+    assert(tb->backlog_buf_size <= tb->backlog_buf_max_size);
+    size_t set_to_zero_offset = tb->backlog_buf_size;
+    if (tb->backlog_buf_max_size == set_to_zero_offset)
+        set_to_zero_offset--;
+    tb->backlog_buf[set_to_zero_offset] = '\0';
+    tb->backlog_buf_size = 0;
+    
+    char *next_backlog_buf = (char *)malloc(tb->backlog_buf_max_size);
+    if (next_backlog_buf == NULL) return NULL;
+
+    char *ret_backlog_text = tb->backlog_buf;
+    tb->backlog_buf = next_backlog_buf;
+    return ret_backlog_text;
 }
 
 static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
@@ -159,15 +191,14 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     assert(tb->lines);
     assert(tb->chars_pool);
     assert(tb->chars_x_pool);
-    if (tb->remain_text.len == 0) return CPYMO_ERR_NO_MORE_CONTENT;
+    if (tb->remain_text.len == 0) goto TEXT_FADEIN_FINISHED;
 
     #define EAT_NEWLINE(NEW_LINE_HEADER) \
         if (cpymo_str_starts_with_str(tb->remain_text, NEW_LINE_HEADER)) { \
             tb->remain_text.begin += sizeof(NEW_LINE_HEADER) - 1; \
             tb->remain_text.len -= sizeof(NEW_LINE_HEADER) - 1; \
-            return cpymo_textbox_nextline(tb) ? \
-                CPYMO_ERR_SUCC : \
-                CPYMO_ERR_NO_MORE_CONTENT; \
+            if (cpymo_textbox_nextline(tb)) return CPYMO_ERR_SUCC; \
+            else goto TEXT_FADEIN_FINISHED; \
         }
 
     EAT_NEWLINE("\n");
@@ -177,6 +208,14 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     cpymo_str remain_text = tb->remain_text;
     cpymo_str ch = cpymo_str_utf8_try_head(&remain_text);
 
+    cpymo_str_copy(
+        tb->backlog_buf + tb->backlog_buf_size, 
+        tb->backlog_buf_max_size - tb->backlog_buf_size, 
+        ch);
+    tb->backlog_buf_size += ch.len;
+    if (tb->backlog_buf_size > tb->backlog_buf_max_size)
+        tb->backlog_buf_size = tb->backlog_buf_max_size;
+
     float ch_w = cpymo_backend_text_width(ch, tb->char_size);
 
     float tbw = tb->w;
@@ -185,7 +224,7 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     
     if (tb->x + tbw - tb->typing_x < ch_w) {
         if (!cpymo_textbox_nextline(tb)) 
-            return CPYMO_ERR_NO_MORE_CONTENT;
+            goto TEXT_FADEIN_FINISHED;
 
         return cpymo_textbox_add_char(tb);            
     }
@@ -200,8 +239,15 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     tb->lines[tb->active_line].pool_slice_size++;
     tb->typing_x += ch_w;
     tb->remain_text = remain_text;
-    tb->text_showing.len += ch.len;
     return CPYMO_ERR_SUCC;
+
+TEXT_FADEIN_FINISHED:
+    char *backlog_text = cpymo_textbox_get_backlog_text(tb);
+    if (backlog_text) {
+        // TODO: Write backlog string to here.
+        free(backlog_text);
+    }
+    return CPYMO_ERR_NO_MORE_CONTENT;
 }
 
 void cpymo_textbox_finalize(cpymo_textbox *tb)

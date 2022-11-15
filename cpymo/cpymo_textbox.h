@@ -16,7 +16,10 @@ typedef struct {
 	size_t active_line;
 	float x, y, w, h, char_size, alpha, typing_x;
 	cpymo_color col;
-	cpymo_str remain_text, text_showing;
+	cpymo_str remain_text;
+
+	char *backlog_buf;
+	size_t backlog_buf_size, backlog_buf_max_size;
 
 	float timer;
 	bool draw_cursor;
