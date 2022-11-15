@@ -475,6 +475,8 @@ jobs:
 
     - name: Bootstrap vcpkg
       run: |
+        mkdir -p ~/.vcpkg
+        touch ~/.vcpkg/vcpkg.path.txt
         ./vcpkg/bootstrap-vcpkg.sh
         ./vcpkg/vcpkg integrate install
       if: ${{ runner.os != 'Windows' }}

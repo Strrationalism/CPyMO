@@ -107,7 +107,7 @@ error_t cpymo_album_generate_album_ui_image_pixels(
 			error_t err = cpymo_assetloader_load_bg_pixels(
 				&thumb_pixels, &cg_w, &cg_h, bgname_span, loader);
 
-			if (err != CPYMO_ERR_SUCC) break;
+			if (err == CPYMO_ERR_SUCC) break;
 		}
 
 		if (thumb_pixels == NULL) continue;
