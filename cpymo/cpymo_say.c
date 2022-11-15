@@ -14,11 +14,12 @@
 		SAY->textbox_usable = false; \
 	}
 
-#define ENABLE_TEXTBOX(SAY, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT, ERR) \
+#define ENABLE_TEXTBOX(SAY, E, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT, ERR) \
 	{ \
 		DISABLE_TEXTBOX(SAY); \
 		ERR = cpymo_textbox_init( \
-			&(SAY)->textbox, X, Y, W, H, FONT_SIZE, COL, ALPHA, TEXT); \
+			&(SAY)->textbox, X, Y, W, H, FONT_SIZE, \
+			COL, ALPHA, TEXT, &(E)->backlog); \
 		if (ERR == CPYMO_ERR_SUCC) SAY->textbox_usable = true; \
 	}
 
@@ -452,7 +453,7 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 
 	error_t err;
 	ENABLE_TEXTBOX(
-		say, x, y, w, h, fontsize, e->gameconfig.textcolor, text_alpha, text, err);
+		say, e, x, y, w, h, fontsize, e->gameconfig.textcolor, text_alpha, text, err);
 
 	cpymo_engine_request_redraw(e);
 

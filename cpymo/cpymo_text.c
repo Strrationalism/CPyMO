@@ -100,7 +100,8 @@ error_t cpymo_text_new(cpymo_engine *e, float x1, float y1, float x2, float y2, 
 			fabsf(x2 - x1), 
 			fabsf(y2 - y1), 
 			fontsize, col, 1.0f, 
-			text);
+			text,
+			NULL);
 
 	if (err != CPYMO_ERR_SUCC) {
 		free(node);

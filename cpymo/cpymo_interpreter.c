@@ -219,17 +219,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			name_or_text.len = 0;
 		}
 
-#ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = (char *)malloc(name_or_text.len + text.len + 1);
-		if (full_text) {
-			memset(full_text, 0, name_or_text.len + text.len + 1);
-			strncpy(full_text, name_or_text.begin, name_or_text.len);
-			strncat(full_text, text.begin, text.len);
-			cpymo_backend_text_extract(full_text);
-			cpymo_backlog_record_write_full_text(&engine->backlog, full_text);
-		}
-#endif
-
 		if (IS_EMPTY(text)) {
 			text = cpymo_str_pure(" ");
 		}

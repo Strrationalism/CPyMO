@@ -23,6 +23,8 @@ typedef struct {
 
 	float timer;
 	bool draw_cursor;
+
+	cpymo_backlog *backlog;
 } cpymo_textbox;
 
 error_t cpymo_textbox_init(
@@ -32,7 +34,8 @@ error_t cpymo_textbox_init(
 	float character_size,
 	cpymo_color col,
 	float alpha,
-	cpymo_str text);
+	cpymo_str text,
+	cpymo_backlog *backlog);
 
 void cpymo_textbox_free(
 	cpymo_textbox *, cpymo_backlog *write_to_backlog);

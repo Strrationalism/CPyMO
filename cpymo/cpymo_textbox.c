@@ -19,7 +19,8 @@ error_t cpymo_textbox_init(
     float width, float height, 
     float character_size, 
     cpymo_color col, float alpha, 
-    cpymo_str text)
+    cpymo_str text,
+    cpymo_backlog *backlog)
 {
     o->max_lines = height / character_size;
     if (o->max_lines < 1) o->max_lines = 1;
@@ -28,15 +29,20 @@ error_t cpymo_textbox_init(
     o->chars_pool_size = 0;
 
     o->backlog_buf_size = 0;
-    o->backlog_buf_max_size = text.len + o->max_lines + 5;
-    o->backlog_buf = (char *)malloc(o->backlog_buf_max_size);
-    if (o->backlog_buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
+    o->backlog_buf_max_size = 0;
+    o->backlog_buf = NULL;
+
+    if (backlog) {
+        o->backlog_buf_max_size = text.len + o->max_lines + 1;
+        o->backlog_buf = (char *)malloc(o->backlog_buf_max_size);
+        if (o->backlog_buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
+    }
 
     uint8_t *mem = (uint8_t *)malloc(
         o->max_lines * sizeof(cpymo_textbox_line) +
         o->chars_pool_max_size * (sizeof(cpymo_backend_text) + sizeof(float)));
     if (mem == NULL) {
-        free(o->backlog_buf);
+        if (o->backlog_buf) free(o->backlog_buf);
         return CPYMO_ERR_OUT_OF_MEM;
     }
 
@@ -60,6 +66,7 @@ error_t cpymo_textbox_init(
     o->typing_x = x;
     o->col = col;
     o->remain_text = text;
+    o->backlog = backlog;
 
     o->lines[0].begin_pool_index = 0;
     o->lines[0].pool_slice_size = 0;
@@ -158,25 +165,30 @@ static bool cpymo_textbox_nextline(cpymo_textbox *tb)
     tb->lines[tb->active_line].pool_slice_size = 0;
     tb->typing_x = tb->x;
 
-    cpymo_str_copy(
-        tb->backlog_buf + tb->backlog_buf_size, 
-        tb->backlog_buf_max_size - tb->backlog_buf_size, 
-        cpymo_str_pure("\n"));
-    tb->backlog_buf_size++;
-    if (tb->backlog_buf_size > tb->backlog_buf_max_size)
-        tb->backlog_buf_size = tb->backlog_buf_max_size;
+    if (tb->backlog_buf) {
+        cpymo_str_copy(
+            tb->backlog_buf + tb->backlog_buf_size, 
+            tb->backlog_buf_max_size - tb->backlog_buf_size, 
+            cpymo_str_pure("\n"));
+        tb->backlog_buf_size++;
+        if (tb->backlog_buf_size > tb->backlog_buf_max_size)
+            tb->backlog_buf_size = tb->backlog_buf_max_size;
+    }
 
     return true;
 }
 
 static char *cpymo_textbox_get_backlog_text(cpymo_textbox *tb)
 {
+    if (tb->backlog_buf == NULL) return NULL;
     assert(tb->backlog_buf_size <= tb->backlog_buf_max_size);
     size_t set_to_zero_offset = tb->backlog_buf_size;
+    tb->backlog_buf_size = 0;
     if (tb->backlog_buf_max_size == set_to_zero_offset)
         set_to_zero_offset--;
+        
+    if (set_to_zero_offset == 0) return NULL;
     tb->backlog_buf[set_to_zero_offset] = '\0';
-    tb->backlog_buf_size = 0;
     
     char *next_backlog_buf = (char *)malloc(tb->backlog_buf_max_size);
     if (next_backlog_buf == NULL) return NULL;
@@ -208,14 +220,6 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     cpymo_str remain_text = tb->remain_text;
     cpymo_str ch = cpymo_str_utf8_try_head(&remain_text);
 
-    cpymo_str_copy(
-        tb->backlog_buf + tb->backlog_buf_size, 
-        tb->backlog_buf_max_size - tb->backlog_buf_size, 
-        ch);
-    tb->backlog_buf_size += ch.len;
-    if (tb->backlog_buf_size > tb->backlog_buf_max_size)
-        tb->backlog_buf_size = tb->backlog_buf_max_size;
-
     float ch_w = cpymo_backend_text_width(ch, tb->char_size);
 
     float tbw = tb->w;
@@ -227,6 +231,16 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
             goto TEXT_FADEIN_FINISHED;
 
         return cpymo_textbox_add_char(tb);            
+    }
+
+    if (tb->backlog_buf) {
+        cpymo_str_copy(
+            tb->backlog_buf + tb->backlog_buf_size, 
+            tb->backlog_buf_max_size - tb->backlog_buf_size, 
+            ch);
+        tb->backlog_buf_size += ch.len;
+        if (tb->backlog_buf_size > tb->backlog_buf_max_size)
+            tb->backlog_buf_size = tb->backlog_buf_max_size;
     }
 
     assert(tb->chars_pool_size < tb->chars_pool_max_size);
@@ -244,8 +258,9 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
 TEXT_FADEIN_FINISHED:
     char *backlog_text = cpymo_textbox_get_backlog_text(tb);
     if (backlog_text) {
-        // TODO: Write backlog string to here.
-        free(backlog_text);
+        assert(tb->backlog);
+        cpymo_backlog_record_write_text(
+            tb->backlog, backlog_text, tb->char_size);
     }
     return CPYMO_ERR_NO_MORE_CONTENT;
 }
