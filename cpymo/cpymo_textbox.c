@@ -256,11 +256,13 @@ static error_t cpymo_textbox_add_char(cpymo_textbox *tb)
     return CPYMO_ERR_SUCC;
 
 TEXT_FADEIN_FINISHED:
-    char *backlog_text = cpymo_textbox_get_backlog_text(tb);
-    if (backlog_text) {
-        assert(tb->backlog);
-        cpymo_backlog_record_write_text(
-            tb->backlog, backlog_text, tb->char_size);
+    {
+        char *backlog_text = cpymo_textbox_get_backlog_text(tb);
+        if (backlog_text) {
+            assert(tb->backlog);
+            cpymo_backlog_record_write_text(
+                tb->backlog, backlog_text, tb->char_size);
+        }
     }
     return CPYMO_ERR_NO_MORE_CONTENT;
 }
