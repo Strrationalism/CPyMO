@@ -425,7 +425,7 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 		if (err != CPYMO_ERR_SUCC) say->name = NULL;
 	}
 
-	cpymo_backlog_record_write_name(&e->backlog, say->name);
+	cpymo_backlog_record_write_name(&e->backlog, say->name, name);
 
 	// Create say message text
 	float msglr_l = (float)e->gameconfig.msglr_l * e->gameconfig.imagesize_w / 540.0f;

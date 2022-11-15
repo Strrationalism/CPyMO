@@ -14,6 +14,10 @@ typedef struct {
 
 	bool owning_name;
 	cpymo_backend_text pending_name;
+
+#ifdef ENABLE_TEXT_EXTRACT
+	char *pending_name_str;
+#endif
 } cpymo_backlog;
 
 error_t cpymo_backlog_init(cpymo_backlog *);
@@ -25,7 +29,8 @@ void cpymo_backlog_record_write_vo(
 
 void cpymo_backlog_record_write_name(
 	cpymo_backlog *,
-	cpymo_backend_text name_moveinto);
+	cpymo_backend_text name_moveinto,
+	cpymo_str name_str);
 
 error_t cpymo_backlog_record_write_text(
 	cpymo_backlog *,
