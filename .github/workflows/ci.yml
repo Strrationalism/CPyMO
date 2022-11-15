@@ -475,7 +475,7 @@ jobs:
 
     - name: Bootstrap vcpkg
       run: |
-        mkdir ~/.vcpkg
+        mkdir -p ~/.vcpkg
         touch ~/.vcpkg/vcpkg.path.txt
         ./vcpkg/bootstrap-vcpkg.sh
         ./vcpkg/vcpkg integrate install
