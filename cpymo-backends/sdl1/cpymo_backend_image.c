@@ -5,8 +5,43 @@
 #include <SDL/SDL.h>
 #include <cpymo_engine.h>
 
+#ifdef ENABLE_SDL_IMAGE
+#include <SDL/SDL_image.h>
+#endif
+
 const extern cpymo_engine engine;
 extern SDL_Surface *framebuffer;
+
+error_t cpymo_backend_image_init(void)
+{
+	#ifdef ENABLE_SDL_IMAGE
+	int flags =
+		IMG_INIT_JPG |
+		IMG_INIT_PNG |
+		IMG_INIT_TIF |
+		IMG_INIT_WEBP;
+
+	int result = IMG_Init(flags);
+
+	if (0 == result) {
+		printf("[Error] IMG_Init: %s\n", IMG_GetError());
+		return CPYMO_ERR_UNKNOWN;
+	}
+
+	if (flags != result) 
+		printf("[Warning] IMG_Init(%d): %s\n", result, IMG_GetError());
+
+	#endif
+
+	return CPYMO_ERR_SUCC;
+}
+
+void cpymo_backend_image_quit(void)
+{
+	#ifdef ENABLE_SDL_IMAGE
+	IMG_Quit();
+	#endif
+}
 
 cpymo_color getpixel(SDL_Surface *surface, int x, int y)
 {
@@ -46,12 +81,12 @@ cpymo_color getpixel(SDL_Surface *surface, int x, int y)
 	return col;
 }
 
-void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col)
+void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col, Uint8 alpha)
 {
     int bpp = surface->format->BytesPerPixel;
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-	Uint32 pixel = SDL_MapRGB(surface->format, col.r, col.g, col.b);
+	Uint32 pixel = SDL_MapRGBA(surface->format, col.r, col.g, col.b, alpha);
 
     switch(bpp) {
     case 1:
@@ -80,6 +115,18 @@ void putpixel(SDL_Surface *surface, int x, int y, cpymo_color col)
     }
 }
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	#define RMASK 0xff000000
+	#define GMASK 0x00ff0000
+	#define BMASK 0x0000ff00
+	#define AMASK 0x000000ff
+#else
+	#define RMASK 0x000000ff
+	#define GMASK 0x0000ff00
+	#define BMASK 0x00ff0000
+	#define AMASK 0xff000000
+#endif
+
 error_t cpymo_backend_image_load(
 	cpymo_backend_image *out_image, 
 	void *pixels_moveintoimage, 
@@ -87,20 +134,7 @@ error_t cpymo_backend_image_load(
 	int height, 
 	enum cpymo_backend_image_format format)
 {
-	Uint32 rmask, gmask, bmask, amask;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#else
-	rmask = 0x000000ff;
-	gmask = 0x0000ff00;
-	bmask = 0x00ff0000;
-	amask = 0xff000000;
-#endif
-
+	Uint32 rmask = RMASK, gmask = GMASK, bmask = BMASK, amask = AMASK;
 #ifdef __WII__
 	if (format == cpymo_backend_image_format_rgb) {
 		rmask >>= 8;
@@ -272,7 +306,7 @@ void cpymo_backend_image_fill_rects(
 				dst.r = (Uint8)(dst_r * 255);
 				dst.g = (Uint8)(dst_g * 255);
 				dst.b = (Uint8)(dst_b * 255);
-				putpixel(framebuffer, x, y, dst);
+				putpixel(framebuffer, x, y, dst, 255);
 			}
 		}
 	}
@@ -331,10 +365,258 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans m, float t, bool is_fa
 			col.r = (uint8_t)(col.r * mask);
 			col.g = (uint8_t)(col.g * mask);
 			col.b = (uint8_t)(col.b * mask);
-			putpixel(framebuffer, px_x, px_y, col);
+			putpixel(framebuffer, px_x, px_y, col, 255);
 		}
 	}
 
 	SDL_UnlockSurface(framebuffer);
 }
+
+#ifdef ENABLE_SDL_IMAGE
+#include <cpymo_package.h>
+#include <cpymo_assetloader.h>
+
+error_t cpymo_assetloader_load_icon_pixels(
+	void **px, int *w, int *h, const char *gamedir)
+{
+	return CPYMO_ERR_UNSUPPORTED;
+}
+
+error_t cpymo_assetloader_load_icon(
+	cpymo_backend_image *out, int *w, int *h, const char *gamedir)
+{
+	char *filename = (char *)malloc(strlen(gamedir) + 10);
+	if (filename == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	sprintf(filename, "%s/icon.png", gamedir);
+	SDL_Surface *sur = IMG_Load(filename);
+	free(filename);
+	if (sur == NULL) 
+		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	*w = sur->w;
+	*h = sur->h;
+	
+	SDL_Surface *sur_optimized = SDL_DisplayFormat(sur);
+	if (sur_optimized == NULL) {
+		*out = (cpymo_backend_image)sur;
+		return CPYMO_ERR_SUCC;
+	}
+
+	SDL_FreeSurface(sur);
+	*out = (cpymo_backend_image)sur_optimized;
+
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_assetloader_load_image_surface(
+	SDL_Surface **out,
+	cpymo_str name,
+	const char *asset_type,
+	const char *asset_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader)
+{
+	SDL_Surface *sur;
+	if (use_pkg) {
+		cpymo_package_stream_reader r;
+		error_t err = cpymo_package_stream_reader_find_create(&r, pkg, name);
+		CPYMO_THROW(err);
+
+		SDL_RWops *rwops = SDL_RWFromFP(r.stream, 0);
+		if (rwops == NULL) {
+			cpymo_package_stream_reader_close(&r);
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+
+		sur = IMG_Load_RW(rwops, 0);
+		SDL_RWclose(rwops);
+		cpymo_package_stream_reader_close(&r);
+		
+		/*char *buf;
+		size_t len;
+		error_t err = cpymo_package_read_file(&buf, &len, pkg, name);
+		CPYMO_THROW(err);
+
+		SDL_RWops *rwops = SDL_RWFromConstMem(buf, (int)len);
+		if (rwops == NULL) {
+			free(buf);
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+
+		sur = IMG_Load_RW(rwops, 0);
+		SDL_RWclose(rwops);
+		free(buf);*/
+	}
+	else {
+		char *path;
+		error_t err = cpymo_assetloader_get_fs_path(
+			&path,
+			name,
+			asset_type,
+			asset_ext,
+			loader);
+		CPYMO_THROW(err);
+
+		sur = IMG_Load(path);
+		free(path);
+	}
+
+	if (sur == NULL) return CPYMO_ERR_OUT_OF_MEM;
+	*out = sur;
+	return CPYMO_ERR_SUCC;
+}
+
+static error_t cpymo_assetloader_load_image_with_mask_ex(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_str name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask,
+	SDL_Surface *(*display_format_converter)(SDL_Surface *))
+{
+	SDL_Surface *sur;
+	error_t err = cpymo_assetloader_load_image_surface(
+		&sur, name, asset_type, asset_ext, use_pkg, pkg, loader);
+	CPYMO_THROW(err);
+
+	if (sur == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+	if (load_mask) {
+		char *mask_name = (char *)malloc(name.len + 6);
+		if (mask_name) {
+			cpymo_str_copy(mask_name, name.len + 6, name);
+			strcat(mask_name, "_mask");
+
+			SDL_Surface *mask;
+			error_t errmask = cpymo_assetloader_load_image_surface(
+				&mask, cpymo_str_pure(mask_name), asset_type, mask_ext, 
+				use_pkg, pkg, loader);
+			free(mask_name);
+
+			if (errmask == CPYMO_ERR_SUCC) {
+				SDL_Surface *masked_image = SDL_CreateRGBSurface(
+					0, 
+					sur->w, 
+					sur->h, 
+					32, 
+					RMASK, 
+					GMASK, 
+					BMASK, 
+					AMASK);
+				
+				if (masked_image) {
+					for (int y = 0; y < sur->h; ++y) {
+						for (int x = 0; x < sur->w; ++x) {
+							cpymo_color maskp = getpixel(sur, x, y);
+							cpymo_color maskc = getpixel(
+								mask, 
+								(int)((float)x / (float)sur->w * (mask->w - 1)),
+								(int)((float)y / (float)sur->h * (mask->h - 1)));
+							putpixel(masked_image, x, y, maskp, maskc.r);
+						}
+					}
+
+					SDL_FreeSurface(sur);
+					sur = masked_image;
+				}
+
+				SDL_FreeSurface(mask);
+			}
+		}
+	}
+
+	*w = sur->w;
+	*h = sur->h;
+
+	SDL_Surface *sur_optimized = display_format_converter(sur);
+	if (sur_optimized) {
+		SDL_FreeSurface(sur);
+		sur = sur_optimized;
+	}
+
+	*img = (cpymo_backend_image)sur;
+
+	return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_assetloader_load_image_with_mask(
+	cpymo_backend_image *img, int *w, int *h, 
+	cpymo_str name, 
+	const char *asset_type,
+	const char *asset_ext,
+	const char *mask_ext,
+	bool use_pkg,
+	const cpymo_package *pkg,
+	const cpymo_assetloader *loader,
+	bool load_mask)
+{
+	return cpymo_assetloader_load_image_with_mask_ex(
+		img, w, h, name, asset_type, asset_ext, mask_ext, use_pkg, pkg, loader,
+		load_mask, &SDL_DisplayFormatAlpha);
+}
+
+error_t cpymo_assetloader_load_bg_pixels(
+	void ** px, int * w, int * h, 
+	cpymo_str name, const cpymo_assetloader * loader)
+{ return CPYMO_ERR_UNSUPPORTED; }
+
+error_t cpymo_assetloader_load_bg_image(
+	cpymo_backend_image * img, int * w, int * h, 
+	cpymo_str name, const cpymo_assetloader * loader)
+{
+	return cpymo_assetloader_load_image_with_mask_ex(
+		img, w, h, name, "bg", loader->game_config->bgformat,
+		NULL, loader->use_pkg_bg, &loader->pkg_bg, loader,
+		false, &SDL_DisplayFormat);
+}
+
+error_t cpymo_assetloader_load_system_masktrans(
+	cpymo_backend_masktrans *out, cpymo_str name, 
+	const cpymo_assetloader *loader)
+{ 
+	char *filename;
+	error_t err = cpymo_assetloader_get_fs_path(
+		&filename,
+		name,
+		"system",
+		"png",
+		loader);		
+	CPYMO_THROW(err);
+
+	SDL_Surface *mask = IMG_Load(filename);
+	free(filename);
+	if (mask == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+	Uint8 *mask_surface = (Uint8 *)malloc(
+		engine.gameconfig.imagesize_w * engine.gameconfig.imagesize_h);
+	if (mask_surface == NULL) {
+		SDL_FreeSurface(mask);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	for (Uint16 y = 0; y < engine.gameconfig.imagesize_h; ++y) {
+		for (Uint16 x = 0; x < engine.gameconfig.imagesize_w; ++x) {
+			float xf = (float)x / (float)engine.gameconfig.imagesize_w;
+			float yf = (float)y / (float)engine.gameconfig.imagesize_h;
+
+			int xm = (int)(xf * (mask->w - 1));
+			int ym = (int)(yf * (mask->h - 1));
+			cpymo_color col = getpixel(mask, xm, ym);
+			mask_surface[y * engine.gameconfig.imagesize_w + x] = col.r;
+		}
+	}
+
+	SDL_FreeSurface(mask);
+	*out = (cpymo_backend_masktrans)mask_surface;
+	
+	return CPYMO_ERR_SUCC;
+}
+
+#endif
+
 
