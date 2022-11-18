@@ -26,6 +26,7 @@ bool cpymo_str_equals(cpymo_str a, cpymo_str b);
 bool cpymo_str_equals_ignore_case(cpymo_str a, cpymo_str b);
 bool cpymo_str_equals_str_ignore_case(cpymo_str a, const char *b);
 bool cpymo_str_starts_with_str_ignore_case(cpymo_str span, const char *prefix);
+bool cpymo_str_starts_with_str(cpymo_str span, const char *prefix);
 
 cpymo_str cpymo_str_utf8_try_head(cpymo_str *tail);
 uint32_t cpymo_str_utf8_try_head_to_utf32(cpymo_str *tail);
