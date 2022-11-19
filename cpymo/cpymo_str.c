@@ -164,6 +164,19 @@ bool cpymo_str_starts_with_str_ignore_case(cpymo_str span, const char * prefix)
 	else return false;
 }
 
+bool cpymo_str_starts_with_str(cpymo_str span, const char *prefix)
+{
+	if (*prefix == '\0') return true;
+	else if (span.len == 0 && *prefix != '\0') return false;
+	else if (span.begin[0] == *prefix) {
+		span.len--;
+		span.begin++;
+		prefix++;
+		return cpymo_str_starts_with_str_ignore_case(span, prefix);
+	}
+	else return false;
+}
+
 cpymo_str cpymo_str_utf8_try_head(cpymo_str *tail)
 {
 	if (tail->len == 0) return cpymo_str_pure("");

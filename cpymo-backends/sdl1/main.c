@@ -278,8 +278,18 @@ static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
 }
 #endif
 
+#ifdef __PSP__
+#define main SDL_main
+#include <psppower.h>
+#endif
+
 int main(int argc, char **argv) 
 {
+#ifdef __PSP__    
+    scePowerSetCpuClockFrequency(333);
+    scePowerSetBusClockFrequency(167);
+#endif
+
     srand((unsigned)time(NULL));
 
 #if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
@@ -297,6 +307,9 @@ int main(int argc, char **argv)
 #ifndef DISABLE_AUDIO
             | SDL_INIT_AUDIO
 #endif
+#ifdef __PSP__
+            | SDL_INIT_JOYSTICK
+#endif
         ) < 0) {
         printf("[Error] SDL_Init: %s\n", SDL_GetError());
         return -1;
@@ -307,10 +320,21 @@ int main(int argc, char **argv)
 
     cpymo_backend_audio_init();
 
+    extern error_t cpymo_backend_image_init(void);
+    extern void cpymo_backend_image_quit(void);
+    error_t err = cpymo_backend_image_init();
+    if (err != CPYMO_ERR_SUCC) {
+        cpymo_backend_audio_free();
+        SDL_Quit();
+        printf("[Error] cpymo_backend_image_init: %s\n", 
+            cpymo_error_message(err));
+        return err;
+    }
+
 #ifdef USE_GAME_SELECTOR
     cpymo_game_selector_item *items = get_game_list(GAME_SELECTOR_DIR);
     char *last_selected = get_last_selected_game_dir();
-    error_t err = cpymo_engine_init_with_game_selector(
+    err = cpymo_engine_init_with_game_selector(
         &engine, 
         SCREEN_WIDTH, SCREEN_HEIGHT,
         GAME_SELECTOR_FONTSIZE,
@@ -325,6 +349,7 @@ int main(int argc, char **argv)
         printf("[Error] cpymo_engine_init_with_game_selector: %s\n", cpymo_error_message(err));
         cpymo_game_selector_item_free_all(items);
         free(last_selected);
+        cpymo_backend_image_quit();
         cpymo_backend_audio_free();
         SDL_Quit();
         return -1;
@@ -340,9 +365,10 @@ int main(int argc, char **argv)
 
     load_game_icon(gamedir);
 
-    error_t err = cpymo_engine_init(&engine, gamedir);
+    err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_engine_init: %s\n", cpymo_error_message(err));
+        cpymo_backend_image_quit();
         cpymo_backend_audio_free();
         SDL_Quit();
         return -1;
@@ -355,6 +381,7 @@ int main(int argc, char **argv)
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_backend_font_init: %s\n", cpymo_error_message(err));
         cpymo_engine_free(&engine);
+        cpymo_backend_image_quit();
         cpymo_backend_audio_free();
         SDL_Quit();
         return -1;
@@ -371,6 +398,7 @@ int main(int argc, char **argv)
     if (framebuffer == NULL) {
         printf("[Error] SDL_SetVideoMode: %s\n", SDL_GetError());
         cpymo_engine_free(&engine);
+        cpymo_backend_image_quit();
         cpymo_backend_audio_free();
         cpymo_backend_font_free();
         SDL_Quit();
@@ -444,7 +472,7 @@ int main(int argc, char **argv)
         bool redraw = false;
         Uint32 cur_time = SDL_GetTicks();
 #ifdef REDRAW_WHAT_EVER
-        cpymo_engine_request_redraw(engine);
+        cpymo_engine_request_redraw(&engine);
 #endif
         err = cpymo_engine_update(
             &engine, 
@@ -477,6 +505,7 @@ int main(int argc, char **argv)
 
 EXIT:
     cpymo_engine_free(&engine);
+    cpymo_backend_image_quit();
     cpymo_backend_audio_free();
     cpymo_backend_font_free();
     SDL_Quit();

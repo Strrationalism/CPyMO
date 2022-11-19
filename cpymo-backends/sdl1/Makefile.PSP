@@ -1,0 +1,86 @@
+.PHONY: build clean
+
+BUILD_DIR := $(shell mkdir -p build.PSP)build.PSP
+BUILD_DIR_BACKEND := $(shell mkdir -p build.PSP/backend)build.PSP/backend
+
+INC := $(wildcard *.h) $(wildcard ../include/*.h) $(wildcard ../../cpymo/*.h)
+
+SRC_CPYMO := $(wildcard ../../cpymo/*.c)
+SRC_BACKEND := $(wildcard *.c) 
+OBJS_CPYMO := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SRC_CPYMO)))
+OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND)))
+
+CFLAGS := \
+	-G0 -G0 -Wall -O3 \
+	-DCPYMO_BACKLOG_MAX_RECORDS=8 \
+	-I../include \
+	-I../../cpymo \
+	-I../../stb -I../../endianness.h \
+	-I. \
+	-I$(PSPDEV)/psp/include \
+	-I$(PSPDEV)/psp/sdk/include \
+	-DFAST_FILL_RECT \
+	-DDISABLE_FFMPEG_AUDIO \
+	-DDISABLE_AUTOSAVE \
+	-DENABLE_SDL_MIXER_AUDIO_BACKEND \
+	-DSDL_MIXER_CHUNKSIZE=1024 \
+	-DSDL_MIXER_FREQ=44100 \
+	-DDISABLE_MOVIE \
+	-DDEFAULT_FULLSCREEN \
+	-DSCREEN_BPP=32 \
+	-DNDEBUG -D__PSP__ \
+	-DSCREEN_WIDTH=480 -DSCREEN_HEIGHT=272 \
+	-DUSE_GAME_SELECTOR \
+	-DGAME_SELECTOR_FONTSIZE=28 \
+	-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE="(GAME_SELECTOR_FONTSIZE * 2.0f)" \
+	-DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
+	-DGAME_SELECTOR_DIR="\"./\"" \
+	-D_PSP_FW_VERSION=150 \
+	-DENABLE_SDL_IMAGE -DDISABLE_STB_IMAGE \
+	-DSCREEN_FLAGS="(SDL_SWSURFACE | SDL_ASYNCBLIT)"
+
+LDFLAGS := \
+	-Wl,-zmax-page-size=128 \
+	-L. -L$(PSPDEV)/psp/lib -L$(PSPDEV)/psp/sdk/lib \
+	-Xlinker "-(" -logg -lvorbisfile -lvorbis -lfreetype -lpspirkeyb \
+	-lSDL_image -lSDL_ttf -lSDL_mixer -lxmp -lSDL -lSDLmain -lGL \
+	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
+	-lpspumd -lpsprtc -lpng -ljpeg \
+	-lpspgum -lpspgu -lpspaudiolib \
+	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
+	-lpspnet_adhocmatching -lpspnet_adhoc \
+	-lpspnet_adhocctl -lm -lpspvram -lbz2 -lmikmod -logg -lvorbis \
+	-Xlinker "-)" \
+	-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspnet -lpspnet_apctl -lpsppower 
+
+CC := psp-gcc
+
+define compile
+	@echo "$(notdir $1)"
+	@$(CC) -c -Wl,-q $1 -o $2 $(CFLAGS)
+endef
+
+build: EBOOT.PBP
+
+clean:
+	@rm -rf EBOOT.PBP $(BUILD_DIR)
+
+$(BUILD_DIR_BACKEND)/%.o: %.c $(INC)
+	$(call compile,$<,$@)
+
+$(BUILD_DIR)/%.o: ../../cpymo/%.c $(INC)
+	$(call compile,$<,$@)
+
+$(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
+	@echo "Linking..."
+	@$(CC) $^ $(LDFLAGS) -o $@
+	@psp-fixup-imports $@
+	@psp-strip $@
+
+$(BUILD_DIR)/PARAM.SFO: 
+	@mksfoex -d MEMSIZE=1 'CPyMO' $@
+
+EBOOT.PBP: $(BUILD_DIR)/cpymo.elf $(BUILD_DIR)/PARAM.SFO
+	@pack-pbp $@ $(BUILD_DIR)/PARAM.SFO ../3ds/icon.png \
+		NULL NULL NULL NULL $(BUILD_DIR)/cpymo.elf NULL
+

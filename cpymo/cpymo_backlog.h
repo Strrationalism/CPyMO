@@ -14,9 +14,9 @@ typedef struct {
 
 	bool owning_name;
 	cpymo_backend_text pending_name;
-	
+
 #ifdef ENABLE_TEXT_EXTRACT
-	char *pending_text;
+	char *pending_name_str;
 #endif
 } cpymo_backlog;
 
@@ -27,20 +27,15 @@ void cpymo_backlog_record_write_vo(
 	cpymo_backlog *,
 	cpymo_str vo);
 
-#ifdef ENABLE_TEXT_EXTRACT
-void cpymo_backlog_record_write_full_text(
-	cpymo_backlog *,
-	char *text);
-#endif
-
 void cpymo_backlog_record_write_name(
 	cpymo_backlog *,
-	cpymo_backend_text name_moveinto);
+	cpymo_backend_text name_moveinto,
+	cpymo_str name_str);
 
 error_t cpymo_backlog_record_write_text(
 	cpymo_backlog *,
-	cpymo_backend_text **textlines_moveinto,
-	size_t max_lines);
+	char *text,
+	float fontsize);
 
 struct cpymo_engine;
 error_t cpymo_backlog_ui_enter(struct cpymo_engine *e);

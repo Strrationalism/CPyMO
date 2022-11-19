@@ -72,6 +72,26 @@ cpymo_input cpymo_input_snapshot()
     if (pressed & WPAD_BUTTON_2) x.skip |= true;
 #endif
 
+#ifdef __PSP__
+    static SDL_Joystick *pspctrl = NULL;
+    if (pspctrl == NULL) 
+        pspctrl = SDL_JoystickOpen(0);
+    
+    if (pspctrl) {
+        x.skip |= SDL_JoystickGetButton(pspctrl, 0);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 1);
+        x.cancel |= SDL_JoystickGetButton(pspctrl, 2);
+        x.hide_window |= SDL_JoystickGetButton(pspctrl, 3);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 4);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 5);
+
+        x.down |= SDL_JoystickGetButton(pspctrl, 6);
+        x.up |= SDL_JoystickGetButton(pspctrl, 8);
+        x.left |= SDL_JoystickGetButton(pspctrl, 7);
+        x.right |= SDL_JoystickGetButton(pspctrl, 9);
+    }
+#endif
+
     return x;
 }
 

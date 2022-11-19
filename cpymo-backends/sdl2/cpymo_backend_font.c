@@ -190,6 +190,7 @@ error_t cpymo_backend_font_init(const char *gamedir)
 
 
 void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_str text, float scale, float baseline) {
+	// TODO: Bug!
 	float xpos = 0;
 
 	int width = 0, height = 0;
@@ -211,11 +212,12 @@ void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_str text
 		}
 
 		stbtt_GetCodepointBitmapBoxSubpixel(&font, (int)codepoint, scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
-		if (out_or_null)
+		if (out_or_null) {
 			stbtt_MakeCodepointBitmapSubpixel(
 				&font,
 				(unsigned char *)out_or_null + (int)xpos + x0 + (int)(baseline + y0 + y_base) * *w,
 				x1 - x0, y1 - y0, *w, scale, scale, x_shift, 0, (int)codepoint);
+		}
 
 		xpos += (advance_width * scale);
 
