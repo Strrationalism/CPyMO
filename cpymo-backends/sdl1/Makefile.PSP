@@ -81,6 +81,6 @@ $(BUILD_DIR)/PARAM.SFO:
 	@mksfoex -d MEMSIZE=1 'CPyMO' $@
 
 EBOOT.PBP: $(BUILD_DIR)/cpymo.elf $(BUILD_DIR)/PARAM.SFO
-	@pack-pbp $@ $(BUILD_DIR)/PARAM.SFO ../3ds/icon.png \
-		NULL NULL NULL NULL $(BUILD_DIR)/cpymo.elf NULL
+	@pack-pbp $@ $(BUILD_DIR)/PARAM.SFO ../sdl2/psp-icon0.png \
+		NULL NULL ../sdl2/psp-pic1.png ../sdl2/psp-snd0.at3 $(BUILD_DIR)/cpymo.elf NULL
 
