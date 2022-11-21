@@ -189,8 +189,8 @@ error_t cpymo_backend_font_init(const char *gamedir)
 #endif
 
 
-void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_str text, float scale, float baseline) {
-	// TODO: Bug!
+void cpymo_backend_font_render(void *out_or_null, int *w, int *h, cpymo_str text, float scale, float baseline) 
+{
 	float xpos = 0;
 
 	int width = 0, height = 0;
