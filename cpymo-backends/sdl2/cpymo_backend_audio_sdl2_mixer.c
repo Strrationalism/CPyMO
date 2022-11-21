@@ -193,9 +193,9 @@ void cpymo_audio_bgm_stop(struct cpymo_engine *e)
 error_t cpymo_audio_se_play(struct cpymo_engine *e, cpymo_str sename, bool loop)
 {
 	if (!enabled) return CPYMO_ERR_SUCC;
-#ifdef __PSP__
+/*#ifdef __PSP__
 	return CPYMO_ERR_SUCC;
-#endif
+#endif*/
 
 	cpymo_audio_se_stop(e);
 
@@ -276,9 +276,10 @@ void cpymo_audio_se_stop(struct cpymo_engine *e)
 error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_str voname)
 {
 	if (!enabled) return CPYMO_ERR_SUCC;
-#ifdef __PSP__
+/*#ifdef __PSP__
 	return CPYMO_ERR_SUCC;
-#endif
+#endif*/
+
 	cpymo_audio_vo_stop(e);
 
 	if (e->assetloader.use_pkg_voice) {
