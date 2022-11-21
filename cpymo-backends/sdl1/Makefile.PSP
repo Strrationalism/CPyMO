@@ -42,8 +42,8 @@ CFLAGS := \
 LDFLAGS := \
 	-Wl,-zmax-page-size=128 \
 	-L. -L$(PSPDEV)/psp/lib -L$(PSPDEV)/psp/sdk/lib \
-	-Xlinker "-(" -logg -lvorbisfile -lvorbis -lfreetype -lpspirkeyb \
-	-lSDL_image -lSDL_ttf -lSDL_mixer -lxmp -lSDL -lSDLmain -lGL \
+	-Xlinker "-(" -logg -lvorbisfile -lvorbis -lpspirkeyb \
+	-lSDL_image -lSDL_mixer -lxmp -lSDL -lSDLmain -lGL \
 	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
 	-lpspumd -lpsprtc -lpng -ljpeg \
 	-lpspgum -lpspgu -lpspaudiolib \
