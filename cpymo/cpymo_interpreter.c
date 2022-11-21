@@ -1358,7 +1358,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 
 		cpymo_audio_se_stop(engine);
 
-		if (isloop || !cpymo_engine_skipping(engine)) {
+		float vol = cpymo_audio_get_channel_volume(
+			CPYMO_AUDIO_CHANNEL_VO, &engine->audio);
+
+		if (isloop || (!cpymo_engine_skipping(engine) && vol > 0)) {
 			error_t err = cpymo_audio_se_play(engine, filename, isloop);
 			CPYMO_THROW(err);
 		}
@@ -1375,8 +1378,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(filename); ENSURE(filename);
 
 		if (!cpymo_engine_skipping(engine)) {
-			error_t err = cpymo_audio_vo_play(engine, filename);
-			CPYMO_THROW(err);
+			float vol = cpymo_audio_get_channel_volume(
+				CPYMO_AUDIO_CHANNEL_VO, &engine->audio);
+
+			if (vol > 0) {
+				error_t err = cpymo_audio_vo_play(engine, filename);
+				CPYMO_THROW(err);
+			}
 		}
 		else {
 			cpymo_audio_vo_stop(engine);

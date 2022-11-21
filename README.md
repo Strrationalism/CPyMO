@@ -17,20 +17,21 @@
 
 如果你需要使用CPyMO制作游戏，可以参见[CPyMO + YukimiScript开发模板](https://github.com/Strrationalism/CPyMO-YukimiScript-Template)。
 
-pymo原版参见：https://github.com/pymo/pymo    
+pymo参见：https://github.com/pymo/pymo    
 
 # 平台支持列表
 
 ### 第一梯队
 **CPyMO主要在这些平台上开发，并将主要在这些平台上进行测试和除错。**
 
-平台          | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
------------- | ---- | -------- | ------------------ | ---------------- | -------
-Windows      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
-Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
+平台               | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
+----------------- | ---- | -------- | ------------------ | ---------------- | -------
+Windows           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
+Nintendo 3DS      | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
+Sony PSP          | SDL2 | 不支持    | SDL2_mixer         | 外置字体          | 游戏选择器
 
 ### 第二梯队
-**CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。**
+**CPyMO可以编译到这些平台，但没有进行全面的测试。**
 
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
@@ -45,28 +46,25 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 ### 第三梯队
 **CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
 
-平台              | 后端       | 视频播放器 | 音频支持                      | 字体支持      | 额外功能
----------------- | --------- | --------- | ---------------------------- | ---------- | ----------
-Sony PSP         | SDL2      | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体     | 游戏选择器
-Sony PSV         | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
-Nintendo Wii     | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
-Windows (SDL 1.2)| SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
-Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
-POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                        | 外置字体     | 在控制台上操作并输出画面
-POSIX (Text)     | Text      | 不支持     | 不支持                        | 无需        | 在控制台上操作并输出游戏文本
+平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
+----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
+Sony PSV          | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
+Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
+Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
+Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
+Linux (SDL 1.2)   | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
+POSIX (ASCII ART) | ASCII ART | 不支持     | 不支持                        | 外置字体     | 在控制台上操作并输出画面
+POSIX (Text)      | Text      | 不支持     | 不支持                        | 无需        | 在控制台上操作并输出游戏文本
 
-**注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**   
 **注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**   
-**注：SDL_mixer音频后端音频支持格式有限。**   
 
 # 与pymo行为差异
 
 * CPyMO的存档位置和存档格式与pymo不同，不能与之互换。
-* CPyMO最小音频支持仅包含OGG格式，且CPyMO不会考虑MID格式的音频播放。
+* CPyMO不会考虑MID格式的音频播放。
 * CPyMO的蒙版渐变动画效果与PyMO不同。
 * 涉及动画时间曲线的部分CPyMO均做了缓动效果，而pymo则使用线性效果。
 * CPyMO的菜单和UI与PyMO不同。
-* CPyMO在可以播放视频的情况下比pymo支持更多编码格式的视频。
 * CPyMO不支持预载，预载选项会被CPyMO直接忽略。
 * CPyMO忽略除字体大小以外所有的字体设置，将自动启用字体阴影和字体反锯齿。
 
@@ -267,55 +265,71 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 # Sony Playstation Portable 平台
 
-PSP平台的CPyMO仅能运行s60v3数据包或下述“适配”的包。
+## SDL2后端版本
 
-## 额外依赖
+此版本画面性能较高，但相对来说不够稳定，音频支持较差。
 
-* [pspdev/pspdev](github.com/pspdev/pspdev)
-* psp-sdl2（已经包括到pspdev中）
-* psp-sdl2_mixer（已经包括到pspdev中）
-* psp-libvorbis（已经包括到pspdev中）
-* psp-libogg（已经包括到pspdev中）
+### 依赖
 
-## 编译
+1. [pspsdk](https://github.com/pspdev/pspsdk).
+2. 使用`psp-pacman`安装:
+    * sdl2
+    * sdl2-mixer
+    * sdl2-image
 
-cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PSP平台。    
+### 编译
 
-## 启动
+在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
-将EBOOT.PBP、游戏文件夹和default.ttf放在一起。    
-你需要自己准备可以使用的default.ttf，CPyMO将会加载这个文件作为字体使用。    
+## SDL1后端版本
 
-在使用PPSSPP模拟器的情况下，你需要关闭“系统设置 - 快速内存访问”，并开启“忽略读写错误”。    
+此版本画面性能较低，但相对比较稳定，音频支持较好。
 
-## 缺陷
+### 依赖
 
-这些缺陷将不会得到修复：
+1. [pspsdk](https://github.com/pspdev/pspsdk).
+2. 使用`psp-pacman`安装：
+    * sdl
+    * sdl-image
+    * libogg
+    * libvorbis
+    * libmikmod
+    * smpeg
+3. 克隆并编译[SDL_mixer](https://github.com/pspdev/SDL_mixer)仓库的`SDL_mixer-psp`分支，并安装：
 
-* 由于PSP生态中没有移植的FFmpeg库
-    - 视频播放器功能已经禁用
-	- 音频播放使用SDL2_mixer后端
-        - 音频不支持mp3格式
-* 由于PSP机能有限
-    - 仅能加载s60v3数据包或下述推荐的PSP数据包
-	- 加载音效和语音会卡在解码上，故禁用音效和语音
-* PPSSPP的“快速内存访问”可能存在问题
-    - 目前仅可在PPSSPP在关闭“快速内存访问”时才可以正常启动
+```sh
+git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
+cd ./SDL_mixer
+chmod +x ./autogen.sh
+./autogen.sh
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" \
+    ./configure --host psp --with-sdl-prefix=$(psp-config --psp-prefix) \
+    --enable-music-mp3 --prefix=$(psp-config --psp-prefix) --enable-music-mod --enable-music-ogg
+make install -j
+```
+
+### 编译
+
+在`cpymo-backends/sdl1`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
+
+## 安装
+
+在PSP的内置存储或记忆棒的`PSP/GAME`目录下创建目录`CPYMO`，然后将`EBOOT.PBP`和`default.ttf`放入，之后将游戏放入该文件夹即可。
+
+## 注意
+
+PSP对音频的解码速度较慢，建议使用.mp3格式的音频，.wav音频可能会导致崩溃，.ogg音频可能会导致严重卡顿。
 
 ## 为PSP适配游戏
 
-如果你需要为PSP适配游戏，那么建议你使用以下参数：
+如果你需要为3DS适配PyMO游戏，那么建议你使用以下参数：
 
 * 分辨率：480×272
-* 背景图像：jpg
-* 立绘图像：png
-* 系统图像：png
-* 声音格式：ogg, 16bit signed little-endian, 44100Hz
+* 音频格式：16bit, 44100Hz, mp3
+* 背景格式：jpg
+* 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
 * platform参数：pygame
-* 不支持的内容：
-    * 视频
-    * 音效（se）
-    * 语音（voice）
+* 不支持视频
 
 # Sony Playstation Vita 平台
 
@@ -745,11 +759,11 @@ CPyMO ASCII ART仅支持键盘操作：
 ## pymo-convert
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
-要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
+要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio`安装到命令行中。    
 
-## pymo-convert-audio-to-ogg
+## pymo-convert-audio
 
-由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为ogg格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
+由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为指定格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
 
 ## mo2pymo
 

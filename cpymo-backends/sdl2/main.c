@@ -198,11 +198,11 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
-#endif
 
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
+#endif
 
 	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);
@@ -351,9 +351,17 @@ static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
 }
 #endif
 
+#ifdef __PSP__
+#include <psppower.h>
+#endif
 
 int main(int argc, char **argv)
 {
+#ifdef __PSP__
+    scePowerSetCpuClockFrequency(333);
+    scePowerSetBusClockFrequency(167);
+#endif
+
 	srand((unsigned)time(NULL));
 	//_CrtSetBreakAlloc(1371);
 
