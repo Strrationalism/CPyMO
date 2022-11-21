@@ -26,7 +26,7 @@ $device_specs = @(
 
     @{ Name = "psp"; Width = 480; Height = 272; UseMask = $false; Movie = $false;
        BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; 
-       Audio = @("ogg", "wav"); DisabledComponents = @();
+       Audio = @("mp3"); DisabledComponents = @();
        ScreenFitSupport = $false;
        RuntimeName = "CPyMO for Sony PSP" },
 
