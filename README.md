@@ -281,7 +281,7 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
-## SDL1后端版本
+## SDL 1.2后端版本（不建议使用）
 
 此版本画面性能较低，但相对比较稳定，音频支持较好。
 
@@ -632,6 +632,10 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 ### 垂直同步
 
 使用`DISABLE_VSYNC`宏即可禁用垂直同步并以最高可能的帧率运行。
+
+### 低质量的rule图过场
+
+定义宏`LOW_QUALITY_MASKTRANS`即可使用低质量但性能更高的rule图过场动画。
 
 ## SDL 1.2后端
 
