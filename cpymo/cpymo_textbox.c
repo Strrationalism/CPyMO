@@ -22,7 +22,7 @@ error_t cpymo_textbox_init(
     cpymo_str text,
     cpymo_backlog *backlog)
 {
-    o->max_lines = height / character_size;
+    o->max_lines = (size_t)(height / character_size);
     if (o->max_lines < 1) o->max_lines = 1;
 
     o->chars_pool_max_size = text.len;
