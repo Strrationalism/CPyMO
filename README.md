@@ -759,11 +759,11 @@ CPyMO ASCII ART仅支持键盘操作：
 ## pymo-convert
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
-要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
+要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio`安装到命令行中。    
 
-## pymo-convert-audio-to-ogg
+## pymo-convert-audio
 
-由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为ogg格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
+由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为指定格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
 
 ## mo2pymo
 

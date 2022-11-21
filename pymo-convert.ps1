@@ -14,7 +14,7 @@ $device_specs = @(
 
     @{ Name = "3ds"; Width = 400; Height = 240; UseMask = $false; Movie = $true;
        BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; 
-       Audio = @("mp3", "ogg", "wav"); DisabledComponents = @();
+       Audio = @("ogg", "mp3", "wav"); DisabledComponents = @();
        ScreenFitSupport = $true;
        RuntimeName = "CPyMO for Nintendo 3DS"; },
 
@@ -40,7 +40,7 @@ $device_specs = @(
 function Write-Help() {
     Write-Host "PyMO Game Converter"
     Write-Host ""
-    Write-Host "You must ensure cpymo-tool/ffmpeg/pymo-convert-audio-to-ogg has installed!"
+    Write-Host "You must ensure cpymo-tool/ffmpeg/pymo-convert-audio has installed!"
     Write-Host ""
     Write-Host "Usage:"
 	Write-Host "    pymo-convert.ps1 <device-spec> <src-game> [dst-dir]"
@@ -256,7 +256,7 @@ $seformat_supported = $spec.Audio.Contains($gameconfig["seformat"].Trim().TrimSt
 $voformat_supported = $spec.Audio.Contains($gameconfig["voiceformat"].Trim().TrimStart('.').Trim())
 
 if ((-not $bgmformat_supported) -or (-not $seformat_supported) -or (-not $voformat_supported)) {
-    pymo-convert-audio-to-ogg.ps1 $outdir
+    pymo-convert-audio.ps1 $spec.Audio[0] $outdir
     
     if (Test-Path "$outdir/bgm-backup") { rm -Recurse -Force "$outdir/bgm-backup" }
     if (Test-Path "$outdir/se-backup") { rm -Recurse -Force "$outdir/se-backup" }
