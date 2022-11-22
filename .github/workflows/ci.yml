@@ -166,7 +166,7 @@ jobs:
     - name: Upload SDL2 Backend
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for Sony PSP
+        name: CPyMO for Sony PSP (SDL2)
         path: |
           ./cpymo-backends/sdl2/EBOOT.PBP
           
