@@ -36,7 +36,8 @@ CFLAGS := \
 	-DGAME_SELECTOR_DIR="\"./\"" \
 	-D_PSP_FW_VERSION=150 \
 	-DENABLE_SDL_IMAGE -DDISABLE_STB_IMAGE \
-	-DSCREEN_FLAGS="(SDL_SWSURFACE | SDL_ASYNCBLIT)"
+	-DSCREEN_FLAGS="(SDL_SWSURFACE | SDL_ASYNCBLIT)" \
+	-DDISABLE_STB_TRUETYPE -DENABLE_SDL_TTF=2
 
 LDFLAGS := \
 	-Wl,-zmax-page-size=128 \
@@ -46,7 +47,7 @@ LDFLAGS := \
 	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
 	-lpspumd -lpsprtc -lpng -ljpeg \
 	-lpspgum -lpspgu -lpspaudiolib \
-	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
+	-lpspaudio -lpsphttp -lpspssl -lpspwlan -lSDL_ttf -lfreetype \
 	-lpspnet_adhocmatching -lpspnet_adhoc \
 	-lpspnet_adhocctl -lm -lpspvram -lbz2 -lmikmod -logg -lvorbis \
 	-Xlinker "-)" \

@@ -291,6 +291,8 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 2. 使用`psp-pacman`安装：
     * sdl
     * sdl-image
+    * sdl-ttf
+    * freetype2
     * libogg
     * libvorbis
     * libmikmod

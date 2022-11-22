@@ -174,7 +174,7 @@ jobs:
       run: |
         export PSPDEV=/usr/local/pspdev
         export PATH=$PATH:$PSPDEV/bin
-        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg --noconfirm
+        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg sdl-ttf freetype2 --noconfirm
 
         git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
         cd ./SDL_mixer
