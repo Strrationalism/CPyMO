@@ -29,7 +29,7 @@ if ($args.Length -ne 2) {
 }
 
 $args[0] = $args[0].Trim().ToLower()
-if (($args[0] -ne "ogg") -and ($args[0] -ne "mp3") -and (args[0] -ne "wav")) {
+if (($args[0] -ne "ogg") -and ($args[0] -ne "mp3") -and ($args[0] -ne "wav")) {
     Write-Help
     Break Script
 }
