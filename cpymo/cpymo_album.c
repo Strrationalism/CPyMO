@@ -13,6 +13,7 @@
 #include <ctype.h>
 
 #define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
+#define CPYMO_ALBUM_SCROLL_TIME 3.0f
 
 #ifdef CPYMO_TOOL
 bool cpymo_backend_image_album_ui_writable(void);
@@ -293,6 +294,18 @@ typedef struct {
 
 	cpymo_key_pluse key_up, key_down, key_left, key_right;
 	cpymo_key_hold key_mouse_button;
+
+	float showing_cg_image_draw_src_end_x,
+		  showing_cg_image_draw_src_end_y;
+
+#ifndef LOW_FRAME_RATE
+	cpymo_tween showing_cg_draw_src_progress;
+#else
+	bool showing_cg_show_end;
+#endif
+
+	int showing_cg_image_draw_src_w,
+		showing_cg_image_draw_src_h;
 } cpymo_album;
 
 uint64_t cpymo_album_cg_name_hash(cpymo_str cg_filename)
@@ -502,8 +515,46 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 
 			if (err != CPYMO_ERR_SUCC) {
 				a->showing_cg_image = NULL;
+				printf("[Error] %s.]\n", cpymo_error_message(err));
 				cpymo_album_showing_cg_next(e, a);
 			}
+
+			a->showing_cg_image_draw_src_w = (float)a->showing_cg_image_w;
+			a->showing_cg_image_draw_src_h = (float)a->showing_cg_image_h;
+
+			float screen_ratio = 
+				(float)e->gameconfig.imagesize_w /
+				(float)e->gameconfig.imagesize_h;
+
+			float cur_ratio =
+				a->showing_cg_image_draw_src_w /
+				a->showing_cg_image_draw_src_h;
+
+			if (cur_ratio > screen_ratio) 
+				a->showing_cg_image_draw_src_w = 
+					screen_ratio * a->showing_cg_image_draw_src_h;
+			else if (cur_ratio < screen_ratio)
+				a->showing_cg_image_draw_src_h = 
+					a->showing_cg_image_draw_src_w / screen_ratio;
+
+				a->showing_cg_image_draw_src_end_x =
+					a->showing_cg_image_w - a->showing_cg_image_draw_src_w;
+				a->showing_cg_image_draw_src_end_y =
+					a->showing_cg_image_h - a->showing_cg_image_draw_src_h; 
+				
+			#ifndef LOW_FRAME_RATE
+				if (a->showing_cg_image_draw_src_end_x > 0 &&
+					a->showing_cg_image_draw_src_end_y > 0)
+					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 1);
+				else {
+					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 0);
+					cpymo_tween_to(
+						&a->showing_cg_draw_src_progress, 
+						1.0f, CPYMO_ALBUM_SCROLL_TIME);
+				}
+			#else
+				a->showing_cg_show_end = false;
+			#endif
 		}
 		else
 			cpymo_album_showing_cg_next(e, a);
@@ -533,8 +584,29 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 	cpymo_key_pluse_update(&album->key_down, dt, e->input.down);
 
 	if (album->showing_cg) {
+		#ifndef LOW_FRAME_RATE
+			bool scroll_finished = 
+				cpymo_tween_finished(&album->showing_cg_draw_src_progress);
+
+			if (!scroll_finished) {
+				cpymo_tween_update(&album->showing_cg_draw_src_progress, dt);
+				cpymo_engine_request_redraw(e);
+			}
+
+		#endif
+
 		if (CPYMO_INPUT_JUST_RELEASED(e, ok) || CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
-			cpymo_album_showing_cg_next(e, album);
+			#ifdef LOW_FRAME_RATE
+				if (album->showing_cg_show_end) 
+					cpymo_album_showing_cg_next(e, album);
+				else {
+					album->showing_cg_show_end = true;
+					cpymo_engine_request_redraw(e);
+				}
+			#else
+				if (scroll_finished) cpymo_album_showing_cg_next(e, album);
+				else cpymo_tween_finish(&album->showing_cg_draw_src_progress);
+			#endif
 			return CPYMO_ERR_SUCC;
 		}
 
@@ -623,8 +695,10 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 		if (e->prev_input.mouse_x != e->input.mouse_x || e->prev_input.mouse_y != e->input.mouse_y) {
 			for (size_t i = 0; i < album->cg_count; ++i) {
 				if (cpymo_album_check_mouse_in_box(e, i)) {
-					cpymo_engine_request_redraw(e);
-					album->current_cg_selection = (int)i;
+					if (album->current_cg_selection != (int)i) {
+						cpymo_engine_request_redraw(e);
+						album->current_cg_selection = (int)i;
+					}
 					break;
 				}
 			}
@@ -645,9 +719,31 @@ static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
 
 	if (a->showing_cg) {
 		if (a->showing_cg_image) {
+			float src_x = 0;
+			float src_y = 0;
+			
+			#ifndef LOW_FRAME_RATE
+				src_x = 
+					cpymo_tween_value(&a->showing_cg_draw_src_progress) *
+					a->showing_cg_image_draw_src_end_x;
+
+				src_y = 
+					cpymo_tween_value(&a->showing_cg_draw_src_progress) *
+					a->showing_cg_image_draw_src_end_y;
+			#else
+				if (a->showing_cg_show_end) {
+					src_x = a->showing_cg_image_draw_src_end_x;
+					src_y = a->showing_cg_image_draw_src_end_y;
+				}
+			#endif
+
 			cpymo_backend_image_draw(
 				0, 0, (float)e->gameconfig.imagesize_w, (float)e->gameconfig.imagesize_h,
-				a->showing_cg_image, 0, 0, a->showing_cg_image_w, a->showing_cg_image_h,
+				a->showing_cg_image,
+				(int)src_x,
+				(int)src_y, 
+				a->showing_cg_image_draw_src_w, 
+				a->showing_cg_image_draw_src_h,
 				1.0f, cpymo_backend_image_draw_type_bg);
 			return;
 		}
