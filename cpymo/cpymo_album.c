@@ -543,8 +543,8 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 				a->showing_cg_image_h - a->showing_cg_image_draw_src_h; 
 				
 			#ifndef LOW_FRAME_RATE
-				if (a->showing_cg_image_draw_src_end_x > 0 &&
-					a->showing_cg_image_draw_src_end_y > 0)
+				if (a->showing_cg_image_draw_src_end_x < 0.0001f &&
+					a->showing_cg_image_draw_src_end_y < 0.0001f)
 					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 1);
 				else {
 					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 0);
