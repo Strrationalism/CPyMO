@@ -23,6 +23,36 @@ extern bool fill_screen_enabled;
 #endif
 
 #ifndef DISABLE_STB_IMAGE
+
+static void cpymo_album_generate_album_ui_image_pixels_cut(
+	void **pixels, int *w, int *h, float ratio)
+{
+	float cur_ratio = (float)*w / (float)*h;
+	int new_w = *w;
+	int new_h = *h;
+
+	if (cur_ratio > ratio) new_w = (int)(*h * ratio);
+	else if (cur_ratio < ratio) new_h = (int)(*w / ratio);
+	if (new_w == *w && new_h == *h) return;
+
+	uint8_t *pixels_cut = malloc(new_w * new_h * 3);
+	if (pixels_cut == NULL) return;
+
+	uint8_t *pixels_src = (uint8_t *)*pixels;
+
+	for (size_t y = 0; y < new_h; ++y) {
+		size_t copy_count = 3 * new_w;
+		uint8_t *copy_src = pixels_src + 3 * *w * y;
+		uint8_t *copy_dst = pixels_cut + 3 * new_w * y;
+		memcpy(copy_dst, copy_src, copy_count);
+	}
+
+	free(*pixels);
+	*pixels = pixels_cut;
+	*w = new_w;
+	*h = new_h;
+}
+
 error_t cpymo_album_generate_album_ui_image_pixels(
 	void **out_image, 
 	cpymo_str album_list_text, 
@@ -111,6 +141,10 @@ error_t cpymo_album_generate_album_ui_image_pixels(
 		}
 
 		if (thumb_pixels == NULL) continue;
+
+		cpymo_album_generate_album_ui_image_pixels_cut(
+			&thumb_pixels, &cg_w, &cg_h, 
+			(float)thumb_width / (float)thumb_height);
 
 		stbir_resize_uint8(
 			(stbi_uc *)thumb_pixels, cg_w, cg_h, cg_w * 3, 
