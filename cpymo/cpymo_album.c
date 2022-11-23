@@ -650,8 +650,42 @@ static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
 			}
 		}
 
-		if((int)i == a->current_cg_selection)
-			cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_bg);
+		if((int)i == a->current_cg_selection) {
+			cpymo_backend_image_fill_rects(
+				xywh, 
+				1, 
+				cpymo_color_white, 
+				0.5f, 
+				cpymo_backend_image_draw_type_bg);
+		}
+	}
+
+	const cpymo_album_cg_info *info = &a->cg_infos[a->current_cg_selection];
+	if (info->title) {
+		float draw_y = e->gameconfig.imagesize_h / 4.0f;
+		if (a->current_cg_selection < 15) draw_y *= 3;
+
+		float xywh[] = {
+			(e->gameconfig.imagesize_w - info->title_width) / 2 - 20,
+			draw_y - cpymo_gameconfig_font_size(&e->gameconfig),
+			info->title_width + 40,
+			cpymo_gameconfig_font_size(&e->gameconfig) + 12.0f
+		};
+
+		cpymo_backend_image_fill_rects(
+			xywh, 
+			1, 
+			cpymo_color_black, 
+			0.35f, 
+			cpymo_backend_image_draw_type_ui_element);
+
+		cpymo_backend_text_draw(
+			info->title,
+			(e->gameconfig.imagesize_w - info->title_width) / 2,
+			draw_y,
+			cpymo_color_white,
+			1.0f,
+			cpymo_backend_image_draw_type_ui_element);
 	}
 }
 
