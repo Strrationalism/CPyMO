@@ -533,14 +533,14 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 			if (cur_ratio > screen_ratio) 
 				a->showing_cg_image_draw_src_w = 
 					screen_ratio * a->showing_cg_image_draw_src_h;
-			else if (cur_ratio < screen_ratio)
+			else if (cur_ratio < screen_ratio) 
 				a->showing_cg_image_draw_src_h = 
 					a->showing_cg_image_draw_src_w / screen_ratio;
 
-				a->showing_cg_image_draw_src_end_x =
-					a->showing_cg_image_w - a->showing_cg_image_draw_src_w;
-				a->showing_cg_image_draw_src_end_y =
-					a->showing_cg_image_h - a->showing_cg_image_draw_src_h; 
+			a->showing_cg_image_draw_src_end_x =
+				a->showing_cg_image_w - a->showing_cg_image_draw_src_w;
+			a->showing_cg_image_draw_src_end_y =
+				a->showing_cg_image_h - a->showing_cg_image_draw_src_h; 
 				
 			#ifndef LOW_FRAME_RATE
 				if (a->showing_cg_image_draw_src_end_x > 0 &&
