@@ -281,7 +281,7 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
-## SDL 1.2后端版本（建议）
+## SDL 1.2后端版本（推荐）
 
 此版本画面性能较低，但相对比较稳定，不支持mp3音频。
 
