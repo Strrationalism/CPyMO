@@ -162,7 +162,7 @@ error_t cpymo_charas_new_chara(
 		if (err == CPYMO_ERR_NOT_FOUND || err == CPYMO_ERR_CAN_NOT_OPEN_FILE) {
 			char name[32];
 			cpymo_str_copy(name, sizeof(name), filename);
-			printf("[Error] Can not load chara \"%s\".", name);
+			printf("[Error] Can not load chara \"%s\".\n", name);
 			return CPYMO_ERR_SUCC;
 		}
 

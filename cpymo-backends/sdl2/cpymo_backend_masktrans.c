@@ -72,8 +72,10 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 	const float radius = 0.25f;
 	t = t * (1.0f + 2 * radius) - radius;
 
+#ifndef LOW_QUALITY_MASKTRANS
 	float t_top = t + radius;
 	float t_bottom = t - radius;
+#endif
 	
 	for (int y = 0; y < m->h; ++y) {
 		for (int x = 0; x < m->w; ++x) {
@@ -82,13 +84,17 @@ void cpymo_backend_masktrans_draw(cpymo_backend_masktrans mt, float t, bool is_f
 			mask = 1.0f - mask;
 
 			if (is_fade_in) mask = 1 - mask;
+			Uint32 *px = (Uint32 *)&((Uint8 *)pixels)[y * pitch + x * 4];
 
+#ifdef LOW_QUALITY_MASKTRANS
+			*px = mask > t ? 255 : 0;
+#else
 			if (mask > t_top) mask = 1.0f;
 			else if (mask < t_bottom) mask = 0.0f;
 			else mask = (mask - t_bottom) / (2 * radius);
 
-			Uint32 *px = (Uint32 *)&((Uint8 *)pixels)[y * pitch + x * 4];
 			*px = (Uint32)(mask * 255.0f);
+#endif
 		}
 	}
 

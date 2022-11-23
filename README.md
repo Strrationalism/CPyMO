@@ -28,7 +28,6 @@ pymo参见：https://github.com/pymo/pymo
 ----------------- | ---- | -------- | ------------------ | ---------------- | -------
 Windows           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
 Nintendo 3DS      | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
-Sony PSP          | SDL2 | 不支持    | SDL2_mixer         | 外置字体          | 游戏选择器
 
 ### 第二梯队
 **CPyMO可以编译到这些平台，但没有进行全面的测试。**
@@ -49,6 +48,7 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
 Sony PSV          | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
+Sony PSP          | SDL2 | 不支持    | SDL2_mixer         | 外置字体          | 游戏选择器
 Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
@@ -267,7 +267,7 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 ## SDL2后端版本
 
-此版本画面性能较高，但相对来说不够稳定，音频支持较差。
+此版本画面性能较高，但相对来说不够稳定，音频较卡顿，支持mp3音频且mp3音频性能较好。
 
 ### 依赖
 
@@ -281,9 +281,9 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
-## SDL1后端版本
+## SDL 1.2后端版本（推荐）
 
-此版本画面性能较低，但相对比较稳定，音频支持较好。
+此版本画面性能较低，但相对比较稳定，不支持mp3音频。
 
 ### 依赖
 
@@ -291,6 +291,8 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 2. 使用`psp-pacman`安装：
     * sdl
     * sdl-image
+    * sdl-ttf
+    * freetype2
     * libogg
     * libvorbis
     * libmikmod
@@ -632,6 +634,10 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 ### 垂直同步
 
 使用`DISABLE_VSYNC`宏即可禁用垂直同步并以最高可能的帧率运行。
+
+### 低质量的rule图过场
+
+定义宏`LOW_QUALITY_MASKTRANS`即可使用低质量但性能更高的rule图过场动画。
 
 ## SDL 1.2后端
 

@@ -174,7 +174,7 @@ jobs:
       run: |
         export PSPDEV=/usr/local/pspdev
         export PATH=$PATH:$PSPDEV/bin
-        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg --noconfirm
+        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg sdl-ttf freetype2 --noconfirm
 
         git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
         cd ./SDL_mixer
@@ -191,7 +191,7 @@ jobs:
     - name: Upload SDL 1.2 Backend
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for Sony PSP (SDL1)
+        name: CPyMO for Sony PSP (SDL 1.2)
         path: |
           ./cpymo-backends/sdl1/EBOOT.PBP
 
