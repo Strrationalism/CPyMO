@@ -157,6 +157,8 @@ jobs:
 
     - name: Build FFmpeg
       run: |
+        export PSPDEV=/usr/local/pspdev
+        export PATH=$PATH:$PSPDEV/bin
         cd ./cpymo-backends/sdl2
         chmod +x ./build-psp-ffmpeg.sh
         ./build-psp-ffmpeg.sh
