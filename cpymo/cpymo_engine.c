@@ -255,6 +255,25 @@ bool cpymo_engine_skipping(cpymo_engine *e)
 	return skipping;
 }
 
+void cpymo_engine_request_redraw(cpymo_engine *engine)
+{
+	engine->redraw = true;
+}
+
+static error_t cpymo_engine_exit_update(
+	struct cpymo_engine *e, void *ui_data, float d)
+{ return CPYMO_ERR_NO_MORE_CONTENT; }
+
+void cpymo_engine_exit(cpymo_engine *e)
+{
+	void *dummy;
+	cpymo_ui_enter(
+		&dummy, e, 0, 
+		&cpymo_engine_exit_update, 
+		&cpymo_ui_empty_drawer,
+		&cpymo_ui_empty_deleter);
+}
+
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
 	error_t err;

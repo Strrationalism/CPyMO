@@ -23,6 +23,7 @@ cpymo_input cpymo_input_snapshot()
 {
     cpymo_input out;
     u32 keys = hidKeysHeld();
+    if (keys | KEY_START) cpymo_engine_exit(&engine);
     
     out.ok = (keys & KEY_A) > 0 || (keys & KEY_Y) > 0 || (keys & KEY_ZL) > 0 || (keys & KEY_ZR) > 0;
     out.skip = (keys & KEY_R) > 0;
@@ -35,6 +36,7 @@ cpymo_input cpymo_input_snapshot()
     out.mouse_button = (keys & KEY_TOUCH) > 0 && enhanced_3ds_display_mode;
     out.mouse_position_useable = out.mouse_button && touch_enabled();
     out.mouse_wheel_delta = 0;
+
 
     circlePosition pos;
     hidCircleRead(&pos);
