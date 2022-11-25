@@ -17,13 +17,14 @@ CFLAGS := \
 	-I../../cpymo \
 	-I../../stb -I../../endianness.h \
 	-I. \
-	-I$(PSPDEV)/psp/include \
+	-I$(PSPDEV)/psp/include -DDISABLE_MOVIE \
 	-I$(PSPDEV)/psp/sdk/include \
-	-DDISABLE_FFMPEG_AUDIO \
-	-DENABLE_SDL2_MIXER_AUDIO_BACKEND \
-	-DSDL2_MIXER_AUDIO_BACKEND_FREQ=44100 \
-	-DSDL2_MIXER_AUDIO_BACKEND_CHUNK_SIZE=2048 \
-	-DDISABLE_MOVIE -DDISABLE_STB_IMAGE -DDISABLE_MOUSE \
+	-I./build.FFmpeg.PSP/include \
+	-DSDL2_AUDIO_DEFAULT_FREQ=44100 \
+	-DSDL2_AUDIO_DEFAULT_FORMAT_SDL=AUDIO_S16 \
+	-DSDL2_AUDIO_DEFAULT_FORMAT_CPYMO=cpymo_backend_audio_s16 \
+	-DSDL2_AUDIO_DEFAULT_SAMPLES=4096 \
+	-DDISABLE_STB_IMAGE -DDISABLE_MOUSE \
 	-DNDEBUG -D__PSP__ \
 	-DSCREEN_WIDTH=480 -DSCREEN_HEIGHT=272 \
 	-DUSE_GAME_SELECTOR -DLOW_QUALITY_MASKTRANS \
@@ -33,15 +34,17 @@ CFLAGS := \
 	-DGAME_SELECTOR_DIR="\"./\"" \
 	-D_PSP_FW_VERSION=150 \
 	-DENABLE_SDL2_IMAGE \
-	-DENABLE_SCREEN_FORCE_CENTERED -DDISABLE_STB_TRUETYPE -DENABLE_SDL2_TTF=2
+	-DENABLE_SCREEN_FORCE_CENTERED
 
 LDFLAGS := \
 	-Wl,-zmax-page-size=128 \
 	-L. -L$(PSPDEV)/psp/lib -L$(PSPDEV)/psp/sdk/lib \
-	-Xlinker "-(" -logg -lvorbisfile -lvorbis \
-	-lSDL2_image -lSDL2_mixer -lxmp -lSDL2 -lSDL2main -lGL -lSDL2_ttf \
+	-L./build.FFmpeg.PSP/lib \
+	-Xlinker "-(" \
+	-lSDL2_image -lxmp -lSDL2 -lSDL2main -lGL -lSDL2_ttf \
 	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lfreetype\
 	-lpspumd -lpsprtc -lpng -ljpeg \
+	-lavcodec -lavformat -lswscale -lswresample -lavutil \
 	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
 	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
 	-lpspnet_adhocmatching -lpspnet_adhoc \

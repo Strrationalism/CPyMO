@@ -28,6 +28,7 @@ pymo参见：https://github.com/pymo/pymo
 ----------------- | ---- | -------- | ------------------ | ---------------- | -------
 Windows           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
 Nintendo 3DS      | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
+Sony PSP          | SDL2 | FFmpeg   | FFmpeg             | 外置字体          | 游戏选择器
 
 ### 第二梯队
 **CPyMO可以编译到这些平台，但没有进行全面的测试。**
@@ -48,7 +49,6 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
 Sony PSV          | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
-Sony PSP          | SDL2 | 不支持    | SDL2_mixer         | 外置字体          | 游戏选择器
 Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
@@ -265,23 +265,21 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 # Sony Playstation Portable 平台
 
-## SDL2后端版本
-
-此版本画面性能较高，但相对来说不够稳定，音频较卡顿，支持mp3音频且mp3音频性能较好。
+## SDL2后端版本（推荐）
 
 ### 依赖
 
 1. [pspsdk](https://github.com/pspdev/pspsdk).
 2. 使用`psp-pacman`安装:
     * sdl2
-    * sdl2-mixer
     * sdl2-image
+3. 使用`./cpymo-backends/sdl2/build-psp-ffmpeg.sh`编译FFmpeg
 
 ### 编译
 
 在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
-## SDL 1.2后端版本（推荐）
+## SDL 1.2后端版本
 
 此版本画面性能较低，但相对比较稳定，不支持mp3音频。
 
@@ -318,9 +316,7 @@ make install -j
 
 在PSP的内置存储或记忆棒的`PSP/GAME`目录下创建目录`CPYMO`，然后将`EBOOT.PBP`和`default.ttf`放入，之后将游戏放入该文件夹即可。
 
-## 注意
-
-PSP对音频的解码速度较慢，建议使用.mp3格式的音频，.wav音频可能会导致崩溃，.ogg音频可能会导致严重卡顿。
+建议字体文件`default.ttf`小于2MB。
 
 ## 为PSP适配游戏
 
