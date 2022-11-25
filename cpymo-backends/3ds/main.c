@@ -262,6 +262,8 @@ int main(void) {
 	
 	gfxInitDefault();
 
+	gfxSet3D(true);
+
 	if(is_new_3ds) {
 		osSetSpeedupEnable(true);
 	}
@@ -366,14 +368,6 @@ int main(void) {
 
 		float slider = osGet3DSliderState();
 		if(slider != prevSlider) {
-			bool enable_3d = slider > 0;
-			gfxSet3D(enable_3d);
-			gfxSetWide(!enable_3d);
-
-			enable_3d = gfxIs3D();
-			bool wide = gfxIsWide();
-			printf("[3DS] wide=%d, 3D=%d\n", wide, enable_3d);
-
 			redraw = true;
 			prevSlider = slider;
 		}
