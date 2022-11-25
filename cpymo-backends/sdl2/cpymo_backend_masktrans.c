@@ -20,6 +20,10 @@ extern SDL_Renderer *renderer;
 
 error_t cpymo_backend_masktrans_create(cpymo_backend_masktrans *out, void *mask_singlechannel_moveinto, int w, int h)
 {
+	#ifdef __PSP__
+	return CPYMO_ERR_UNSUPPORTED;
+	#endif
+	
 	cpymo_backend_masktrans_i *m = 
 		(cpymo_backend_masktrans_i *)malloc(sizeof(cpymo_backend_masktrans_i));
 
