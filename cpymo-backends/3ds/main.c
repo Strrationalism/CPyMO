@@ -367,6 +367,7 @@ int main(void) {
 		float slider = osGet3DSliderState();
 		if(slider != prevSlider) {
 			bool enable_3d = slider > 0;
+			gfxSetWide(false);
 			gfxSet3D(enable_3d);
 			gfxSetWide(!enable_3d);
 
