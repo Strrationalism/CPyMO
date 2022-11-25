@@ -33,14 +33,14 @@ CFLAGS := \
 	-DGAME_SELECTOR_DIR="\"./\"" \
 	-D_PSP_FW_VERSION=150 \
 	-DENABLE_SDL2_IMAGE \
-	-DENABLE_SCREEN_FORCE_CENTERED
+	-DENABLE_SCREEN_FORCE_CENTERED -DDISABLE_STB_TRUETYPE -DENABLE_SDL2_TTF=2
 
 LDFLAGS := \
 	-Wl,-zmax-page-size=128 \
 	-L. -L$(PSPDEV)/psp/lib -L$(PSPDEV)/psp/sdk/lib \
 	-Xlinker "-(" -logg -lvorbisfile -lvorbis \
-	-lSDL2_image -lSDL2_mixer -lxmp -lSDL2 -lSDL2main -lGL \
-	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl \
+	-lSDL2_image -lSDL2_mixer -lxmp -lSDL2 -lSDL2main -lGL -lSDL2_ttf \
+	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lfreetype\
 	-lpspumd -lpsprtc -lpng -ljpeg \
 	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
 	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
