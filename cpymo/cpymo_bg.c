@@ -112,8 +112,8 @@ static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
 
 static void cpymo_bg_transfer_operate(cpymo_engine *e)
 {
-	assert(bg->transform_next_bg);
 	cpymo_bg *bg = &e->bg;
+	assert(bg->transform_next_bg);
 
 	if (bg->current_bg)
 		cpymo_backend_image_free(bg->current_bg);
