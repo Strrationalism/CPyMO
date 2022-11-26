@@ -8,6 +8,11 @@ cd FFmpeg-n5.0.1
 
 chmod +x ./configure
 
+PCM_US=pcm_u8,pcm_u16be,pcm_u16le,pcm_u24be,pcm_u24le,pcm_u32be,pcm_u32le
+PCM_SS=pcm_s8,pcm_s16be,pcm_s16le,pcm_s24be,pcm_s24le,pcm_s32be,pcm_s32le
+PCM_FS=pcm_f32be,pcm_f32le,pcm_f64le,pcm_f64be
+AUDIO_SUPPORT=vorbis,mp3,pcm,ogg,wav,$PCM_US,$PCM_SS,$PCM_FS
+
 ./configure --prefix=$(pwd)/../build.FFmpeg.PSP \
 --enable-cross-compile \
 --cross-prefix=psp- \
@@ -25,8 +30,17 @@ chmod +x ./configure
 --disable-muxers \
 --enable-protocol=file \
 --enable-static \
---disable-decoder=gif,webp,bmp,dds,mjpeg,jpeg1s,jpeg2000,photocd,png,ppm,psd,qpeg,sga,sgi,smvjpeg,text \
---disable-parser=bmp,gif,mjpeg,webp,png,ipu,jpeg2000,pnm \
+--disable-parsers \
+--disable-decoders \
+--disable-demuxers \
+--disable-avfilter \
+--disable-swscale \
+--disable-postproc \
+--disable-avdevice \
+--disable-bsfs \
+--enable-decoder=$AUDIO_SUPPORT \
+--enable-parser=$AUDIO_SUPPORT \
+--enable-demuxer=$AUDIO_SUPPORT \
 --arch=mips \
 --cpu=generic \
 --disable-asm \
@@ -41,7 +55,8 @@ chmod +x ./configure
 --disable-zlib \
 --disable-debug \
 --enable-gpl \
---enable-version3 
+--enable-version3 \
+--enable-small
 
 make install -j
 

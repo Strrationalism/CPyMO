@@ -12,7 +12,6 @@ OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND
 
 CFLAGS := \
 	-G0 -G0 -Wall -O3 \
-	-DCPYMO_BACKLOG_MAX_RECORDS=8 \
 	-I../include \
 	-I../../cpymo \
 	-I../../stb -I../../endianness.h \
@@ -20,6 +19,7 @@ CFLAGS := \
 	-I$(PSPDEV)/psp/include -DDISABLE_MOVIE \
 	-I$(PSPDEV)/psp/sdk/include \
 	-I./build.FFmpeg.PSP/include \
+	-DCPYMO_BACKLOG_MAX_RECORDS=8 \
 	-DSDL2_AUDIO_DEFAULT_FREQ=44100 \
 	-DSDL2_AUDIO_DEFAULT_FORMAT_SDL=AUDIO_S16 \
 	-DSDL2_AUDIO_DEFAULT_FORMAT_CPYMO=cpymo_backend_audio_s16 \
@@ -27,7 +27,7 @@ CFLAGS := \
 	-DDISABLE_STB_IMAGE -DDISABLE_MOUSE \
 	-DNDEBUG -D__PSP__ \
 	-DSCREEN_WIDTH=480 -DSCREEN_HEIGHT=272 \
-	-DUSE_GAME_SELECTOR -DLOW_QUALITY_MASKTRANS \
+	-DUSE_GAME_SELECTOR \
 	-DGAME_SELECTOR_FONTSIZE=28 \
 	-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE="(GAME_SELECTOR_FONTSIZE * 2.0f)" \
 	-DGAME_SELECTOR_COUNT_PER_SCREEN=3 \
@@ -45,7 +45,7 @@ LDFLAGS := \
 	-lSDL2_image -lxmp -lSDL2 -lSDL2main -lGL -lSDL2_ttf \
 	-lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lfreetype\
 	-lpspumd -lpsprtc -lpng -ljpeg \
-	-lavcodec -lavformat -lswscale -lswresample -lavutil \
+	-lavcodec -lavformat -lswresample -lavutil \
 	-lpsppower -lpspgum -lpspgu -lpspaudiolib \
 	-lpspaudio -lpsphttp -lpspssl -lpspwlan \
 	-lpspnet_adhocmatching -lpspnet_adhoc \
