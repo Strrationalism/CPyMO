@@ -61,8 +61,8 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	subtex.height = (u16)height;
 	subtex.left = 0;
 	subtex.top = 0;
-	subtex.right = 1;
-	subtex.bottom = 1;
+	subtex.right = (float)width / (float)tex_edge_len;
+	subtex.bottom = (float)height / (float)tex_edge_len;
 
 	image.tex = &tex;
 	image.subtex = &subtex;
@@ -76,7 +76,7 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	p.input_format = input_format;
 	p.output_format = OUTPUT_RGB_16_565;
 	p.rotation = ROTATION_NONE;
-	p.block_alignment = BLOCK_8_BY_8;
+	p.block_alignment = BLOCK_LINE;
 	p.input_line_width = width;
 	p.input_lines = height;
 	p.standard_coefficient = COEFFICIENT_ITU_R_BT_601;
@@ -122,7 +122,10 @@ static void cpymo_backend_movie_convert(u16 lines)
 	} while (!done);
 
 	for (size_t y = 0; y < lines; ++y) {
-		memcpy(((u8 *)tex.data) + tex_edge_len * y * 2, ((u8 *)fuck) + y * w * 2, w * 2);
+		for (size_t x = 0; x < w; ++x) {
+			MAKE_PTR_TEX(o, tex, x, y, 2, tex_edge_len, tex_edge_len);
+			*(u16 *)o = ((u16 *)fuck)[y * w + x];
+		}
 	}
 
 	C3D_TexFlush(&tex);
