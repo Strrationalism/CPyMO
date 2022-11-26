@@ -5,8 +5,8 @@ tar -xf ffmpeg.tar.gz
 
 cd FFmpeg-n5.0.1
 
-export PATH=$DEVKITARM/bin:$PATH
-export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
+PATH=$DEVKITARM/bin:$PATH
+ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 
 chmod +x ./configure
 
