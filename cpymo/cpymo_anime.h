@@ -20,7 +20,11 @@ typedef struct {
 	char *anime_name;
 } cpymo_anime;
 
-void cpymo_anime_update(cpymo_anime *anime, float delta_time, bool *redraw);
+void cpymo_anime_update(
+	struct cpymo_engine *e, 
+	cpymo_anime *anime, 
+	float delta_time);
+	
 void cpymo_anime_draw(const cpymo_anime *);
 
 error_t cpymo_anime_on(
