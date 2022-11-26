@@ -54,6 +54,8 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 
 	C3D_TexSetFilter(&tex, GPU_LINEAR, GPU_LINEAR);
     C3D_TexSetWrap(&tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
+	memset(tex.data, 0, tex.size);
+	C3D_TexFlush(&tex);
 
 	float ratio_w = (float)width / 400.0f;
 	float ratio_h = (float)height / 240.0f;
@@ -114,8 +116,7 @@ static void cpymo_backend_movie_update_surface()
 	for (size_t y = 0; y < subtex.height; y++) {
 		for (size_t x = 0; x < subtex.width; ++x) {
 			MAKE_PTR_TEX(out, tex, x, y, 2, tex.width, tex.height);
-			out[0] = tex_line_by_line[(y * subtex.width + x) * 2];
-			out[1] = tex_line_by_line[(y * subtex.width + x) * 2 + 1];
+			*(u16 *)out = ((u16 *)tex_line_by_line)[(y * subtex.width + x)];
 		}
 	}
 
