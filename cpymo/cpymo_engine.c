@@ -343,7 +343,7 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 
 	REDRAW;
 
-	return CPYMO_ERR_SUCC;
+	return err;
 
 	#undef REDRAW
 }
