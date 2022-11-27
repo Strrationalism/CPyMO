@@ -41,10 +41,6 @@ function Convert-Asset($gamedir, $asstype, $ext) {
     if (-not (Test-Path "$gamedir/$asstype")) { return $false }
     if (((ls "$gamedir/$asstype/*$ext").Count -eq 0) -and (-not (Test-Path "$gamedir/$asstype/$asstype.pak"))) { return $false }
 
-    if ($ext.ToUpper().Trim() -eq $target_ext) {
-        return $false
-    }
-
     $pack = $false
     
     $unpack_dir = "$gamedir/$asstype-unpack"
