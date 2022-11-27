@@ -13,6 +13,8 @@ static SDL_FRect draw_target;
 static SDL_Rect draw_target;
 #endif
 
+bool playing_movie = false;
+
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
 	return cpymo_backend_movie_how_to_play_send_surface;
 }
@@ -63,6 +65,8 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	tex = SDL_CreateTexture(renderer, sdlfmt, SDL_TEXTUREACCESS_STREAMING, (int)width, (int)height);
 	if (tex == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
+	playing_movie = true;
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -76,6 +80,7 @@ void cpymo_backend_movie_free_surface()
 	SDL_assert(tex);
 	SDL_DestroyTexture(tex);
 	tex = NULL;
+	playing_movie = false;
 }
 
 void cpymo_backend_movie_update_yuv_surface(

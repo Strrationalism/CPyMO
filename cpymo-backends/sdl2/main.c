@@ -594,6 +594,10 @@ int main(int argc, char **argv)
 #ifndef __ANDROID__
 			else if (event.type == SDL_QUIT) {
 				#ifdef ENABLE_EXIT_CONFIRM
+				#ifndef DISALBE_MOVIE
+				extern bool playing_movie;
+				if (playing_movie) goto EXIT;
+				#endif
 				if (!exit_msgbox_opened) {
 					err = cpymo_msgbox_ui_enter(
 						&engine,
