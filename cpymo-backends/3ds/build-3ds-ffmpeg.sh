@@ -25,6 +25,10 @@ chmod +x ./configure
 --disable-protocols \
 --enable-bsfs \
 --disable-muxers \
+--disable-postproc \
+--disable-swscale \
+--disable-avdevice \
+--disable-avfilter \
 --enable-protocol=file \
 --enable-static \
 --disable-decoder=gif,webp,bmp,dds,mjpeg,jpeg1s,jpeg2000,photocd,png,ppm,psd,qpeg,sga,sgi,smvjpeg,text \
