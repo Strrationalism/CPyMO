@@ -9,7 +9,12 @@
 #include <citro2d.h>
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
-	return cpymo_backend_movie_how_to_play_send_surface;
+	bool is_new_3ds = false;
+	APT_CheckNew3DS(&is_new_3ds);
+
+	return is_new_3ds ? 
+		cpymo_backend_movie_how_to_play_send_surface :
+		cpymo_backend_movie_how_to_play_unsupported;
 }
 
 int pad_tex_size(int s);
