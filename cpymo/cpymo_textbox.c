@@ -120,17 +120,27 @@ void cpymo_textbox_draw(
         return;
 
     if (tb->draw_cursor && e->say.msg_cursor) {
-        float x = tb->w;
-        float y = tb->lines[tb->max_lines - 1].y;
-        float w = tb->char_size;
-        float h = tb->char_size;
+        float x = tb->w + tb->x - tb->char_size;
+        float y = tb->lines[tb->max_lines - 1].y - tb->char_size;
+        float wh = tb->char_size;
+
+        float draw_w = e->say.msg_cursor_w;
+        float draw_h = e->say.msg_cursor_h;
+
+        #ifndef DISABLE_IMAGE_SCALING
+        if (draw_w > wh || draw_h > wh) {
+            float scale = (draw_w > draw_h ? draw_w : draw_h) / wh;
+            draw_w /= scale;
+            draw_h /= scale;
+        }
+        #endif
         
-        float x1 = w / 2 - e->say.msg_cursor_w / 2.0f;
-        float y1 = h / 2 - e->say.msg_cursor_h / 2.0f;
+        float x1 = wh / 2 - draw_w / 2;
+        float y1 = wh / 2 - draw_h / 2;
 
         cpymo_backend_image_draw(
-            x - x1, y - y1, 
-            (float)e->say.msg_cursor_w, (float)e->say.msg_cursor_h,
+            x + x1, y + y1, 
+            draw_w, draw_h,
             e->say.msg_cursor,
             0, 0, e->say.msg_cursor_w, e->say.msg_cursor_h,
             1.0f, drawtype);
