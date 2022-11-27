@@ -7,10 +7,14 @@
 #include <3ds.h>
 #include <citro3d.h>
 #include <citro2d.h>
-#include <libswscale/swscale.h>
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
-	return cpymo_backend_movie_how_to_play_send_surface;
+	bool is_new_3ds = false;
+	APT_CheckNew3DS(&is_new_3ds);
+
+	return is_new_3ds ? 
+		cpymo_backend_movie_how_to_play_send_surface :
+		cpymo_backend_movie_how_to_play_unsupported;
 }
 
 int pad_tex_size(int s);
@@ -18,105 +22,126 @@ int pad_tex_size(int s);
 static C3D_Tex tex;
 static Tex3DS_SubTexture subtex;
 static C2D_Image image;
-static u8 *tex_line_by_line = NULL;
-static struct SwsContext *sws = NULL;
-static size_t origin_height;
+static size_t tex_edge_len;
+static bool end_interrupt;
+
 const extern bool drawing_bottom_screen;
+static u16 *image_buf_line_by_line;
 
 error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo_backend_movie_format format)
 {
-	assert(tex_line_by_line == NULL);
-	origin_height = height;
-
-	enum AVPixelFormat fmt;
+	if (width % 8) return CPYMO_ERR_UNSUPPORTED;
+	Y2RU_InputFormat input_format;
 	switch (format) {
-		case cpymo_backend_movie_format_yuv420p:
-			fmt = AV_PIX_FMT_YUV420P;
-			break;
-		case cpymo_backend_movie_format_yuv422p:
-			fmt = AV_PIX_FMT_YUV422P;
-			break;
-		case cpymo_backend_movie_format_yuv420p16:
-			fmt = AV_PIX_FMT_YUV420P16;
-			break;
-		case cpymo_backend_movie_format_yuv422p16:
-			fmt = AV_PIX_FMT_YUV422P16;
-			break;
-		case cpymo_backend_movie_format_yuyv422:
-			fmt = AV_PIX_FMT_YUYV422;
-			break;
-		default: return CPYMO_ERR_UNSUPPORTED;
-	}
+	case cpymo_backend_movie_format_yuv420p: 
+		input_format = INPUT_YUV420_INDIV_8;
+		break;
+	case cpymo_backend_movie_format_yuv420p16:
+		input_format = INPUT_YUV420_INDIV_16;
+		break;
+	case cpymo_backend_movie_format_yuv422p:
+		input_format = INPUT_YUV422_INDIV_8;
+		break;
+	case cpymo_backend_movie_format_yuv422p16:
+		input_format = INPUT_YUV422_INDIV_16;
+		break;
+	case cpymo_backend_movie_format_yuyv422:
+		input_format = INPUT_YUV422_BATCH;
+		break;
+	default: return CPYMO_ERR_UNSUPPORTED;
+	};
 
-	if (!C3D_TexInit(&tex, 512, 512, GPU_RGB565)) {
+	tex_edge_len = (size_t)pad_tex_size((int)(width > height ? width : height));
+	if (tex_edge_len == -1) return CPYMO_ERR_UNSUPPORTED;
+
+	if (!C3D_TexInit(&tex, tex_edge_len, tex_edge_len, GPU_RGB565)) {
 		return CPYMO_ERR_OUT_OF_MEM;
 	}
 
 	C3D_TexSetFilter(&tex, GPU_LINEAR, GPU_LINEAR);
     C3D_TexSetWrap(&tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-	memset(tex.data, 0, tex.size);
-	C3D_TexFlush(&tex);
 
-	float ratio_w = (float)width / 400.0f;
-	float ratio_h = (float)height / 240.0f;
-	float ratio = ratio_w > ratio_h ? ratio_w : ratio_h;
-	float target_w = width / ratio;
-	float target_h = height / ratio;
-
-	subtex.width = (u16)target_w;
-	subtex.height = (u16)target_h;
+	subtex.width = (u16)width;
+	subtex.height = (u16)height;
 	subtex.left = 0;
 	subtex.top = 0;
-	subtex.right = (float)subtex.width / 512.0f;
-	subtex.bottom = (float)subtex.height / 512.0f;
+	subtex.right = (float)width / (float)tex_edge_len;
+	subtex.bottom = (float)height / (float)tex_edge_len;
 
 	image.tex = &tex;
 	image.subtex = &subtex;
 
-	tex_line_by_line = malloc(subtex.width * subtex.height * 2);
-	if (tex_line_by_line == NULL) 
-	{ 
-		C3D_TexDelete(&tex);
-		return CPYMO_ERR_OUT_OF_MEM; 
-	}
-
-	sws = sws_getContext(
-		(int)width,
-		(int)height,
-		fmt,
-		(int)subtex.width,
-		(int)subtex.height,
-		AV_PIX_FMT_RGB565,
-		SWS_FAST_BILINEAR,
-		NULL,
-		NULL,
-		NULL
-	);
-
-	if (sws == NULL) {
-		free(tex_line_by_line);
+	if (R_FAILED(y2rInit())) {
 		C3D_TexDelete(&tex);
 		return CPYMO_ERR_OUT_OF_MEM;
 	}
+
+	Y2RU_ConversionParams p;
+	p.input_format = input_format;
+	p.output_format = OUTPUT_RGB_16_565;
+	p.rotation = ROTATION_NONE;
+	p.block_alignment = BLOCK_LINE;
+	p.input_line_width = width;
+	p.input_lines = height;
+	p.standard_coefficient = COEFFICIENT_ITU_R_BT_709;
+	p.alpha = 255;
+
+	if (R_FAILED(Y2RU_SetConversionParams(&p))) {
+		C3D_TexDelete(&tex);
+		y2rExit();
+	}
+
+	end_interrupt = R_SUCCEEDED(Y2RU_SetTransferEndInterrupt(true));
+
+	image_buf_line_by_line = (u16 *)linearAlloc(width * height * 2);
+	if (image_buf_line_by_line == NULL) {
+		C3D_TexDelete(&tex);
+		y2rExit();
+	}
 	
+	C3D_TexFlush(&tex);
+
+	gfxSet3D(false);
+
 	return CPYMO_ERR_SUCC;
 }
 
 void cpymo_backend_movie_free_surface()
 {
-	assert(tex_line_by_line != NULL);
-	sws_freeContext(sws);
+	linearFree(image_buf_line_by_line);
 	C3D_TexDelete(&tex);
-	free(tex_line_by_line);
-	tex_line_by_line = NULL;
+	y2rExit();
+
+	gfxSet3D(true);
 }
 
-static void cpymo_backend_movie_update_surface()
+static void cpymo_backend_movie_convert(u16 lines)
 {
-	for (size_t y = 0; y < subtex.height; y++) {
-		for (size_t x = 0; x < subtex.width; ++x) {
-			MAKE_PTR_TEX(out, tex, x, y, 2, tex.width, tex.height);
-			*(u16 *)out = ((u16 *)tex_line_by_line)[(y * subtex.width + x)];
+	u16 w;
+	if (R_FAILED(Y2RU_GetInputLineWidth(&w))) return;
+	if (R_FAILED(Y2RU_SetReceiving(
+		image_buf_line_by_line, w * lines * 2, w * 2, 0))) return;
+
+	if (R_FAILED(Y2RU_StartConversion())) return;
+
+	bool done = false;
+	do {
+		if (end_interrupt) {
+			Handle handle;
+			if (R_SUCCEEDED(Y2RU_GetTransferEndEvent(&handle)))
+				svcWaitSynchronization(handle, 1000000);
+		}
+
+		if (R_FAILED(Y2RU_IsDoneReceiving(&done))) {
+			Y2RU_StopConversion();
+			return;
+		}
+	} while (!done);
+
+	for (size_t y = 0; y < lines; ++y) {
+		for (size_t x = 0; x < w; ++x) {
+			MAKE_PTR_TEX(o, tex, x, y, 2, tex_edge_len, tex_edge_len);
+			*(u16 *)o = image_buf_line_by_line[y * w + x];
 		}
 	}
 
@@ -128,27 +153,22 @@ void cpymo_backend_movie_update_yuv_surface(
 	const void *u, size_t u_pitch,
 	const void *v, size_t v_pitch)
 {
-	const uint8_t *px[] = {
-		(const uint8_t *)y,
-		(const uint8_t *)u,
-		(const uint8_t *)v
-	};
+	u16 lines;
+	if (R_FAILED(Y2RU_GetInputLines(&lines))) return;
+	if (R_FAILED(Y2RU_SetSendingY(y, y_pitch * lines, y_pitch, 0))) return;
+	if (R_FAILED(Y2RU_SetSendingU(u, u_pitch * lines, u_pitch, 0))) return;
+	if (R_FAILED(Y2RU_SetSendingV(v, v_pitch * lines, v_pitch, 0))) return;
 
-	const int px_pitch[] = {
-		(int)y_pitch,
-		(int)u_pitch,
-		(int)v_pitch
-	};
-
-	uint8_t *dst[] = { (uint8_t *)tex_line_by_line	};
-	const int dst_pitch[] = { (int)subtex.width * 2 };
-
-	sws_scale(sws, px, px_pitch, 0, (int)origin_height, dst, dst_pitch);
-	cpymo_backend_movie_update_surface();
+	cpymo_backend_movie_convert(lines);
 }
 
 void cpymo_backend_movie_update_yuyv_surface(const void *p, size_t pitch)
 {
+	u16 lines;
+	if (R_FAILED(Y2RU_GetInputLines(&lines))) return;
+	if (R_FAILED(Y2RU_SetSendingYUYV(p, pitch * lines, pitch, 0))) return;
+
+	cpymo_backend_movie_convert(lines);
 }
 
 void trans_size(float *w, float *h);
