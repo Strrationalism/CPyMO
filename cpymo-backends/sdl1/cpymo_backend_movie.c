@@ -2,9 +2,11 @@
 #ifndef DISABLE_MOVIE
 #include <cpymo_backend_movie.h>
 #include <SDL/SDL.h>
+#include <stdbool.h>
 #include <libswscale/swscale.h>
 
 extern SDL_Surface *framebuffer;
+bool playing_movie = false;
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play()
 { return cpymo_backend_movie_how_to_play_send_surface; }
@@ -46,11 +48,14 @@ error_t cpymo_backend_movie_init_surface(
         NULL,
         NULL
     );
+
     if (sws == NULL) {
         SDL_FreeYUVOverlay(overlay);
         overlay = NULL;
         return CPYMO_ERR_UNSUPPORTED;
     }
+
+    playing_movie = true;
 
     return CPYMO_ERR_SUCC;
 }
@@ -62,6 +67,8 @@ void cpymo_backend_movie_free_surface()
 
     sws_freeContext(sws);
     sws = NULL;
+
+    playing_movie = false;
 }
 
 void cpymo_backend_movie_update_yuv_surface(

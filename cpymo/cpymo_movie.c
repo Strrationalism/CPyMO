@@ -321,6 +321,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	m->backend_inited = true;
 
 	cpymo_audio_play_video(e, path);
+	cpymo_movie_send_video_frame_to_backend(m);
 	
 	free(path);
 

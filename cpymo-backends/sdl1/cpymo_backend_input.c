@@ -9,7 +9,7 @@
 #include <wiiuse/wpad.h>
 #endif
 
-const extern cpymo_engine engine;
+extern cpymo_engine engine;
 const extern SDL_Surface *framebuffer;
 
 int mouse_wheel = 0;
@@ -89,8 +89,22 @@ cpymo_input cpymo_input_snapshot()
         x.up |= SDL_JoystickGetButton(pspctrl, 8);
         x.left |= SDL_JoystickGetButton(pspctrl, 7);
         x.right |= SDL_JoystickGetButton(pspctrl, 9);
+
+        Sint16 cx = SDL_JoystickGetAxis(pspctrl, 0),
+               cy = SDL_JoystickGetAxis(pspctrl, 1);
+
+        if (cx >= 32000) x.right = true;
+        else if (cx < -32000) x.left = true;
+
+        if (cy > 32000) x.down = true;
+        else if (cy < -32000) x.up = true;
+
+        if (SDL_JoystickGetButton(pspctrl, 11))
+            cpymo_engine_exit(&engine);
     }
 #endif
+
+    
 
     return x;
 }

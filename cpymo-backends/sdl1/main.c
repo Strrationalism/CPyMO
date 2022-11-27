@@ -419,6 +419,10 @@ int main(int argc, char **argv)
             switch (event.type) {
             case SDL_QUIT: {
                 #ifdef ENABLE_EXIT_CONFIRM
+                #ifndef DISABLE_MOVIE
+                extern bool playing_movie;
+                if (playing_movie) goto EXIT;
+                #endif
 				
 				if (cpymo_ui_enabled(&engine))
                 	cpymo_ui_exit(&engine);
@@ -513,7 +517,7 @@ EXIT:
     #ifdef LEAKCHECK
     stb_leakcheck_dumpmem();
     #endif
-    
+
     return ret;
 }
 

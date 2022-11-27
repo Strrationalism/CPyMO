@@ -1,4 +1,5 @@
-﻿#include <cpymo_prelude.h>
+﻿#ifndef DISABLE_MOVIE
+#include <cpymo_prelude.h>
 #include "cpymo_backend_movie.h"
 #include "cpymo_import_sdl2.h"
 #include <cpymo_engine.h>
@@ -6,6 +7,13 @@
 static SDL_Texture *tex = NULL;
 extern SDL_Renderer *renderer;
 extern cpymo_engine engine;
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+static SDL_FRect draw_target;
+#else
+static SDL_Rect draw_target;
+#endif
+
+bool playing_movie = false;
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
 	return cpymo_backend_movie_how_to_play_send_surface;
@@ -14,6 +22,33 @@ enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
 error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo_backend_movie_format format)
 {
 	SDL_assert(tex == NULL);
+
+	float ratio_w = (float)engine.gameconfig.imagesize_w / (float)width;
+	float ratio_h = (float)engine.gameconfig.imagesize_h / (float)height;
+	float ratio = ratio_w < ratio_h ? ratio_w : ratio_h;
+	draw_target.w = 
+		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		(int)
+		#endif
+		(ratio * (float)width);
+
+	draw_target.h = 
+		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		(int)
+		#endif
+		(ratio * (float)height);
+
+	draw_target.x = 
+		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		(int)
+		#endif
+		(((float)engine.gameconfig.imagesize_w - draw_target.w) / 2);
+
+	draw_target.y = 
+		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		(int)
+		#endif
+		(((float)engine.gameconfig.imagesize_h - draw_target.h) / 2);
 
 	int sdlfmt;
 	switch (format) {
@@ -30,7 +65,7 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	tex = SDL_CreateTexture(renderer, sdlfmt, SDL_TEXTUREACCESS_STREAMING, (int)width, (int)height);
 	if (tex == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-	SDL_RenderSetLogicalSize(renderer, (int)width, (int)height);
+	playing_movie = true;
 
 	return CPYMO_ERR_SUCC;
 }
@@ -45,7 +80,7 @@ void cpymo_backend_movie_free_surface()
 	SDL_assert(tex);
 	SDL_DestroyTexture(tex);
 	tex = NULL;
-	SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h);
+	playing_movie = false;
 }
 
 void cpymo_backend_movie_update_yuv_surface(
@@ -58,6 +93,11 @@ void cpymo_backend_movie_update_yuv_surface(
 
 void cpymo_backend_movie_draw_surface()
 {
-	SDL_RenderCopy(renderer, tex, NULL, NULL);
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	SDL_RenderCopyF(renderer, tex, NULL, &draw_target);
+#else
+	SDL_RenderCopy(renderer, tex, NULL, &draw_target);
+#endif
 }
 
+#endif

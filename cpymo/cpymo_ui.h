@@ -33,4 +33,7 @@ void cpymo_ui_draw(const struct cpymo_engine *);
 
 bool cpymo_ui_enabled(const struct cpymo_engine *);
 
+void cpymo_ui_empty_drawer(const struct cpymo_engine *e, const void *ui_data);
+void cpymo_ui_empty_deleter(struct cpymo_engine *e, void *ui_data);
+
 #endif

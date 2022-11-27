@@ -102,6 +102,7 @@ error_t cpymo_backend_text_create(
 
     int w, h;
     cpymo_backend_text_render(NULL, &w, &h, utf8_string, scale, baseline);
+    h += 4; // magic
 
     cpymo_backend_text_impl *o = (cpymo_backend_text_impl *)malloc(sizeof(cpymo_backend_text_impl) + w * h);
     if (o == NULL) return CPYMO_ERR_OUT_OF_MEM;

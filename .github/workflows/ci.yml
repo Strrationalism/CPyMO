@@ -155,18 +155,26 @@ jobs:
         ./build-all.sh
         psp-pacman -Syu
 
+    - name: Build FFmpeg
+      run: |
+        export PSPDEV=/usr/local/pspdev
+        export PATH=$PATH:$PSPDEV/bin
+        cd ./cpymo-backends/sdl2
+        chmod +x ./build-psp-ffmpeg.sh
+        ./build-psp-ffmpeg.sh
+
     - name: Build SDL2 Backend
       run: |
         export PSPDEV=/usr/local/pspdev
         export PATH=$PATH:$PSPDEV/bin
-        psp-pacman -S sdl2 sdl2-mixer sdl2-image --noconfirm
+        psp-pacman -S sdl2 sdl2-image freetype2 sdl2-ttf --noconfirm
         cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
 
     - name: Upload SDL2 Backend
       uses: actions/upload-artifact@v2.3.0
       with:
-        name: CPyMO for Sony PSP (SDL2)
+        name: CPyMO for Sony PSP
         path: |
           ./cpymo-backends/sdl2/EBOOT.PBP
           
@@ -174,7 +182,7 @@ jobs:
       run: |
         export PSPDEV=/usr/local/pspdev
         export PATH=$PATH:$PSPDEV/bin
-        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg sdl-ttf freetype2 --noconfirm
+        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg sdl-ttf --noconfirm
 
         git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
         cd ./SDL_mixer

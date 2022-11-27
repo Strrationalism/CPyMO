@@ -36,7 +36,7 @@ static void cpymo_album_generate_album_ui_image_pixels_cut(
 	else if (cur_ratio < ratio) new_h = (int)(*w / ratio);
 	if (new_w == *w && new_h == *h) return;
 
-	uint8_t *pixels_cut = malloc(new_w * new_h * 3);
+	uint8_t *pixels_cut = (uint8_t *)malloc(new_w * new_h * 3);
 	if (pixels_cut == NULL) return;
 
 	uint8_t *pixels_src = (uint8_t *)*pixels;
@@ -519,32 +519,32 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 				cpymo_album_showing_cg_next(e, a);
 			}
 
-			a->showing_cg_image_draw_src_w = (float)a->showing_cg_image_w;
-			a->showing_cg_image_draw_src_h = (float)a->showing_cg_image_h;
+			a->showing_cg_image_draw_src_w = a->showing_cg_image_w;
+			a->showing_cg_image_draw_src_h = a->showing_cg_image_h;
 
 			float screen_ratio = 
 				(float)e->gameconfig.imagesize_w /
 				(float)e->gameconfig.imagesize_h;
 
 			float cur_ratio =
-				a->showing_cg_image_draw_src_w /
-				a->showing_cg_image_draw_src_h;
+				(float)a->showing_cg_image_draw_src_w /
+				(float)a->showing_cg_image_draw_src_h;
 
 			if (cur_ratio > screen_ratio) 
 				a->showing_cg_image_draw_src_w = 
-					screen_ratio * a->showing_cg_image_draw_src_h;
+					(int)(screen_ratio * a->showing_cg_image_draw_src_h);
 			else if (cur_ratio < screen_ratio) 
 				a->showing_cg_image_draw_src_h = 
-					a->showing_cg_image_draw_src_w / screen_ratio;
+					(int)(a->showing_cg_image_draw_src_w / screen_ratio);
 
 			a->showing_cg_image_draw_src_end_x =
-				a->showing_cg_image_w - a->showing_cg_image_draw_src_w;
+				(float)(a->showing_cg_image_w - a->showing_cg_image_draw_src_w);
 			a->showing_cg_image_draw_src_end_y =
-				a->showing_cg_image_h - a->showing_cg_image_draw_src_h; 
+				(float)(a->showing_cg_image_h - a->showing_cg_image_draw_src_h); 
 				
 			#ifndef LOW_FRAME_RATE
-				if (a->showing_cg_image_draw_src_end_x < 0.0001f &&
-					a->showing_cg_image_draw_src_end_y < 0.0001f)
+				if (a->showing_cg_image_draw_src_end_x < 5.0f &&
+					a->showing_cg_image_draw_src_end_y < 5.0f)
 					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 1);
 				else {
 					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 0);

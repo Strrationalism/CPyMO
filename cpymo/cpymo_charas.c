@@ -19,6 +19,25 @@ void cpymo_charas_free(cpymo_charas *c)
 		free(c->anime_pos);
 }
 
+static void cpymo_charas_gc(cpymo_charas *p)
+{
+	struct cpymo_chara *pcur = p->chara, **ppcur = &p->chara;
+	while (pcur) {
+		struct cpymo_chara *pnext = pcur->next;
+		if (!pcur->alive && cpymo_tween_value(&pcur->alpha) <= 0.0001f) {
+			*ppcur = pnext;
+
+			cpymo_backend_image_free(pcur->img);
+			free(pcur);
+		}
+		else {
+			ppcur = &pcur->next;
+		}
+
+		pcur = pnext;
+	}
+}
+
 static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 {
 	cpymo_engine_request_redraw(e);
@@ -26,7 +45,6 @@ static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 
 	bool forward_key_pressed = cpymo_input_foward_key_just_pressed(e);
 
-	struct cpymo_chara ** ppcur = &e->charas.chara;
 	struct cpymo_chara * pcur = e->charas.chara;
 	while (pcur) {
 
@@ -45,20 +63,10 @@ static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 		cpymo_tween_update(&pcur->pos_y, delta_time);
 		cpymo_tween_update(&pcur->alpha, delta_time);
 
-		struct cpymo_chara *pnext = pcur->next;
-
-		if (!pcur->alive && cpymo_tween_value(&pcur->alpha) <= 0.0001f) {
-			*ppcur = pnext;
-
-			cpymo_backend_image_free(pcur->img);
-			free(pcur);
-		}
-		else {
-			ppcur = &pcur->next;
-		}
-
-		pcur = pnext;
+		pcur = pcur->next;
 	}
+
+	cpymo_charas_gc(&e->charas);
 
 	return !waiting;
 }
@@ -267,6 +275,8 @@ static void cpymo_charas_stop_all_tween(cpymo_engine *e)
 		cpymo_tween_finish(&chara->alpha);
 		chara = chara->next;
 	}
+
+	cpymo_charas_gc(&e->charas);
 }
 
 void cpymo_charas_wait(cpymo_engine *e)
