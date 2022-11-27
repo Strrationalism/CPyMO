@@ -96,6 +96,8 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	
 	C3D_TexFlush(&tex);
 
+	gfxSet3D(false);
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -104,6 +106,8 @@ void cpymo_backend_movie_free_surface()
 	linearFree(image_buf_line_by_line);
 	C3D_TexDelete(&tex);
 	y2rExit();
+
+	gfxSet3D(true);
 }
 
 static void cpymo_backend_movie_convert(u16 lines)
