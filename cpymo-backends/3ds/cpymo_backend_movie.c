@@ -55,7 +55,6 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 
 	C3D_TexSetFilter(&tex, GPU_LINEAR, GPU_LINEAR);
     C3D_TexSetWrap(&tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-	memset(tex.data, 0, tex.size);
 
 	subtex.width = (u16)width;
 	subtex.height = (u16)height;
