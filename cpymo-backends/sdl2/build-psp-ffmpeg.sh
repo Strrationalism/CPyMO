@@ -7,11 +7,7 @@ tar -xf ffmpeg.tar.gz
 cd FFmpeg-n5.0.1
 
 chmod +x ./configure
-
-PCM_US=pcm_u8,pcm_u16be,pcm_u16le,pcm_u24be,pcm_u24le,pcm_u32be,pcm_u32le
-PCM_SS=pcm_s8,pcm_s16be,pcm_s16le,pcm_s24be,pcm_s24le,pcm_s32be,pcm_s32le
-PCM_FS=pcm_f32be,pcm_f32le,pcm_f64le,pcm_f64be
-AUDIO_SUPPORT=vorbis,mp3,pcm,ogg,wav,$PCM_US,$PCM_SS,$PCM_FS
+chmod +x ../../../ffmpeg-config.sh
 
 ./configure --prefix=$(pwd)/../build.FFmpeg.PSP \
 --enable-cross-compile \
@@ -38,9 +34,7 @@ AUDIO_SUPPORT=vorbis,mp3,pcm,ogg,wav,$PCM_US,$PCM_SS,$PCM_FS
 --disable-postproc \
 --disable-avdevice \
 --disable-bsfs \
---enable-decoder=$AUDIO_SUPPORT \
---enable-parser=$AUDIO_SUPPORT \
---enable-demuxer=$AUDIO_SUPPORT \
+`../../../ffmpeg-config.sh --audio` \
 --arch=mips \
 --cpu=generic \
 --disable-asm \
