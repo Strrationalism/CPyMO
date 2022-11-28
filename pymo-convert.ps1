@@ -3,37 +3,43 @@ $device_specs = @(
     @{ Name = "s60v3"; Width = 320; Height = 240; UseMask = $true; 
        BGFormat = "jpg"; Charaformat = "jpg"; PlatformId = "s60v3"; 
        Audio = @("mp3", "ogg", "wav"); DisabledComponents = @(); 
-       Movie = $true; ScreenFitSupport = $false;
+       Movie = $true; ScreenFitSupport = $false; 
+       ForcedConvertAudio = $true;
        RuntimeName = "PyMO for Symbian S60v3"; },
 
     @{ Name = "s60v5"; Width = 540; Height = 360; UseMask = $true; 
        Movie = $true; BGFormat = "jpg"; Charaformat = "jpg"; 
        PlatformId = "s60v5"; Audio = @("mp3", "ogg", "wav"); 
        DisabledComponents = @(); ScreenFitSupport = $false;
+       ForcedConvertAudio = $true;
        RuntimeName = "PyMO for Symbian S60v5"; },
 
     @{ Name = "3ds"; Width = 400; Height = 240; UseMask = $false; Movie = $true;
        BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; 
        Audio = @("ogg", "mp3", "wav"); DisabledComponents = @();
        ScreenFitSupport = $true;
+       ForcedConvertAudio = $false;
        RuntimeName = "CPyMO for Nintendo 3DS"; },
 
     @{ Name = "pymo-android"; Width = 800; Height = 600; UseMask = $false; 
        Movie = $true; BGFormat = "png"; Charaformat = "png"; 
        PlatformId = "pygame"; Audio = @("ogg", "wav"); 
        DisabledComponents = @(); ScreenFitSupport = $false;
+       ForcedConvertAudio = $true;
        RuntimeName = "PyMO for Android 2.2~4.3"; },
 
     @{ Name = "psp"; Width = 480; Height = 272; UseMask = $false; Movie = $false;
        BGFormat = "jpg"; Charaformat = "png"; PlatformId = "pygame"; 
-       Audio = @("ogg"); DisabledComponents = @();
+       Audio = @("mp3", "ogg", "wav"); DisabledComponents = @();
        ScreenFitSupport = $false;
+       ForcedConvertAudio = $true;
        RuntimeName = "CPyMO for Sony PSP" },
 
     @{ Name = "wii"; Width = 640; Height = 480; UseMask = $false; 
        Movie = $false; BGFormat = "jpg"; Charaformat = "png"; 
        PlatformId = "pygame"; Audio = @("ogg", "wav");
        DisabledComponents = @(); ScreenFitSupport = $false;
+       ForcedConvertAudio = $true;
        RuntimeName = "CPyMO for Nintendo Wii" }
 )
 
@@ -255,7 +261,7 @@ $bgmformat_supported = $spec.Audio.Contains($gameconfig["bgmformat"].Trim().Trim
 $seformat_supported = $spec.Audio.Contains($gameconfig["seformat"].Trim().TrimStart('.').Trim())
 $voformat_supported = $spec.Audio.Contains($gameconfig["voiceformat"].Trim().TrimStart('.').Trim())
 
-if ((-not $bgmformat_supported) -or (-not $seformat_supported) -or (-not $voformat_supported)) {
+if ((-not $bgmformat_supported) -or (-not $seformat_supported) -or (-not $voformat_supported) -or $spec.ForcedConvertAudio) {
     pymo-convert-audio.ps1 $spec.Audio[0] $outdir
     
     if (Test-Path "$outdir/bgm-backup") { rm -Recurse -Force "$outdir/bgm-backup" }
