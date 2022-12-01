@@ -6,21 +6,25 @@
 
 struct cpymo_engine;
 
+struct cpymo_textbox_line;
+
 typedef struct {
-	float x, y;
-	float width;
-	float character_size;
-	size_t max_lines;
-	cpymo_backend_text *lines;
+	size_t chars_pool_max_size, chars_pool_size, max_lines;
+	cpymo_backend_text *chars_pool;
+	float *chars_x_pool;
+	struct cpymo_textbox_line *lines;
 	size_t active_line;
-	float active_line_current_width;
-	cpymo_str text_curline_and_remaining;
-	size_t text_curline_size;
-	cpymo_color color;
-	float alpha;
+	float x, y, w, h, char_size, alpha, typing_x;
+	cpymo_color col;
+	cpymo_str remain_text;
+
+	char *backlog_buf;
+	size_t backlog_buf_size, backlog_buf_max_size;
 
 	float timer;
-	bool msg_cursor_visible;
+	bool draw_cursor;
+
+	cpymo_backlog *backlog;
 } cpymo_textbox;
 
 error_t cpymo_textbox_init(
@@ -30,7 +34,8 @@ error_t cpymo_textbox_init(
 	float character_size,
 	cpymo_color col,
 	float alpha,
-	cpymo_str text);
+	cpymo_str text,
+	cpymo_backlog *backlog);
 
 void cpymo_textbox_free(
 	cpymo_textbox *, cpymo_backlog *write_to_backlog);
@@ -40,19 +45,12 @@ void cpymo_textbox_draw(
 	const cpymo_textbox *, 
 	enum cpymo_backend_image_draw_type drawtype);
 
-static inline bool cpymo_textbox_page_full(cpymo_textbox *tb)
-{ return tb->active_line >= tb->max_lines; }
-
-void cpymo_textbox_refresh_curline(cpymo_textbox *);
-
-void cpymo_textbox_show_next_char(cpymo_textbox *);
-
 error_t cpymo_textbox_clear_page(cpymo_textbox *, cpymo_backlog *write_to_backlog);
 
 static inline bool cpymo_textbox_all_finished(cpymo_textbox *tb)
-{ return tb->text_curline_and_remaining.len == tb->text_curline_size; }
+{ return tb->remain_text.len == 0; }
 
-void cpymo_textbox_finalize(cpymo_textbox *);
+void cpymo_textbox_finalize(cpymo_textbox *tb);
 
 bool cpymo_textbox_wait_text_fadein(struct cpymo_engine *, float, cpymo_textbox *which_textbox);
 bool cpymo_textbox_wait_text_reading(struct cpymo_engine *, float, cpymo_textbox *which_textbox);

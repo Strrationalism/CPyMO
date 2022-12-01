@@ -13,11 +13,7 @@ typedef void(*cpymo_ui_drawer)(const struct cpymo_engine *, const void *ui_data)
 
 typedef void(*cpymo_ui_deleter)(struct cpymo_engine *, void *ui_data);
 
-typedef struct {
-	cpymo_ui_updater update;
-	cpymo_ui_drawer draw;
-	cpymo_ui_deleter deleter;
-} cpymo_ui;
+struct cpymo_ui;
 
 error_t cpymo_ui_enter(
 	void **out_uidata, 
@@ -36,5 +32,8 @@ error_t cpymo_ui_update(struct cpymo_engine *, float dt);
 void cpymo_ui_draw(const struct cpymo_engine *);
 
 bool cpymo_ui_enabled(const struct cpymo_engine *);
+
+void cpymo_ui_empty_drawer(const struct cpymo_engine *e, const void *ui_data);
+void cpymo_ui_empty_deleter(struct cpymo_engine *e, void *ui_data);
 
 #endif

@@ -5,10 +5,7 @@
 
 struct cpymo_engine;
 
-struct cpymo_textbox_list {
-	struct cpymo_textbox_list *next;
-	cpymo_textbox box;
-};
+struct cpymo_textbox_list;
 
 typedef struct {
 	struct cpymo_textbox_list *ls;

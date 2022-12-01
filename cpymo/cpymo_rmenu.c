@@ -155,13 +155,14 @@ error_t cpymo_rmenu_restart_game(cpymo_engine *e, void *data)
 static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 {
 	switch (sel) {
-	case 0: cpymo_save_ui_enter(e, false); break;
-	case 1: cpymo_save_ui_enter(e, true); break;
+	case 0: cpymo_ui_exit(e); cpymo_save_ui_enter(e, false); break;
+	case 1: cpymo_ui_exit(e); cpymo_save_ui_enter(e, true); break;
 	case 2: cpymo_ui_exit(e); e->skipping = true; break;
 	case 3: cpymo_say_hidewindow_until_click(e); cpymo_ui_exit(e); break;
-	case 4: cpymo_backlog_ui_enter(e); break;
-	case 5: cpymo_config_ui_enter(e); break;
+	case 4: cpymo_ui_exit(e); cpymo_backlog_ui_enter(e); break;
+	case 5: cpymo_ui_exit(e); cpymo_config_ui_enter(e); break;
 	case 6: 
+		cpymo_ui_exit(e);
 		cpymo_msgbox_ui_enter(
 			e, 
 			cpymo_str_pure(

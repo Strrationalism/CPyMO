@@ -181,7 +181,7 @@ error_t cpymo_backend_image_load(
     switch(fmt) {
     case cpymo_backend_image_format_rgb: tex_fmt = GPU_RGB8; channels = 3; break;
     case cpymo_backend_image_format_rgba: tex_fmt = GPU_RGBA8; channels = 4; break;
-    default: assert(false); return CPYMO_ERR_UNKNOWN;
+    default: assert(false); return CPYMO_ERR_INVALID_ARG;
     };
 
     if(width > 1024 || height > 1024) {
@@ -232,7 +232,7 @@ error_t cpymo_backend_image_load(
 
     if(!C3D_TexInit(&img->tex, (u16)pad_height, (u16)pad_width, tex_fmt)) {
         free(img);
-        return CPYMO_ERR_UNKNOWN;
+        return CPYMO_ERR_OUT_OF_MEM;
     }
 
     C3D_TexSetFilter(&img->tex, GPU_LINEAR, GPU_LINEAR);

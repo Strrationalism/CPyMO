@@ -16,3 +16,5 @@ cpymo.exe
 cpymo
 *.dll
 /FFmpeg-*
+/*_psp
+/default.ttf

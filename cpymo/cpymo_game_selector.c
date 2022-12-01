@@ -280,9 +280,8 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 			cpymo_list_ui_set_selection_changed_callback(e, &cpymo_game_selector_visual_im_help_selection_changed_callback);
 		#endif
 
-		cpymo_list_ui *list_ui = (cpymo_list_ui *)cpymo_ui_data(e);
-		list_ui->allow_exit_list_ui = false;
-		list_ui->selection_relative_to_cur = relative;
+		cpymo_list_ui_set_allow_exit(e, false);
+		cpymo_list_ui_set_selection_relative_to_cur(e, relative);
 
 		cpymo_list_ui_set_custom_update(e, &cpymo_game_selector_init_refresh);
 		cpymo_list_ui_enable_loop(e);

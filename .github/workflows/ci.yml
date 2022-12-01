@@ -139,12 +139,14 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
+        
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@v1.1
     
     - name: Install PSPDEV
       run: |
         git clone https://github.com/pspdev/pspdev.git --depth 1
         cd pspdev
-        sudo apt-get update
         sudo ./prepare-debian-ubuntu.sh
         export PSPDEV=/usr/local/pspdev
         sudo mkdir -p $PSPDEV
@@ -152,21 +154,54 @@ jobs:
         export PATH=$PATH:$PSPDEV/bin
         ./build-all.sh
         psp-pacman -Syu
-        psp-pacman -S sdl2 sdl2-mixer sdl2-image sdl2-ttf --noconfirm
 
-    - name: Build
+    - name: Build FFmpeg
       run: |
         export PSPDEV=/usr/local/pspdev
         export PATH=$PATH:$PSPDEV/bin
         cd ./cpymo-backends/sdl2
+        chmod +x ./build-psp-ffmpeg.sh
+        ./build-psp-ffmpeg.sh
+
+    - name: Build SDL2 Backend
+      run: |
+        export PSPDEV=/usr/local/pspdev
+        export PATH=$PATH:$PSPDEV/bin
+        psp-pacman -S sdl2 sdl2-image freetype2 sdl2-ttf --noconfirm
+        cd ./cpymo-backends/sdl2
         make -f Makefile.PSP
 
-    - name: Upload
+    - name: Upload SDL2 Backend
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Sony PSP
         path: |
           ./cpymo-backends/sdl2/EBOOT.PBP
+          
+    - name: Build SDL 1.2 Backend
+      run: |
+        export PSPDEV=/usr/local/pspdev
+        export PATH=$PATH:$PSPDEV/bin
+        psp-pacman -S sdl sdl-image libogg libvorbis libmikmod smpeg sdl-ttf --noconfirm
+
+        git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
+        cd ./SDL_mixer
+        chmod +x ./autogen.sh
+        ./autogen.sh
+        LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" \
+          ./configure --host psp --with-sdl-prefix=$(psp-config --psp-prefix) \
+          --enable-music-mp3 --prefix=$(psp-config --psp-prefix) --enable-music-mod --enable-music-ogg
+        make install -j
+
+        cd ../cpymo-backends/sdl1
+        make -f Makefile.PSP
+        
+    - name: Upload SDL 1.2 Backend
+      uses: actions/upload-artifact@v2.3.0
+      with:
+        name: CPyMO for Sony PSP (SDL 1.2)
+        path: |
+          ./cpymo-backends/sdl1/EBOOT.PBP
 
   build-wasm:
     name: 'Emscripten'
@@ -475,6 +510,8 @@ jobs:
 
     - name: Bootstrap vcpkg
       run: |
+        mkdir -p ~/.vcpkg
+        touch ~/.vcpkg/vcpkg.path.txt
         ./vcpkg/bootstrap-vcpkg.sh
         ./vcpkg/vcpkg integrate install
       if: ${{ runner.os != 'Windows' }}

@@ -9,7 +9,7 @@
 #include <wiiuse/wpad.h>
 #endif
 
-const extern cpymo_engine engine;
+extern cpymo_engine engine;
 const extern SDL_Surface *framebuffer;
 
 int mouse_wheel = 0;
@@ -71,6 +71,40 @@ cpymo_input cpymo_input_snapshot()
     if (pressed & WPAD_BUTTON_1) x.hide_window |= true;
     if (pressed & WPAD_BUTTON_2) x.skip |= true;
 #endif
+
+#ifdef __PSP__
+    static SDL_Joystick *pspctrl = NULL;
+    if (pspctrl == NULL) 
+        pspctrl = SDL_JoystickOpen(0);
+    
+    if (pspctrl) {
+        x.cancel |= SDL_JoystickGetButton(pspctrl, 0);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 1);
+        x.cancel |= SDL_JoystickGetButton(pspctrl, 2);
+        x.ok |= SDL_JoystickGetButton(pspctrl, 3);
+        x.hide_window |= SDL_JoystickGetButton(pspctrl, 4);
+        x.skip |= SDL_JoystickGetButton(pspctrl, 5);
+
+        x.down |= SDL_JoystickGetButton(pspctrl, 6);
+        x.up |= SDL_JoystickGetButton(pspctrl, 8);
+        x.left |= SDL_JoystickGetButton(pspctrl, 7);
+        x.right |= SDL_JoystickGetButton(pspctrl, 9);
+
+        Sint16 cx = SDL_JoystickGetAxis(pspctrl, 0),
+               cy = SDL_JoystickGetAxis(pspctrl, 1);
+
+        if (cx >= 32000) x.right = true;
+        else if (cx < -32000) x.left = true;
+
+        if (cy > 32000) x.down = true;
+        else if (cy < -32000) x.up = true;
+
+        if (SDL_JoystickGetButton(pspctrl, 11))
+            cpymo_engine_exit(&engine);
+    }
+#endif
+
+    
 
     return x;
 }
