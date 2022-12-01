@@ -124,8 +124,8 @@ void cpymo_textbox_draw(
         float y = tb->lines[tb->max_lines - 1].y - tb->char_size;
         float wh = tb->char_size;
 
-        float draw_w = e->say.msg_cursor_w;
-        float draw_h = e->say.msg_cursor_h;
+        float draw_w = (float)e->say.msg_cursor_w;
+        float draw_h = (float)e->say.msg_cursor_h;
 
         #ifndef DISABLE_IMAGE_SCALING
         if (draw_w > wh || draw_h > wh) {
