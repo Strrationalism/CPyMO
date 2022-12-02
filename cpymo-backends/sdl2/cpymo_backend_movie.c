@@ -27,25 +27,25 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	float ratio_h = (float)engine.gameconfig.imagesize_h / (float)height;
 	float ratio = ratio_w < ratio_h ? ratio_w : ratio_h;
 	draw_target.w = 
-		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
 		(int)
 		#endif
 		(ratio * (float)width);
 
 	draw_target.h = 
-		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
 		(int)
 		#endif
 		(ratio * (float)height);
 
 	draw_target.x = 
-		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
 		(int)
 		#endif
 		(((float)engine.gameconfig.imagesize_w - draw_target.w) / 2);
 
 	draw_target.y = 
-		#if SDL_VERSION_ATLEAST(2, 0, 10)
+		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
 		(int)
 		#endif
 		(((float)engine.gameconfig.imagesize_h - draw_target.h) / 2);
