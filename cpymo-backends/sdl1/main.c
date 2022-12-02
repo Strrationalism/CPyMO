@@ -188,14 +188,12 @@ static char *get_last_selected_game_dir()
 
 static void save_last_selected_game_dir(const char *gamedir)
 {
-#ifndef __WII__
 	size_t len = strlen(gamedir);
 	FILE *f = fopen(GAME_SELECTOR_DIR "/last_game.txt", "wb");
 	if (f == NULL) return;
 
 	fwrite(gamedir, len, 1, f);
 	fclose(f);
-#endif
 }
 
 static error_t after_start_game(cpymo_engine *e, const char *gamedir)
