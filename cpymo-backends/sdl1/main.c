@@ -188,12 +188,14 @@ static char *get_last_selected_game_dir()
 
 static void save_last_selected_game_dir(const char *gamedir)
 {
+#ifndef __WII__
 	size_t len = strlen(gamedir);
 	FILE *f = fopen(GAME_SELECTOR_DIR "/last_game.txt", "wb");
 	if (f == NULL) return;
 
 	fwrite(gamedir, len, 1, f);
 	fclose(f);
+#endif
 }
 
 static error_t after_start_game(cpymo_engine *e, const char *gamedir)
@@ -207,7 +209,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
     set_clip_rect(SCREEN_WIDTH, SCREEN_HEIGHT);
 #endif
 
-#ifndef __PSP__
+#if !(defined __PSP__ || defined __WII__)
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
@@ -508,6 +510,7 @@ int main(int argc, char **argv)
     }
 
 EXIT:
+
     cpymo_engine_free(&engine);
     cpymo_backend_image_quit();
     cpymo_backend_audio_free();
