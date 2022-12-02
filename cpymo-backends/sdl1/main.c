@@ -317,6 +317,10 @@ int main(int argc, char **argv)
         return -1;
     }
 
+#if defined __WII__ || defined __PSP__
+    SDL_ShowCursor(SDL_DISABLE);
+#endif
+
     extern void cpymo_backend_audio_init(void);
     extern void cpymo_backend_audio_free(void);
 
