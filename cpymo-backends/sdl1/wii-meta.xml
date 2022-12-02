@@ -1,0 +1,9 @@
+  <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <app version="1">
+    <name>CPyMO</name>
+    <coder></coder>
+    <version></version>
+    <release_date></release_date>
+    <short_description>CPyMO AVG Game Engine</short_description>
+    <long_description>PyMO AVG Game Engine implemention in C.</long_description>
+  </app>
