@@ -781,12 +781,31 @@ static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
 		}
 
 		if((int)i == a->current_cg_selection) {
+			const float thick = 3;
+			float highlight_rects[] = {
+				xywh[0] - thick, xywh[1], thick, xywh[3],
+				xywh[0] + xywh[2] , xywh[1], thick, xywh[3],
+				xywh[0] - thick, xywh[1] - thick, xywh[2] + 2 * thick, thick,
+				xywh[0] - thick, xywh[1] + xywh[3], xywh[2] + 2 * thick, thick
+			};
+
+			const cpymo_color col = { 0 , 255, 0 };
+
+			cpymo_backend_image_fill_rects(
+				highlight_rects, 
+				CPYMO_ARR_COUNT(highlight_rects) / 4, 
+				col, 
+				1.0f, 
+				cpymo_backend_image_draw_type_bg);
+
+			#ifndef DISABLE_HIGHLIGHT_SQUARE
 			cpymo_backend_image_fill_rects(
 				xywh, 
 				1, 
 				cpymo_color_white, 
 				0.5f, 
 				cpymo_backend_image_draw_type_bg);
+			#endif
 		}
 	}
 

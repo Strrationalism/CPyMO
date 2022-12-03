@@ -559,6 +559,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 如果你只想解除FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
 
+### 如果在不支持半透明方块填充的平台上
+
+可以定义`DISABLE_HIGHLIGHT_SQUARE`宏以禁用对选项高亮的半透明方块填充，如CG上的高亮方块。
+
 ## SDL2后端
 
 SDL2后端在目录`cpymo-backends/sdl2`中。
