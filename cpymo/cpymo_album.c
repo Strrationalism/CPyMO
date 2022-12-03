@@ -41,7 +41,7 @@ static void cpymo_album_generate_album_ui_image_pixels_cut(
 
 	uint8_t *pixels_src = (uint8_t *)*pixels;
 
-	for (size_t y = 0; y < new_h; ++y) {
+	for (size_t y = 0; y < (int)new_h; ++y) {
 		size_t copy_count = 3 * new_w;
 		uint8_t *copy_src = pixels_src + 3 * *w * y;
 		uint8_t *copy_dst = pixels_cut + 3 * new_w * y;
