@@ -32,6 +32,8 @@ static void cpymo_album_generate_album_ui_image_pixels_cut(
 	int new_w = *w;
 	int new_h = *h;
 
+	assert(new_w >= 0 && new_h >= 0);
+
 	if (cur_ratio > ratio) new_w = (int)(*h * ratio);
 	else if (cur_ratio < ratio) new_h = (int)(*w / ratio);
 	if (new_w == *w && new_h == *h) return;
@@ -41,7 +43,7 @@ static void cpymo_album_generate_album_ui_image_pixels_cut(
 
 	uint8_t *pixels_src = (uint8_t *)*pixels;
 
-	for (size_t y = 0; y < (int)new_h; ++y) {
+	for (size_t y = 0; y < (size_t)new_h; ++y) {
 		size_t copy_count = 3 * new_w;
 		uint8_t *copy_src = pixels_src + 3 * *w * y;
 		uint8_t *copy_dst = pixels_cut + 3 * new_w * y;
