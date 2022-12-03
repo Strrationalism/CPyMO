@@ -28,7 +28,7 @@ pymo参见：https://github.com/pymo/pymo
 ----------------- | ---- | -------- | ------------------ | ---------------- | -------
 Windows           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
 Nintendo 3DS      | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
-Sony PSP          | SDL2 | FFmpeg   | FFmpeg             | 外置字体          | 游戏选择器
+Sony PSP          | SDL2 | 无       | FFmpeg             | 外置字体          | 游戏选择器
 
 ### 第二梯队
 **CPyMO可以编译到这些平台，但没有进行全面的测试。**
