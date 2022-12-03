@@ -51,7 +51,7 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 
 	// Global Variables
 	while (true) {
-		char flag = 0;
+		uint8_t flag = 0;
 		READ(&flag, sizeof(flag), 1);
 
 		if (flag == 0) break;
@@ -70,7 +70,7 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 
 		uint32_t val_abs;
 		READ(&val_abs, sizeof(val_abs), 1);
-		val_abs = end_le16toh(val_abs);
+		val_abs = end_le32toh(val_abs);
 
 		cpymo_str var_name;
 		var_name.begin = buf;
@@ -94,6 +94,7 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 	for (size_t i = 0; i < hash_flags_count; ++i) {
 		uint64_t flag;
 		READ(&flag, sizeof(flag), 1);
+		flag = end_le64toh(flag);
 		cpymo_hash_flags_add(&e->flags, flag);
 	}
 
@@ -135,7 +136,7 @@ error_t cpymo_save_global_save(cpymo_engine *e)
 		uint16_t var_name_len = (uint16_t)strlen(var_name);
 		uint16_t var_name_len_le16 = end_htole16(var_name_len);
 
-		char negative = val >= 0 ? 1 : 2;
+		uint8_t negative = val >= 0 ? 1 : 2;
 		WRITE(&negative, sizeof(negative), 1);
 
 		WRITE(&var_name_len_le16, sizeof(var_name_len_le16), 1);
@@ -145,7 +146,7 @@ error_t cpymo_save_global_save(cpymo_engine *e)
 		WRITE(&val_abs, sizeof(val_abs), 1);
 	}
 
-	char end_flag = 0;
+	uint8_t end_flag = 0;
 	WRITE(&end_flag, sizeof(end_flag), 1);
 
 	// Hash Flags

@@ -28,7 +28,7 @@ pymo参见：https://github.com/pymo/pymo
 ----------------- | ---- | -------- | ------------------ | ---------------- | -------
 Windows           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
 Nintendo 3DS      | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
-Sony PSP          | SDL2 | FFmpeg   | FFmpeg             | 外置字体          | 游戏选择器
+Sony PSP          | SDL2 | 无       | FFmpeg             | 外置字体          | 游戏选择器
 
 ### 第二梯队
 **CPyMO可以编译到这些平台，但没有进行全面的测试。**
@@ -168,6 +168,8 @@ brew install libxcb
 你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
 ## 启动
+
+**你需要确保你的SD卡没有打开写保护。**  
 你需要将你的游戏放置于SD卡的`/pymogames/`下，保证路径中只有半角英文、数字和下划线，之后该游戏便会被CPyMO for 3DS检测到。   
 如果你已经安装了Citra且citra命令可用，你可以直接使用`make run`来调用Citra模拟器来启动CPyMO。    
 
@@ -176,14 +178,11 @@ CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。
 按下SELECT键在四种屏幕模式之间切换。
 ZL和ZR键功能和A、Y键相同，用于单手操作。    
 
+**如果你无法启动cia版本，可以尝试启动3dsx版本。**
+
 ### 以调试模式启动
 如果你需要查看CPyMO控制台，你需要在游戏列表中**按住L键**，同时按下A键选择游戏，即可激活调试模式。    
 在这种模式下，下屏会显示CPyMO控制台，Start键将不再可用，对话文本会被强制显示在上屏。    
-
-### 如果无法启动CIA版本的话？
-
-1. 目前仅在New 3DS日版（系统版本号Ver 11.15.0-47J）上对CIA版本进行过测试。
-2. 如果你的机器在运行CIA版本的CPyMO时崩溃，请尝试切换到3dsx版。
 
 ### 如何启动3DSX版本？
 
@@ -207,7 +206,7 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 * 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
 * platform参数：pygame
 * 默认字体大小：28
-* 视频格式：H264 MP4，低于30FPS，Old 3DS请不要使用视频
+* 视频格式：H264 MP4，低于30FPS，仅New 3DS系列支持播放视频
 
 ## 关于字体
 
@@ -318,9 +317,11 @@ make install -j
 
 建议字体文件`default.ttf`小于2MB。
 
+所有的游戏数据包必须使用pymo-convert转换为psp目标才可正常运行。
+
 ## 为PSP适配游戏
 
-如果你需要为3DS适配PyMO游戏，那么建议你使用以下参数：
+如果你需要为PSP适配PyMO游戏，那么建议你使用以下参数：
 
 * 分辨率：480×272
 * 音频格式：16bit, 44100Hz, mp3
@@ -448,10 +449,14 @@ GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为
 * devkitPro + wii dev
 * wii-sdl
 * wii-sdl_mixer
+* wii-sdl_image
 * ppc-libogg
 * ppc-libvorbis
 * ppc-libmodplug
 * ppc-libmad
+* ppc-libpng
+* ppc-libjpeg
+* ppc-zlib
 
 直接使用devkitPro pacman安装即可。
 
@@ -461,12 +466,25 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
 
 ## 启动
 
+**你需要确保你的SD卡没有开启写保护，否则CPyMO将会在启动游戏时崩溃。**  
 将游戏和`default.ttf`放入SD卡的`/pymogames/`目录即可。
 
-注意，Wii平台仅s60v5数据包才可有较好体验。
+注意，Wii平台的游戏数据包需要经过pymo-convert转换为wii目标才可正常运行，也可直接使用s60v5数据包。
 
 如果你使用Dolphin模拟器，则需要将“图形” - “修正” - “纹理缓存”的“精确度”选项设置为“安全”，否则会导致画面刷新卡顿。
 
+*由于Wii平台处理器特殊，所以全局存档中关于CG开启状况、已读对话状况等与Hash Flags相关的数据在移动到其他平台时将会丢失。*
+
+## 为Wii平台适配游戏
+
+如果你需要为Wii适配PyMO游戏，那么建议你使用以下参数：
+
+* 分辨率：640x480
+* 音频格式：16bit, 22050Hz, ogg
+* 背景格式：jpg
+* 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
+* platform参数：pygame
+* 不支持视频
 
 # 使用CPyMO开发新游戏
 
@@ -514,6 +532,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 使用宏`DISABLE_MOVIE`可完全关闭视频播放功能。
 
+### 禁用蒙版图转场效果
+
+使用宏`DISABLE_MASKTRANS`即可将所有的蒙版图转场效果替换为普通的渐入渐出效果。
+
 ### 低帧率模式
 
 某些设备可能刷新屏幕会造成闪烁，需要尽可能减少屏幕刷新，这时可定义LOW_FRAME_RATE宏来启用低帧率模式，它将关闭动画效果并显著减少刷新次数。
@@ -521,12 +543,11 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 ### 解除stb依赖
 
 某些平台上不能运行stb库（如Sony PSP），可定义以下宏来分别禁用stb依赖：
+- `DISABLE_STB_IMAGE`
 
 ### 限制窗口大小到屏幕大小
 
 如果窗口大小太大超出屏幕范围，可定义宏`LIMIT_WINDOW_SIZE_TO_SCREEN`使游戏窗口超出屏幕大小时直接创建最大化的游戏窗口。
-
-- `DISABLE_STB_IMAGE`
 
 但是你需要重新实现一些函数来加载图片。
 
@@ -539,6 +560,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 某些平台上FFmpeg难以编译，同时定义`DISABLE_FFMPEG_AUDIO`和`DISABLE_FFMPEG_MOVIE`即可彻底对解除FFmpeg的依赖，并替换为你的音频视频后端。
 
 如果你只想解除FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
+
+### 如果在不支持半透明方块填充的平台上
+
+可以定义`DISABLE_HIGHLIGHT_SQUARE`宏以禁用对选项高亮的半透明方块填充，如CG上的高亮方块。
 
 ## SDL2后端
 
@@ -793,6 +818,7 @@ CPyMO ASCII ART仅支持键盘操作：
   - heiyu04
 * 调试设备提供
   - Sony PSP - 白若秋
+  - Nintendo Wii - 开心豆
 * 测试
   - 幻世
   - °SARTINCE。

@@ -32,6 +32,8 @@ static void cpymo_album_generate_album_ui_image_pixels_cut(
 	int new_w = *w;
 	int new_h = *h;
 
+	assert(new_w >= 0 && new_h >= 0);
+
 	if (cur_ratio > ratio) new_w = (int)(*h * ratio);
 	else if (cur_ratio < ratio) new_h = (int)(*w / ratio);
 	if (new_w == *w && new_h == *h) return;
@@ -41,7 +43,7 @@ static void cpymo_album_generate_album_ui_image_pixels_cut(
 
 	uint8_t *pixels_src = (uint8_t *)*pixels;
 
-	for (size_t y = 0; y < new_h; ++y) {
+	for (size_t y = 0; y < (size_t)new_h; ++y) {
 		size_t copy_count = 3 * new_w;
 		uint8_t *copy_src = pixels_src + 3 * *w * y;
 		uint8_t *copy_dst = pixels_cut + 3 * new_w * y;
@@ -781,12 +783,31 @@ static void cpymo_album_draw(const cpymo_engine *e, const void *_a)
 		}
 
 		if((int)i == a->current_cg_selection) {
+			const float thick = 3;
+			float highlight_rects[] = {
+				xywh[0] - thick, xywh[1], thick, xywh[3],
+				xywh[0] + xywh[2] , xywh[1], thick, xywh[3],
+				xywh[0] - thick, xywh[1] - thick, xywh[2] + 2 * thick, thick,
+				xywh[0] - thick, xywh[1] + xywh[3], xywh[2] + 2 * thick, thick
+			};
+
+			const cpymo_color col = { 0 , 255, 0 };
+
+			cpymo_backend_image_fill_rects(
+				highlight_rects, 
+				CPYMO_ARR_COUNT(highlight_rects) / 4, 
+				col, 
+				1.0f, 
+				cpymo_backend_image_draw_type_bg);
+
+			#ifndef DISABLE_HIGHLIGHT_SQUARE
 			cpymo_backend_image_fill_rects(
 				xywh, 
 				1, 
 				cpymo_color_white, 
 				0.5f, 
 				cpymo_backend_image_draw_type_bg);
+			#endif
 		}
 	}
 

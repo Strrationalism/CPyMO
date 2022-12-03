@@ -88,12 +88,17 @@ jobs:
         run: |
           cd cpymo-backends/sdl1
           make -f Makefile.Wii
+          mv wii-meta.xml meta.xml
+          mv wii-icon.png icon.png
 
       - name: 'Upload'
         uses: actions/upload-artifact@v2.3.0
         with:
           name: CPyMO for Nintendo Wii
-          path: ./cpymo-backends/sdl1/cpymo.dol
+          path: |
+            ./cpymo-backends/sdl1/boot.dol
+            ./cpymo-backends/sdl1/icon.png
+            ./cpymo-backends/sdl1/meta.xml
 
   build-psv:
     name: 'Sony PSV'

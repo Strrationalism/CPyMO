@@ -15,7 +15,7 @@ include $(DEVKITPPC)/wii_rules
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	cpymo
+TARGET		:=	boot
 BUILD		:=	build.Wii
 SOURCES		:= . ../../cpymo
 DATA		:=	data
@@ -28,20 +28,21 @@ INCLUDES	:= ../../cpymo ../../stb ../../endianness.h ../include
 CFLAGS	= -O3 -Wall $(MACHDEP) $(INCLUDE) \
 			-DDISABLE_FFMPEG_AUDIO -DENABLE_SDL_MIXER_AUDIO_BACKEND -DDISABLE_MOVIE \
 			-DUSE_GAME_SELECTOR \
-			-DSDL_MIXER_CHUNKSIZE=256 \
+			-DSDL_MIXER_FREQ=44100 \
+			-DSDL_MIXER_CHUNKSIZE=8192 \
 			-DSCREEN_BPP=16 \
 			-DSCREEN_WIDTH=640 \
 			-DSCREEN_HEIGHT=480 \
 			-DDISABLE_IMAGE_SCALING \
 			-DNDEBUG \
-			-DGAME_SELECTOR_FONTSIZE=20 \
+			-DGAME_SELECTOR_FONTSIZE=22 \
 			-DGAME_SELECTOR_EMPTY_MSG_FONTSIZE=8 \
-			-DGAME_SELECTOR_COUNT_PER_SCREEN=8 \
-			-DGAME_SELECTOR_DIR="\"sd:/pymogames/\"" \
+			-DGAME_SELECTOR_COUNT_PER_SCREEN=5 \
+			-DGAME_SELECTOR_DIR=" \"sd:/pymogames/\" " \
 			-D__WII__ \
 			-DFONT_RENDER_QUALITY=3 \
-			-DSCREEN_FLAGS="(SDL_DOUBLEBUF | SDL_HWSURFACE | SDL_ASYNCBLIT)" \
-			-DSTREAMING_LOAD_IMAGE
+			-DSCREEN_FLAGS="(SDL_DOUBLEBUF | SDL_SWSURFACE)" \
+			-DFAST_FILL_RECT -DDISABLE_MASKTRANS -DDISABLE_HIGHLIGHT_SQUARE
 
 CXXFLAGS	=	$(CFLAGS)
 
@@ -50,7 +51,7 @@ LDFLAGS	=	-L$(PORTLIBS_PATH)/wii/lib -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lSDLmain -lSDL_mixer -lSDL -lmad -lmodplug -lvorbisfile -lvorbis -logg -laesnd -lwiiuse -lbte -lwiikeyboard -lfat -logc -lstdc++ -lm 
+LIBS	:=	-lSDLmain -lSDL_mixer -lSDL -lSDL_image -lpng -ljpeg -lmad -lmodplug -lvorbisfile -lvorbis -logg -laesnd -lwiiuse -lbte -lwiikeyboard -lfat -logc -lstdc++ -lm -lz
 
 
 #---------------------------------------------------------------------------------
