@@ -232,6 +232,7 @@ error_t cpymo_bg_command(
 			&cpymo_bg_progression_over_callback);
 	}
 	else {
+		#ifndef DISABLE_MASKTRANS
 		if (!cpymo_str_equals_str(transition, "BG_FADE")) {
 			cpymo_backend_masktrans trans;
 			if (cpymo_assetloader_load_system_masktrans(
@@ -243,6 +244,7 @@ error_t cpymo_bg_command(
 				printf("[Warning] Failed to load mask transition.\n");
 			}
 		}
+		#endif
 
 		bg->transform_progression = cpymo_tween_create(time * 2);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_fade;

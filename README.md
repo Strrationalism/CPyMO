@@ -207,7 +207,7 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 * 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
 * platform参数：pygame
 * 默认字体大小：28
-* 视频格式：H264 MP4，低于30FPS，Old 3DS请不要使用视频
+* 视频格式：H264 MP4，低于30FPS，仅New 3DS系列支持播放视频
 
 ## 关于字体
 
@@ -318,9 +318,11 @@ make install -j
 
 建议字体文件`default.ttf`小于2MB。
 
+所有的游戏数据包必须使用pymo-convert转换为psp目标才可正常运行。
+
 ## 为PSP适配游戏
 
-如果你需要为3DS适配PyMO游戏，那么建议你使用以下参数：
+如果你需要为PSP适配PyMO游戏，那么建议你使用以下参数：
 
 * 分辨率：480×272
 * 音频格式：16bit, 44100Hz, mp3
@@ -448,10 +450,14 @@ GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为
 * devkitPro + wii dev
 * wii-sdl
 * wii-sdl_mixer
+* wii-sdl_image
 * ppc-libogg
 * ppc-libvorbis
 * ppc-libmodplug
 * ppc-libmad
+* ppc-libpng
+* ppc-libjpeg
+* ppc-zlib
 
 直接使用devkitPro pacman安装即可。
 
@@ -463,10 +469,20 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
 
 将游戏和`default.ttf`放入SD卡的`/pymogames/`目录即可。
 
-注意，Wii平台仅s60v5数据包才可有较好体验。
+注意，Wii平台的游戏数据包需要经过pymo-convert转换为wii目标才可正常运行，也可直接使用s60v5数据包。
 
 如果你使用Dolphin模拟器，则需要将“图形” - “修正” - “纹理缓存”的“精确度”选项设置为“安全”，否则会导致画面刷新卡顿。
 
+## 为Wii平台适配游戏
+
+如果你需要为Wii适配PyMO游戏，那么建议你使用以下参数：
+
+* 分辨率：640x480
+* 音频格式：16bit, 22050Hz, ogg
+* 背景格式：jpg
+* 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
+* platform参数：pygame
+* 不支持视频
 
 # 使用CPyMO开发新游戏
 
@@ -514,6 +530,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 使用宏`DISABLE_MOVIE`可完全关闭视频播放功能。
 
+### 禁用蒙版图转场效果
+
+使用宏`DISABLE_MASKTRANS`即可将所有的蒙版图转场效果替换为普通的渐入渐出效果。
+
 ### 低帧率模式
 
 某些设备可能刷新屏幕会造成闪烁，需要尽可能减少屏幕刷新，这时可定义LOW_FRAME_RATE宏来启用低帧率模式，它将关闭动画效果并显著减少刷新次数。
@@ -521,12 +541,11 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 ### 解除stb依赖
 
 某些平台上不能运行stb库（如Sony PSP），可定义以下宏来分别禁用stb依赖：
+- `DISABLE_STB_IMAGE`
 
 ### 限制窗口大小到屏幕大小
 
 如果窗口大小太大超出屏幕范围，可定义宏`LIMIT_WINDOW_SIZE_TO_SCREEN`使游戏窗口超出屏幕大小时直接创建最大化的游戏窗口。
-
-- `DISABLE_STB_IMAGE`
 
 但是你需要重新实现一些函数来加载图片。
 
@@ -793,6 +812,7 @@ CPyMO ASCII ART仅支持键盘操作：
   - heiyu04
 * 调试设备提供
   - Sony PSP - 白若秋
+  - Nintendo Wii - 开心豆
 * 测试
   - 幻世
   - °SARTINCE。

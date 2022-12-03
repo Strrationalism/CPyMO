@@ -19,6 +19,8 @@ cpymo_input cpymo_input_snapshot()
     cpymo_input x;
     memset(&x, 0, sizeof(x));
 
+#if !(defined __WII__ || defined __PSP__)
+
     Uint8 *keystate = SDL_GetKeyState(NULL);
 
     x.left = keystate[SDLK_LEFT];
@@ -57,19 +59,22 @@ cpymo_input cpymo_input_snapshot()
         x.mouse_x = mouse_x - (framebuffer->w - engine.gameconfig.imagesize_w) / 2;
         x.mouse_y = mouse_y - (framebuffer->h - engine.gameconfig.imagesize_h) / 2;    
     }
+#endif
     
 #ifdef __WII__
     WPAD_ScanPads();
-    u32 pressed = WPAD_ButtonsDown(0);
+    u32 pressed = WPAD_ButtonsHeld(0);
 
     if (pressed & WPAD_BUTTON_A) x.ok |= true;
-    if (pressed & WPAD_BUTTON_B) x.cancel |= true;
+    if (pressed & (WPAD_BUTTON_B | WPAD_BUTTON_MINUS | WPAD_BUTTON_PLUS)) 
+        x.cancel |= true;
     if (pressed & WPAD_BUTTON_UP) x.up |= true;
     if (pressed & WPAD_BUTTON_DOWN) x.down |= true;
     if (pressed & WPAD_BUTTON_LEFT) x.left |= true;
     if (pressed & WPAD_BUTTON_RIGHT) x.right |= true;
     if (pressed & WPAD_BUTTON_1) x.hide_window |= true;
     if (pressed & WPAD_BUTTON_2) x.skip |= true;
+    if (pressed & WPAD_BUTTON_HOME) cpymo_engine_exit(&engine);
 #endif
 
 #ifdef __PSP__

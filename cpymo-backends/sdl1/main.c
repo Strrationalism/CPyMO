@@ -207,7 +207,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
     set_clip_rect(SCREEN_WIDTH, SCREEN_HEIGHT);
 #endif
 
-#ifndef __PSP__
+#if !(defined __PSP__ || defined __WII__)
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
@@ -314,6 +314,10 @@ int main(int argc, char **argv)
         printf("[Error] SDL_Init: %s\n", SDL_GetError());
         return -1;
     }
+
+#if defined __WII__ || defined __PSP__
+    SDL_ShowCursor(SDL_DISABLE);
+#endif
 
     extern void cpymo_backend_audio_init(void);
     extern void cpymo_backend_audio_free(void);
@@ -508,6 +512,7 @@ int main(int argc, char **argv)
     }
 
 EXIT:
+
     cpymo_engine_free(&engine);
     cpymo_backend_image_quit();
     cpymo_backend_audio_free();
