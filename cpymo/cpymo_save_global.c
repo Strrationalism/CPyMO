@@ -70,7 +70,7 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 
 		uint32_t val_abs;
 		READ(&val_abs, sizeof(val_abs), 1);
-		val_abs = end_le16toh(val_abs);
+		val_abs = end_le32toh(val_abs);
 
 		cpymo_str var_name;
 		var_name.begin = buf;
@@ -94,6 +94,7 @@ error_t cpymo_save_global_load(cpymo_engine *e)
 	for (size_t i = 0; i < hash_flags_count; ++i) {
 		uint64_t flag;
 		READ(&flag, sizeof(flag), 1);
+		flag = end_le64toh(flag);
 		cpymo_hash_flags_add(&e->flags, flag);
 	}
 
