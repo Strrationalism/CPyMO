@@ -74,6 +74,21 @@ jobs:
         name: CPyMO for Nintendo 3DS (3dsx)
         path: ./cpymo-backends/3ds/cpymo.3dsx
 
+  build-gamecube:
+    name: 'Nintendo GameCube'
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitppc:latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with: 
+          submodules: true
+      
+      - name: 'Build'
+        run: |
+          cd cpymo-backends/sdl1
+          make -f Makefile.GameCube -j
+
   build-wii:
     name: 'Nintendo Wii'
     runs-on: ubuntu-latest
@@ -87,7 +102,7 @@ jobs:
       - name: 'Build'
         run: |
           cd cpymo-backends/sdl1
-          make -f Makefile.Wii
+          make -f Makefile.Wii -j
           mv wii-meta.xml meta.xml
           mv wii-icon.png icon.png
 
