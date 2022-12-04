@@ -79,7 +79,7 @@ $(BUILD_DIR)/cpymo.velf: $(BUILD_DIR)/cpymo.elf
 	@vita-elf-create $< $@
 
 $(BUILD_DIR)/param.sfo: 
-	@vita-mksfoex -s TITLE_ID="FHOMM0002" "CPyMO" $@
+	@vita-mksfoex -s TITLE_ID="CPYMO0002" "CPyMO" $@
 
 $(BUILD_DIR)/eboot.bin: $(BUILD_DIR)/cpymo.velf
 	@vita-make-fself -s -ss $< $@
