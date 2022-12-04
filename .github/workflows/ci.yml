@@ -189,7 +189,7 @@ jobs:
         export PATH=$PATH:$PSPDEV/bin
         psp-pacman -S sdl2 sdl2-image freetype2 sdl2-ttf --noconfirm
         cd ./cpymo-backends/sdl2
-        make -f Makefile.PSP
+        make -f Makefile.PSP -j
 
     - name: Upload SDL2 Backend
       uses: actions/upload-artifact@v2.3.0
@@ -214,7 +214,7 @@ jobs:
         make install -j
 
         cd ../cpymo-backends/sdl1
-        make -f Makefile.PSP
+        make -f Makefile.PSP -j
         
     - name: Upload SDL 1.2 Backend
       uses: actions/upload-artifact@v2.3.0
