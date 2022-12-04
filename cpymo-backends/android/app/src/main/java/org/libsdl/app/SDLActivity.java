@@ -2182,14 +2182,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     @Override
     public void onScan(MotionEvent event, float x, float y) {
-        int touchDevId = event.getDeviceId();
-        int index = event.getActionIndex();
-        int pointerId = event.getPointerId(index);
-        x /= mWidth;
-        y /= mHeight;
-        float p = event.getPressure(index);
-        if (p > 1.0f) p = 1.0f;
-        SDLActivity.onNativeTouch(touchDevId, pointerId, MotionEvent.ACTION_MOVE, x, y, p);
+        SDLActivity.onNativeMouse(0, MotionEvent.ACTION_HOVER_MOVE, x, y, false);
     }
 
     @Override

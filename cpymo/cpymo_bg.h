@@ -13,8 +13,6 @@ typedef struct {
 	float current_bg_x, current_bg_y;
 	int current_bg_w, current_bg_h;
 
-	bool redraw;
-
 	// Transformation Effect
 	cpymo_backend_image transform_next_bg;
 	float transform_next_bg_x, transform_next_bg_y;
@@ -41,16 +39,12 @@ static inline void cpymo_bg_init(cpymo_bg *bg)
 	bg->follow_chara_quake = false;
 	bg->trans = NULL;
 	bg->current_bg_name = NULL;
-
-	bg->redraw = false;
 }
 
 void cpymo_bg_free(cpymo_bg *);
 
 static inline void cpymo_bg_reset(cpymo_bg *bg)
 { cpymo_bg_free(bg); cpymo_bg_init(bg); }
-
-error_t cpymo_bg_update(cpymo_bg *, bool *redraw);
 
 void cpymo_bg_draw(const struct cpymo_engine *);
 void cpymo_bg_draw_transform_effect(const struct cpymo_engine *);

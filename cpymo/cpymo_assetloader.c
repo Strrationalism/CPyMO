@@ -265,7 +265,7 @@ static error_t cpymo_assetloader_load_image_with_mask(
 		if (err != CPYMO_ERR_SUCC) free(pixels);
 	}
 
-	return CPYMO_ERR_SUCC;
+	return err;
 }
 #endif
 #else

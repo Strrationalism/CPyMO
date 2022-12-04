@@ -299,11 +299,31 @@ bool cpymo_engine_skipping(cpymo_engine *e)
 	return skipping;
 }
 
+void cpymo_engine_request_redraw(cpymo_engine *engine)
+{
+	engine->redraw = true;
+}
+
+static error_t cpymo_engine_exit_update(
+	struct cpymo_engine *e, void *ui_data, float d)
+{ return CPYMO_ERR_NO_MORE_CONTENT; }
+
+void cpymo_engine_exit(cpymo_engine *e)
+{
+	void *dummy;
+	cpymo_ui_enter(
+		&dummy, e, 0, 
+		&cpymo_engine_exit_update, 
+		&cpymo_ui_empty_drawer,
+		&cpymo_ui_empty_deleter);
+}
+
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
-	error_t err;
-	*redraw |= engine->redraw;
-	engine->redraw = false;
+	#define REDRAW *redraw |= engine->redraw; engine->redraw = false
+
+	error_t err = CPYMO_ERR_SUCC;
+	REDRAW;
 
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
@@ -327,53 +347,61 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	}
 
 	if (engine->input.hide_window != engine->prev_input.hide_window)
-		*redraw = true;
+		cpymo_engine_request_redraw(engine);
 
-	if (cpymo_ui_enabled(engine)) {
-		error_t err = cpymo_ui_update(engine, delta_time_sec);
-		*redraw |= engine->redraw;
-		return err;
-	}
+	if (cpymo_ui_enabled(engine))
+		err = cpymo_ui_update(engine, delta_time_sec);
+	else {
 
-#if CPYMO_FEATURE_LEVEL >= 1
-	if (engine->feature_level >= 1) {
-		err = cpymo_lua_actor_update_main(&engine->lua, delta_time_sec);
+		#if CPYMO_FEATURE_LEVEL >= 1
+		if (engine->feature_level >= 1) {
+			err = cpymo_lua_actor_update_main(&engine->lua, delta_time_sec);
+			CPYMO_THROW(err);
+		}
+		#endif
+		
+		cpymo_anime_update(
+			engine, 
+			&engine->anime, 
+			delta_time_sec);
+
+		err = cpymo_select_img_update(
+			engine, 
+			&engine->select_img, 
+			delta_time_sec);
 		CPYMO_THROW(err);
-	}
-#endif
 
-	err = cpymo_bg_update(&engine->bg, redraw);
-	CPYMO_THROW(err);
+		err = cpymo_wait_update(
+			&engine->wait, 
+			engine, 
+			delta_time_sec);
+		CPYMO_THROW(err);
 
-	cpymo_anime_update(&engine->anime, delta_time_sec, redraw);
+		if (!cpymo_wait_is_wating(&engine->wait)) {
+			if (engine->interpreter)
+				err = cpymo_interpreter_execute_step(
+					engine->interpreter, engine);
+			else return CPYMO_ERR_NO_MORE_CONTENT;
 
-	err = cpymo_select_img_update(engine, &engine->select_img, delta_time_sec);
-	CPYMO_THROW(err);
+			if (cpymo_wait_is_wating(&engine->wait)) {
+				if (err == CPYMO_ERR_NO_MORE_CONTENT) 
+					err = CPYMO_ERR_SUCC;
+			}
 
-	err = cpymo_wait_update(&engine->wait, engine, delta_time_sec);
-	CPYMO_THROW(err);
-
-	if (!cpymo_wait_is_wating(&engine->wait)) {
-		if (engine->interpreter)
-			err = cpymo_interpreter_execute_step(engine->interpreter, engine);
-		else return CPYMO_ERR_NO_MORE_CONTENT;
-
-		if (cpymo_wait_is_wating(&engine->wait)) {
-			if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_NO_MORE_CONTENT) return err;
-		}
-		else {
-			if (err != CPYMO_ERR_SUCC) return err;
+			CPYMO_THROW(err);
 		}
 	}
 
-	*redraw |= engine->redraw;
-	engine->redraw = false;
+	REDRAW;
 
 	#if CPYMO_FEATURE_LEVEL >= 1 && defined LEAKCHECK
 	cpymo_lua_context_leakcheck(&engine->lua);
 	#endif
 
-	return CPYMO_ERR_SUCC;
+	return err;
+
+
+	#undef REDRAW
 }
 
 void cpymo_engine_draw(const cpymo_engine *engine)

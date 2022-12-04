@@ -1,4 +1,6 @@
 ﻿#include <cpymo_prelude.h>
+
+#ifndef ENABLE_SDL_TTF
 #include <cpymo_backend_text.h>
 #include <SDL/SDL.h>
 #include <stb_truetype.h>
@@ -39,6 +41,7 @@ error_t cpymo_backend_text_create(
 
     int w, h;
     cpymo_backend_font_render(NULL, &w, &h, s, scale, baseline);
+    h += 4; // MAGIC FOR MORE MEMORY
 
     cpymo_backend_text_impl *impl = malloc(sizeof(cpymo_backend_text_impl) + w * h);
     if (impl == NULL) return CPYMO_ERR_OUT_OF_MEM;
@@ -148,3 +151,4 @@ float cpymo_backend_text_width(
 }
 
 
+#endif

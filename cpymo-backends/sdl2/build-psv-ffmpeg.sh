@@ -13,6 +13,9 @@ chmod +x ./configure
 		--disable-armv5te \
 		--disable-programs \
 		--disable-doc \
+		--disable-avfilter \
+		--disable-avdevice \
+		--disable-postproc \
 		--disable-network \
 		--disable-encoders \
 		--disable-filters \
@@ -30,8 +33,8 @@ chmod +x ./configure
 		--cpu=cortex-a9 \
 		--disable-armv6t2 \
 		--target-os=none \
-		--extra-cflags=" -Wl,-q -O2 -ftree-vectorize -fomit-frame-pointer -ffast-math -D_BSD_SOURCE" \
-		--extra-cxxflags=" -Wl,-q -O2 -ftree-vectorize -fomit-frame-pointer -ffast-math -fno-rtti -fno-exceptions -std=gnu++11 -D_BSD_SOURCE" \
+		--extra-cflags=" -Wl,-q -O3 -D_BSD_SOURCE" \
+		--extra-cxxflags=" -Wl,-q -O3 -D_BSD_SOURCE" \
 		--extra-ldflags=" -L$VITASDK/lib " \
 		--disable-bzlib \
 		--disable-iconv \

@@ -69,3 +69,6 @@ bool cpymo_ui_enabled(const cpymo_engine *e)
 	return e->ui != NULL;
 }
 
+void cpymo_ui_empty_drawer(const struct cpymo_engine *e, const void *ui_data) {}
+
+void cpymo_ui_empty_deleter(struct cpymo_engine *e, void *ui_data) {}

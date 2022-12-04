@@ -5,8 +5,8 @@ tar -xf ffmpeg.tar.gz
 
 cd FFmpeg-n5.0.1
 
-export PATH=$DEVKITARM/bin:$PATH
-export ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
+PATH=$DEVKITARM/bin:$PATH
+ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
 
 chmod +x ./configure
 
@@ -25,6 +25,10 @@ chmod +x ./configure
 --disable-protocols \
 --enable-bsfs \
 --disable-muxers \
+--disable-postproc \
+--disable-swscale \
+--disable-avdevice \
+--disable-avfilter \
 --enable-protocol=file \
 --enable-static \
 --disable-decoder=gif,webp,bmp,dds,mjpeg,jpeg1s,jpeg2000,photocd,png,ppm,psd,qpeg,sga,sgi,smvjpeg,text \

@@ -14,8 +14,8 @@ INC := $(wildcard *.h) $(wildcard ../../cpymo/*.h) $(wildcard ../include/*.h) $(
 CFLAGS += \
 	-DDISABLE_AUDIO \
 	-DDISABLE_MOVIE \
-	-DDEBUG \
-	-g \
+	-DNDEBUG \
+	-O3 \
 	-I../software \
 	-I../../cpymo \
 	-I../../endianness.h \

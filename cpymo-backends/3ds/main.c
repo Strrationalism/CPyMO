@@ -414,8 +414,6 @@ int main(void) {
 		} else {
 			gspWaitForVBlank();
 		}
-
-		if(hidKeysDown() & KEY_START) break;
 	}
 
 	EXIT:

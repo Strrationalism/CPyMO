@@ -262,6 +262,20 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	err = cpymo_assetloader_get_video_path(&path, videoname, &e->assetloader);
 	THROW(err != CPYMO_ERR_SUCC, err, "Faild to get video path");
 
+	#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
+	{
+		char *path2 = path;
+		path = malloc(strlen(path) + 1 + strlen("file://"));
+		if (path == NULL) {
+			free(path2);
+			return CPYMO_ERR_OUT_OF_MEM;
+		}
+		strcpy(path, "file://");
+		strcat(path, path2);
+		free(path2);
+	}
+	#endif
+
 	int averr = avformat_open_input(&m->format_context, path, NULL, NULL);
 	if (averr != 0) {
 		if (path) free(path);
@@ -321,6 +335,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	m->backend_inited = true;
 
 	cpymo_audio_play_video(e, path);
+	cpymo_movie_send_video_frame_to_backend(m);
 	
 	free(path);
 

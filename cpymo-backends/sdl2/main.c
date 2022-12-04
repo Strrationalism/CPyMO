@@ -198,11 +198,11 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
-#endif
 
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
+#endif
 
 	ensure_save_dir(gamedir);
 	set_window_icon(gamedir);
@@ -215,7 +215,13 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 
 
 
-#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__ || defined __IOS__) && defined USE_GAME_SELECTOR)
+#if (defined USE_GAME_SELECTOR && ( \
+		defined __SWITCH__ || \
+		defined __PSP__ || \
+		defined __PSV__ || \
+		defined __ANDROID__ || \
+		defined __IOS__ || \
+		defined __WIIU__))
 
 #include <dirent.h>
 cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
@@ -351,9 +357,17 @@ static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
 }
 #endif
 
+#ifdef __PSP__
+#include <psppower.h>
+#endif
 
 int main(int argc, char **argv)
 {
+#ifdef __PSP__
+    scePowerSetCpuClockFrequency(333);
+    scePowerSetBusClockFrequency(167);
+#endif
+
 	srand((unsigned)time(NULL));
 	//_CrtSetBreakAlloc(1371);
 
@@ -586,6 +600,10 @@ int main(int argc, char **argv)
 #ifndef __ANDROID__
 			else if (event.type == SDL_QUIT) {
 				#ifdef ENABLE_EXIT_CONFIRM
+				#ifndef DISALBE_MOVIE
+				extern bool playing_movie;
+				if (playing_movie) goto EXIT;
+				#endif
 				if (!exit_msgbox_opened) {
 					err = cpymo_msgbox_ui_enter(
 						&engine,

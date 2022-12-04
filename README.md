@@ -17,20 +17,21 @@
 
 如果你需要使用CPyMO制作游戏，可以参见[CPyMO + YukimiScript开发模板](https://github.com/Strrationalism/CPyMO-YukimiScript-Template)。
 
-pymo原版参见：https://github.com/pymo/pymo    
+pymo参见：https://github.com/pymo/pymo    
 
 # 平台支持列表
 
 ### 第一梯队
 **CPyMO主要在这些平台上开发，并将主要在这些平台上进行测试和除错。**
 
-平台          | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
------------- | ---- | -------- | ------------------ | ---------------- | -------
-Windows      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
-Nintendo 3DS | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
+平台               | 后端 | 视频播放器 | 音频支持            | 字体支持          | 额外功能
+----------------- | ---- | -------- | ------------------ | ---------------- | -------
+Windows           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体       | 视障帮助
+Nintendo 3DS      | 3DS  | FFmpeg   | FFmpeg             | 自带字体          | 游戏选择器
+Sony PSP          | SDL2 | 无       | FFmpeg             | 外置字体          | 游戏选择器
 
 ### 第二梯队
-**CPyMO可以编译到这些平台，保证全部功能可用，但不保证用户体验，也没有进行全面的测试。**
+**CPyMO可以编译到这些平台，但没有进行全面的测试。**
 
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
@@ -41,32 +42,29 @@ Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | �
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
 Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器,视障帮助
+Sony PSV        | SDL  | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
 
 ### 第三梯队
 **CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
 
-平台              | 后端       | 视频播放器 | 音频支持                      | 字体支持      | 额外功能
----------------- | --------- | --------- | ---------------------------- | ---------- | ----------
-Sony PSP         | SDL2      | 不支持     | SDL2_mixer(仅支持BGM通道)      | 外置字体     | 游戏选择器
-Sony PSV         | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
-Nintendo Wii     | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
-Windows (SDL 1.2)| SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
-Linux (SDL 1.2)  | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
-POSIX (ASCII ART)| ASCII ART | 不支持     | 不支持                        | 外置字体     | 在控制台上操作并输出画面
-POSIX (Text)     | Text      | 不支持     | 不支持                        | 无需        | 在控制台上操作并输出游戏文本
+平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
+----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
+Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
+Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
+Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
+Linux (SDL 1.2)   | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
+POSIX (ASCII ART) | ASCII ART | 不支持     | 不支持                        | 外置字体     | 在控制台上操作并输出画面
+POSIX (Text)      | Text      | 不支持     | 不支持                        | 无需        | 在控制台上操作并输出游戏文本
 
-**注：SDL2_mixer音频后端仅支持在BGM通道播放MP3文件，其余通道不支持。**   
 **注：SDL 1.2后端不支持对Alpha图像再次设置透明度。**   
-**注：SDL_mixer音频后端音频支持格式有限。**   
 
 # 与pymo行为差异
 
 * CPyMO的存档位置和存档格式与pymo不同，不能与之互换。
-* CPyMO最小音频支持仅包含OGG格式，且CPyMO不会考虑MID格式的音频播放。
+* CPyMO不会考虑MID格式的音频播放。
 * CPyMO的蒙版渐变动画效果与PyMO不同。
 * 涉及动画时间曲线的部分CPyMO均做了缓动效果，而pymo则使用线性效果。
 * CPyMO的菜单和UI与PyMO不同。
-* CPyMO在可以播放视频的情况下比pymo支持更多编码格式的视频。
 * CPyMO不支持预载，预载选项会被CPyMO直接忽略。
 * CPyMO忽略除字体大小以外所有的字体设置，将自动启用字体阴影和字体反锯齿。
 
@@ -170,6 +168,8 @@ brew install libxcb
 你可以在 https://github.com/3DSGuy/Project_CTR 找到makerom的可执行文件。
 
 ## 启动
+
+**你需要确保你的SD卡没有打开写保护。**  
 你需要将你的游戏放置于SD卡的`/pymogames/`下，保证路径中只有半角英文、数字和下划线，之后该游戏便会被CPyMO for 3DS检测到。   
 如果你已经安装了Citra且citra命令可用，你可以直接使用`make run`来调用Citra模拟器来启动CPyMO。    
 
@@ -178,14 +178,11 @@ CPyMO for 3DS支持3D显示，可使用3D滑块来打开3D显示功能。
 按下SELECT键在四种屏幕模式之间切换。
 ZL和ZR键功能和A、Y键相同，用于单手操作。    
 
+**如果你无法启动cia版本，可以尝试启动3dsx版本。**
+
 ### 以调试模式启动
 如果你需要查看CPyMO控制台，你需要在游戏列表中**按住L键**，同时按下A键选择游戏，即可激活调试模式。    
 在这种模式下，下屏会显示CPyMO控制台，Start键将不再可用，对话文本会被强制显示在上屏。    
-
-### 如果无法启动CIA版本的话？
-
-1. 目前仅在New 3DS日版（系统版本号Ver 11.15.0-47J）上对CIA版本进行过测试。
-2. 如果你的机器在运行CIA版本的CPyMO时崩溃，请尝试切换到3dsx版。
 
 ### 如何启动3DSX版本？
 
@@ -209,7 +206,7 @@ ZL和ZR键功能和A、Y键相同，用于单手操作。
 * 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
 * platform参数：pygame
 * 默认字体大小：28
-* 视频格式：H264 MP4，低于30FPS，Old 3DS请不要使用视频
+* 视频格式：H264 MP4，低于30FPS，仅New 3DS系列支持播放视频
 
 ## 关于字体
 
@@ -267,55 +264,71 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 # Sony Playstation Portable 平台
 
-PSP平台的CPyMO仅能运行s60v3数据包或下述“适配”的包。
+## SDL2后端版本（推荐）
 
-## 额外依赖
+### 依赖
 
-* [pspdev/pspdev](github.com/pspdev/pspdev)
-* psp-sdl2（已经包括到pspdev中）
-* psp-sdl2_mixer（已经包括到pspdev中）
-* psp-libvorbis（已经包括到pspdev中）
-* psp-libogg（已经包括到pspdev中）
+1. [pspsdk](https://github.com/pspdev/pspsdk).
+2. 使用`psp-pacman`安装:
+    * sdl2
+    * sdl2-image
+3. 使用`./cpymo-backends/sdl2/build-psp-ffmpeg.sh`编译FFmpeg
 
-## 编译
+### 编译
 
-cd到`cpymo-backends/sdl2`，执行`make -f Makefile.PSP`即可编译到索尼PSP平台。    
+在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
-## 启动
+## SDL 1.2后端版本
 
-将EBOOT.PBP、游戏文件夹和default.ttf放在一起。    
-你需要自己准备可以使用的default.ttf，CPyMO将会加载这个文件作为字体使用。    
+此版本画面性能较低，但相对比较稳定，不支持mp3音频。
 
-在使用PPSSPP模拟器的情况下，你需要关闭“系统设置 - 快速内存访问”，并开启“忽略读写错误”。    
+### 依赖
 
-## 缺陷
+1. [pspsdk](https://github.com/pspdev/pspsdk).
+2. 使用`psp-pacman`安装：
+    * sdl
+    * sdl-image
+    * sdl-ttf
+    * freetype2
+    * libogg
+    * libvorbis
+    * libmikmod
+    * smpeg
+3. 克隆并编译[SDL_mixer](https://github.com/pspdev/SDL_mixer)仓库的`SDL_mixer-psp`分支，并安装：
 
-这些缺陷将不会得到修复：
+```sh
+git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
+cd ./SDL_mixer
+chmod +x ./autogen.sh
+./autogen.sh
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" \
+    ./configure --host psp --with-sdl-prefix=$(psp-config --psp-prefix) \
+    --enable-music-mp3 --prefix=$(psp-config --psp-prefix) --enable-music-mod --enable-music-ogg
+make install -j
+```
 
-* 由于PSP生态中没有移植的FFmpeg库
-    - 视频播放器功能已经禁用
-	- 音频播放使用SDL2_mixer后端
-        - 音频不支持mp3格式
-* 由于PSP机能有限
-    - 仅能加载s60v3数据包或下述推荐的PSP数据包
-	- 加载音效和语音会卡在解码上，故禁用音效和语音
-* PPSSPP的“快速内存访问”可能存在问题
-    - 目前仅可在PPSSPP在关闭“快速内存访问”时才可以正常启动
+### 编译
+
+在`cpymo-backends/sdl1`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
+
+## 安装
+
+在PSP的内置存储或记忆棒的`PSP/GAME`目录下创建目录`CPYMO`，然后将`EBOOT.PBP`和`default.ttf`放入，之后将游戏放入该文件夹即可。
+
+建议字体文件`default.ttf`小于2MB。
+
+所有的游戏数据包必须使用pymo-convert转换为psp目标才可正常运行。
 
 ## 为PSP适配游戏
 
-如果你需要为PSP适配游戏，那么建议你使用以下参数：
+如果你需要为PSP适配PyMO游戏，那么建议你使用以下参数：
 
 * 分辨率：480×272
-* 背景图像：jpg
-* 立绘图像：png
-* 系统图像：png
-* 声音格式：ogg, 16bit signed little-endian, 44100Hz
+* 音频格式：16bit, 44100Hz, mp3
+* 背景格式：jpg
+* 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
 * platform参数：pygame
-* 不支持的内容：
-    * 视频
-    * 音效（se）
-    * 语音（voice）
+* 不支持视频
 
 # Sony Playstation Vita 平台
 
@@ -436,10 +449,14 @@ GitHub Action和Release中的“CPyMO for Android (Accessibility)”版本即为
 * devkitPro + wii dev
 * wii-sdl
 * wii-sdl_mixer
+* wii-sdl_image
 * ppc-libogg
 * ppc-libvorbis
 * ppc-libmodplug
 * ppc-libmad
+* ppc-libpng
+* ppc-libjpeg
+* ppc-zlib
 
 直接使用devkitPro pacman安装即可。
 
@@ -449,12 +466,25 @@ cd到`cpymo-backends/sdl1`，执行`make -j -f Makefile.Wii`即可生成dol文�
 
 ## 启动
 
+**你需要确保你的SD卡没有开启写保护，否则CPyMO将会在启动游戏时崩溃。**  
 将游戏和`default.ttf`放入SD卡的`/pymogames/`目录即可。
 
-注意，Wii平台仅s60v5数据包才可有较好体验。
+注意，Wii平台的游戏数据包需要经过pymo-convert转换为wii目标才可正常运行，也可直接使用s60v5数据包。
 
 如果你使用Dolphin模拟器，则需要将“图形” - “修正” - “纹理缓存”的“精确度”选项设置为“安全”，否则会导致画面刷新卡顿。
 
+*由于Wii平台处理器特殊，所以全局存档中关于CG开启状况、已读对话状况等与Hash Flags相关的数据在移动到其他平台时将会丢失。*
+
+## 为Wii平台适配游戏
+
+如果你需要为Wii适配PyMO游戏，那么建议你使用以下参数：
+
+* 分辨率：640x480
+* 音频格式：16bit, 22050Hz, ogg
+* 背景格式：jpg
+* 其他图片：带透明通道的png，不要使用额外的mask灰阶图片
+* platform参数：pygame
+* 不支持视频
 
 # 使用CPyMO开发新游戏
 
@@ -502,6 +532,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 使用宏`DISABLE_MOVIE`可完全关闭视频播放功能。
 
+### 禁用蒙版图转场效果
+
+使用宏`DISABLE_MASKTRANS`即可将所有的蒙版图转场效果替换为普通的渐入渐出效果。
+
 ### 低帧率模式
 
 某些设备可能刷新屏幕会造成闪烁，需要尽可能减少屏幕刷新，这时可定义LOW_FRAME_RATE宏来启用低帧率模式，它将关闭动画效果并显著减少刷新次数。
@@ -509,12 +543,11 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 ### 解除stb依赖
 
 某些平台上不能运行stb库（如Sony PSP），可定义以下宏来分别禁用stb依赖：
+- `DISABLE_STB_IMAGE`
 
 ### 限制窗口大小到屏幕大小
 
 如果窗口大小太大超出屏幕范围，可定义宏`LIMIT_WINDOW_SIZE_TO_SCREEN`使游戏窗口超出屏幕大小时直接创建最大化的游戏窗口。
-
-- `DISABLE_STB_IMAGE`
 
 但是你需要重新实现一些函数来加载图片。
 
@@ -527,6 +560,14 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 某些平台上FFmpeg难以编译，同时定义`DISABLE_FFMPEG_AUDIO`和`DISABLE_FFMPEG_MOVIE`即可彻底对解除FFmpeg的依赖，并替换为你的音频视频后端。
 
 如果你只想解除FFmpeg依赖，并且不想提供后端，则可通过同时定义`DISABLE_AUDIO`和`DISABLE_MOVIE`来彻底关闭音频和视频播放器支持。
+
+### 如果在不支持半透明方块填充的平台上
+
+可以定义`DISABLE_HIGHLIGHT_SQUARE`宏以禁用对选项高亮的半透明方块填充，如CG上的高亮方块。
+
+### 如果需要明确向FFmpeg URL传入`file://`前缀
+
+定义`FFMPEG_PREPEND_FILE_PROTOCOL`宏即可明确在传给FFmpeg的URL中添加`file://`前缀。
 
 ## SDL2后端
 
@@ -618,6 +659,10 @@ SDL2_mixer音频后端可能无法播放mp3格式的语音和音效。
 ### 垂直同步
 
 使用`DISABLE_VSYNC`宏即可禁用垂直同步并以最高可能的帧率运行。
+
+### 低质量的rule图过场
+
+定义宏`LOW_QUALITY_MASKTRANS`即可使用低质量但性能更高的rule图过场动画。
 
 ## SDL 1.2后端
 
@@ -745,11 +790,11 @@ CPyMO ASCII ART仅支持键盘操作：
 ## pymo-convert
 
 该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
-要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio-to-ogg`安装到命令行中。    
+要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio`安装到命令行中。    
 
-## pymo-convert-audio-to-ogg
+## pymo-convert-audio
 
-由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为ogg格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
+由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为指定格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
 
 ## mo2pymo
 
@@ -777,6 +822,7 @@ CPyMO ASCII ART仅支持键盘操作：
   - heiyu04
 * 调试设备提供
   - Sony PSP - 白若秋
+  - Nintendo Wii - 开心豆
 * 测试
   - 幻世
   - °SARTINCE。

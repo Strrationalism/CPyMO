@@ -24,15 +24,6 @@ void cpymo_bg_free(cpymo_bg *bg)
 		free(bg->current_bg_name);
 }
 
-error_t cpymo_bg_update(cpymo_bg *bg, bool *redraw)
-{
-	if (bg->redraw) *redraw = true;
-
-	bg->redraw = false;
-
-	return CPYMO_ERR_SUCC;
-}
-
 void cpymo_bg_draw(const cpymo_engine *e)
 {
 	const cpymo_bg *bg = &e->bg;
@@ -119,8 +110,9 @@ static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
 	}
 }
 
-static void cpymo_bg_transfer_operate(cpymo_bg *bg)
+static void cpymo_bg_transfer_operate(cpymo_engine *e)
 {
+	cpymo_bg *bg = &e->bg;
 	assert(bg->transform_next_bg);
 
 	if (bg->current_bg)
@@ -134,14 +126,14 @@ static void cpymo_bg_transfer_operate(cpymo_bg *bg)
 	bg->current_bg_y = bg->transform_next_bg_y;
 	bg->transform_draw = NULL;
 
-	bg->redraw = true;
+	cpymo_engine_request_redraw(e);
 }
 
 static void cpymo_bg_transfer(cpymo_engine *e)
 {
 	cpymo_engine_request_redraw(e);
 
-	cpymo_bg_transfer_operate(&e->bg);
+	cpymo_bg_transfer_operate(e);
 
 	// After transfer
 	cpymo_charas_fast_kill_all(&e->charas);
@@ -240,6 +232,7 @@ error_t cpymo_bg_command(
 			&cpymo_bg_progression_over_callback);
 	}
 	else {
+		#ifndef DISABLE_MASKTRANS
 		if (!cpymo_str_equals_str(transition, "BG_FADE")) {
 			cpymo_backend_masktrans trans;
 			if (cpymo_assetloader_load_system_masktrans(
@@ -251,6 +244,7 @@ error_t cpymo_bg_command(
 				printf("[Warning] Failed to load mask transition.\n");
 			}
 		}
+		#endif
 
 		bg->transform_progression = cpymo_tween_create(time * 2);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_fade;

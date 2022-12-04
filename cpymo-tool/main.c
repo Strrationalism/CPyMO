@@ -78,7 +78,7 @@ int main(int argc, const char **argv) {
 			ret = cpymo_tool_invoke_pack_images(argc, argv);
 		else if (strcmp(argv[1], "gen-album-cache") == 0)
 			ret = cpymo_tool_invoke_generate_album_ui(argc, argv);
-		else ret =help();
+		else ret = help();
 	}
 
 	#ifdef LEAKCHECK

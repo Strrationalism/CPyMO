@@ -600,6 +600,20 @@ static error_t cpymo_audio_high_level_play(
 			error_t err = get_path(&path, filename, &e->assetloader);
 			CPYMO_THROW(err);
 
+			#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
+			{
+				char *path2 = path;
+				path = malloc(strlen(path) + 1 + strlen("file://"));
+				if (path == NULL) {
+					free(path2);
+					return CPYMO_ERR_OUT_OF_MEM;
+				}
+				strcpy(path, "file://");
+				strcat(path, path2);
+				free(path2);
+			}
+			#endif
+
 			err = cpymo_audio_channel_play_file(
 				&e->audio.channels[channel],
 				path,

@@ -223,13 +223,14 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		}
 
 #ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = (char *)malloc(name_or_text.len + text.len + 1);
+		char *full_text = (char *)malloc(name_or_text.len + text.len + 2);
 		if (full_text) {
-			memset(full_text, 0, name_or_text.len + text.len + 1);
+			memset(full_text, 0, name_or_text.len + text.len + 2);
 			strncpy(full_text, name_or_text.begin, name_or_text.len);
+			if (name_or_text.len) strcat(full_text, "\n");
 			strncat(full_text, text.begin, text.len);
 			cpymo_backend_text_extract(full_text);
-			cpymo_backlog_record_write_full_text(&engine->backlog, full_text);
+			free(full_text);
 		}
 #endif
 
@@ -1360,7 +1361,10 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 
 		cpymo_audio_se_stop(engine);
 
-		if (isloop || !cpymo_engine_skipping(engine)) {
+		float vol = cpymo_audio_get_channel_volume(
+			CPYMO_AUDIO_CHANNEL_VO, &engine->audio);
+
+		if (isloop || (!cpymo_engine_skipping(engine) && vol > 0)) {
 			error_t err = cpymo_audio_se_play(engine, filename, isloop);
 			CPYMO_THROW(err);
 		}
@@ -1377,8 +1381,13 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(filename); ENSURE(filename);
 
 		if (!cpymo_engine_skipping(engine)) {
-			error_t err = cpymo_audio_vo_play(engine, filename);
-			CPYMO_THROW(err);
+			float vol = cpymo_audio_get_channel_volume(
+				CPYMO_AUDIO_CHANNEL_VO, &engine->audio);
+
+			if (vol > 0) {
+				error_t err = cpymo_audio_vo_play(engine, filename);
+				CPYMO_THROW(err);
+			}
 		}
 		else {
 			cpymo_audio_vo_stop(engine);

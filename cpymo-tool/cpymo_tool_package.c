@@ -69,6 +69,7 @@ static error_t cpymo_tool_unpack(const char *pak_path, const char *extension, co
 	}
 
 	free(buf);
+	cpymo_package_close(&pkg);
 
 	return CPYMO_ERR_SUCC;
 }
@@ -241,6 +242,8 @@ static error_t cpymo_tool_get_file_list(char *** files, size_t * count, const ch
 			++*count;
 		}
 	} while (cpymo_parser_next_line(&parser));
+
+	free(ls_buf);
 
 	return CPYMO_ERR_SUCC;
 }

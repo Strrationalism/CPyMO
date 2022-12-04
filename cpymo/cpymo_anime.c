@@ -61,13 +61,16 @@ error_t cpymo_anime_on(
 	return CPYMO_ERR_SUCC;
 }
 
-void cpymo_anime_update(cpymo_anime *anime, float delta_time, bool * redraw)
+void cpymo_anime_update(
+	cpymo_engine *e, 
+	cpymo_anime *anime, 
+	float delta_time)
 {
 	if (anime->anime_image) {
 		anime->current_time += delta_time;
 		if (anime->current_time >= anime->interval) {
 			anime->current_time = 0.0f;
-			*redraw = true;
+			cpymo_engine_request_redraw(e);
 
 			anime->current_frame++;
 			if (anime->current_frame >= anime->all_frame) {

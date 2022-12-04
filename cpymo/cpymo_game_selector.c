@@ -255,9 +255,9 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 
 		int relative = 0;
 		if (last_selected) {
-			if (last_selected->prev) {
+			while (last_selected->prev && relative < (int)data->nodes_per_screen - 1) {
 				last_selected = last_selected->prev;
-				relative = 1;
+				relative++;
 			}
 		}
 
