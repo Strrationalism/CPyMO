@@ -565,6 +565,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 可以定义`DISABLE_HIGHLIGHT_SQUARE`宏以禁用对选项高亮的半透明方块填充，如CG上的高亮方块。
 
+### 如果需要明确向FFmpeg URL传入`file://`前缀
+
+定义`FFMPEG_PREPEND_FILE_PROTOCOL`宏即可明确在传给FFmpeg的URL中添加`file://`前缀。
+
 ## SDL2后端
 
 SDL2后端在目录`cpymo-backends/sdl2`中。
