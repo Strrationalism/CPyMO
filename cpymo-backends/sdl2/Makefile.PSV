@@ -97,6 +97,9 @@ $(BUILD_DIR)/eboot.bin: $(BUILD_DIR)/cpymo.velf
 	@vita-make-fself -s -ss $< $@
 
 cpymo.vpk: $(BUILD_DIR)/param.sfo $(BUILD_DIR)/eboot.bin
-	@vita-pack-vpk -s $(BUILD_DIR)/param.sfo -b $(BUILD_DIR)/eboot.bin $@
+	@vita-pack-vpk \
+		-s $(BUILD_DIR)/param.sfo \
+		-b $(BUILD_DIR)/eboot.bin $@ \
+		-a psv-icon0.png=sce_sys/icon0.png
 	@echo "=> $@"
 
