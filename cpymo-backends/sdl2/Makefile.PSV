@@ -80,7 +80,6 @@ $(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
 		-lSceTouch_stub \
 		-lSceHid_stub \
 		-lSceMotion_stub \
-		-lswscale -lavformat -lavcodec -lavutil -lswresample \
 		-lm \
 		-Xlinker "-)" \
 		-L$(VITASDK)/arm-vita-eabi/lib \
