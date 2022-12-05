@@ -48,8 +48,8 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
-Sony PSV          | SDL2      | FFmpeg    | FFmpeg                       | 外置字体     | 游戏选择器
 Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
+Sony PSV          | SDL2      | 不支持     | SDL2_mixer                   | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)   | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
@@ -335,8 +335,18 @@ make install -j
 ## 额外依赖
 
 1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
-2. 通过命令行`vdpm sdl2`安装SDL2。
-3. cd到`cpymo-backends/sdl2`下执行`./build-psv-ffmpeg.sh`编译FFmpeg，注意这个版本和vdpm中的ffmpeg使用的剪裁参数不同，不要使用vdpm中的ffmpeg。
+2. 通过以下命令安装依赖：
+
+```sh
+./vdpm sdl2
+./vdpm sdl2_mixer
+./vdpm libogg
+./vdpm libvorbis
+./vdpm libmodplug
+./vdpm mpg123
+./vdpm libmikmod
+./vdpm flac
+```
 
 ## 编译
 
@@ -353,6 +363,7 @@ make install -j
 * 分辨率：960×544
 * 图像：带透明通道的png，不要使用mask灰阶图片
 * 声音：ogg，16bit signed，little endian，44100Hz
+* 不支持视频
 
 # Emscripten 平台
 
@@ -564,6 +575,10 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 ### 如果在不支持半透明方块填充的平台上
 
 可以定义`DISABLE_HIGHLIGHT_SQUARE`宏以禁用对选项高亮的半透明方块填充，如CG上的高亮方块。
+
+### 如果需要明确向FFmpeg URL传入`file://`前缀
+
+定义`FFMPEG_PREPEND_FILE_PROTOCOL`宏即可明确在传给FFmpeg的URL中添加`file://`前缀。
 
 ## SDL2后端
 

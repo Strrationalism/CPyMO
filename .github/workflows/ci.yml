@@ -74,6 +74,21 @@ jobs:
         name: CPyMO for Nintendo 3DS (3dsx)
         path: ./cpymo-backends/3ds/cpymo.3dsx
 
+  build-gamecube:
+    name: 'Nintendo GameCube'
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitppc:latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with: 
+          submodules: true
+      
+      - name: 'Build'
+        run: |
+          cd cpymo-backends/sdl1
+          make -f Makefile.GameCube -j
+
   build-wii:
     name: 'Nintendo Wii'
     runs-on: ubuntu-latest
@@ -87,7 +102,7 @@ jobs:
       - name: 'Build'
         run: |
           cd cpymo-backends/sdl1
-          make -f Makefile.Wii
+          make -f Makefile.Wii -j
           mv wii-meta.xml meta.xml
           mv wii-icon.png icon.png
 
@@ -117,9 +132,16 @@ jobs:
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
+        ./vdpm sdl2_mixer
+        ./vdpm libogg
+        ./vdpm libvorbis
+        ./vdpm libmodplug
+        ./vdpm mpg123
+        ./vdpm libmikmod
+        ./vdpm flac
         cd ../cpymo-backends/sdl2
-        chmod +x ./build-psv-ffmpeg.sh
-        ./build-psv-ffmpeg.sh
+        # chmod +x ./build-psv-ffmpeg.sh
+        # ./build-psv-ffmpeg.sh
         cd ../../
 
     - name: Build
@@ -174,7 +196,7 @@ jobs:
         export PATH=$PATH:$PSPDEV/bin
         psp-pacman -S sdl2 sdl2-image freetype2 sdl2-ttf --noconfirm
         cd ./cpymo-backends/sdl2
-        make -f Makefile.PSP
+        make -f Makefile.PSP -j
 
     - name: Upload SDL2 Backend
       uses: actions/upload-artifact@v2.3.0
@@ -199,7 +221,7 @@ jobs:
         make install -j
 
         cd ../cpymo-backends/sdl1
-        make -f Makefile.PSP
+        make -f Makefile.PSP -j
         
     - name: Upload SDL 1.2 Backend
       uses: actions/upload-artifact@v2.3.0

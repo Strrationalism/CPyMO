@@ -198,7 +198,9 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
+#endif
 
+#if !(defined __PSP__ || defined __PSV__)
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);
@@ -215,7 +217,13 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 
 
 
-#if ((defined __SWITCH__ || defined __PSP__ || defined __PSV__ || defined __ANDROID__ || defined __IOS__) && defined USE_GAME_SELECTOR)
+#if (defined USE_GAME_SELECTOR && ( \
+		defined __SWITCH__ || \
+		defined __PSP__ || \
+		defined __PSV__ || \
+		defined __ANDROID__ || \
+		defined __IOS__ || \
+		defined __WIIU__))
 
 #include <dirent.h>
 cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
