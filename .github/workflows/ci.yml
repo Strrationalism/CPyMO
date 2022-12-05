@@ -131,7 +131,8 @@ jobs:
         export VITASDK=~/vitasdk
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
-        ./vdpm sdl2 sdl2_mixer
+        ./vdpm sdl2
+        ./vdpm sdl2_mixer
         cd ../cpymo-backends/sdl2
         # chmod +x ./build-psv-ffmpeg.sh
         # ./build-psv-ffmpeg.sh
