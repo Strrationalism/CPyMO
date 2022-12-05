@@ -80,6 +80,25 @@ static void cpymo_config_ui_deleter(cpymo_engine *e, void *ui_data)
 	cpymo_save_config_save(e);
 }
 
+#ifdef ENABLE_TEXT_EXTRACT
+static void cpymo_config_ui_extract_setting_title(cpymo_engine *e, int item_id)
+{
+	const cpymo_localization *l = cpymo_localization_get(e);
+	const char *p = NULL;
+	switch (item_id) {
+	case ITEM_BGM_VOL: p = l->config_bgmvol; break;
+	case ITEM_SE_VOL: p = l->config_sevol; break;
+	case ITEM_VO_VOL: p = l->config_vovol; break;
+	case ITEM_FONT_SIZE: p = l->config_fontsize; break;
+	case ITEM_TEXT_SPEED: p = l->config_sayspeed; break;
+	case ITEM_SKIP_ALREADY_READ_ONLY: p = l->config_skip_mode; break;
+	default: assert(false);
+	}
+
+	cpymo_backend_text_extract(p);
+}
+#endif
+
 static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, int item_index, int val)
 {
 	cpymo_config_ui_item *item = ui->items + item_index;
@@ -115,6 +134,7 @@ static error_t cpymo_config_ui_set_value(cpymo_engine *e, cpymo_config_ui *ui, i
 	}
 
 #ifdef ENABLE_TEXT_EXTRACT
+	cpymo_config_ui_extract_setting_title(e, item_index);
 	cpymo_backend_text_extract(val_str);
 #endif
 	
@@ -212,18 +232,7 @@ static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
 static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
 {
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
-	const cpymo_localization *l = cpymo_localization_get(e);
-	const char *p = NULL;
-	switch (i) {
-	case ITEM_BGM_VOL: p = l->config_bgmvol; break;
-	case ITEM_SE_VOL: p = l->config_sevol; break;
-	case ITEM_VO_VOL: p = l->config_vovol; break;
-	case ITEM_FONT_SIZE: p = l->config_fontsize; break;
-	case ITEM_TEXT_SPEED: p = l->config_sayspeed; break;
-	default: assert(false);
-	}
-
-	cpymo_backend_text_extract(p);
+	cpymo_config_ui_extract_setting_title(e, i);
 
 	return CPYMO_ERR_SUCC;
 }
