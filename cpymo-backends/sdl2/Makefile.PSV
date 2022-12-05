@@ -59,6 +59,16 @@ $(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
 		-Xlinker "-(" \
 		-lSDL2 \
 		-lSDL2main \
+		-lSDL2_mixer \
+		-lvorbis \
+		-lvorbisfile \
+		-lmpg123 \
+		-lmodplug \
+		-lmikmod \
+		-lstdc++ \
+		-lpthread \
+		-lFLAC \
+		-logg \
 		-lSceDisplay_stub \
 		-lSceCtrl_stub \
 		-lSceAudio_stub \
