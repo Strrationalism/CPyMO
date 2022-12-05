@@ -198,7 +198,9 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
 	}
+#endif
 
+#if !(defined __PSP__ || defined __PSV__)
 	cpymo_backend_font_free();
 	error_t err = cpymo_backend_font_init(gamedir);
 	CPYMO_THROW(err);

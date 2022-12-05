@@ -116,7 +116,7 @@ cpymo_input cpymo_input_snapshot()
 	
 	
 
-#if defined __SWITCH__ || defined __PSP__
+#if defined __SWITCH__ || defined __PSP__ || defined __PSV__
 	MAP_CONTROLLER(out.ok, SDL_CONTROLLER_BUTTON_B);
 	MAP_CONTROLLER(out.ok, SDL_CONTROLLER_BUTTON_X);
 	MAP_CONTROLLER(out.cancel, SDL_CONTROLLER_BUTTON_A);
