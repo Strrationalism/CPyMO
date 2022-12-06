@@ -10,7 +10,7 @@
 
 error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
 	out_package->has_stream_reader = false;
 #endif
 	
@@ -218,8 +218,11 @@ size_t cpymo_package_stream_reader_read(char *dst_buf, size_t dst_buf_size, cpym
 
 void cpymo_package_stream_reader_close(cpymo_package_stream_reader * r)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
 	r->package->has_stream_reader = false;
+	#ifdef LEAKCHECK
+	free(r->leak_marker);
+	#endif
 #endif
 }
 
@@ -232,9 +235,13 @@ cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	reader.file_length = index->file_length;
 	reader.current = 0;
 	reader.stream = package->stream;
-#ifndef NDEBUG
+#ifdef DEBUG
 	assert(package->has_stream_reader == false);
 	reader.package = (cpymo_package *)package;
+#ifdef LEAKCHECK
+	reader.leak_marker = malloc(1024);
+	assert(reader.leak_marker);
+#endif
 #endif
 	cpymo_package_stream_reader_seek(0, &reader);
 	return reader;
