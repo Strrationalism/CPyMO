@@ -52,7 +52,6 @@ INCLUDES	:=	../include ../../cpymo ../../stb ../../endianness.h
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-NO_NACP := 1
 CFLAGS	:=	-g -Wall -O3 -ffunction-sections -DNDEBUG \
 			$(ARCH) $(DEFINES)
 
@@ -157,7 +156,7 @@ ifeq ($(strip $(NO_ICON)),)
 endif
 
 ifeq ($(strip $(NO_NACP)),)
-	export NROFLAGS += --nacp=$(CURDIR)/$(TARGET).nacp
+	export NROFLAGS += --nacp=$(CURDIR)/$(BUILD)/$(TARGET).nacp
 endif
 
 ifneq ($(APP_TITLEID),)
