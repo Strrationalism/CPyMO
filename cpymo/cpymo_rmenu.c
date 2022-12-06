@@ -37,7 +37,8 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 {
 	cpymo_rmenu *r = (cpymo_rmenu *)ui_data;
 
-	enum cpymo_key_hold_result result = cpymo_key_hold_update(&r->touch, dt, e->input.mouse_button);
+	enum cpymo_key_hold_result result = cpymo_key_hold_update(
+		e, &r->touch, dt, e->input.mouse_button);
 	if (result == cpymo_key_hold_result_just_hold) {
 		cpymo_ui_exit(e);
 		return CPYMO_ERR_SUCC;

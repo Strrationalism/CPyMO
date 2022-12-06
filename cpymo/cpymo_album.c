@@ -578,7 +578,7 @@ static error_t cpymo_album_update(cpymo_engine *e, void *a, float dt)
 	cpymo_album *album = (cpymo_album *)a;
 
 	enum cpymo_key_hold_result mouse_button_state = cpymo_key_hold_update(
-		&album->key_mouse_button, dt, e->input.mouse_button);
+		e, &album->key_mouse_button, dt, e->input.mouse_button);
 
 	cpymo_key_pluse_update(&album->key_left, dt, e->input.left);
 	cpymo_key_pluse_update(&album->key_up, dt, e->input.up);
