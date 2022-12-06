@@ -122,28 +122,6 @@ enum cpymo_key_hold_result cpymo_key_hold_update(
 
 	if (h->ignore_current) return cpymo_key_hold_result_released;
 
-	float mouse_speed = 0;
-	if (e->input.mouse_position_useable && e->input.mouse_position_useable) {
-		float 
-			mouse_distance_x = fabsf(e->input.mouse_x - e->prev_input.mouse_x),
-			mouse_distance_y = fabsf(e->input.mouse_y - e->prev_input.mouse_y);
-		float mouse_distance = mouse_distance_x;
-		if (mouse_distance_y > mouse_distance) 
-			mouse_distance = mouse_distance_y;
-		mouse_speed = mouse_distance / (dt > 0.00001f ? dt : 0.016f);
-		float max_screen_edge = e->gameconfig.imagesize_h;
-		if (max_screen_edge < e->gameconfig.imagesize_w) 
-			max_screen_edge = e->gameconfig.imagesize_w;
-		mouse_speed /= max_screen_edge;
-	}
-
-	if (mouse_speed > cpymo_key_hold_cancel_speed) {
-		if (!h->hold_canceled) {
-			h->hold_canceled = true;
-			return cpymo_key_hold_result_cancel;
-		}
-	}
-
 	const bool prev_pressed = h->prev_pressed;
 	h->prev_pressed = pressed;
 
@@ -156,8 +134,31 @@ enum cpymo_key_hold_result cpymo_key_hold_update(
 		return cpymo_key_hold_result_just_press;
 	}
 	else if (pressed && prev_pressed) {
-		h->timer += dt;
+		float mouse_speed = 0;
+		if (e->input.mouse_position_useable && e->input.mouse_position_useable) {
+			float 
+				mouse_distance_x = fabsf(e->input.mouse_x - e->prev_input.mouse_x),
+				mouse_distance_y = fabsf(e->input.mouse_y - e->prev_input.mouse_y);
+			float mouse_distance = mouse_distance_x;
+			if (mouse_distance_y > mouse_distance) 
+				mouse_distance = mouse_distance_y;
+			mouse_speed = mouse_distance / (dt > 0.00001f ? dt : 0.016f);
+			float max_screen_edge = e->gameconfig.imagesize_h;
+			if (max_screen_edge < e->gameconfig.imagesize_w) 
+				max_screen_edge = e->gameconfig.imagesize_w;
+			mouse_speed /= max_screen_edge;
+		}
+
+		if (mouse_speed > cpymo_key_hold_cancel_speed) {
+			if (!h->hold_canceled) {
+				h->hold_canceled = true;
+				if (h->timer >= cpymo_key_hold_time)
+					return cpymo_key_hold_result_cancel;
+			}
+		}
+	
 		if (h->hold_canceled) return cpymo_key_hold_result_pressing;
+		h->timer += dt;
 		if (h->timer - dt < cpymo_key_hold_time && h->timer >= cpymo_key_hold_time) 
 			return cpymo_key_hold_result_just_hold;
 		else if (h->timer >= cpymo_key_hold_time) 
