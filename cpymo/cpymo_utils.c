@@ -108,13 +108,12 @@ void cpymo_utils_attach_mask_to_rgba_ex(void * rgba_, int w, int h, void * mask_
 }
 
 
-
 enum cpymo_key_hold_result cpymo_key_hold_update(
 	cpymo_engine *e, cpymo_key_hold *h, float dt, bool pressed)
 {
 	const float 
 		cpymo_key_hold_time = 0.4f,
-		cpymo_key_hold_cancel_speed = 0.5f;
+		cpymo_key_hold_cancel_speed = 0.7f;
 
 	if (!pressed) {
 		h->ignore_current = false;
