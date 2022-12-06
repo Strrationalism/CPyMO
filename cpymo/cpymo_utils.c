@@ -138,8 +138,6 @@ enum cpymo_key_hold_result cpymo_key_hold_update(
 		mouse_speed /= max_screen_edge;
 	}
 
-	printf("%f\n", mouse_speed);
-
 	if (mouse_speed > cpymo_key_hold_cancel_speed) {
 		if (!h->hold_canceled) {
 			h->hold_canceled = true;
