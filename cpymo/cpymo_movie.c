@@ -260,7 +260,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 
 	char *path = NULL;
 	err = cpymo_assetloader_get_video_path(&path, videoname, &e->assetloader);
-	THROW(err != CPYMO_ERR_SUCC, err, "Faild to get video path");
+	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Faild to get video path");
 
 	#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
 	{
@@ -287,14 +287,14 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	THROW_AVERR(averr < 0, CPYMO_ERR_NOT_FOUND);
 
 	m->video_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
-	THROW(m->video_stream_index < 0, CPYMO_ERR_NOT_FOUND, "Could not find video stream");
+	THROW(m->video_stream_index < 0, CPYMO_ERR_NOT_FOUND, "[Error] Could not find video stream");
 
 	const AVCodec *video_codec = 
 		avcodec_find_decoder(m->format_context->streams[m->video_stream_index]->codecpar->codec_id);
-	THROW(video_codec == NULL, CPYMO_ERR_NOT_FOUND, "Could not find video codec");
+	THROW(video_codec == NULL, CPYMO_ERR_NOT_FOUND, "[Error] Could not find video codec");
 
 	m->video_codec_context = avcodec_alloc_context3(video_codec);
-	THROW(m->video_codec_context == NULL, CPYMO_ERR_UNKNOWN, "Could not open video codec context");
+	THROW(m->video_codec_context == NULL, CPYMO_ERR_UNKNOWN, "[Error] Could not open video codec context");
 
 	averr = avcodec_parameters_to_context(
 		m->video_codec_context,
@@ -305,10 +305,10 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	THROW_AVERR(averr, CPYMO_ERR_UNKNOWN);
 
 	m->packet = av_packet_alloc();
-	THROW(m->packet == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVPacket");
+	THROW(m->packet == NULL, CPYMO_ERR_OUT_OF_MEM, "[Error] Could not alloc AVPacket");
 
 	m->video_frame = av_frame_alloc();
-	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVFrame");
+	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "[Error] Could not alloc AVFrame");
 
 	m->video_frame->best_effort_timestamp = 0;
 
@@ -334,7 +334,8 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 
 	m->backend_inited = true;
 
-	cpymo_audio_play_video(e, path);
+	err = cpymo_audio_play_video(e, path);
+	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Can not open audio.");
 	cpymo_movie_send_video_frame_to_backend(m);
 	
 	free(path);
