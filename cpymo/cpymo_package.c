@@ -86,7 +86,10 @@ error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package 
 
 error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package * package, const cpymo_package_index * index)
 {
+	#ifdef DEBUG
 	assert(package->has_stream_reader == false);
+	#endif
+	
 	fseek(package->stream, index->file_offset, SEEK_SET);
 	const size_t count = fread(out_buffer, index->file_length, 1, package->stream);
 
