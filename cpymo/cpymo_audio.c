@@ -570,6 +570,38 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 	return !e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].enabled;
 }
 
+static error_t cpymo_audio_high_level_play_file_on_filesystem(
+	cpymo_engine *e,
+	const char *path,
+	int channel,
+	bool loop)
+{
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		cpymo_package_stream_reader r;
+		error_t err = cpymo_package_stream_reader_from_file(&r, path);
+		CPYMO_THROW(err);
+		
+		err = cpymo_audio_channel_play_file(
+			&e->audio.channels[channel],
+			NULL,
+			&r,
+			loop);
+
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_package_stream_reader_close(&r);
+			return err;
+		}
+
+		return CPYMO_ERR_SUCC;
+	#else
+		return cpymo_audio_channel_play_file(
+			&e->audio.channels[channel],
+			path,
+			NULL,
+			loop);
+	#endif
+}
+
 static error_t cpymo_audio_high_level_play(
 	cpymo_engine *e,
 	cpymo_str filename,
@@ -600,25 +632,8 @@ static error_t cpymo_audio_high_level_play(
 			error_t err = get_path(&path, filename, &e->assetloader);
 			CPYMO_THROW(err);
 
-			#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
-			{
-				char *path2 = path;
-				path = malloc(strlen(path) + 1 + strlen("file://"));
-				if (path == NULL) {
-					free(path2);
-					return CPYMO_ERR_OUT_OF_MEM;
-				}
-				strcpy(path, "file://");
-				strcat(path, path2);
-				free(path2);
-			}
-			#endif
-
-			err = cpymo_audio_channel_play_file(
-				&e->audio.channels[channel],
-				path,
-				NULL,
-				loop);
+			err = cpymo_audio_high_level_play_file_on_filesystem(
+				e, path, channel, loop);
 			free(path);
 			return err;
 		}
@@ -719,11 +734,8 @@ void cpymo_audio_vo_stop(cpymo_engine * e)
 
 error_t cpymo_audio_play_video(cpymo_engine * e, const char * path)
 {
-	return cpymo_audio_channel_play_file(
-		&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
-		path,
-		NULL,
-		false);
+	return cpymo_audio_high_level_play_file_on_filesystem(
+		e, path, CPYMO_AUDIO_CHANNEL_BGM, false);
 }
 
 const char * cpymo_audio_get_bgm_name(cpymo_engine * e)
