@@ -18,7 +18,7 @@ typedef struct {
 	cpymo_package_index *files;
 	FILE *stream;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	bool has_stream_reader;
 #endif
 } cpymo_package;
@@ -42,11 +42,20 @@ typedef struct {
 	size_t file_length;
 	size_t current;
 	FILE *stream;
+	bool own_stream;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	cpymo_package *package;
 #endif
+
+#ifdef LEAKCHECK
+	void *leak_mark;
+#endif
 } cpymo_package_stream_reader;
+
+error_t cpymo_package_stream_reader_from_file(
+	cpymo_package_stream_reader *out,
+	const char *path);
 
 cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	const cpymo_package *package, 

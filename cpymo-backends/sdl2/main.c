@@ -51,7 +51,7 @@
 #define SDL_Delay emscripten_sleep
 #endif
 
-#if _WIN32 && !NDEBUG
+#if _WIN32 && DEBUG
 #include <crtdbg.h>
 #endif
 
@@ -719,7 +719,7 @@ EXIT:
 
 	SDL_Quit();
 
-	#if _WIN32 && !NDEBUG
+	#if _WIN32 && DEBUG
 	_CrtDumpMemoryLeaks();
 	#endif
 

@@ -35,13 +35,14 @@ Sony PSP          | SDL2 | 无       | FFmpeg             | 外置字体        
 
 平台            | 后端  | 视频播放器 | 音频支持            | 字体支持     | 额外功能
 --------------- | ---- | -------- | ------------------ | ----------- | ---------------
-Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体  | 视障帮助
+Linux           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 视障帮助
 macOS           | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 加载系统字体  | 视障帮助
-iOS             | SDL2 | FFmpeg   | FFmpeg             | 外置字体      | 游戏选择器
+iOS             | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
 Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
 Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器,视障帮助
+Sony PSV        | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
 
 ### 第三梯队
 **CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
@@ -49,7 +50,6 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
 Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
-Sony PSV          | SDL2      | 不支持     | SDL2_mixer                   | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)   | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
@@ -335,18 +335,8 @@ make install -j
 ## 额外依赖
 
 1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
-2. 通过以下命令安装依赖：
-
-```sh
-./vdpm sdl2
-./vdpm sdl2_mixer
-./vdpm libogg
-./vdpm libvorbis
-./vdpm libmodplug
-./vdpm mpg123
-./vdpm libmikmod
-./vdpm flac
-```
+2. 通过命令`vdpm sdl2`安装依赖。
+3. 执行`cpymo-backends/sdl2/build-psv-ffmpeg.sh`来构建FFmpeg。
 
 ## 编译
 
@@ -363,7 +353,6 @@ make install -j
 * 分辨率：960×544
 * 图像：带透明通道的png，不要使用mask灰阶图片
 * 声音：ogg，16bit signed，little endian，44100Hz
-* 不支持视频
 
 # Emscripten 平台
 
@@ -576,9 +565,9 @@ CPyMO由一套完全跨平台的通用代码和适配于多平台的“后端”
 
 可以定义`DISABLE_HIGHLIGHT_SQUARE`宏以禁用对选项高亮的半透明方块填充，如CG上的高亮方块。
 
-### 如果需要明确向FFmpeg URL传入`file://`前缀
+### 如果FFmpeg不能识别媒体文件的路径
 
-定义`FFMPEG_PREPEND_FILE_PROTOCOL`宏即可明确在传给FFmpeg的URL中添加`file://`前缀。
+定义`DONT_PASS_PATH_TO_FFMPEG`宏即可禁止FFmpeg使用路径来识别媒体文件，而是使用Stream Reader来读取文件，但这样做性能更差。
 
 ## SDL2后端
 
@@ -697,6 +686,7 @@ SDL 1.2的Alpha混合与缩放功能受限，将不会支持已有透明图层�
 * 可以使用`SDL`环境变量传入使用自定义`SDL`二进制库目录，如果不传入则使用系统安装的库。
 * 设置`DEBUG`为1时，将会启动调试信息。
 * 设置`LEAKCHECK`为1时，将会启动stb_leakcheck进行内存泄漏检查。
+* 设置`DISABLE_AUDIO`为1时，将会禁止音频和视频文件的播放。
 
 之后在`cpymo-backends/sdl1`中执行`make`即可编译。
 

@@ -28,6 +28,7 @@ typedef struct {
 	cpymo_wait menu_waiter;
 
 	cpymo_key_hold touch;
+	float bg_zoom_out;
 
 	bool alive;
 } cpymo_rmenu;
@@ -36,7 +37,8 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 {
 	cpymo_rmenu *r = (cpymo_rmenu *)ui_data;
 
-	enum cpymo_key_hold_result result = cpymo_key_hold_update(&r->touch, dt, e->input.mouse_button);
+	enum cpymo_key_hold_result result = cpymo_key_hold_update(
+		e, &r->touch, dt, e->input.mouse_button);
 	if (result == cpymo_key_hold_result_just_hold) {
 		cpymo_ui_exit(e);
 		return CPYMO_ERR_SUCC;
@@ -55,15 +57,6 @@ static error_t cpymo_rmenu_update(cpymo_engine *e, void *ui_data, float dt)
 	return CPYMO_ERR_SUCC;
 }
 
-static inline float cpymo_rmenu_zoom(const cpymo_engine *e) 
-{
-	if (cpymo_gameconfig_is_symbian(&e->gameconfig)) {
-		if (e->gameconfig.platform[4] == '5') return 1.3f;		// s60v5
-		else return 1.6f;	// s60v3
-	}
-	else return 1.0f;	// android
-}
-
 static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 {
 	const cpymo_rmenu *r = (const cpymo_rmenu *)ui_data;
@@ -76,9 +69,8 @@ static void cpymo_rmenu_draw(const cpymo_engine *e, const void *ui_data)
 		fill_screen_enabled = false;
 	#endif
 
-	float zoom = cpymo_rmenu_zoom(e);
-	float w = (float)r->bg_w * zoom;
-	float h = (float)r->bg_h * zoom;
+	float w = (float)r->bg_w * r->bg_zoom_out;
+	float h = (float)r->bg_h * r->bg_zoom_out;
 
 	float bg_xywh[4] = {
 		((float)e->gameconfig.imagesize_w - (float)w) / 2,
@@ -239,7 +231,15 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		return err;
 	}
 
-	const float font_size = cpymo_rmenu_zoom(e) * 16 / 240.0f * e->gameconfig.imagesize_h * 0.75f;
+	const float max_font_size = 18.0f / 240.0f * e->gameconfig.imagesize_h * 0.8f;
+	float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
+	#ifdef DISABLE_IMAGE_SCALING
+		if (font_size > max_font_size) font_size = max_font_size;
+		rmenu->bg_zoom_out = 1.0f;
+	#else
+		rmenu->bg_zoom_out = font_size / max_font_size;
+		if (rmenu->bg_zoom_out < 1.0f) rmenu->bg_zoom_out = 1.0f;
+	#endif
 
 	#define RMENU_ITEM(_, TEXT, ENABLED) \
 		err = cpymo_select_img_configuare_select_text( \

@@ -184,7 +184,7 @@ static bool cpymo_select_img_wait(struct cpymo_engine *e, float dt)
 	}
 
 	enum cpymo_key_hold_result mouse_button_state =
-		cpymo_key_hold_update(&e->select_img.key_mouse_button, dt, e->input.mouse_button);
+		cpymo_key_hold_update(e, &e->select_img.key_mouse_button, dt, e->input.mouse_button);
 
 	if (e->select_img.save_enabled) {
 		if (e->input.mouse_wheel_delta > 0)

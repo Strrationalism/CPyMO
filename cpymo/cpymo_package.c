@@ -10,7 +10,7 @@
 
 error_t cpymo_package_open(cpymo_package *out_package, const char * path)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
 	out_package->has_stream_reader = false;
 #endif
 	
@@ -86,7 +86,10 @@ error_t cpymo_package_find(cpymo_package_index * out_index, const cpymo_package 
 
 error_t cpymo_package_read_file_from_index(char *out_buffer, const cpymo_package * package, const cpymo_package_index * index)
 {
+	#ifdef DEBUG
 	assert(package->has_stream_reader == false);
+	#endif
+	
 	fseek(package->stream, index->file_offset, SEEK_SET);
 	const size_t count = fread(out_buffer, index->file_length, 1, package->stream);
 
@@ -218,8 +221,13 @@ size_t cpymo_package_stream_reader_read(char *dst_buf, size_t dst_buf_size, cpym
 
 void cpymo_package_stream_reader_close(cpymo_package_stream_reader * r)
 {
-#ifndef NDEBUG
-	r->package->has_stream_reader = false;
+	if (r->own_stream && r->stream) fclose(r->stream);
+#ifdef DEBUG
+	if (r->package) r->package->has_stream_reader = false;
+#endif
+
+#ifdef LEAKCHECK
+	free(r->leak_mark);
 #endif
 }
 
@@ -232,11 +240,50 @@ cpymo_package_stream_reader cpymo_package_stream_reader_create(
 	reader.file_length = index->file_length;
 	reader.current = 0;
 	reader.stream = package->stream;
-#ifndef NDEBUG
+	reader.own_stream = false;
+#ifdef DEBUG
 	assert(package->has_stream_reader == false);
 	reader.package = (cpymo_package *)package;
+#endif
+
+#ifdef LEAKCHECK
+	reader.leak_mark = malloc(1024);
+	assert(reader.leak_mark);
 #endif
 	cpymo_package_stream_reader_seek(0, &reader);
 	return reader;
 }
 
+error_t cpymo_package_stream_reader_from_file(
+	cpymo_package_stream_reader *out,
+	const char *path)
+{
+	FILE *file = fopen(path, "rb");
+	if (file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+#ifdef LEAKCHECK
+	void *leak_mark = malloc(1024);
+	if (leak_mark == NULL) {
+		fclose(file);
+		return CPYMO_ERR_OUT_OF_MEM;
+	}
+
+	out->leak_mark = leak_mark;
+#endif
+
+#ifdef DEBUG
+	out->package = NULL;
+#endif
+
+	fseek(file, 0, SEEK_END);
+
+	out->current = 0;
+	out->file_length = (size_t)ftell(file);
+	out->file_offset = 0;
+	out->own_stream = true;
+	out->stream = file;
+
+	fseek(file, 0, SEEK_SET);
+
+	return CPYMO_ERR_SUCC;
+}

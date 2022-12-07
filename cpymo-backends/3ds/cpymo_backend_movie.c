@@ -1,6 +1,7 @@
 ﻿#include <cpymo_prelude.h>
-#include "cpymo_backend_movie.h"
+#include <cpymo_backend_movie.h>
 #include "utils.h"
+#include <cpymo_utils.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -24,6 +25,7 @@ static Tex3DS_SubTexture subtex;
 static C2D_Image image;
 static size_t tex_edge_len;
 static bool end_interrupt;
+static C2D_DrawParams draw_params;
 
 const extern bool drawing_bottom_screen;
 static u16 *image_buf_line_by_line;
@@ -103,6 +105,19 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 
 	gfxSet3D(false);
 
+	draw_params.angle = 0;
+	draw_params.center.x = 0;
+	draw_params.center.y = 0;
+	draw_params.depth = 0;
+
+	draw_params.pos.w = (float)width;
+	draw_params.pos.h = (float)height;
+	cpymo_utils_match_rect(400, 240, &draw_params.pos.w, &draw_params.pos.h);
+	cpymo_utils_center(
+		400, 240, 
+		draw_params.pos.w, draw_params.pos.h,
+		&draw_params.pos.x, &draw_params.pos.y);
+
 	return CPYMO_ERR_SUCC;
 }
 
@@ -171,30 +186,28 @@ void cpymo_backend_movie_update_yuyv_surface(const void *p, size_t pitch)
 	cpymo_backend_movie_convert(lines);
 }
 
-void trans_size(float *w, float *h);
-void trans_pos(float *x, float *y);
-const extern float game_width, game_height;
-
 void cpymo_backend_movie_draw_surface()
 {
 	if (drawing_bottom_screen) return;
-	C2D_DrawParams p;
-    p.angle = 0;
-    p.center.x = 0;
-    p.center.y = 0;
-    p.depth = 0;
-
-	p.pos.x = 0;
-	p.pos.y = 0;
-	p.pos.w = game_width;
-	p.pos.h = game_height;
-
-	trans_size(&p.pos.w, &p.pos.h);
-	trans_pos(&p.pos.x, &p.pos.y);
 
     C2D_ImageTint tint;
     C2D_AlphaImageTint(&tint, 1.0f);
+	extern bool is_fill_screen(void);
 
-    C2D_DrawImage(image, &p, &tint);
+	const static C2D_DrawParams full_screen_draw = {
+		.angle = 0,
+		.center.x = 0,
+		.center.y = 0,
+		.depth = 0,
+		.pos.x = 0,
+		.pos.y = 0,
+		.pos.w = 400,
+		.pos.h = 240
+	};
+
+    C2D_DrawImage(
+		image, 
+		is_fill_screen() ? &full_screen_draw : &draw_params, 
+		&tint);
 }
 

@@ -185,7 +185,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
 
 	enum cpymo_key_hold_result mouse_button_state =
-		cpymo_key_hold_update(&ui->key_mouse_button, d, e->input.mouse_button);
+		cpymo_key_hold_update(e, &ui->key_mouse_button, d, e->input.mouse_button);
 
 	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 		cpymo_list_ui_exit(e); 
