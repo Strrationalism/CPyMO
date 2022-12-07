@@ -45,9 +45,10 @@ typedef struct {
 
 #ifdef DEBUG
 	cpymo_package *package;
-#ifdef LEAKCHECK
-	void *leak_marker;
 #endif
+
+#ifdef LEAKCHECK
+	void *leak_mark;
 #endif
 } cpymo_package_stream_reader;
 

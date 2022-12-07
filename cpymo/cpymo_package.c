@@ -223,9 +223,10 @@ void cpymo_package_stream_reader_close(cpymo_package_stream_reader * r)
 {
 #ifdef DEBUG
 	r->package->has_stream_reader = false;
-	#ifdef LEAKCHECK
-	free(r->leak_marker);
-	#endif
+#endif
+
+#ifdef LEAKCHECK
+	free(r->leak_mark);
 #endif
 }
 
@@ -241,10 +242,11 @@ cpymo_package_stream_reader cpymo_package_stream_reader_create(
 #ifdef DEBUG
 	assert(package->has_stream_reader == false);
 	reader.package = (cpymo_package *)package;
-#ifdef LEAKCHECK
-	reader.leak_marker = malloc(1024);
-	assert(reader.leak_marker);
 #endif
+
+#ifdef LEAKCHECK
+	reader.leak_mark = malloc(1024);
+	assert(reader.leak_mark);
 #endif
 	cpymo_package_stream_reader_seek(0, &reader);
 	return reader;
