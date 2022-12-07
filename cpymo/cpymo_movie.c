@@ -44,8 +44,6 @@ typedef struct {
 	bool backend_inited;
 	bool skip_pressed;
 
-	float bgm_volume;
-
 	float current_time;
 	float video_current_frame_time;
 
@@ -185,8 +183,6 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 	cpymo_audio_bgm_stop(e);
 
-	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, m->bgm_volume);
-
 	if (m->current_bgm_name) {
 		cpymo_audio_bgm_play(
 			e, 
@@ -263,8 +259,6 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	m->current_time = 0;
 	m->backend_inited = false;
 	m->skip_pressed = e->input.skip;
-	m->bgm_volume = cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio);
-	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, 1.0f);
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
