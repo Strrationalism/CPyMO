@@ -719,7 +719,7 @@ EXIT:
 
 	SDL_Quit();
 
-	#if _WIN32 && !NDEBUG
+	#if _WIN32 && DEBUG
 	_CrtDumpMemoryLeaks();
 	#endif
 
