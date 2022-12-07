@@ -42,6 +42,7 @@ typedef struct {
 	float bgm_volume;
 
 	float current_time;
+	float video_current_frame_time;
 
 	char *current_bgm_name;
 } cpymo_movie;
@@ -114,12 +115,14 @@ RETRY: {
 		default: assert(false);
 		};
 
-		const float video_current_frame_time =
+		m->video_current_frame_time =
 			(float)
 			(m->video_frame->best_effort_timestamp
 				* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
 
-		if (video_current_frame_time < m->current_time)
+		av_frame_unref(m->video_frame);
+
+		if (m->video_current_frame_time < m->current_time)
 			goto RETRY;
 
 		return CPYMO_ERR_SUCC;
@@ -145,12 +148,7 @@ static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 	cpymo_movie *m = (cpymo_movie *)ui_data;
 	m->current_time += dt;
 
-	const float video_current_frame_time = 
-		(float)
-		(m->video_frame->best_effort_timestamp 
-			* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
-
-	if (video_current_frame_time < m->current_time) {
+	if (m->video_current_frame_time < m->current_time) {
 		error_t err = cpymo_movie_send_video_frame_to_backend(m);
 		if (err == CPYMO_ERR_NO_MORE_CONTENT) {
 			cpymo_ui_exit(e);
@@ -311,6 +309,7 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "[Error] Could not alloc AVFrame");
 
 	m->video_frame->best_effort_timestamp = 0;
+	m->video_current_frame_time = 0;
 
 	int width = m->format_context->streams[m->video_stream_index]->codecpar->width;
 	int height = m->format_context->streams[m->video_stream_index]->codecpar->height;
