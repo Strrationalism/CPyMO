@@ -32,6 +32,12 @@ void cpymo_utils_attach_mask_to_rgba(void *rgba, void *mask, int w, int h);
 void cpymo_utils_attach_mask_to_rgba_ex(
 	void *rgba, int w, int h, void *mask, int mask_w, int mask_h);
 
+void cpymo_utils_match_rect(
+	float container_w, float container_h, float *w, float *h);
+
+void cpymo_utils_center(
+	float container_w, float container_h, float w, float h, float *x, float *y);
+
 #define CPYMO_ARR_COUNT(ARR) (sizeof(ARR) / sizeof(ARR[0]))
 
 #define CPYMO_FOREACH_ARR(INDEX, ARR) \

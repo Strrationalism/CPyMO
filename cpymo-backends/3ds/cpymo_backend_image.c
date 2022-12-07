@@ -38,7 +38,7 @@ bool fill_screen_enabled = true;
 const extern bool enhanced_3ds_display_mode;
 extern cpymo_engine engine;
 
-static inline bool is_fill_screen(void)
+bool is_fill_screen(void)
 {
     return fill_screen && fill_screen_enabled;
 }

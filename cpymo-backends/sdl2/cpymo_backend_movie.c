@@ -23,8 +23,14 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 {
 	SDL_assert(tex == NULL);
 
-	float ratio_w = (float)engine.gameconfig.imagesize_w / (float)width;
-	float ratio_h = (float)engine.gameconfig.imagesize_h / (float)height;
+	int renderer_w, renderer_h;
+	if (SDL_GetRendererOutputSize(renderer, &renderer_w, &renderer_h)) {
+		renderer_w = (int)engine.gameconfig.imagesize_w;
+		renderer_h = (int)engine.gameconfig.imagesize_h; 
+	}
+	
+	float ratio_w = (float)renderer_w / (float)width;
+	float ratio_h = (float)renderer_h / (float)height;
 	float ratio = ratio_w < ratio_h ? ratio_w : ratio_h;
 	draw_target.w = 
 		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
@@ -42,13 +48,13 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
 		(int)
 		#endif
-		(((float)engine.gameconfig.imagesize_w - draw_target.w) / 2);
+		(((float)renderer_w - draw_target.w) / 2);
 
 	draw_target.y = 
 		#if (!SDL_VERSION_ATLEAST(2, 0, 10))
 		(int)
 		#endif
-		(((float)engine.gameconfig.imagesize_h - draw_target.h) / 2);
+		(((float)renderer_h - draw_target.h) / 2);
 
 	int sdlfmt;
 	switch (format) {
@@ -66,6 +72,7 @@ error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo
 	if (tex == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 	playing_movie = true;
+	SDL_RenderSetLogicalSize(renderer, (int)renderer_w, (int)renderer_h);
 
 	return CPYMO_ERR_SUCC;
 }
@@ -81,6 +88,11 @@ void cpymo_backend_movie_free_surface()
 	SDL_DestroyTexture(tex);
 	tex = NULL;
 	playing_movie = false;
+
+	SDL_RenderSetLogicalSize(
+		renderer, 
+		(int)engine.gameconfig.imagesize_w, 
+		(int)engine.gameconfig.imagesize_h);
 }
 
 void cpymo_backend_movie_update_yuv_surface(

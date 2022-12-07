@@ -107,6 +107,22 @@ void cpymo_utils_attach_mask_to_rgba_ex(void * rgba_, int w, int h, void * mask_
 	}
 }
 
+void cpymo_utils_match_rect(
+	float container_w, float container_h, float *w, float *h)
+{
+	float ratio_w = *w / container_w;
+	float ratio_h = *h / container_h;
+	float ratio = ratio_w > ratio_h ? ratio_w : ratio_h;
+	*w /= ratio;
+	*h /= ratio;
+}
+
+void cpymo_utils_center(
+	float container_w, float container_h, float w, float h, float *x, float *y)
+{
+	*x = (container_w - w) / 2;
+	*y = (container_h - h) / 2;
+}
 
 enum cpymo_key_hold_result cpymo_key_hold_update(
 	cpymo_engine *e, cpymo_key_hold *h, float dt, bool pressed)
