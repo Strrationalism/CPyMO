@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 typedef struct {
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		cpymo_package_stream_reader stream_reader;
+		AVIOContext *io_context;
+	#endif
+
 	AVFormatContext *format_context;
 	int video_stream_index;
 
@@ -194,6 +199,17 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 	if (m->packet) av_packet_free(&m->packet);
 	if (m->video_codec_context) avcodec_free_context(&m->video_codec_context);
 	if (m->format_context) avformat_close_input(&m->format_context);
+
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		if (m->io_context) {
+			void *buf = m->io_context->buffer;
+			avio_context_free(&m->io_context);
+			if (buf) av_free(buf);
+		}
+
+		cpymo_package_stream_reader_close(&m->stream_reader);
+	#endif
+
 	if (m->backend_inited) cpymo_backend_movie_free_surface();
 }
 
@@ -233,6 +249,11 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 			&cpymo_movie_delete);
 	CPYMO_THROW(err);
 
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		m->io_context = NULL;
+		memset(&m->stream_reader, 0, sizeof(m->stream_reader));
+	#endif
+
 	m->current_bgm_name = current_bgm_name;
 	m->format_context = NULL;
 	m->video_codec_context = NULL;
@@ -256,25 +277,49 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	#define THROW_AVERR(ERR_COND, ERRCODE) \
 		THROW(ERR_COND, ERRCODE, av_err2str(averr));
 
+	#define THROW_CPYMO_IF(ERR_COND, ERR) \
+		THROW(ERR_COND, ERR, cpymo_error_message(ERR));
+
 	char *path = NULL;
 	err = cpymo_assetloader_get_video_path(&path, videoname, &e->assetloader);
 	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Faild to get video path");
 
-	#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
-	{
-		char *path2 = path;
-		path = malloc(strlen(path) + 1 + strlen("file://"));
-		if (path == NULL) {
-			free(path2);
-			return CPYMO_ERR_OUT_OF_MEM;
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		err = cpymo_package_stream_reader_from_file(&m->stream_reader, path);
+		THROW_CPYMO_IF(err != CPYMO_ERR_SUCC, err);
+
+		const size_t avio_buf_size = 1024 * 1024;
+		void *io_buffer = av_malloc(avio_buf_size);
+		THROW_CPYMO_IF(io_buffer == NULL, CPYMO_ERR_OUT_OF_MEM);
+
+		extern int cpymo_audio_packaged_audio_ffmpeg_read_packet(
+			void *opaque, uint8_t *buf, int buf_size);
+		extern int64_t cpymo_audio_packaged_audio_ffmpeg_seek(
+			void *opaque, int64_t offset, int whence);
+			
+		m->io_context = avio_alloc_context(
+			(unsigned char *)io_buffer, avio_buf_size, 0, &m->stream_reader,
+			&cpymo_audio_packaged_audio_ffmpeg_read_packet,
+			NULL,
+			&cpymo_audio_packaged_audio_ffmpeg_seek);
+		
+		if (m->io_context == NULL) {
+			av_free(io_buffer);
+			THROW_CPYMO_IF(true, CPYMO_ERR_OUT_OF_MEM);
 		}
-		strcpy(path, "file://");
-		strcat(path, path2);
-		free(path2);
-	}
+
+		m->format_context = avformat_alloc_context();
+		THROW_CPYMO_IF(m->format_context == NULL, CPYMO_ERR_OUT_OF_MEM);
+
+		m->format_context->pb = m->io_context;
+		m->format_context->flags |= AVFMT_FLAG_CUSTOM_IO;
+		#define PATH_ARG ""
+	#else
+		#define PATH_ARG path
 	#endif
 
-	int averr = avformat_open_input(&m->format_context, path, NULL, NULL);
+	int averr = avformat_open_input(&m->format_context, PATH_ARG, NULL, NULL);
+	#undef PATH_ARG
 	if (averr != 0) {
 		if (path) free(path);
 		cpymo_ui_exit(e);

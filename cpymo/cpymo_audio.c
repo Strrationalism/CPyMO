@@ -283,7 +283,7 @@ FILL_BLANK_AND_RESET:
 	return;
 }
 
-static int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *buf, int buf_size)
+int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *buf, int buf_size)
 {
 	cpymo_package_stream_reader *r = (cpymo_package_stream_reader *)opaque;
 	size_t size = cpymo_package_stream_reader_read((char *)buf, buf_size, r);
@@ -291,7 +291,7 @@ static int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *
 	else return (int)size;
 }
 
-static int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offset, int whence)
+int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offset, int whence)
 {
 	cpymo_package_stream_reader *r = (cpymo_package_stream_reader *)opaque;
 
