@@ -804,7 +804,8 @@ error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_str voname)
 
 void cpymo_audio_vo_stop(struct cpymo_engine *e) {}
 
-void cpymo_audio_play_video(struct cpymo_engine *e, const char *path) {}
+error_t cpymo_audio_play_video(struct cpymo_engine *e, const char *path) 
+{ return CPYMO_ERR_UNSUPPORTED; }
 
 #endif
 
