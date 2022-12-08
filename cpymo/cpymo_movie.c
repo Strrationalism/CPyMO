@@ -282,8 +282,12 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 		err = cpymo_package_stream_reader_from_file(&m->stream_reader, path);
 		THROW_CPYMO_IF(err != CPYMO_ERR_SUCC, err);
 
+		#ifndef FFMPEG_MOVIE_AVIO_BUFFER_SIZE
+		#define FFMPEG_MOVIE_AVIO_BUFFER_SIZE 1024 * 1024
+		#endif
+
 		const size_t avio_buf_size = 1024 * 1024;
-		void *io_buffer = av_malloc(avio_buf_size);
+		void *io_buffer = av_malloc(FFMPEG_MOVIE_AVIO_BUFFER_SIZE);
 		THROW_CPYMO_IF(io_buffer == NULL, CPYMO_ERR_OUT_OF_MEM);
 
 		extern int cpymo_audio_packaged_audio_ffmpeg_read_packet(
@@ -292,7 +296,8 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 			void *opaque, int64_t offset, int whence);
 			
 		m->io_context = avio_alloc_context(
-			(unsigned char *)io_buffer, avio_buf_size, 0, &m->stream_reader,
+			(unsigned char *)io_buffer, FFMPEG_MOVIE_AVIO_BUFFER_SIZE,
+			0, &m->stream_reader,
 			&cpymo_audio_packaged_audio_ffmpeg_read_packet,
 			NULL,
 			&cpymo_audio_packaged_audio_ffmpeg_seek);
