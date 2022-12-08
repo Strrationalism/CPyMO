@@ -231,7 +231,7 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		return err;
 	}
 
-	const float max_font_size = 18.0f / 240.0f * e->gameconfig.imagesize_h * 0.8f;
+	const float max_font_size = 16.0f / 240.0f * e->gameconfig.imagesize_h * 0.8f;
 	float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
 	#ifdef DISABLE_IMAGE_SCALING
 		if (font_size > max_font_size) font_size = max_font_size;

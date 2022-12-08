@@ -286,7 +286,6 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 		#define FFMPEG_MOVIE_AVIO_BUFFER_SIZE 1024 * 1024
 		#endif
 
-		const size_t avio_buf_size = 1024 * 1024;
 		void *io_buffer = av_malloc(FFMPEG_MOVIE_AVIO_BUFFER_SIZE);
 		THROW_CPYMO_IF(io_buffer == NULL, CPYMO_ERR_OUT_OF_MEM);
 
