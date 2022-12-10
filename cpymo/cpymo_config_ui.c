@@ -201,7 +201,7 @@ static error_t cpymo_config_ui_set_value(
 	cpymo_config_ui *ui, 
 	int item_index, 
 	int val,
-	bool only_create_text);
+	bool refreshing);
 
 static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 {
@@ -352,7 +352,7 @@ static error_t cpymo_config_ui_set_value(
 	cpymo_config_ui *ui, 
 	int item_index, 
 	int val,
-	bool only_create_text)
+	bool refreshing)
 {
 	cpymo_config_ui_item *item = ui->items + item_index;
 
@@ -387,20 +387,25 @@ static error_t cpymo_config_ui_set_value(
 	}
 
 #ifdef ENABLE_TEXT_EXTRACT
-	cpymo_config_ui_extract_setting_title(e, item_index);
-	cpymo_backend_text_extract(val_str);
+	if (!refreshing) {
+		cpymo_config_ui_extract_setting_title(e, item_index);
+		cpymo_backend_text_extract(val_str);
+	}
 #endif
+
+	if (!refreshing && item_index == ITEM_FONT_SIZE) goto JUST_REFRESH;
 	
 	error_t err = cpymo_backend_text_create(
 		&item->show_value, 
 		&item->show_value_width, 
 		cpymo_str_pure(val_str), 
 		ui->font_size);
+JUST_REFRESH:
 
 	if (err != CPYMO_ERR_SUCC)
 		item->show_value = NULL;
 
-	if (only_create_text) return err;
+	if (refreshing) return err;
 
 	switch (item_index) {
 	case ITEM_BGM_VOL:
@@ -540,6 +545,11 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	cpymo_key_pluse_init(&ui->right, e->input.right);
 
 	cpymo_config_ui_refresh_items(e);
+
+#ifdef ENABLE_TEXT_EXTRACT
+	const cpymo_localization *l = cpymo_localization_get(e);
+	cpymo_backend_text_extract(l->config_bgmvol);
+#endif	
 
 	return CPYMO_ERR_SUCC;
 }

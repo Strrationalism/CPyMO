@@ -152,7 +152,7 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 {
 	const cpymo_backlog_record *rec = &e->backlog.records[DEC(node_to_draw)];
 
-	const float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
+	const float font_size = rec->font_size;
 	y += font_size;
 	if (rec->name) {
 		cpymo_backend_text_draw(
