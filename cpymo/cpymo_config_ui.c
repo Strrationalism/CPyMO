@@ -147,7 +147,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		if (cpymo_list_ui_get_current_selected_const(e) == node_to_draw)
 		{
 			dec_pressed = e->input.left;
-			inc_pressed = e->input.right;
+			inc_pressed = e->input.right || e->input.ok;
 		}
 
 		cpymo_backend_image_fill_rects(
@@ -207,12 +207,36 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 {
 	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
 	
-	float width;
-	cpymo_backend_text show_name;
-	error_t err;
-
 	const cpymo_gameconfig *c = &e->gameconfig;
 	ui->font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
+
+	cpymo_backend_image btn;
+	float btn_width;
+	error_t err = cpymo_backend_text_create(
+		&btn, 
+		&btn_width,
+		cpymo_str_pure("+"),
+		ui->font_size);
+	if (err == CPYMO_ERR_SUCC) {
+		if (ui->inc_btn) cpymo_backend_text_free(ui->inc_btn);
+		ui->inc_btn = btn;
+		ui->inc_btn_w = btn_width;
+	}
+
+	err = cpymo_backend_text_create(
+		&btn,
+		&btn_width,
+		cpymo_str_pure("-"),
+		ui->font_size);
+	if (err == CPYMO_ERR_SUCC) {
+		if (ui->dec_btn) cpymo_backend_text_free(ui->dec_btn);
+		ui->dec_btn = btn;
+		ui->dec_btn_w = btn_width;
+	}
+	
+	float width;
+	cpymo_backend_text show_name;
+
 
 	#define INIT_ITEM(ITEM_ID, TEXT, MIN_VAL, MAX_VAL, CUR_VAL, SHOW_INC_DEC_BTN) \
 		ui->items[ITEM_ID].min_value = MIN_VAL; \
@@ -443,13 +467,14 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_key_pluse_update(&ui->right, dt, e->input.right);
 
 	if (e->prev_input.left != e->input.left ||
-		e->prev_input.right != e->input.right)
+		e->prev_input.right != e->input.right ||
+		e->prev_input.ok != e->input.ok)
 		cpymo_engine_request_redraw(e);
 
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
 	if (cpymo_key_pluse_output(&ui->left))
 		cpymo_config_ui_item_dec(e, ui, i);
-	else if (cpymo_key_pluse_output(&ui->right))
+	else if (cpymo_key_pluse_output(&ui->right) || CPYMO_INPUT_JUST_PRESSED(e, ok))
 		cpymo_config_ui_item_inc(e, ui, i);
 
 	return CPYMO_ERR_SUCC;
@@ -458,10 +483,7 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 
 static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
 {
-	return cpymo_config_ui_item_inc(
-		e, 
-		(cpymo_config_ui *)cpymo_list_ui_data(e), 
-		(int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(selected));
+	return CPYMO_ERR_SUCC;
 }
 
 #ifdef ENABLE_TEXT_EXTRACT
@@ -479,28 +501,8 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	const cpymo_gameconfig *c = &e->gameconfig;
 	const float font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
 
-	cpymo_backend_text inc_btn, dec_btn;
-	float inc_btn_width, dec_btn_width;
-
-	error_t err = cpymo_backend_text_create(
-		&inc_btn, 
-		&inc_btn_width,
-		cpymo_str_pure("+"),
-		font_size);
-	CPYMO_THROW(err);
-
-	err = cpymo_backend_text_create(
-		&dec_btn,
-		&dec_btn_width,
-		cpymo_str_pure("-"),
-		font_size);
-	if (err != CPYMO_ERR_SUCC) {
-		cpymo_backend_text_free(inc_btn);
-		return err;
-	}
-
 	cpymo_config_ui *ui = NULL;
-	err = cpymo_list_ui_enter(
+	error_t err = cpymo_list_ui_enter(
 		e,
 		(void **)&ui,
 		sizeof(cpymo_config_ui),
@@ -512,16 +514,12 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		&cpymo_config_ui_get_prev_item,
 		false,
 		CONFIG_ITEMS);
-	if (err != CPYMO_ERR_SUCC) {
-		cpymo_backend_text_free(inc_btn);
-		cpymo_backend_text_free(dec_btn);
-		return err;
-	}
+	CPYMO_THROW(err);
 
-	ui->dec_btn = dec_btn;
-	ui->dec_btn_w = dec_btn_width;
-	ui->inc_btn = inc_btn;
-	ui->inc_btn_w = inc_btn_width;
+	ui->dec_btn = NULL;
+	ui->dec_btn_w = 0;
+	ui->inc_btn = NULL;
+	ui->inc_btn_w = 0;
 
 #ifdef ENABLE_TEXT_EXTRACT
 	cpymo_list_ui_set_selection_changed_callback(e, &cpymo_config_ui_visual_im_help_selection_changed_callback);
