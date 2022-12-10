@@ -210,12 +210,14 @@ static error_t cpymo_config_ui_set_value(
 		&item->show_value_width, 
 		cpymo_str_pure(val_str), 
 		ui->font_size);
-JUST_REFRESH:
 
 	if (err != CPYMO_ERR_SUCC)
 		item->show_value = NULL;
 
-	if (refreshing) return err;
+	if (refreshing) return CPYMO_ERR_SUCC;
+
+JUST_REFRESH:
+	err = CPYMO_ERR_SUCC;
 
 	switch (item_index) {
 	case ITEM_BGM_VOL:
