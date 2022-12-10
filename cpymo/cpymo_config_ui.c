@@ -50,25 +50,135 @@ static void *cpymo_config_ui_get_prev_item(const cpymo_engine *e, const void *ui
 	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC((x - 1));
 }
 
+static inline void cpymo_config_ui_calc_layout(
+	const cpymo_engine *e,
+	const cpymo_config_ui *ui,
+	size_t item_id,
+	float y,
+	const cpymo_config_ui_item **out_item,
+	float *out_text_y,
+	float *out_value_display_x,
+	float *out_inc_btn_xywh,
+	float *out_dec_btn_x
+)
+{
+	const cpymo_config_ui_item *item = 
+		&ui->items[item_id];
+	*out_item = item;
+
+	float height = (float)e->gameconfig.imagesize_h / (float)CONFIG_ITEMS;
+
+	float text_y = y + height / 2 + ui->font_size / 4;
+	*out_text_y = text_y;
+
+	float inc_dec_btn_width = 0;
+	float inc_dec_btn_space = 0;
+	if (item->show_inc_dec_button) {
+		inc_dec_btn_width = ui->dec_btn_w;
+		if (ui->inc_btn_w > inc_dec_btn_width) inc_dec_btn_width = 
+			ui->inc_btn_w;
+		if (ui->font_size > inc_dec_btn_width) inc_dec_btn_width = 
+			ui->font_size;
+		inc_dec_btn_space = ui->font_size / 2;
+	}
+
+	float right_edge = 
+		(float)e->gameconfig.imagesize_w - LR_PADDING;
+
+	*out_value_display_x = 
+		right_edge 
+		- inc_dec_btn_space 
+		- inc_dec_btn_width 
+		- item->show_value_width;
+
+	out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
+	out_inc_btn_xywh[1] = (height - ui->font_size) / 2 + y;
+	out_inc_btn_xywh[2] = inc_dec_btn_width;
+	out_inc_btn_xywh[3] = ui->font_size;
+
+	float max_value_width = 0;
+		for (size_t i = 0; i < CONFIG_ITEMS; ++i) 
+			if (max_value_width < ui->items[i].show_value_width)
+				max_value_width = ui->items[i].show_value_width;
+				
+	*out_dec_btn_x = 
+		out_inc_btn_xywh[0] 
+		- (max_value_width + 2.25f * inc_dec_btn_space + inc_dec_btn_width);
+}
+
 static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
 	const cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data_const(e);
-	const cpymo_config_ui_item *item = &ui->items[CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw)];
+	const cpymo_config_ui_item *item;
+	float 
+		text_y, 
+		value_display_x,
+		inc_dec_btn_xywh[4],
+		dec_btn_x;
 
-	const float height = (float)e->gameconfig.imagesize_h / (float)CONFIG_ITEMS;
-	y += height / 2 + ui->font_size / 2;
-	y -= ui->font_size / 4;
+	size_t item_index = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw);
+
+	cpymo_config_ui_calc_layout(
+		e, ui, 
+		item_index, y,
+		&item,
+		&text_y,
+		&value_display_x,
+		inc_dec_btn_xywh,
+		&dec_btn_x);
 
 	if (item->show_name) {
 		cpymo_backend_text_draw(
-			item->show_name, LR_PADDING, y, cpymo_color_white, 1.0f,
+			item->show_name, LR_PADDING, text_y, cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 	}
 
 	if (item->show_value) {
 		cpymo_backend_text_draw(
-			item->show_value, (float)e->gameconfig.imagesize_w - item->show_value_width - LR_PADDING, 
-			y, cpymo_color_white, 1.0f, cpymo_backend_image_draw_type_ui_element);
+			item->show_value, 
+			value_display_x, 
+			text_y, cpymo_color_white, 1.0f, 
+			cpymo_backend_image_draw_type_ui_element);
+	}
+
+	if (item->show_inc_dec_button) {
+		bool inc_pressed = false, dec_pressed = false;
+		
+		if (cpymo_list_ui_get_current_selected_const(e) == node_to_draw)
+		{
+			dec_pressed = e->input.left;
+			inc_pressed = e->input.right;
+		}
+
+		cpymo_backend_image_fill_rects(
+			inc_dec_btn_xywh, 
+			1, 
+			inc_pressed ? cpymo_color_white : cpymo_color_black, 
+			0.5f, 
+			cpymo_backend_image_draw_type_ui_element);
+
+		cpymo_backend_text_draw(
+			ui->inc_btn,
+			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2, 
+			text_y, 
+			inc_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
+			cpymo_backend_image_draw_type_ui_element);
+		
+		inc_dec_btn_xywh[0] = dec_btn_x;
+
+		cpymo_backend_image_fill_rects(
+			inc_dec_btn_xywh, 
+			1, 
+			dec_pressed ? cpymo_color_white : cpymo_color_black, 
+			0.5f, 
+			cpymo_backend_image_draw_type_ui_element);
+
+		cpymo_backend_text_draw(
+			ui->dec_btn,
+			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2, 
+			text_y, 
+			dec_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
+			cpymo_backend_image_draw_type_ui_element);
 	}
 }
 
@@ -215,6 +325,10 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
 	cpymo_key_pluse_update(&ui->left, dt, e->input.left);
 	cpymo_key_pluse_update(&ui->right, dt, e->input.right);
+
+	if (e->prev_input.left != e->input.left ||
+		e->prev_input.right != e->input.right)
+		cpymo_engine_request_redraw(e);
 
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
 	if (cpymo_key_pluse_output(&ui->left))

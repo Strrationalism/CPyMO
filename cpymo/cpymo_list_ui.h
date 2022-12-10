@@ -52,5 +52,6 @@ void cpymo_list_ui_exit(struct cpymo_engine *e);
 
 void cpymo_list_ui_enable_loop(struct cpymo_engine *);
 
+const void *cpymo_list_ui_get_current_selected_const(const struct cpymo_engine *);
 
 #endif

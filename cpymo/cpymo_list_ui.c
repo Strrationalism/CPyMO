@@ -437,6 +437,14 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	return CPYMO_ERR_SUCC;
 }
 
+const void *cpymo_list_ui_get_current_selected_const(
+	const struct cpymo_engine * e)
+{
+	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
+	return cpymo_list_ui_get_relative_id_to_cur(
+		e, ui->selection_relative_to_cur);
+}
+
 static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 {
 	cpymo_bg_draw(e);
