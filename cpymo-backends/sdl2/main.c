@@ -365,6 +365,14 @@ static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
 
 int main(int argc, char **argv)
 {
+#ifdef EXIT_TO_GAME_SELECTOR
+#ifndef USE_GAME_SELECTOR
+#error "You must define USE_GAME_SELECTOR when you define EXIT_TO_GAME_SELECTOR."
+#endif
+
+START:
+#endif
+
 #ifdef __PSP__
     scePowerSetCpuClockFrequency(333);
     scePowerSetBusClockFrequency(167);
@@ -728,6 +736,10 @@ EXIT:
 	extern void cpymo_backend_image_leakcheck(void);
 	cpymo_backend_image_leakcheck();
 	#endif
+
+#ifdef EXIT_TO_GAME_SELECTOR
+	goto START;
+#endif
 
 	return ret;
 }

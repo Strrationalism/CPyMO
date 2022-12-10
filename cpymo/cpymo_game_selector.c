@@ -297,10 +297,11 @@ static error_t cpymo_game_selector_lazy_init_update(cpymo_engine *e, void *ui_, 
 
 		ui->items = items;
 
+		#ifndef EXIT_TO_GAME_SELECTOR
 		if (ui->items != NULL)
 			if (ui->items->next == NULL && ui->items->prev == NULL)
 				return cpymo_game_selector_ok(e, ui->items);
-
+		#endif
 
 		return CPYMO_ERR_SUCC;
 	}
