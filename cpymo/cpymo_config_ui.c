@@ -18,6 +18,8 @@ typedef struct {
 } cpymo_config_ui_item;
 
 typedef struct {
+	cpymo_backend_text inc_btn, dec_btn;
+	float inc_btn_w, dec_btn_w;
 	cpymo_config_ui_item items[CONFIG_ITEMS];
 	float font_size;
 
@@ -77,6 +79,9 @@ static void cpymo_config_ui_deleter(cpymo_engine *e, void *ui_data)
 		if (ui->items[i].show_name) cpymo_backend_text_free(ui->items[i].show_name);
 		if (ui->items[i].show_value) cpymo_backend_text_free(ui->items[i].show_value);
 	}
+
+	cpymo_backend_text_free(ui->dec_btn);
+	cpymo_backend_text_free(ui->inc_btn);
 
 	cpymo_save_config_save(e);
 }
@@ -241,8 +246,31 @@ static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_e
 
 error_t cpymo_config_ui_enter(cpymo_engine *e)
 {
+	const cpymo_gameconfig *c = &e->gameconfig;
+	const float font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
+
+	cpymo_backend_text inc_btn, dec_btn;
+	float inc_btn_width, dec_btn_width;
+
+	error_t err = cpymo_backend_text_create(
+		&inc_btn, 
+		&inc_btn_width,
+		cpymo_str_pure("+"),
+		font_size);
+	CPYMO_THROW(err);
+
+	err = cpymo_backend_text_create(
+		&dec_btn,
+		&dec_btn_width,
+		cpymo_str_pure("-"),
+		font_size);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_backend_text_free(inc_btn);
+		return err;
+	}
+
 	cpymo_config_ui *ui = NULL;
-	error_t err = cpymo_list_ui_enter(
+	err = cpymo_list_ui_enter(
 		e,
 		(void **)&ui,
 		sizeof(cpymo_config_ui),
@@ -254,7 +282,16 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		&cpymo_config_ui_get_prev_item,
 		false,
 		CONFIG_ITEMS);
-	CPYMO_THROW(err);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_backend_text_free(inc_btn);
+		cpymo_backend_text_free(dec_btn);
+		return err;
+	}
+
+	ui->dec_btn = dec_btn;
+	ui->dec_btn_w = dec_btn_width;
+	ui->inc_btn = inc_btn;
+	ui->inc_btn_w = inc_btn_width;
 
 #ifdef ENABLE_TEXT_EXTRACT
 	cpymo_list_ui_set_selection_changed_callback(e, &cpymo_config_ui_visual_im_help_selection_changed_callback);
@@ -269,8 +306,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		ui->items[i].show_value = NULL;
 	}
 
-	const cpymo_gameconfig *c = &e->gameconfig;
-	ui->font_size = c->fontsize / 240.0f * c->imagesize_h * 0.8f;
+	ui->font_size = font_size;
 
 	cpymo_key_pluse_init(&ui->left, e->input.left);
 	cpymo_key_pluse_init(&ui->right, e->input.right);
