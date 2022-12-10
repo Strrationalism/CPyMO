@@ -14,6 +14,7 @@ typedef struct {
 	cpymo_backend_text show_value;
 	float show_value_width;
 	int value, max_value, min_value;
+	bool show_inc_dec_button;
 } cpymo_config_ui_item;
 
 typedef struct {
@@ -275,9 +276,10 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	cpymo_key_pluse_init(&ui->right, e->input.right);
 
 	float width;
-	#define INIT_ITEM(ITEM_ID, TEXT, MIN_VAL, MAX_VAL, CUR_VAL) \
+	#define INIT_ITEM(ITEM_ID, TEXT, MIN_VAL, MAX_VAL, CUR_VAL, SHOW_INC_DEC_BTN) \
 		ui->items[ITEM_ID].min_value = MIN_VAL; \
 		ui->items[ITEM_ID].max_value = MAX_VAL; \
+		ui->items[ITEM_ID].show_inc_dec_button = SHOW_INC_DEC_BTN; \
 		err = cpymo_backend_text_create( \
 			&ui->items[ITEM_ID].show_name, \
 			&width, \
@@ -298,19 +300,69 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	#ifdef LOW_FRAME_RATE
 	#define MIN_SAY_SPEED 5
 	e->gameconfig.textspeed = 5;
+	#define TEXT_SPEED_INC_DEC_BTN false
 	#else
 	#define MIN_SAY_SPEED 0
+	#define TEXT_SPEED_INC_DEC_BTN true
 	#endif
 
 		
-	INIT_ITEM(ITEM_BGM_VOL, l->config_bgmvol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio) * 10));
-	INIT_ITEM(ITEM_SE_VOL, l->config_sevol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio) * 10));
-	INIT_ITEM(ITEM_VO_VOL, l->config_vovol, 0, 10, (int)roundf(cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio) * 10));
-	INIT_ITEM(ITEM_TEXT_SPEED, l->config_sayspeed, MIN_SAY_SPEED, 5, (int)e->gameconfig.textspeed);
-	INIT_ITEM(ITEM_FONT_SIZE, l->config_fontsize, 12, 32, (int)e->gameconfig.fontsize);
-	INIT_ITEM(ITEM_SKIP_ALREADY_READ_ONLY, l->config_skip_mode, 0, 1, (int)e->config_skip_already_read_only);
+	INIT_ITEM(
+		ITEM_BGM_VOL, 
+		l->config_bgmvol, 
+		0, 
+		10, 
+		(int)roundf(
+			cpymo_audio_get_channel_volume(
+				CPYMO_AUDIO_CHANNEL_BGM, &e->audio) * 10),
+		true);
+
+	INIT_ITEM(
+		ITEM_SE_VOL, 
+		l->config_sevol, 
+		0, 
+		10, 
+		(int)roundf(
+			cpymo_audio_get_channel_volume(
+				CPYMO_AUDIO_CHANNEL_SE, &e->audio) * 10),
+		true);
+
+	INIT_ITEM(
+		ITEM_VO_VOL, 
+		l->config_vovol, 
+		0, 
+		10, 
+		(int)roundf(
+			cpymo_audio_get_channel_volume(
+				CPYMO_AUDIO_CHANNEL_VO, &e->audio) * 10),
+		true);
+
+	INIT_ITEM(
+		ITEM_TEXT_SPEED, 
+		l->config_sayspeed, 
+		MIN_SAY_SPEED, 
+		5, 
+		(int)e->gameconfig.textspeed,
+		TEXT_SPEED_INC_DEC_BTN);
+
+	INIT_ITEM(
+		ITEM_FONT_SIZE, 
+		l->config_fontsize, 
+		12, 
+		32, 
+		(int)e->gameconfig.fontsize,
+		true);
+
+	INIT_ITEM(
+		ITEM_SKIP_ALREADY_READ_ONLY, 
+		l->config_skip_mode, 
+		0, 
+		1, 
+		(int)e->config_skip_already_read_only,
+		false);
 	
 	#undef MIN_SAY_SPEED
+	#undef TEXT_SPEED_INC_DEC_BTN
 	#undef INIT_ITEM
 
 	return CPYMO_ERR_SUCC;
