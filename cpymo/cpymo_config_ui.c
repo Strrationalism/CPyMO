@@ -217,7 +217,6 @@ static error_t cpymo_config_ui_set_value(
 	if (refreshing) return CPYMO_ERR_SUCC;
 
 JUST_REFRESH:
-	err = CPYMO_ERR_SUCC;
 
 	switch (item_index) {
 	case ITEM_BGM_VOL:
@@ -244,7 +243,7 @@ JUST_REFRESH:
 
 	cpymo_engine_request_redraw(e);
 
-	return err;
+	return CPYMO_ERR_SUCC;
 }
 
 static error_t cpymo_config_ui_item_inc(cpymo_engine *e, cpymo_config_ui *ui, int item_index)
