@@ -42,13 +42,13 @@ Nintendo Switch | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | �
 UWP             | SDL2 | FFmpeg   | FFmpeg             | 加载系统字体  | 游戏选择器
 Emscripten      | SDL2 | FFmpeg   | FFmpeg, SDL2_mixer | 外置字体     | 
 Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器,视障帮助
-Sony PSV        | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游戏选择器
 
 ### 第三梯队
 **CPyMO可以编译到这些平台，但可能有部分次要功能不可用。**
 
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
+Sony PSV          | SDL2      | 不支持     | SDL2_mixer                   | 外置字体     | 游戏选择器
 Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
@@ -335,12 +335,21 @@ make install -j
 ## 额外依赖
 
 1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
-2. 通过命令`vdpm sdl2`安装依赖。
-3. 执行`cpymo-backends/sdl2/build-psv-ffmpeg.sh`来构建FFmpeg。
+2. 执行以下命令安装依赖：
+```sh
+vdpm sdl2
+vdpm sdl2_mixer 
+vdpm flac 
+vdpm libmodplug 
+vdpm mpg123 
+vdpm libogg 
+vdpm libvorbis 
+vdpm libmikmod 
+```
 
 ## 编译
 
-在`cpymo-backends/sdl2`下执行`make -f Makefile.PSV`即可得到CPyMO.vpk。
+在`cpymo-backends/sdl2`下执行`make -f Makefile.PSV -j`即可得到CPyMO.vpk。
 
 ## 安装
 
@@ -353,6 +362,7 @@ make install -j
 * 分辨率：960×544
 * 图像：带透明通道的png，不要使用mask灰阶图片
 * 声音：ogg，16bit signed，little endian，44100Hz
+* 不支持视频
 
 # Emscripten 平台
 

@@ -132,10 +132,17 @@ jobs:
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
-        cd ../cpymo-backends/sdl2
-        chmod +x ./build-psv-ffmpeg.sh
-        ./build-psv-ffmpeg.sh
-        cd ../../
+        ./vdpm sdl2_mixer 
+        ./vdpm flac 
+        ./vdpm libmodplug 
+        ./vdpm mpg123 
+        ./vdpm libogg 
+        ./vdpm libvorbis 
+        ./vdpm libmikmod 
+        # cd ../cpymo-backends/sdl2
+        # chmod +x ./build-psv-ffmpeg.sh
+        # ./build-psv-ffmpeg.sh
+        # cd ../../
 
     - name: Build
       run: |
