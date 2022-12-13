@@ -342,10 +342,14 @@ make install -j
 
 在`cpymo-backends/sdl2`下执行`make -f Makefile.PSV`即可得到CPyMO.vpk。
 
-## 安装
+## 初次安装
 
-安装CPyMO.vpk之后，你还需要在`ux0:/pymogames`目录下放置`default.ttf`和游戏文件。    
+安装CPyMO.vpk之后，你还需要在`ux0:/apps/CPYMO0002/pymogames`目录下放置`default.ttf`和游戏文件。    
 		
+## 从旧版本升级
+
+请勿直接卸载CPyMO或重新安装vpk文件，直接将vpk文件解压到`ux0:/apps/CPYMO0002`中覆盖已有文件即可。
+
 ## 为PSV适配游戏
 
 如果你需要为PSV适配游戏，那么建议你使用以下参数：
