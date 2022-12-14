@@ -424,8 +424,6 @@ static error_t cpymo_config_ui_set_value(
 	if (refreshing) return CPYMO_ERR_SUCC;
 
 JUST_REFRESH:
-
-JUST_REFRESH:
 	switch (item_index) {
 	case ITEM_BGM_VOL:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, (float)val / 10.0f);
@@ -547,13 +545,19 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 			e->prev_input.left != e->input.left ||
 			e->prev_input.right != e->input.right)
 			cpymo_engine_request_redraw(e);
-	}
 
-	if (cpymo_key_pluse_output(&ui->left))
-		cpymo_config_ui_item_dec(e, ui, i);
-	else if (cpymo_key_pluse_output(&ui->right) || 
-			(cpymo_key_pluse_output(&ui->ok) && ui->items[i].show_inc_dec_button))
-		cpymo_config_ui_item_inc(e, ui, i);
+		if (cpymo_key_pluse_output(&ui->left))
+			cpymo_config_ui_item_dec(e, ui, i);
+		else if (cpymo_key_pluse_output(&ui->right) || 
+				(cpymo_key_pluse_output(&ui->ok)))
+			cpymo_config_ui_item_inc(e, ui, i);
+	}
+	else {
+		if (CPYMO_INPUT_JUST_PRESSED(e, left))
+			cpymo_config_ui_item_dec(e, ui, i);
+		else if (CPYMO_INPUT_JUST_PRESSED(e, right))
+			cpymo_config_ui_item_inc(e, ui, i);
+	}
 
 	return CPYMO_ERR_SUCC;
 }
