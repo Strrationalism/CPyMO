@@ -94,24 +94,24 @@ static inline void cpymo_config_ui_calc_layout(
 		- item->show_value_width;
 
 
-	if (item->show_inc_dec_button) {
-		out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
-		out_inc_btn_xywh[1] = (height - max_font_size) / 2 + y;
-		out_inc_btn_xywh[2] = inc_dec_btn_width;
-		out_inc_btn_xywh[3] = max_font_size;
 
-		float max_value_width = 0;
-			for (size_t i = 0; i < CONFIG_ITEMS; ++i) 
-				if (max_value_width < ui->items[i].show_value_width && 
-					ui->items[i].show_inc_dec_button)
-					max_value_width = ui->items[i].show_value_width;
-					
-		*out_dec_btn_x = 
-			out_inc_btn_xywh[0] 
-			- (max_value_width + 1.95f * inc_dec_btn_space + inc_dec_btn_width);
+	out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
+	out_inc_btn_xywh[1] = (height - max_font_size) / 2 + y;
+	out_inc_btn_xywh[2] = inc_dec_btn_width;
+	out_inc_btn_xywh[3] = max_font_size;
 
-		*out_inc_dec_btn_symbol = y + height / 2 + max_font_size / 4;
-	}
+	float max_value_width = 0;
+		for (size_t i = 0; i < CONFIG_ITEMS; ++i) 
+			if (max_value_width < ui->items[i].show_value_width && 
+				ui->items[i].show_inc_dec_button)
+				max_value_width = ui->items[i].show_value_width;
+				
+	*out_dec_btn_x = 
+		out_inc_btn_xywh[0] 
+		- (max_value_width + 1.95f * inc_dec_btn_space + inc_dec_btn_width);
+
+	*out_inc_dec_btn_symbol = y + height / 2 + max_font_size / 4;
+
 }
 
 static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
@@ -409,20 +409,21 @@ static error_t cpymo_config_ui_set_value(
 	}
 #endif
 
+	error_t err = CPYMO_ERR_SUCC;
 	if (!refreshing && item_index == ITEM_FONT_SIZE) goto JUST_REFRESH;
 	
-	error_t err = cpymo_backend_text_create(
+	err = cpymo_backend_text_create(
 		&item->show_value, 
 		&item->show_value_width, 
 		cpymo_str_pure(val_str), 
 		ui->font_size);
-JUST_REFRESH:
 
 	if (err != CPYMO_ERR_SUCC)
 		item->show_value = NULL;
 
 	if (refreshing) return err;
 
+JUST_REFRESH:
 	switch (item_index) {
 	case ITEM_BGM_VOL:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, (float)val / 10.0f);
@@ -575,6 +576,45 @@ static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_e
 }
 #endif
 
+error_t cpymo_config_ui_mouse_button_just_hold(cpymo_engine *e)
+{ 
+	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
+	for (size_t i = 0; i < CONFIG_ITEMS; ++i) {
+		if (!ui->items[i].show_inc_dec_button) continue;
+		const cpymo_config_ui_item *item;
+		float y;
+		float x;
+
+		float inc_dec_rect_xywh[4];
+		float dec_rect_x;
+		float symbol_y;
+		cpymo_config_ui_calc_layout(
+			e, ui, i, 
+			((float)e->gameconfig.imagesize_h / CONFIG_ITEMS) * i,
+			&item,
+			&y,
+			&x,
+			inc_dec_rect_xywh,
+			&dec_rect_x,
+			&symbol_y);
+
+		if (e->input.mouse_position_useable)
+			if (cpymo_utils_point_in_rect_xywh(
+				e->input.mouse_x, e->input.mouse_y, inc_dec_rect_xywh))
+				return CPYMO_ERR_SUCC;
+
+		inc_dec_rect_xywh[0] = dec_rect_x;
+		if (e->input.mouse_position_useable)
+			if (cpymo_utils_point_in_rect_xywh(
+				e->input.mouse_x, e->input.mouse_y, inc_dec_rect_xywh))
+				return CPYMO_ERR_SUCC;
+	}
+
+	cpymo_ui_exit(e);
+
+	return CPYMO_ERR_SUCC; 
+}
+
 error_t cpymo_config_ui_enter(cpymo_engine *e)
 {
 	const cpymo_gameconfig *c = &e->gameconfig;
@@ -608,6 +648,8 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	cpymo_list_ui_set_scroll_enabled(e, false);
 	cpymo_list_ui_set_custom_update(e, &cpymo_config_ui_update);
 	cpymo_list_ui_enable_loop(e);
+	cpymo_list_ui_set_mouse_button_just_hold_callback(
+		e, &cpymo_config_ui_mouse_button_just_hold);
 
 	for (size_t i = 0; i < sizeof(ui->items) / sizeof(ui->items[0]); ++i) {
 		ui->items[i].show_name = NULL;
@@ -619,7 +661,6 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 	cpymo_key_pluse_init(&ui->left, e->input.left);
 	cpymo_key_pluse_init(&ui->right, e->input.right);
 
-	cpymo_config_ui_refresh_items(e);
 
 #ifdef ENABLE_TEXT_EXTRACT
 	const cpymo_localization *l = cpymo_localization_get(e);
@@ -650,8 +691,8 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		return err;
 	}
 
+	cpymo_config_ui_refresh_items(e);
 
 	return CPYMO_ERR_SUCC;
 }
-
 
