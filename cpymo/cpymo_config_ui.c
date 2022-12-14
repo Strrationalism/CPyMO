@@ -59,7 +59,8 @@ static inline void cpymo_config_ui_calc_layout(
 	float *out_text_y,
 	float *out_value_display_x,
 	float *out_inc_btn_xywh,
-	float *out_dec_btn_x
+	float *out_dec_btn_x,
+	float *out_inc_dec_btn_symbol
 )
 {
 	const cpymo_config_ui_item *item = 
@@ -71,15 +72,16 @@ static inline void cpymo_config_ui_calc_layout(
 	float text_y = y + height / 2 + ui->font_size / 4;
 	*out_text_y = text_y;
 
+	const float max_font_size = 32 / 240.0f * e->gameconfig.imagesize_h * 0.8f;
 	float inc_dec_btn_width = 0;
 	float inc_dec_btn_space = 0;
 	if (item->show_inc_dec_button) {
 		inc_dec_btn_width = ui->dec_btn_w;
 		if (ui->inc_btn_w > inc_dec_btn_width) inc_dec_btn_width = 
 			ui->inc_btn_w;
-		if (ui->font_size > inc_dec_btn_width) inc_dec_btn_width = 
-			ui->font_size;
-		inc_dec_btn_space = ui->font_size / 2;
+		if (max_font_size > inc_dec_btn_width) inc_dec_btn_width = 
+			max_font_size;
+		inc_dec_btn_space = max_font_size / 2;
 	}
 
 	float right_edge = 
@@ -91,11 +93,12 @@ static inline void cpymo_config_ui_calc_layout(
 		- inc_dec_btn_width 
 		- item->show_value_width;
 
+
 	if (item->show_inc_dec_button) {
 		out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
-		out_inc_btn_xywh[1] = (height - ui->font_size) / 2 + y;
+		out_inc_btn_xywh[1] = (height - max_font_size) / 2 + y;
 		out_inc_btn_xywh[2] = inc_dec_btn_width;
-		out_inc_btn_xywh[3] = ui->font_size;
+		out_inc_btn_xywh[3] = max_font_size;
 
 		float max_value_width = 0;
 			for (size_t i = 0; i < CONFIG_ITEMS; ++i) 
@@ -105,6 +108,8 @@ static inline void cpymo_config_ui_calc_layout(
 		*out_dec_btn_x = 
 			out_inc_btn_xywh[0] 
 			- (max_value_width + 2.25f * inc_dec_btn_space + inc_dec_btn_width);
+
+		*out_inc_dec_btn_symbol = y + height / 2 + max_font_size / 4;
 	}
 }
 
@@ -116,7 +121,8 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		text_y, 
 		value_display_x,
 		inc_dec_btn_xywh[4],
-		dec_btn_x;
+		dec_btn_x,
+		inc_dec_btn_symbol_y;
 
 	size_t item_index = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw);
 
@@ -127,7 +133,8 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		&text_y,
 		&value_display_x,
 		inc_dec_btn_xywh,
-		&dec_btn_x);
+		&dec_btn_x,
+		&inc_dec_btn_symbol_y);
 
 	if (item->show_name) {
 		cpymo_backend_text_draw(
@@ -180,7 +187,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		cpymo_backend_text_draw(
 			ui->inc_btn,
 			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2, 
-			text_y, 
+			inc_dec_btn_symbol_y, 
 			is_pointed || inc_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 		
@@ -208,7 +215,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		cpymo_backend_text_draw(
 			ui->dec_btn,
 			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2, 
-			text_y, 
+			inc_dec_btn_symbol_y, 
 			is_pointed || dec_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 	}
@@ -248,7 +255,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		&btn, 
 		&btn_width,
 		cpymo_str_pure("+"),
-		ui->font_size);
+		32 / 240.0f * c->imagesize_h * 0.8f);
 	if (err == CPYMO_ERR_SUCC) {
 		if (ui->inc_btn) cpymo_backend_text_free(ui->inc_btn);
 		ui->inc_btn = btn;
@@ -259,7 +266,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		&btn,
 		&btn_width,
 		cpymo_str_pure("-"),
-		ui->font_size);
+		32 / 240.0f * c->imagesize_h * 0.8f);
 	if (err == CPYMO_ERR_SUCC) {
 		if (ui->dec_btn) cpymo_backend_text_free(ui->dec_btn);
 		ui->dec_btn = btn;
@@ -503,13 +510,17 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_key_pluse_update(&ui->left, dt, e->input.left);
 	cpymo_key_pluse_update(&ui->right, dt, e->input.right);
 
-	for (size_t i = 0; i < CONFIG_ITEMS; ++i) {
+	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+
+	if (ui->items[i].show_inc_dec_button)
+	{
 		const cpymo_config_ui_item *item;
 		float y;
 		float x;
 
 		float inc_dec_rect_xywh[4];
 		float dec_rect_x;
+		float symbol_y;
 		cpymo_config_ui_calc_layout(
 			e, ui, i, 
 			((float)e->gameconfig.imagesize_h / CONFIG_ITEMS) * i,
@@ -517,28 +528,36 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 			&y,
 			&x,
 			inc_dec_rect_xywh,
-			&dec_rect_x);
+			&dec_rect_x,
+			&symbol_y);
 
-		bool cur_pointed = false, prev_pointed = false;
+		bool cur_pointed_plus = false, prev_pointed = false;
 		if (e->input.mouse_position_useable)
-			cur_pointed = cpymo_utils_point_in_rect_xywh(
+			cur_pointed_plus = cpymo_utils_point_in_rect_xywh(
 				e->input.mouse_x, e->input.mouse_y, inc_dec_rect_xywh);
 		if (e->prev_input.mouse_position_useable)
 			prev_pointed = cpymo_utils_point_in_rect_xywh(
 				e->prev_input.mouse_x, e->prev_input.mouse_y, inc_dec_rect_xywh);
-		if (cur_pointed != prev_pointed)
+		if (cur_pointed_plus != prev_pointed)
 			cpymo_engine_request_redraw(e);
 
 		inc_dec_rect_xywh[0] = dec_rect_x;
-		cur_pointed = false, prev_pointed = false;
+		bool cur_pointed_minus = false;
+		prev_pointed = false;
 		if (e->input.mouse_position_useable)
-			cur_pointed = cpymo_utils_point_in_rect_xywh(
+			cur_pointed_minus = cpymo_utils_point_in_rect_xywh(
 				e->input.mouse_x, e->input.mouse_y, inc_dec_rect_xywh);
 		if (e->prev_input.mouse_position_useable)
-			prev_pointed = cpymo_utils_point_in_rect_xywh(
+			cur_pointed_minus = cpymo_utils_point_in_rect_xywh(
 				e->prev_input.mouse_x, e->prev_input.mouse_y, inc_dec_rect_xywh);
-		if (cur_pointed != prev_pointed)
+		if (cur_pointed_minus != prev_pointed)
 			cpymo_engine_request_redraw(e);
+
+		if (cur_pointed_minus && CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
+			cpymo_config_ui_item_dec(e, ui, i);		
+		
+		if (cur_pointed_plus && CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
+			cpymo_config_ui_item_inc(e, ui, i);
 	}
 
 	if (e->prev_input.left != e->input.left ||
@@ -548,7 +567,6 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 		e->prev_input.mouse_button != e->input.mouse_button)
 		cpymo_engine_request_redraw(e);
 
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
 	if (cpymo_key_pluse_output(&ui->left))
 		cpymo_config_ui_item_dec(e, ui, i);
 	else if (cpymo_key_pluse_output(&ui->right) || CPYMO_INPUT_JUST_PRESSED(e, ok))
@@ -558,9 +576,15 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 }
 
 
-static error_t cpymo_config_ui_ok(cpymo_engine *e, void *selected)
+static error_t cpymo_config_ui_ok(cpymo_engine *e, void *sel)
 {
-	return CPYMO_ERR_SUCC;
+	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
+	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+
+	return ui->items->show_inc_dec_button ?
+		CPYMO_ERR_SUCC :
+		cpymo_config_ui_item_inc(
+			e, (cpymo_config_ui *)cpymo_list_ui_data(e), i);
 }
 
 #ifdef ENABLE_TEXT_EXTRACT
@@ -586,6 +610,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		&cpymo_config_ui_draw_node,
 		&cpymo_config_ui_ok,
 		&cpymo_config_ui_deleter,
+
 		CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(ITEM_BGM_VOL),
 		&cpymo_config_ui_get_next_item,
 		&cpymo_config_ui_get_prev_item,
