@@ -106,6 +106,33 @@ void cpymo_backend_image_free(cpymo_backend_image image)
 	#endif
 }
 
+#ifdef ENABLE_SCREEN_FORCE_CENTERED
+static void cpymo_backend_image_force_center(
+	float *dstx, float *dsty, float *dstw, float *dsth) {
+	/*float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
+	*dstx += offset;
+	offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
+	*dsty += offset;*/
+
+	float game_w = engine.gameconfig.imagesize_w;
+	float game_h = engine.gameconfig.imagesize_h;
+	cpymo_utils_match_rect(
+		SCREEN_WIDTH, SCREEN_HEIGHT,
+		&game_w, &game_h);
+
+	*dstw /= engine.gameconfig.imagesize_w;
+	*dstw *= game_w;
+	*dsth /= engine.gameconfig.imagesize_h;
+	*dsth *= game_h;
+
+	*dstx /= engine.gameconfig.imagesize_w;
+	*dstx *= game_w;
+	*dsty /= engine.gameconfig.imagesize_h;
+	*dsty *= game_h;
+	cpymo_utils_center(SCREEN_WIDTH, SCREEN_HEIGHT, game_w, game_h, dstx, dsty);
+}
+#endif
+
 void cpymo_backend_image_draw(
 	float dstx, 
 	float dsty, 
@@ -120,10 +147,7 @@ void cpymo_backend_image_draw(
 	enum cpymo_backend_image_draw_type draw_type)
 {
 #ifdef ENABLE_SCREEN_FORCE_CENTERED
-	float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
-	dstx += offset;
-	offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
-	dsty += offset;
+	cpymo_backend_image_force_center(&dstx, &dsty, &dstw, &dsth);
 #endif
 
 #ifdef DISABLE_IMAGE_SCALING
@@ -179,10 +203,12 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 		rect.h = (int)xywh[i * 4 + 3];
 
 #ifdef ENABLE_SCREEN_FORCE_CENTERED
-		float offset = (float)(SCREEN_WIDTH - engine.gameconfig.imagesize_w) / 2;
-		rect.x += (int)offset;
-		offset = (float)(SCREEN_HEIGHT - engine.gameconfig.imagesize_h) / 2;
-		rect.y += offset;
+		float rx = rect.x, ry = rect.y, rw = rect.w, rh = rect.h;
+		cpymo_backend_image_force_center(&rx, &ry, &rw, &rh);
+		rect.x = (int)rx;
+		rect.y = (int)ry;
+		rect.w = (int)rw; 
+		rect.h = (int)rh;
 #endif
 		SDL_RenderFillRect(renderer, &rect);
 	}

@@ -193,7 +193,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
 	save_last_selected_game_dir(gamedir);
 
-#ifndef __PSP__
+#ifndef ENABLE_SCREEN_FORCE_CENTERED
 	if (SDL_RenderSetLogicalSize(renderer, 
 		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
@@ -690,10 +690,10 @@ START:
 			const float game_w = engine.gameconfig.imagesize_w;
 			const float game_h = engine.gameconfig.imagesize_h;
 			const float rects[] = {
-				-100, 0, 100, game_h,
-				game_w, 0, 100, game_h,
-				0, -100, game_w, 100,
-				0, game_h, game_w, 100
+				-200, 0, 200, game_h,
+				game_w, 0, 200, game_h,
+				0, -200, game_w, 200,
+				0, game_h, game_w, 200
 			};
 
 			cpymo_backend_image_fill_rects(
