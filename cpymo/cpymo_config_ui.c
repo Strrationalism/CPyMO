@@ -91,19 +91,21 @@ static inline void cpymo_config_ui_calc_layout(
 		- inc_dec_btn_width 
 		- item->show_value_width;
 
-	out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
-	out_inc_btn_xywh[1] = (height - ui->font_size) / 2 + y;
-	out_inc_btn_xywh[2] = inc_dec_btn_width;
-	out_inc_btn_xywh[3] = ui->font_size;
+	if (item->show_inc_dec_button) {
+		out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
+		out_inc_btn_xywh[1] = (height - ui->font_size) / 2 + y;
+		out_inc_btn_xywh[2] = inc_dec_btn_width;
+		out_inc_btn_xywh[3] = ui->font_size;
 
-	float max_value_width = 0;
-		for (size_t i = 0; i < CONFIG_ITEMS; ++i) 
-			if (max_value_width < ui->items[i].show_value_width)
-				max_value_width = ui->items[i].show_value_width;
-				
-	*out_dec_btn_x = 
-		out_inc_btn_xywh[0] 
-		- (max_value_width + 2.25f * inc_dec_btn_space + inc_dec_btn_width);
+		float max_value_width = 0;
+			for (size_t i = 0; i < CONFIG_ITEMS; ++i) 
+				if (max_value_width < ui->items[i].show_value_width)
+					max_value_width = ui->items[i].show_value_width;
+					
+		*out_dec_btn_x = 
+			out_inc_btn_xywh[0] 
+			- (max_value_width + 2.25f * inc_dec_btn_space + inc_dec_btn_width);
+	}
 }
 
 static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
@@ -143,17 +145,35 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 
 	if (item->show_inc_dec_button) {
 		bool inc_pressed = false, dec_pressed = false;
-		
+
 		if (cpymo_list_ui_get_current_selected_const(e) == node_to_draw)
 		{
 			dec_pressed = e->input.left;
 			inc_pressed = e->input.right || e->input.ok;
 		}
 
+		bool is_pointed = false;
+		if (e->input.mouse_position_useable) {
+			is_pointed = cpymo_utils_point_in_rect_xywh(
+				e->input.mouse_x,
+				e->input.mouse_y,
+				inc_dec_btn_xywh);
+
+			if (e->input.mouse_button && is_pointed)
+				inc_pressed = true;
+		}
+
+		cpymo_color pressed_color;
+		pressed_color.r = 127;
+		pressed_color.g = 127;
+		pressed_color.b = 127;
+
 		cpymo_backend_image_fill_rects(
 			inc_dec_btn_xywh, 
 			1, 
-			inc_pressed ? cpymo_color_white : cpymo_color_black, 
+			is_pointed ? 
+				(inc_pressed ? pressed_color : cpymo_color_white) : 
+				cpymo_color_black, 
 			0.5f, 
 			cpymo_backend_image_draw_type_ui_element);
 
@@ -161,15 +181,27 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 			ui->inc_btn,
 			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2, 
 			text_y, 
-			inc_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
+			is_pointed || inc_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 		
 		inc_dec_btn_xywh[0] = dec_btn_x;
 
+		if (e->input.mouse_position_useable) {
+			is_pointed = cpymo_utils_point_in_rect_xywh(
+				e->input.mouse_x,
+				e->input.mouse_y,
+				inc_dec_btn_xywh);
+
+			if (e->input.mouse_button && is_pointed)
+				dec_pressed = true;
+		}
+
 		cpymo_backend_image_fill_rects(
 			inc_dec_btn_xywh, 
 			1, 
-			dec_pressed ? cpymo_color_white : cpymo_color_black, 
+			is_pointed ? 
+				(dec_pressed ? pressed_color : cpymo_color_white) : 
+				cpymo_color_black, 
 			0.5f, 
 			cpymo_backend_image_draw_type_ui_element);
 
@@ -177,7 +209,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 			ui->dec_btn,
 			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2, 
 			text_y, 
-			dec_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
+			is_pointed || dec_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 	}
 }
@@ -471,9 +503,49 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_key_pluse_update(&ui->left, dt, e->input.left);
 	cpymo_key_pluse_update(&ui->right, dt, e->input.right);
 
+	for (size_t i = 0; i < CONFIG_ITEMS; ++i) {
+		const cpymo_config_ui_item *item;
+		float y;
+		float x;
+
+		float inc_dec_rect_xywh[4];
+		float dec_rect_x;
+		cpymo_config_ui_calc_layout(
+			e, ui, i, 
+			((float)e->gameconfig.imagesize_h / CONFIG_ITEMS) * i,
+			&item,
+			&y,
+			&x,
+			inc_dec_rect_xywh,
+			&dec_rect_x);
+
+		bool cur_pointed = false, prev_pointed = false;
+		if (e->input.mouse_position_useable)
+			cur_pointed = cpymo_utils_point_in_rect_xywh(
+				e->input.mouse_x, e->input.mouse_y, inc_dec_rect_xywh);
+		if (e->prev_input.mouse_position_useable)
+			prev_pointed = cpymo_utils_point_in_rect_xywh(
+				e->prev_input.mouse_x, e->prev_input.mouse_y, inc_dec_rect_xywh);
+		if (cur_pointed != prev_pointed)
+			cpymo_engine_request_redraw(e);
+
+		inc_dec_rect_xywh[0] = dec_rect_x;
+		cur_pointed = false, prev_pointed = false;
+		if (e->input.mouse_position_useable)
+			cur_pointed = cpymo_utils_point_in_rect_xywh(
+				e->input.mouse_x, e->input.mouse_y, inc_dec_rect_xywh);
+		if (e->prev_input.mouse_position_useable)
+			prev_pointed = cpymo_utils_point_in_rect_xywh(
+				e->prev_input.mouse_x, e->prev_input.mouse_y, inc_dec_rect_xywh);
+		if (cur_pointed != prev_pointed)
+			cpymo_engine_request_redraw(e);
+	}
+
 	if (e->prev_input.left != e->input.left ||
 		e->prev_input.right != e->input.right ||
-		e->prev_input.ok != e->input.ok)
+		e->prev_input.ok != e->input.ok ||
+		e->prev_input.mouse_position_useable != e->input.mouse_position_useable ||
+		e->prev_input.mouse_button != e->input.mouse_button)
 		cpymo_engine_request_redraw(e);
 
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
