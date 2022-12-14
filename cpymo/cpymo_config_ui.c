@@ -23,7 +23,7 @@ typedef struct {
 	cpymo_config_ui_item items[CONFIG_ITEMS];
 	float font_size;
 
-	cpymo_key_pluse left, right;
+	cpymo_key_pluse left, right, ok, mouse_button;
 } cpymo_config_ui;
 
 #define ITEM_BGM_VOL 0
@@ -487,6 +487,8 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
 	cpymo_key_pluse_update(&ui->left, dt, e->input.left);
 	cpymo_key_pluse_update(&ui->right, dt, e->input.right);
+	cpymo_key_pluse_update(&ui->ok, dt, e->input.ok);
+	cpymo_key_pluse_update(&ui->mouse_button, dt, e->input.mouse_button);
 
 	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
 
@@ -531,10 +533,10 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 		if (cur_pointed_minus != prev_pointed)
 			cpymo_engine_request_redraw(e);
 
-		if (cur_pointed_minus && CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
+		if (cur_pointed_minus && cpymo_key_pluse_output(&ui->mouse_button))
 			cpymo_config_ui_item_dec(e, ui, i);		
 		
-		if (cur_pointed_plus && CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
+		if (cur_pointed_plus && cpymo_key_pluse_output(&ui->mouse_button))
 			cpymo_config_ui_item_inc(e, ui, i);
 
 		if (e->prev_input.mouse_position_useable != e->input.mouse_position_useable ||
@@ -548,7 +550,7 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	if (cpymo_key_pluse_output(&ui->left))
 		cpymo_config_ui_item_dec(e, ui, i);
 	else if (cpymo_key_pluse_output(&ui->right) || 
-			(CPYMO_INPUT_JUST_RELEASED(e, ok) && ui->items[i].show_inc_dec_button))
+			(cpymo_key_pluse_output(&ui->ok) && ui->items[i].show_inc_dec_button))
 		cpymo_config_ui_item_inc(e, ui, i);
 
 	return CPYMO_ERR_SUCC;
@@ -660,6 +662,8 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 
 	cpymo_key_pluse_init(&ui->left, e->input.left);
 	cpymo_key_pluse_init(&ui->right, e->input.right);
+	cpymo_key_pluse_init(&ui->ok, e->input.ok);
+	cpymo_key_pluse_init(&ui->mouse_button, e->input.mouse_button);
 
 
 #ifdef ENABLE_TEXT_EXTRACT
