@@ -332,6 +332,8 @@ make install -j
 
 # Sony Playstation Vita 平台
 
+**PSV版本不支持自动存档，需要手动存档。**
+
 ## 额外依赖
 
 1. 你需要安装[vdpm](https://github.com/vitasdk/vdpm)，并使用其安装vitasdk。
