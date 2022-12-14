@@ -363,8 +363,24 @@ static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
 #include <psppower.h>
 #endif
 
+#ifdef __PSV__
+#include <psp2/power.h>
+#endif
+
 int main(int argc, char **argv)
 {
+#ifdef __PSP__
+    scePowerSetCpuClockFrequency(333);
+    scePowerSetBusClockFrequency(167);
+#endif
+
+#ifdef __PSV__
+	scePowerSetArmClockFrequency(444);
+	scePowerSetBusClockFrequency(222);
+	scePowerSetGpuClockFrequency(222);
+	scePowerSetGpuXbarClockFrequency(166);
+#endif
+
 #ifdef EXIT_TO_GAME_SELECTOR
 #ifndef USE_GAME_SELECTOR
 #error "You must define USE_GAME_SELECTOR when you define EXIT_TO_GAME_SELECTOR."
@@ -373,10 +389,6 @@ int main(int argc, char **argv)
 START:
 #endif
 
-#ifdef __PSP__
-    scePowerSetCpuClockFrequency(333);
-    scePowerSetBusClockFrequency(167);
-#endif
 
 	srand((unsigned)time(NULL));
 	//_CrtSetBreakAlloc(1371);

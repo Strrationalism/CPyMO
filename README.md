@@ -48,7 +48,7 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
-Sony PSV          | SDL2      | 不支持     | SDL2_mixer                   | 外置字体     | 游戏选择器
+Sony PS Vita      | SDL2      | 不支持     | SDL2_mixer                   | 外置字体     | 游戏选择器
 Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
