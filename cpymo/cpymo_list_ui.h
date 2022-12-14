@@ -15,7 +15,7 @@ typedef error_t (*cpymo_list_ui_ok)(struct cpymo_engine *, void *selected);
 typedef error_t(*cpymo_list_ui_custom_update)(struct cpymo_engine *, float dt, void *selected);
 typedef error_t(*cpymo_list_ui_selecting_no_more_content_callback)(struct cpymo_engine *, bool is_down);
 typedef error_t(*cpymo_list_ui_selection_changed)(struct cpymo_engine *e, void *selected);
-
+typedef error_t(*cpymo_list_ui_mouse_button_just_hold_callback)(struct cpymo_engine *e);
 
 error_t cpymo_list_ui_enter(
 	struct cpymo_engine *,
@@ -46,11 +46,14 @@ void *cpymo_list_ui_data(struct cpymo_engine *e);
 
 void cpymo_list_ui_set_selecting_no_more_content_callback(struct cpymo_engine *e, cpymo_list_ui_selecting_no_more_content_callback c);
 
+void cpymo_list_ui_set_mouse_button_just_hold_callback(struct cpymo_engine *e, cpymo_list_ui_mouse_button_just_hold_callback c);
+
 const void *cpymo_list_ui_data_const(const struct cpymo_engine *e);
 
 void cpymo_list_ui_exit(struct cpymo_engine *e);
 
 void cpymo_list_ui_enable_loop(struct cpymo_engine *);
 
+const void *cpymo_list_ui_get_current_selected_const(const struct cpymo_engine *);
 
 #endif
