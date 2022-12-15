@@ -198,7 +198,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		e->input.mouse_position_useable)
 		mouse_y_delta = e->input.mouse_y - e->prev_input.mouse_y;
 
-	if (e->input.mouse_button != e->prev_input.mouse_button)
+	if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
 		cpymo_engine_request_redraw(e);
 
 	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button))
@@ -235,13 +235,19 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			}
 			else ui->scroll_speed = 0;
 
-			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL)
-				if (ui->current_y > 0)
+			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL) {
+				if (ui->current_y > 0) {
 					ui->current_y = 0;
+					ui->scroll_speed = 0;
+				}
+			}
 
-			if (cpymo_list_ui_is_last_node(e, ui_data))
-				if (ui->current_y < 0)
+			if (cpymo_list_ui_is_last_node(e, ui_data)) {
+				if (ui->current_y < 0) {
 					ui->current_y = 0;
+					ui->scroll_speed = 0;
+				}
+			}
 		}
 
 		float cur_speed = fabs(ui->scroll_speed);
