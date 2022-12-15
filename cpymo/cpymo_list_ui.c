@@ -42,6 +42,7 @@ typedef struct cpymo_list_ui {
 	bool allow_exit_list_ui;
 
 	cpymo_list_ui_selecting_no_more_content_callback no_more_content_callback;
+	cpymo_list_ui_mouse_button_just_hold_callback just_hold_callback;
 
 	float current_y;
 	size_t nodes_per_screen;
@@ -411,8 +412,12 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	}
 
 	if (mouse_button_state == cpymo_key_hold_result_just_hold && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
-		cpymo_list_ui_exit(e);
-		return CPYMO_ERR_SUCC;
+		if (ui->just_hold_callback) 
+			return ui->just_hold_callback(e);
+		else {
+			cpymo_list_ui_exit(e);
+			return CPYMO_ERR_SUCC;
+		}
 	}
 	else if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
 		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
@@ -435,6 +440,14 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		ui->scroll_delta_y_sum = 0;
 
 	return CPYMO_ERR_SUCC;
+}
+
+const void *cpymo_list_ui_get_current_selected_const(
+	const struct cpymo_engine * e)
+{
+	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
+	return cpymo_list_ui_get_relative_id_to_cur(
+		e, ui->selection_relative_to_cur);
 }
 
 static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
@@ -536,6 +549,7 @@ error_t cpymo_list_ui_enter(
 	data->allow_exit_list_ui = true;
 	data->nodes_per_screen = nodes_per_screen;
 	data->mouse_touch_move_y_sum = 0;
+	data->just_hold_callback = NULL;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
@@ -611,6 +625,9 @@ void *cpymo_list_ui_data(struct cpymo_engine *e)
 
 void cpymo_list_ui_set_selecting_no_more_content_callback(struct cpymo_engine *e, cpymo_list_ui_selecting_no_more_content_callback c)
 { ((cpymo_list_ui *)cpymo_ui_data(e))->no_more_content_callback = c; }
+
+void cpymo_list_ui_set_mouse_button_just_hold_callback(struct cpymo_engine *e, cpymo_list_ui_mouse_button_just_hold_callback c)
+{ ((cpymo_list_ui *)cpymo_ui_data(e))->just_hold_callback = c; }
 
 const void *cpymo_list_ui_data_const(const struct cpymo_engine *e)
 { return ((uint8_t *)cpymo_ui_data_const(e)) + sizeof(cpymo_list_ui); }

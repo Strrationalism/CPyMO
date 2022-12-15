@@ -120,8 +120,8 @@ void cpymo_utils_match_rect(
 void cpymo_utils_center(
 	float container_w, float container_h, float w, float h, float *x, float *y)
 {
-	*x = (container_w - w) / 2;
-	*y = (container_h - h) / 2;
+	*x += (container_w - w) / 2;
+	*y += (container_h - h) / 2;
 }
 
 enum cpymo_key_hold_result cpymo_key_hold_update(
