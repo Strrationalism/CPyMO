@@ -207,6 +207,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	bool scrolled = false;
 #ifndef LOW_FRAME_RATE
 	if (ui->allow_scroll) {
+		float prev_speed = fabs(ui->scroll_speed);
 		if (e->input.mouse_button) {
 			ui->scroll_speed = 0;
 			if (e->prev_input.mouse_position_useable && 
@@ -239,6 +240,10 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 				if (ui->current_y < 0)
 					ui->current_y = 0;
 		}
+
+		float cur_speed = fabs(ui->scroll_speed);
+		if (prev_speed > 0.0001f && cur_speed <= 0.0001f)
+			cpymo_engine_request_redraw(e);
 	}
 #endif	
 
@@ -308,7 +313,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		if (ui->selection_relative_to_cur > (int)ui->nodes_per_screen - 1)
 			ui->selection_relative_to_cur = (int)ui->nodes_per_screen - 1;
 
-		if (control_by_wheel) {
+		if (!control_by_wheel) {
 			int s = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 			if (s != INT_MAX) 
 				ui->selection_relative_to_cur = s;
@@ -464,9 +469,17 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_ui_bg);
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
-	xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
-	xywh[3] = ui->node_height;
-	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_ui_element_bg);
+
+	bool is_sliding = 
+		e->input.mouse_button && ui->scroll_delta_y_sum >= SLIDE_LIMIT;
+	bool is_sliding_inertia = fabs(ui->scroll_speed) > 0.001f;
+	if (!is_sliding && !is_sliding_inertia) {
+		xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
+		xywh[3] = ui->node_height;
+		cpymo_backend_image_fill_rects(
+			xywh, 1, cpymo_color_white, 0.5f, 
+			cpymo_backend_image_draw_type_ui_element_bg);
+	}
 
 	// For Debugging!
 	/*cpymo_color red;
