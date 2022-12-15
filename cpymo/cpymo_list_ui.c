@@ -308,7 +308,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		if (ui->selection_relative_to_cur > (int)ui->nodes_per_screen - 1)
 			ui->selection_relative_to_cur = (int)ui->nodes_per_screen - 1;
 
-		if (control_by_wheel) {
+		if (!control_by_wheel) {
 			int s = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 			if (s != INT_MAX) 
 				ui->selection_relative_to_cur = s;
