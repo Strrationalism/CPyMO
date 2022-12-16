@@ -198,6 +198,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		e->input.mouse_position_useable)
 		mouse_y_delta = e->input.mouse_y - e->prev_input.mouse_y;
 
+	if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
+		cpymo_engine_request_redraw(e);
+
 	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button))
 		ui->mouse_touch_move_y_sum = 0;
 
@@ -232,13 +235,19 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			}
 			else ui->scroll_speed = 0;
 
-			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL)
-				if (ui->current_y > 0)
+			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL) {
+				if (ui->current_y > 0) {
 					ui->current_y = 0;
+					ui->scroll_speed = 0;
+				}
+			}
 
-			if (cpymo_list_ui_is_last_node(e, ui_data))
-				if (ui->current_y < 0)
+			if (cpymo_list_ui_is_last_node(e, ui_data)) {
+				if (ui->current_y < 0) {
 					ui->current_y = 0;
+					ui->scroll_speed = 0;
+				}
+			}
 		}
 
 		float cur_speed = fabs(ui->scroll_speed);
@@ -472,7 +481,8 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 
 	bool is_sliding = 
 		e->input.mouse_button && ui->scroll_delta_y_sum >= SLIDE_LIMIT;
-	bool is_sliding_inertia = fabs(ui->scroll_speed) > 0.001f;
+	bool is_sliding_inertia = 
+		fabs(ui->scroll_speed) > 0.001f && !e->input.mouse_button;
 	if (!is_sliding && !is_sliding_inertia) {
 		xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
 		xywh[3] = ui->node_height;
