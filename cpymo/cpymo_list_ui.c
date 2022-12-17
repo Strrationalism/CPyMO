@@ -210,7 +210,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	bool scrolled = false;
 #ifndef LOW_FRAME_RATE
 	if (ui->allow_scroll) {
-		float prev_speed = fabs(ui->scroll_speed);
+		float prev_speed = fabsf(ui->scroll_speed);
 		if (e->input.mouse_button) {
 			ui->scroll_speed = 0;
 			if (e->prev_input.mouse_position_useable && 
@@ -250,7 +250,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			}
 		}
 
-		float cur_speed = fabs(ui->scroll_speed);
+		float cur_speed = fabsf(ui->scroll_speed);
 		if (prev_speed > 0.0001f && cur_speed <= 0.0001f)
 			cpymo_engine_request_redraw(e);
 	}
