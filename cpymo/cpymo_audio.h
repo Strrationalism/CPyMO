@@ -99,7 +99,7 @@ void cpymo_audio_se_stop(struct cpymo_engine *e);
 error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_str voname);
 void cpymo_audio_vo_stop(struct cpymo_engine *e);
 
-void cpymo_audio_play_video(struct cpymo_engine *e, const char *path);
+error_t cpymo_audio_play_video(struct cpymo_engine *e, const char *path);
 
 const char *cpymo_audio_get_bgm_name(struct cpymo_engine *e);
 const char *cpymo_audio_get_se_name(struct cpymo_engine *e);

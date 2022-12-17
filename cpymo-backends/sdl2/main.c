@@ -51,7 +51,7 @@
 #define SDL_Delay emscripten_sleep
 #endif
 
-#if _WIN32 && !NDEBUG
+#if _WIN32 && DEBUG
 #include <crtdbg.h>
 #endif
 
@@ -193,7 +193,7 @@ static error_t after_start_game(cpymo_engine *e, const char *gamedir)
 {
 	save_last_selected_game_dir(gamedir);
 
-#ifndef __PSP__
+#ifndef ENABLE_SCREEN_FORCE_CENTERED
 	if (SDL_RenderSetLogicalSize(renderer, 
 		e->gameconfig.imagesize_w, e->gameconfig.imagesize_h) != 0) {
 		return CPYMO_ERR_UNKNOWN;
@@ -363,12 +363,32 @@ static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
 #include <psppower.h>
 #endif
 
+#ifdef __PSV__
+#include <psp2/power.h>
+#endif
+
 int main(int argc, char **argv)
 {
 #ifdef __PSP__
     scePowerSetCpuClockFrequency(333);
     scePowerSetBusClockFrequency(167);
 #endif
+
+#ifdef __PSV__
+	scePowerSetArmClockFrequency(444);
+	scePowerSetBusClockFrequency(222);
+	scePowerSetGpuClockFrequency(222);
+	scePowerSetGpuXbarClockFrequency(166);
+#endif
+
+#ifdef EXIT_TO_GAME_SELECTOR
+#ifndef USE_GAME_SELECTOR
+#error "You must define USE_GAME_SELECTOR when you define EXIT_TO_GAME_SELECTOR."
+#endif
+
+START:
+#endif
+
 
 	srand((unsigned)time(NULL));
 	//_CrtSetBreakAlloc(1371);
@@ -682,10 +702,10 @@ int main(int argc, char **argv)
 			const float game_w = engine.gameconfig.imagesize_w;
 			const float game_h = engine.gameconfig.imagesize_h;
 			const float rects[] = {
-				-100, 0, 100, game_h,
-				game_w, 0, 100, game_h,
-				0, -100, game_w, 100,
-				0, game_h, game_w, 100
+				-200, 0, 200, game_h,
+				game_w, 0, 200, game_h,
+				0, -200, game_w, 200,
+				0, game_h, game_w, 200
 			};
 
 			cpymo_backend_image_fill_rects(
@@ -719,7 +739,7 @@ EXIT:
 
 	SDL_Quit();
 
-	#if _WIN32 && !NDEBUG
+	#if _WIN32 && DEBUG
 	_CrtDumpMemoryLeaks();
 	#endif
 
@@ -728,6 +748,10 @@ EXIT:
 	extern void cpymo_backend_image_leakcheck(void);
 	cpymo_backend_image_leakcheck();
 	#endif
+
+#ifdef EXIT_TO_GAME_SELECTOR
+	goto START;
+#endif
 
 	return ret;
 }

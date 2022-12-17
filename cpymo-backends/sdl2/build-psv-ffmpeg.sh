@@ -23,7 +23,6 @@ chmod +x ./configure
 		--disable-protocols \
 		--enable-bsfs \
 		--disable-muxers \
-		--enable-protocol=file \
 		--enable-static \
 		--disable-decoder=gif,webp,bmp,dds,mjpeg,jpeg1s,jpeg2000,photocd,png,ppm,psd,qpeg,sga,sgi,smvjpeg,text \
 		--disable-parser=bmp,gif,mjpeg,webp,png,ipu,jpeg2000,pnm \

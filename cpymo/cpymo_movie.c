@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 typedef struct {
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		cpymo_package_stream_reader stream_reader;
+		AVIOContext *io_context;
+	#endif
+
 	AVFormatContext *format_context;
 	int video_stream_index;
 
@@ -39,9 +44,8 @@ typedef struct {
 	bool backend_inited;
 	bool skip_pressed;
 
-	float bgm_volume;
-
 	float current_time;
+	float video_current_frame_time;
 
 	char *current_bgm_name;
 } cpymo_movie;
@@ -114,12 +118,14 @@ RETRY: {
 		default: assert(false);
 		};
 
-		const float video_current_frame_time =
+		m->video_current_frame_time =
 			(float)
 			(m->video_frame->best_effort_timestamp
 				* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
 
-		if (video_current_frame_time < m->current_time)
+		av_frame_unref(m->video_frame);
+
+		if (m->video_current_frame_time < m->current_time)
 			goto RETRY;
 
 		return CPYMO_ERR_SUCC;
@@ -145,12 +151,7 @@ static error_t cpymo_movie_update(cpymo_engine *e, void *ui_data, float dt)
 	cpymo_movie *m = (cpymo_movie *)ui_data;
 	m->current_time += dt;
 
-	const float video_current_frame_time = 
-		(float)
-		(m->video_frame->best_effort_timestamp 
-			* av_q2d(m->format_context->streams[m->video_stream_index]->time_base));
-
-	if (video_current_frame_time < m->current_time) {
+	if (m->video_current_frame_time < m->current_time) {
 		error_t err = cpymo_movie_send_video_frame_to_backend(m);
 		if (err == CPYMO_ERR_NO_MORE_CONTENT) {
 			cpymo_ui_exit(e);
@@ -182,8 +183,6 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 
 	cpymo_audio_bgm_stop(e);
 
-	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, m->bgm_volume);
-
 	if (m->current_bgm_name) {
 		cpymo_audio_bgm_play(
 			e, 
@@ -196,6 +195,17 @@ static void cpymo_movie_delete(cpymo_engine *e, void *ui_data)
 	if (m->packet) av_packet_free(&m->packet);
 	if (m->video_codec_context) avcodec_free_context(&m->video_codec_context);
 	if (m->format_context) avformat_close_input(&m->format_context);
+
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		if (m->io_context) {
+			void *buf = m->io_context->buffer;
+			avio_context_free(&m->io_context);
+			if (buf) av_free(buf);
+		}
+
+		cpymo_package_stream_reader_close(&m->stream_reader);
+	#endif
+
 	if (m->backend_inited) cpymo_backend_movie_free_surface();
 }
 
@@ -235,6 +245,11 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 			&cpymo_movie_delete);
 	CPYMO_THROW(err);
 
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		m->io_context = NULL;
+		memset(&m->stream_reader, 0, sizeof(m->stream_reader));
+	#endif
+
 	m->current_bgm_name = current_bgm_name;
 	m->format_context = NULL;
 	m->video_codec_context = NULL;
@@ -244,8 +259,6 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	m->current_time = 0;
 	m->backend_inited = false;
 	m->skip_pressed = e->input.skip;
-	m->bgm_volume = cpymo_audio_get_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio);
-	cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, 1.0f);
 
 	#define THROW(ERR_COND, ERRCODE, MESSAGE) \
 		if (ERR_COND) { \
@@ -258,25 +271,53 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	#define THROW_AVERR(ERR_COND, ERRCODE) \
 		THROW(ERR_COND, ERRCODE, av_err2str(averr));
 
+	#define THROW_CPYMO_IF(ERR_COND, ERR) \
+		THROW(ERR_COND, ERR, cpymo_error_message(ERR));
+
 	char *path = NULL;
 	err = cpymo_assetloader_get_video_path(&path, videoname, &e->assetloader);
-	THROW(err != CPYMO_ERR_SUCC, err, "Faild to get video path");
+	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Faild to get video path");
 
-	#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
-	{
-		char *path2 = path;
-		path = malloc(strlen(path) + 1 + strlen("file://"));
-		if (path == NULL) {
-			free(path2);
-			return CPYMO_ERR_OUT_OF_MEM;
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		err = cpymo_package_stream_reader_from_file(&m->stream_reader, path);
+		THROW_CPYMO_IF(err != CPYMO_ERR_SUCC, err);
+
+		#ifndef FFMPEG_MOVIE_AVIO_BUFFER_SIZE
+		#define FFMPEG_MOVIE_AVIO_BUFFER_SIZE 1024 * 1024
+		#endif
+
+		void *io_buffer = av_malloc(FFMPEG_MOVIE_AVIO_BUFFER_SIZE);
+		THROW_CPYMO_IF(io_buffer == NULL, CPYMO_ERR_OUT_OF_MEM);
+
+		extern int cpymo_audio_packaged_audio_ffmpeg_read_packet(
+			void *opaque, uint8_t *buf, int buf_size);
+		extern int64_t cpymo_audio_packaged_audio_ffmpeg_seek(
+			void *opaque, int64_t offset, int whence);
+			
+		m->io_context = avio_alloc_context(
+			(unsigned char *)io_buffer, FFMPEG_MOVIE_AVIO_BUFFER_SIZE,
+			0, &m->stream_reader,
+			&cpymo_audio_packaged_audio_ffmpeg_read_packet,
+			NULL,
+			&cpymo_audio_packaged_audio_ffmpeg_seek);
+		
+		if (m->io_context == NULL) {
+			av_free(io_buffer);
+			THROW_CPYMO_IF(true, CPYMO_ERR_OUT_OF_MEM);
 		}
-		strcpy(path, "file://");
-		strcat(path, path2);
-		free(path2);
-	}
+
+		m->format_context = avformat_alloc_context();
+		THROW_CPYMO_IF(m->format_context == NULL, CPYMO_ERR_OUT_OF_MEM);
+
+		m->format_context->pb = m->io_context;
+		m->format_context->flags |= AVFMT_FLAG_CUSTOM_IO;
+		#define PATH_ARG ""
+	#else
+		#define PATH_ARG path
 	#endif
 
-	int averr = avformat_open_input(&m->format_context, path, NULL, NULL);
+	int averr = avformat_open_input(&m->format_context, PATH_ARG, NULL, NULL);
+	#undef PATH_ARG
 	if (averr != 0) {
 		if (path) free(path);
 		cpymo_ui_exit(e);
@@ -287,14 +328,14 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	THROW_AVERR(averr < 0, CPYMO_ERR_NOT_FOUND);
 
 	m->video_stream_index = av_find_best_stream(m->format_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
-	THROW(m->video_stream_index < 0, CPYMO_ERR_NOT_FOUND, "Could not find video stream");
+	THROW(m->video_stream_index < 0, CPYMO_ERR_NOT_FOUND, "[Error] Could not find video stream");
 
 	const AVCodec *video_codec = 
 		avcodec_find_decoder(m->format_context->streams[m->video_stream_index]->codecpar->codec_id);
-	THROW(video_codec == NULL, CPYMO_ERR_NOT_FOUND, "Could not find video codec");
+	THROW(video_codec == NULL, CPYMO_ERR_NOT_FOUND, "[Error] Could not find video codec");
 
 	m->video_codec_context = avcodec_alloc_context3(video_codec);
-	THROW(m->video_codec_context == NULL, CPYMO_ERR_UNKNOWN, "Could not open video codec context");
+	THROW(m->video_codec_context == NULL, CPYMO_ERR_UNKNOWN, "[Error] Could not open video codec context");
 
 	averr = avcodec_parameters_to_context(
 		m->video_codec_context,
@@ -305,12 +346,13 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 	THROW_AVERR(averr, CPYMO_ERR_UNKNOWN);
 
 	m->packet = av_packet_alloc();
-	THROW(m->packet == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVPacket");
+	THROW(m->packet == NULL, CPYMO_ERR_OUT_OF_MEM, "[Error] Could not alloc AVPacket");
 
 	m->video_frame = av_frame_alloc();
-	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "Could not alloc AVFrame");
+	THROW(m->video_frame == NULL, CPYMO_ERR_OUT_OF_MEM, "[Error] Could not alloc AVFrame");
 
 	m->video_frame->best_effort_timestamp = 0;
+	m->video_current_frame_time = 0;
 
 	int width = m->format_context->streams[m->video_stream_index]->codecpar->width;
 	int height = m->format_context->streams[m->video_stream_index]->codecpar->height;
@@ -334,7 +376,8 @@ error_t cpymo_movie_play(cpymo_engine * e, cpymo_str videoname)
 
 	m->backend_inited = true;
 
-	cpymo_audio_play_video(e, path);
+	err = cpymo_audio_play_video(e, path);
+	THROW(err != CPYMO_ERR_SUCC, err, "[Error] Can not open audio.");
 	cpymo_movie_send_video_frame_to_backend(m);
 	
 	free(path);

@@ -75,7 +75,21 @@ cpymo_input cpymo_input_snapshot()
 	out.mouse_position_useable = true;
 
 	SDL_Rect viewport;
+#ifndef ENABLE_SCREEN_FORCE_CENTERED
 	SDL_RenderGetViewport(renderer, &viewport);
+#else
+	float game_w = engine.gameconfig.imagesize_w;
+	float game_h = engine.gameconfig.imagesize_h;
+	cpymo_utils_match_rect(
+		SCREEN_WIDTH, SCREEN_HEIGHT,
+		&game_w, &game_h);
+	float x = 0, y = 0;
+	cpymo_utils_center(SCREEN_WIDTH, SCREEN_HEIGHT, game_w, game_h, &x, &y);
+	viewport.x = (int)x;
+	viewport.y = (int)y;
+	viewport.w = (int)game_w;
+	viewport.h = (int)game_h;
+#endif
 
 	out.mouse_x = ((float)mx / scale_x - viewport.x) / (float)viewport.w;
 	out.mouse_y = ((float)my / scale_y - viewport.y) / (float)viewport.h;

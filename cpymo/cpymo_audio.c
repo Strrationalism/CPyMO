@@ -283,7 +283,7 @@ FILL_BLANK_AND_RESET:
 	return;
 }
 
-static int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *buf, int buf_size)
+int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *buf, int buf_size)
 {
 	cpymo_package_stream_reader *r = (cpymo_package_stream_reader *)opaque;
 	size_t size = cpymo_package_stream_reader_read((char *)buf, buf_size, r);
@@ -291,7 +291,7 @@ static int cpymo_audio_packaged_audio_ffmpeg_read_packet(void *opaque, uint8_t *
 	else return (int)size;
 }
 
-static int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offset, int whence)
+int64_t cpymo_audio_packaged_audio_ffmpeg_seek(void *opaque, int64_t offset, int whence)
 {
 	cpymo_package_stream_reader *r = (cpymo_package_stream_reader *)opaque;
 
@@ -570,6 +570,38 @@ bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 	return !e->audio.channels[CPYMO_AUDIO_CHANNEL_SE].enabled;
 }
 
+static error_t cpymo_audio_high_level_play_file_on_filesystem(
+	cpymo_engine *e,
+	const char *path,
+	int channel,
+	bool loop)
+{
+	#ifdef DONT_PASS_PATH_TO_FFMPEG
+		cpymo_package_stream_reader r;
+		error_t err = cpymo_package_stream_reader_from_file(&r, path);
+		CPYMO_THROW(err);
+		
+		err = cpymo_audio_channel_play_file(
+			&e->audio.channels[channel],
+			NULL,
+			&r,
+			loop);
+
+		if (err != CPYMO_ERR_SUCC) {
+			cpymo_package_stream_reader_close(&r);
+			return err;
+		}
+
+		return CPYMO_ERR_SUCC;
+	#else
+		return cpymo_audio_channel_play_file(
+			&e->audio.channels[channel],
+			path,
+			NULL,
+			loop);
+	#endif
+}
+
 static error_t cpymo_audio_high_level_play(
 	cpymo_engine *e,
 	cpymo_str filename,
@@ -600,25 +632,8 @@ static error_t cpymo_audio_high_level_play(
 			error_t err = get_path(&path, filename, &e->assetloader);
 			CPYMO_THROW(err);
 
-			#ifdef FFMPEG_PREPEND_FILE_PROTOCOL
-			{
-				char *path2 = path;
-				path = malloc(strlen(path) + 1 + strlen("file://"));
-				if (path == NULL) {
-					free(path2);
-					return CPYMO_ERR_OUT_OF_MEM;
-				}
-				strcpy(path, "file://");
-				strcat(path, path2);
-				free(path2);
-			}
-			#endif
-
-			err = cpymo_audio_channel_play_file(
-				&e->audio.channels[channel],
-				path,
-				NULL,
-				loop);
+			err = cpymo_audio_high_level_play_file_on_filesystem(
+				e, path, channel, loop);
 			free(path);
 			return err;
 		}
@@ -717,13 +732,10 @@ void cpymo_audio_vo_stop(cpymo_engine * e)
 	cpymo_audio_channel_reset(e->audio.channels + CPYMO_AUDIO_CHANNEL_VO);
 }
 
-void cpymo_audio_play_video(cpymo_engine * e, const char * path)
+error_t cpymo_audio_play_video(cpymo_engine * e, const char * path)
 {
-	cpymo_audio_channel_play_file(
-		&e->audio.channels[CPYMO_AUDIO_CHANNEL_BGM],
-		path,
-		NULL,
-		false);
+	return cpymo_audio_high_level_play_file_on_filesystem(
+		e, path, CPYMO_AUDIO_CHANNEL_BGM, false);
 }
 
 const char * cpymo_audio_get_bgm_name(cpymo_engine * e)
@@ -804,7 +816,8 @@ error_t cpymo_audio_vo_play(struct cpymo_engine *e, cpymo_str voname)
 
 void cpymo_audio_vo_stop(struct cpymo_engine *e) {}
 
-void cpymo_audio_play_video(struct cpymo_engine *e, const char *path) {}
+error_t cpymo_audio_play_video(struct cpymo_engine *e, const char *path) 
+{ return CPYMO_ERR_UNSUPPORTED; }
 
 #endif
 

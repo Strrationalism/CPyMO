@@ -1,4 +1,5 @@
 ﻿#include "cpymo_prelude.h"
+#include "cpymo_engine.h"
 #include "cpymo_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,3 +107,83 @@ void cpymo_utils_attach_mask_to_rgba_ex(void * rgba_, int w, int h, void * mask_
 	}
 }
 
+void cpymo_utils_match_rect(
+	float container_w, float container_h, float *w, float *h)
+{
+	float ratio_w = *w / container_w;
+	float ratio_h = *h / container_h;
+	float ratio = ratio_w > ratio_h ? ratio_w : ratio_h;
+	*w /= ratio;
+	*h /= ratio;
+}
+
+void cpymo_utils_center(
+	float container_w, float container_h, float w, float h, float *x, float *y)
+{
+	*x += (container_w - w) / 2;
+	*y += (container_h - h) / 2;
+}
+
+enum cpymo_key_hold_result cpymo_key_hold_update(
+	cpymo_engine *e, cpymo_key_hold *h, float dt, bool pressed)
+{
+	const float 
+		cpymo_key_hold_time = 0.4f,
+		cpymo_key_hold_cancel_speed = 0.7f;
+
+	if (!pressed) {
+		h->ignore_current = false;
+		h->hold_canceled = false;
+	}
+
+	if (h->ignore_current) return cpymo_key_hold_result_released;
+
+	const bool prev_pressed = h->prev_pressed;
+	h->prev_pressed = pressed;
+
+	if (!pressed && !prev_pressed) {
+		h->timer = 0;
+		return cpymo_key_hold_result_released;
+	}
+	else if (pressed && !prev_pressed) {
+		h->timer = 0;
+		return cpymo_key_hold_result_just_press;
+	}
+	else if (pressed && prev_pressed) {
+		float mouse_speed = 0;
+		if (e->input.mouse_position_useable && e->input.mouse_position_useable) {
+			float 
+				mouse_distance_x = fabsf(e->input.mouse_x - e->prev_input.mouse_x),
+				mouse_distance_y = fabsf(e->input.mouse_y - e->prev_input.mouse_y);
+			float mouse_distance = mouse_distance_x;
+			if (mouse_distance_y > mouse_distance) 
+				mouse_distance = mouse_distance_y;
+			mouse_speed = mouse_distance / (dt > 0.00001f ? dt : 0.016f);
+			float max_screen_edge = e->gameconfig.imagesize_h;
+			if (max_screen_edge < e->gameconfig.imagesize_w) 
+				max_screen_edge = e->gameconfig.imagesize_w;
+			mouse_speed /= max_screen_edge;
+		}
+
+		if (mouse_speed > cpymo_key_hold_cancel_speed) {
+			if (!h->hold_canceled) {
+				h->hold_canceled = true;
+				if (h->timer >= cpymo_key_hold_time)
+					return cpymo_key_hold_result_cancel;
+			}
+		}
+	
+		if (h->hold_canceled) return cpymo_key_hold_result_pressing;
+		h->timer += dt;
+		if (h->timer - dt < cpymo_key_hold_time && h->timer >= cpymo_key_hold_time) 
+			return cpymo_key_hold_result_just_hold;
+		else if (h->timer >= cpymo_key_hold_time) 
+			return cpymo_key_hold_result_holding;
+		else return cpymo_key_hold_result_pressing;
+	}
+	else {//if (!pressed && prev_pressed) {
+		if (h->timer >= cpymo_key_hold_time && !h->hold_canceled) 
+			return cpymo_key_hold_result_hold_released;
+		else return cpymo_key_hold_result_just_released;
+	}
+}

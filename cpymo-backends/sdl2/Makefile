@@ -23,6 +23,10 @@ else
 CFLAGS += -O3 -DNDEBUG
 endif
 
+ifeq ($(DISABLE_AUDIO), 1)
+CFLAGS += -DDISABLE_AUDIO -DDISABLE_MOVIE
+endif
+
 ifeq ($(LEAKCHECK), 1)
 CFLAGS += -DLEAKCHECK
 endif

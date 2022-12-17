@@ -118,7 +118,7 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
 
 	enum cpymo_key_hold_result mbs = cpymo_key_hold_update(
-		&ui->mouse_button, dt, e->input.mouse_button);
+		e, &ui->mouse_button, dt, e->input.mouse_button);
 	
 	if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mbs == cpymo_key_hold_result_holding) {
 		cpymo_ui_exit(e);

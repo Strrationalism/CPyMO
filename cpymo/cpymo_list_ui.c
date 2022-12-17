@@ -42,6 +42,7 @@ typedef struct cpymo_list_ui {
 	bool allow_exit_list_ui;
 
 	cpymo_list_ui_selecting_no_more_content_callback no_more_content_callback;
+	cpymo_list_ui_mouse_button_just_hold_callback just_hold_callback;
 
 	float current_y;
 	size_t nodes_per_screen;
@@ -185,7 +186,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
 
 	enum cpymo_key_hold_result mouse_button_state =
-		cpymo_key_hold_update(&ui->key_mouse_button, d, e->input.mouse_button);
+		cpymo_key_hold_update(e, &ui->key_mouse_button, d, e->input.mouse_button);
 
 	if (CPYMO_INPUT_JUST_RELEASED(e, cancel)) {
 		cpymo_list_ui_exit(e); 
@@ -197,6 +198,9 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		e->input.mouse_position_useable)
 		mouse_y_delta = e->input.mouse_y - e->prev_input.mouse_y;
 
+	if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button))
+		cpymo_engine_request_redraw(e);
+
 	if (CPYMO_INPUT_JUST_PRESSED(e, mouse_button))
 		ui->mouse_touch_move_y_sum = 0;
 
@@ -206,6 +210,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	bool scrolled = false;
 #ifndef LOW_FRAME_RATE
 	if (ui->allow_scroll) {
+		float prev_speed = fabsf(ui->scroll_speed);
 		if (e->input.mouse_button) {
 			ui->scroll_speed = 0;
 			if (e->prev_input.mouse_position_useable && 
@@ -230,14 +235,24 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			}
 			else ui->scroll_speed = 0;
 
-			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL)
-				if (ui->current_y > 0)
+			if (ui->get_prev(e, ui + 1, ui->current_node) == NULL) {
+				if (ui->current_y > 0) {
 					ui->current_y = 0;
+					ui->scroll_speed = 0;
+				}
+			}
 
-			if (cpymo_list_ui_is_last_node(e, ui_data))
-				if (ui->current_y < 0)
+			if (cpymo_list_ui_is_last_node(e, ui_data)) {
+				if (ui->current_y < 0) {
 					ui->current_y = 0;
+					ui->scroll_speed = 0;
+				}
+			}
 		}
+
+		float cur_speed = fabsf(ui->scroll_speed);
+		if (prev_speed > 0.0001f && cur_speed <= 0.0001f)
+			cpymo_engine_request_redraw(e);
 	}
 #endif	
 
@@ -307,7 +322,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		if (ui->selection_relative_to_cur > (int)ui->nodes_per_screen - 1)
 			ui->selection_relative_to_cur = (int)ui->nodes_per_screen - 1;
 
-		if (control_by_wheel) {
+		if (!control_by_wheel) {
 			int s = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 			if (s != INT_MAX) 
 				ui->selection_relative_to_cur = s;
@@ -411,8 +426,12 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	}
 
 	if (mouse_button_state == cpymo_key_hold_result_just_hold && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
-		cpymo_list_ui_exit(e);
-		return CPYMO_ERR_SUCC;
+		if (ui->just_hold_callback) 
+			return ui->just_hold_callback(e);
+		else {
+			cpymo_list_ui_exit(e);
+			return CPYMO_ERR_SUCC;
+		}
 	}
 	else if (CPYMO_INPUT_JUST_PRESSED(e, ok)) {
 		void *obj = cpymo_list_ui_get_relative_id_to_cur(e, ui->selection_relative_to_cur);
@@ -437,6 +456,14 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 	return CPYMO_ERR_SUCC;
 }
 
+const void *cpymo_list_ui_get_current_selected_const(
+	const struct cpymo_engine * e)
+{
+	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
+	return cpymo_list_ui_get_relative_id_to_cur(
+		e, ui->selection_relative_to_cur);
+}
+
 static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 {
 	cpymo_bg_draw(e);
@@ -451,9 +478,18 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_black, 0.5f, cpymo_backend_image_draw_type_ui_bg);
 
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
-	xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
-	xywh[3] = ui->node_height;
-	cpymo_backend_image_fill_rects(xywh, 1, cpymo_color_white, 0.5f, cpymo_backend_image_draw_type_ui_element_bg);
+
+	bool is_sliding = 
+		e->input.mouse_button && ui->scroll_delta_y_sum >= SLIDE_LIMIT;
+	bool is_sliding_inertia = 
+		fabs(ui->scroll_speed) > 0.001f && !e->input.mouse_button;
+	if (!is_sliding && !is_sliding_inertia) {
+		xywh[1] = cpymo_list_ui_get_y(e, ui->selection_relative_to_cur);
+		xywh[3] = ui->node_height;
+		cpymo_backend_image_fill_rects(
+			xywh, 1, cpymo_color_white, 0.5f, 
+			cpymo_backend_image_draw_type_ui_element_bg);
+	}
 
 	// For Debugging!
 	/*cpymo_color red;
@@ -536,6 +572,7 @@ error_t cpymo_list_ui_enter(
 	data->allow_exit_list_ui = true;
 	data->nodes_per_screen = nodes_per_screen;
 	data->mouse_touch_move_y_sum = 0;
+	data->just_hold_callback = NULL;
 
 	cpymo_key_pluse_init(&data->key_up, e->input.up);
 	cpymo_key_pluse_init(&data->key_down, e->input.down);
@@ -611,6 +648,9 @@ void *cpymo_list_ui_data(struct cpymo_engine *e)
 
 void cpymo_list_ui_set_selecting_no_more_content_callback(struct cpymo_engine *e, cpymo_list_ui_selecting_no_more_content_callback c)
 { ((cpymo_list_ui *)cpymo_ui_data(e))->no_more_content_callback = c; }
+
+void cpymo_list_ui_set_mouse_button_just_hold_callback(struct cpymo_engine *e, cpymo_list_ui_mouse_button_just_hold_callback c)
+{ ((cpymo_list_ui *)cpymo_ui_data(e))->just_hold_callback = c; }
 
 const void *cpymo_list_ui_data_const(const struct cpymo_engine *e)
 { return ((uint8_t *)cpymo_ui_data_const(e)) + sizeof(cpymo_list_ui); }

@@ -132,17 +132,17 @@ jobs:
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
-        ./vdpm sdl2_mixer
-        ./vdpm libogg
-        ./vdpm libvorbis
-        ./vdpm libmodplug
-        ./vdpm mpg123
-        ./vdpm libmikmod
-        ./vdpm flac
-        cd ../cpymo-backends/sdl2
+        ./vdpm sdl2_mixer 
+        ./vdpm flac 
+        ./vdpm libmodplug 
+        ./vdpm mpg123 
+        ./vdpm libogg 
+        ./vdpm libvorbis 
+        ./vdpm libmikmod 
+        # cd ../cpymo-backends/sdl2
         # chmod +x ./build-psv-ffmpeg.sh
         # ./build-psv-ffmpeg.sh
-        cd ../../
+        # cd ../../
 
     - name: Build
       run: |
@@ -448,7 +448,9 @@ jobs:
         submodules: true
 
     - name: Install dependents
-      run: sudo apt-get install libsdl-dev libsdl-mixer1.2-dev # libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install libsdl1.2-dev libsdl-mixer1.2-dev # libavcodec-dev libswscale-dev libavformat-dev libswresample-dev libavutil-dev
 
     - name: Build
       run: |

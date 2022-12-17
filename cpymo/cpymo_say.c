@@ -274,7 +274,7 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 	assert(e->say.textbox_usable);
 
 	const enum cpymo_key_hold_result mouse_button_state =
-		cpymo_key_hold_update(&e->say.key_mouse_button, dt, e->input.mouse_button);
+		cpymo_key_hold_update(e, &e->say.key_mouse_button, dt, e->input.mouse_button);
 
 	if (e->say.hide_window) {
 		if (cpymo_input_foward_key_just_released(e)) {
