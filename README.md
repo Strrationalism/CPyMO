@@ -835,6 +835,7 @@ CPyMO ASCII ART仅支持键盘操作：
   - heiyu04
 * 调试设备提供
   - Sony PSP - 白若秋
+  - Sony PS Vita - 福星老师
   - Nintendo Wii - 开心豆
 * 测试
   - 幻世
