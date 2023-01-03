@@ -367,8 +367,8 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 
 	cpymo_floating_hint_draw(&engine->floating_hint);
 	cpymo_flash_draw(engine);
-	cpymo_fade_draw(engine);
 	cpymo_bg_draw_transform_effect(engine);
+	cpymo_fade_draw(engine);
 
 	cpymo_text_draw(engine);
 	cpymo_say_draw(engine);
