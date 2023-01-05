@@ -49,7 +49,6 @@ Android         | SDL2 | FFmpeg   | FFmpeg             | 外置字体     | 游�
 平台               | 后端       | 视频播放器 | 音频支持                       | 字体支持      | 额外功能
 ----------------  | --------- | --------- | ---------------------------- | ---------- | ----------
 Sony PS Vita      | SDL2      | 不支持     | SDL2_mixer                   | 外置字体     | 游戏选择器
-Sony PSP (SDL 1.2)| SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Nintendo Wii      | SDL 1.2   | 不支持     | SDL_mixer                    | 外置字体     | 游戏选择器
 Windows (SDL 1.2) | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 加载系统字体  | 
 Linux (SDL 1.2)   | SDL 1.2   | FFmpeg    | FFmpeg, SDL_mixer            | 外置字体     | 
@@ -264,9 +263,7 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
 
 # Sony Playstation Portable 平台
 
-## SDL2后端版本（推荐）
-
-### 依赖
+## 依赖
 
 1. [pspsdk](https://github.com/pspdev/pspsdk).
 2. 使用`psp-pacman`安装:
@@ -274,42 +271,9 @@ cd到`cpymo-backends/sdl2`，执行`make -j -f Makefile.Switch`即可编译到�
     * sdl2-image
 3. 使用`./cpymo-backends/sdl2/build-psp-ffmpeg.sh`编译FFmpeg
 
-### 编译
+## 编译
 
 在`cpymo-backends/sdl2`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
-
-## SDL 1.2后端版本
-
-此版本画面性能较低，但相对比较稳定，不支持mp3音频。
-
-### 依赖
-
-1. [pspsdk](https://github.com/pspdev/pspsdk).
-2. 使用`psp-pacman`安装：
-    * sdl
-    * sdl-image
-    * sdl-ttf
-    * freetype2
-    * libogg
-    * libvorbis
-    * libmikmod
-    * smpeg
-3. 克隆并编译[SDL_mixer](https://github.com/pspdev/SDL_mixer)仓库的`SDL_mixer-psp`分支，并安装：
-
-```sh
-git clone https://github.com/pspdev/SDL_mixer -b SDL_mixer-psp --depth 1
-cd ./SDL_mixer
-chmod +x ./autogen.sh
-./autogen.sh
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" \
-    ./configure --host psp --with-sdl-prefix=$(psp-config --psp-prefix) \
-    --enable-music-mp3 --prefix=$(psp-config --psp-prefix) --enable-music-mod --enable-music-ogg
-make install -j
-```
-
-### 编译
-
-在`cpymo-backends/sdl1`下执行`make -f Makefile.PSP`即可生成`EBOOT.PBP`.
 
 ## 安装
 
@@ -835,6 +799,7 @@ CPyMO ASCII ART仅支持键盘操作：
   - heiyu04
 * 调试设备提供
   - Sony PSP - 白若秋
+  - Sony PS Vita - 福星老师
   - Nintendo Wii - 开心豆
 * 测试
   - 幻世
