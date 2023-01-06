@@ -559,8 +559,10 @@ static void cpymo_album_showing_cg_next(
 
 			if (err != CPYMO_ERR_SUCC) {
 				a->showing_cg_image = NULL;
-				printf("[Error] %s.]\n", cpymo_error_message(err));
-				cpymo_album_showing_cg_next(e, a);
+				printf("[Error] %s\n", cpymo_error_message(err));
+				if (err != CPYMO_ERR_OUT_OF_MEM)
+					cpymo_album_showing_cg_next(e, a);
+				return;
 			}
 
 			a->showing_cg_image_draw_src_w = a->showing_cg_image_w;
@@ -892,6 +894,10 @@ static void cpymo_album_deleter(cpymo_engine *e, void *a)
 	if (album->album_list_text) free(album->album_list_text);
 	if (album->current_ui) cpymo_backend_image_free(album->current_ui);
 	if (album->cv_thumb_cover) cpymo_backend_image_free(album->cv_thumb_cover);
+	if (album->showing_cg) {
+		if (album->showing_cg_image) 
+			cpymo_backend_image_free(album->showing_cg_image);
+	}
 
 	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i)
 		if (album->cg_infos[i].title != NULL)
