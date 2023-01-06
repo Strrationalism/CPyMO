@@ -110,10 +110,10 @@ static void cpymo_bg_draw_transform_effect_fade(const cpymo_engine *e)
 	}
 }
 
-static void cpymo_bg_transfer_operate(cpymo_engine *e)
+void cpymo_bg_transfer_operate(cpymo_engine *e)
 {
 	cpymo_bg *bg = &e->bg;
-	assert(bg->transform_next_bg);
+	if (bg->transform_next_bg == NULL) return;
 
 	if (bg->current_bg)
 		cpymo_backend_image_free(bg->current_bg);
@@ -125,8 +125,6 @@ static void cpymo_bg_transfer_operate(cpymo_engine *e)
 	bg->current_bg_x = bg->transform_next_bg_x;
 	bg->current_bg_y = bg->transform_next_bg_y;
 	bg->transform_draw = NULL;
-
-	cpymo_engine_request_redraw(e);
 }
 
 static void cpymo_bg_transfer(cpymo_engine *e)
@@ -179,6 +177,58 @@ static bool cpymo_bg_wait_for_progression_fade(cpymo_engine *engine, float delta
 	return cpymo_bg_wait_for_progression(engine, delta_time);
 }
 
+static void cpymo_bg_calc_pos(
+	cpymo_engine *e,
+	cpymo_bg *bg,
+	float w,
+	float h,
+	float *x,
+	float *y)
+{
+	// In pymo, when x = y = 0 and bg smaller than screen, bg will be centered.
+	if (fabs(*x) < 1 && fabs(*y) < 1 && (w <= e->gameconfig.imagesize_w || h <= e->gameconfig.imagesize_h)) {
+		*x = (float)(e->gameconfig.imagesize_w - w) / 2.0f;
+		*y = (float)(e->gameconfig.imagesize_h - h) / 2.0f;
+	} 
+	else {
+		*x = -(*x / 100.0f) * (float)w;
+		*y = -(*y / 100.0f) * (float)h;
+	}
+}
+
+error_t cpymo_bg_command_low_memory(
+	cpymo_engine *engine,
+	cpymo_bg *bg,
+	cpymo_str bgname,
+	float x,
+	float y)
+{
+	cpymo_bg_reset(bg);
+
+	error_t err = cpymo_assetloader_load_bg_image(
+		&bg->current_bg, 
+		&bg->current_bg_w, 
+		&bg->current_bg_h, 
+		bgname, 
+		&engine->assetloader);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_bg_init(bg);
+		return err;
+	}
+
+	cpymo_bg_calc_pos(
+		engine, 
+		bg, 
+		bg->current_bg_w, bg->current_bg_h, 
+		&bg->current_bg_x, &bg->current_bg_y);
+
+	assert(bg->current_bg_name == NULL);
+	bg->current_bg_name = cpymo_str_copy_malloc_trim_memory(engine, bgname);
+
+	cpymo_engine_request_redraw(engine);
+	return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_bg_command(
 	cpymo_engine *engine,
 	cpymo_bg *bg,
@@ -188,12 +238,26 @@ error_t cpymo_bg_command(
 	float y,
 	float time)
 {
+	if (cpymo_str_equals_str(transition, "BG_NOFADE") || time <= 0.00001f)
+		return cpymo_bg_command_low_memory(engine, bg, bgname, x, y);
+
 	int w, h;
 	cpymo_backend_image img;
-	error_t err = cpymo_assetloader_load_bg_image(&img, &w, &h, bgname, &engine->assetloader);
+	error_t err = cpymo_assetloader_load_bg_image(
+		&img, &w, &h, bgname, &engine->assetloader);
+
+	if (err == CPYMO_ERR_OUT_OF_MEM) {
+		cpymo_engine_trim_memory(engine);
+		return cpymo_bg_command_low_memory(engine, bg, bgname, x, y);
+	}
+
 	CPYMO_THROW(err);
 
 	char *next_bg_name = (char *)realloc(bg->current_bg_name, bgname.len + 1);
+	if (next_bg_name == NULL) {
+		cpymo_engine_trim_memory(engine);
+		next_bg_name = (char *)realloc(bg->current_bg_name, bgname.len + 1);
+	}
 	if (next_bg_name) {
 		cpymo_str_copy(next_bg_name, bgname.len + 1, bgname);
 		bg->current_bg_name = next_bg_name;
@@ -205,25 +269,20 @@ error_t cpymo_bg_command(
 	bg->transform_next_bg = img;
 	bg->transform_next_bg_w = w;
 	bg->transform_next_bg_h = h;
+	bg->transform_next_bg_x = x;
+	bg->transform_next_bg_y = y;
 
-	// In pymo, when x = y = 0 and bg smaller than screen, bg will be centered.
-	if (fabs(x) < 1 && fabs(y) < 1 && (w <= engine->gameconfig.imagesize_w || h <= engine->gameconfig.imagesize_h)) {
-		bg->transform_next_bg_x = (float)(engine->gameconfig.imagesize_w - w) / 2.0f;
-		bg->transform_next_bg_y = (float)(engine->gameconfig.imagesize_h - h) / 2.0f;
-	} 
-	else {
-		bg->transform_next_bg_x = -(x / 100.0f) * (float)w;
-		bg->transform_next_bg_y = -(y / 100.0f) * (float)h;
-	}
+	cpymo_bg_calc_pos(
+		engine, 
+		bg, 
+		w, h, 
+		&bg->transform_next_bg_x, &bg->transform_next_bg_y);
 
 #ifdef LOW_FRAME_RATE
 	transition = cpymo_str_pure("BG_NOFADE");
 #endif
 
-	if (cpymo_str_equals_str(transition, "BG_NOFADE")) {
-		cpymo_bg_transfer(engine);
-	}
-	else if (cpymo_str_equals_str(transition, "BG_ALPHA")) {
+	if (cpymo_str_equals_str(transition, "BG_ALPHA")) {
 		bg->transform_progression = cpymo_tween_create(time);
 		bg->transform_draw = &cpymo_bg_draw_transform_effect_alpha;
 		cpymo_wait_register_with_callback(

@@ -63,6 +63,7 @@ void cpymo_engine_draw(const cpymo_engine *engine);
 
 bool cpymo_engine_skipping(cpymo_engine *engine);
 
+void cpymo_engine_trim_memory(cpymo_engine *e);
 void cpymo_engine_request_redraw(cpymo_engine *engine);
 void cpymo_engine_exit(cpymo_engine *e);
 

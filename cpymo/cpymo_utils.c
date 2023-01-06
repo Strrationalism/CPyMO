@@ -34,6 +34,17 @@ error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 	return CPYMO_ERR_SUCC;
 }
 
+void *cpymo_utils_malloc_trim_memory(cpymo_engine *e, size_t size)
+{
+	void *ret = malloc(size);
+	if (ret == NULL && e) {
+		cpymo_engine_trim_memory(e);
+		ret = malloc(size);
+	}
+
+	return ret;
+}
+
 float cpymo_utils_lerp(float a, float b, float x)
 {
 	float t = (float)(x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2);
