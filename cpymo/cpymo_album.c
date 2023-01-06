@@ -308,6 +308,9 @@ typedef struct {
 
 	int showing_cg_image_draw_src_w,
 		showing_cg_image_draw_src_h;
+
+	char *current_bg_name;
+	float current_bg_x, current_bg_y;
 } cpymo_album;
 
 uint64_t cpymo_album_cg_name_hash(cpymo_str cg_filename)
@@ -331,10 +334,8 @@ error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_str cg_filename)
 	return cpymo_hash_flags_add(&e->flags, cpymo_album_cg_name_hash(cg_filename));
 }
 
-static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
+static void cpymo_album_unload_page(cpymo_engine *e, cpymo_album *a)
 {
-	cpymo_engine_request_redraw(e);
-
 	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
 		if (a->cg_infos[i].title != NULL)
 			cpymo_backend_text_free(a->cg_infos[i].title);
@@ -346,11 +347,17 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 		a->current_ui = NULL;
 	}
 
+	
 	a->current_ui_w = e->gameconfig.imagesize_w;
 	a->current_ui_h = e->gameconfig.imagesize_h;
+}
+
+static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
+{
+	cpymo_engine_request_redraw(e);
+	cpymo_album_unload_page(e, a);
 
 	a->cg_count = 0;
-	a->current_cg_selection = 0;
 
 	cpymo_parser album_list;
 	cpymo_parser_init(&album_list, a->album_list_text, a->album_list_text_size);
@@ -437,12 +444,12 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 
 static error_t cpymo_album_next_page(cpymo_engine *e, cpymo_album *a)
 {
+	a->current_cg_selection = 0;
 	size_t prev_page = a->current_page;
 	a->current_page = (a->current_page + 1) % a->page_count;
 	if (prev_page != a->current_page) 
 		return cpymo_album_load_page(e, a);
 	else {
-		a->current_cg_selection = 0;
 		cpymo_engine_request_redraw(e);
 		return CPYMO_ERR_SUCC;
 	}
@@ -450,13 +457,14 @@ static error_t cpymo_album_next_page(cpymo_engine *e, cpymo_album *a)
 
 static error_t cpymo_album_prev_page(cpymo_engine *e, cpymo_album *a)
 {
+	a->current_cg_selection = 0;
 	size_t prev_page = a->current_page;
 	if (a->current_page <= 0) a->current_page = a->page_count - 1;
 	else a->current_page--;
 
-	if (prev_page != a->current_page) return cpymo_album_load_page(e, a);
+	if (prev_page != a->current_page) 
+		return cpymo_album_load_page(e, a);
 	else {
-		a->current_cg_selection = 0;
 		cpymo_engine_request_redraw(e);
 		return CPYMO_ERR_SUCC;
 	}
@@ -486,10 +494,12 @@ static void cpymo_album_exit_showing_cg(cpymo_engine *e, cpymo_album *a) {
 	}
 
 	a->showing_cg = NULL;
+	cpymo_album_load_page(e, a);
 	cpymo_input_ignore_next_mouse_button_event(e);
 }
 
-static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
+static void cpymo_album_showing_cg_next(
+	cpymo_engine *e, cpymo_album *a) {
 	cpymo_input_ignore_next_mouse_button_event(e);
 	if (a->showing_cg_image != NULL) {
 		cpymo_backend_image_free(a->showing_cg_image);
@@ -557,6 +567,8 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 			#else
 				a->showing_cg_show_end = false;
 			#endif
+
+			cpymo_album_unload_page(e, a);
 		}
 		else
 			cpymo_album_showing_cg_next(e, a);
@@ -565,7 +577,9 @@ static void cpymo_album_showing_cg_next(cpymo_engine *e, cpymo_album *a) {
 
 static error_t cpymo_album_select_ok(cpymo_engine *e, cpymo_album *a)
 {
-	a->showing_cg = &a->cg_infos[a->current_cg_selection];
+	cpymo_album_cg_info *cg_info = &a->cg_infos[a->current_cg_selection];
+	if (!cg_info->preview_unlocked) return CPYMO_ERR_SUCC;
+	a->showing_cg = cg_info;
 	a->showing_cg_filename_parser = a->showing_cg->cg_name_parser;
 	a->showing_cg_next_cg_id = 0;
 	cpymo_album_showing_cg_next(e, a);
@@ -854,6 +868,17 @@ static void cpymo_album_deleter(cpymo_engine *e, void *a)
 	#ifdef __3DS__
 	fill_screen_enabled = true;
 	#endif
+
+	
+	if (album->current_bg_name) {
+		cpymo_bg_command(
+			e, 
+			&e->bg, 
+			cpymo_str_pure(album->current_bg_name),
+			cpymo_str_pure("BG_NOFADE"),
+			album->current_bg_x, album->current_bg_y, 0);
+		free(album->current_bg_name);
+	}
 }
 
 error_t cpymo_album_enter(
@@ -882,6 +907,7 @@ error_t cpymo_album_enter(
 	album->mouse_x_sum = 0;
 	album->showing_cg = NULL;
 	album->showing_cg_image = NULL;
+	album->current_bg_name = NULL;
 
 	cpymo_key_pluse_init(&album->key_left, e->input.left);
 	cpymo_key_pluse_init(&album->key_right, e->input.right);
@@ -928,6 +954,15 @@ error_t cpymo_album_enter(
 	} while (cpymo_parser_next_line(&parser));
 
 	CPYMO_THROW(err);
+
+	album->current_bg_name = e->bg.current_bg_name;
+	e->bg.current_bg_name = NULL;
+	album->current_bg_x = e->bg.current_bg_x;
+	album->current_bg_y = e->bg.current_bg_y;
+	cpymo_bg_reset(&e->bg);
+
+	album->current_cg_selection = 0;
+	album->current_page = 0;
 
 	return cpymo_album_load_page(e, album);
 }
