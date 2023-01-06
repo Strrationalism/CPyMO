@@ -238,6 +238,11 @@ error_t cpymo_bg_command(
 	float y,
 	float time)
 {
+
+#ifdef LOW_FRAME_RATE
+	transition = cpymo_str_pure("BG_NOFADE");
+#endif
+
 	if (cpymo_str_equals_str(transition, "BG_NOFADE") || time <= 0.00001f)
 		return cpymo_bg_command_low_memory(engine, bg, bgname, x, y);
 
@@ -277,10 +282,6 @@ error_t cpymo_bg_command(
 		bg, 
 		w, h, 
 		&bg->transform_next_bg_x, &bg->transform_next_bg_y);
-
-#ifdef LOW_FRAME_RATE
-	transition = cpymo_str_pure("BG_NOFADE");
-#endif
 
 	if (cpymo_str_equals_str(transition, "BG_ALPHA")) {
 		bg->transform_progression = cpymo_tween_create(time);
