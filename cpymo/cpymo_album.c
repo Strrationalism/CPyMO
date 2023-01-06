@@ -560,8 +560,7 @@ static void cpymo_album_showing_cg_next(
 			if (err != CPYMO_ERR_SUCC) {
 				a->showing_cg_image = NULL;
 				printf("[Error] %s\n", cpymo_error_message(err));
-				if (err != CPYMO_ERR_OUT_OF_MEM)
-					cpymo_album_showing_cg_next(e, a);
+				cpymo_album_showing_cg_next(e, a);
 				return;
 			}
 
