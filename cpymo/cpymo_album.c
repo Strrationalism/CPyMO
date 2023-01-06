@@ -347,9 +347,15 @@ static void cpymo_album_unload_page(cpymo_engine *e, cpymo_album *a)
 		a->current_ui = NULL;
 	}
 
-	
 	a->current_ui_w = e->gameconfig.imagesize_w;
 	a->current_ui_h = e->gameconfig.imagesize_h;
+
+	if (a->cv_thumb_cover) {
+		cpymo_backend_image_free(a->cv_thumb_cover);
+		a->cv_thumb_cover = NULL;
+		a->cv_thumb_cover_w = 0;
+		a->cv_thumb_cover_h = 0;
+	}
 }
 
 static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
@@ -438,6 +444,32 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 		&e->assetloader,
 		&a->current_ui_w,
 		&a->current_ui_h);
+
+	for (size_t i = 0; i < a->cg_count; ++i) {
+		if (!a->cg_infos[i].preview_unlocked) {
+			int w, h;
+			assert(a->cv_thumb_cover == NULL);
+			error_t err = cpymo_assetloader_load_system_image(
+				&a->cv_thumb_cover,
+				&w,
+				&h,
+				cpymo_str_pure("cvThumb"),
+				&e->assetloader,
+				false);
+
+			if (err == CPYMO_ERR_SUCC) {
+				a->cv_thumb_cover_w = (size_t)w;
+				a->cv_thumb_cover_h = (size_t)h;
+			}
+			else {
+				a->cv_thumb_cover = NULL;
+				a->cv_thumb_cover_w = 0;
+				a->cv_thumb_cover_h = 0;
+			}
+
+			break;
+		}
+	}
 
 	return err;
 }
@@ -903,7 +935,6 @@ error_t cpymo_album_enter(
 	album->current_page = page;
 	album->page_count = 0;
 	album->mouse_wheel_sum = 0;
-	album->cv_thumb_cover = NULL;
 	album->mouse_x_sum = 0;
 	album->showing_cg = NULL;
 	album->showing_cg_image = NULL;
@@ -915,19 +946,9 @@ error_t cpymo_album_enter(
 	cpymo_key_pluse_init(&album->key_down, e->input.down);
 	cpymo_key_hold_init(&album->key_mouse_button, e->input.mouse_button);
 
-	int w, h;
-	err = cpymo_assetloader_load_system_image(
-		&album->cv_thumb_cover,
-		&w,
-		&h,
-		cpymo_str_pure("cvThumb"),
-		&e->assetloader,
-		false);
-
-	if (err == CPYMO_ERR_SUCC) {
-		album->cv_thumb_cover_w = (size_t)w;
-		album->cv_thumb_cover_h = (size_t)h;
-	}
+	album->cv_thumb_cover = NULL;
+	album->cv_thumb_cover_w = 0;
+	album->cv_thumb_cover_h = 0;
 	
 	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
 		album->cg_infos[i].title = NULL;
