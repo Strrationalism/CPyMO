@@ -52,6 +52,7 @@ char *cpymo_str_copy_malloc(cpymo_str str)
 	return cstr;
 }
 
+#ifndef CPYMO_TOOL
 char *cpymo_str_copy_malloc_trim_memory(struct cpymo_engine *e, cpymo_str str)
 {
 	char *cstr = (char *)cpymo_utils_malloc_trim_memory(e, str.len + 1);
@@ -61,6 +62,7 @@ char *cpymo_str_copy_malloc_trim_memory(struct cpymo_engine *e, cpymo_str str)
 	cstr[str.len] = '\0';
 	return cstr;
 }
+#endif
 
 int cpymo_str_atoi(cpymo_str span)
 {

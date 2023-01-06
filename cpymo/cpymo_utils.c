@@ -1,5 +1,4 @@
 ﻿#include "cpymo_prelude.h"
-#include "cpymo_engine.h"
 #include "cpymo_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,16 +33,19 @@ error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len)
 	return CPYMO_ERR_SUCC;
 }
 
-void *cpymo_utils_malloc_trim_memory(cpymo_engine *e, size_t size)
+#ifndef CPYMO_TOOL
+void *cpymo_utils_malloc_trim_memory(struct cpymo_engine *e, size_t size)
 {
 	void *ret = malloc(size);
 	if (ret == NULL && e) {
+		extern void cpymo_engine_trim_memory(struct cpymo_engine *);
 		cpymo_engine_trim_memory(e);
 		ret = malloc(size);
 	}
 
 	return ret;
 }
+#endif
 
 float cpymo_utils_lerp(float a, float b, float x)
 {
@@ -135,6 +137,8 @@ void cpymo_utils_center(
 	*y += (container_h - h) / 2;
 }
 
+#ifndef CPYMO_TOOL
+#include "cpymo_engine.h"
 enum cpymo_key_hold_result cpymo_key_hold_update(
 	cpymo_engine *e, cpymo_key_hold *h, float dt, bool pressed)
 {
@@ -198,3 +202,4 @@ enum cpymo_key_hold_result cpymo_key_hold_update(
 		else return cpymo_key_hold_result_just_released;
 	}
 }
+#endif

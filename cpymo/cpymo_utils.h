@@ -7,8 +7,10 @@
 
 error_t cpymo_utils_loadfile(const char *path, char **outbuf, size_t *len);
 
+#ifndef CPYMO_TOOL
 struct cpymo_engine;
 void *cpymo_utils_malloc_trim_memory(struct cpymo_engine *e, size_t size);
+#endif
 
 static inline int cpymo_utils_clamp(int v, int minv, int maxv)
 {
