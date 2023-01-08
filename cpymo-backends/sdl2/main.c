@@ -536,6 +536,7 @@ START:
 	ensure_save_dir(gamedir);
 #endif
 
+#ifndef ENABLE_SCREEN_FORCE_CENTERED
 	if (SDL_RenderSetLogicalSize(renderer, engine.gameconfig.imagesize_w, engine.gameconfig.imagesize_h) != 0) {
 		SDL_Log("[Error] Can not set logical size: %s", SDL_GetError());
 		SDL_DestroyRenderer(renderer);
@@ -545,6 +546,7 @@ START:
 		SDL_Quit();
 		return -1;
 	}
+#endif
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 

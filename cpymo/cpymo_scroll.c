@@ -47,16 +47,20 @@ error_t cpymo_scroll_start(cpymo_engine *e, cpymo_str bgname, float sx, float sy
 	cpymo_bg_reset(&e->bg);
 	cpymo_charas_fast_kill_all(&e->charas);
 
-	char *next_bg_name = (char *)realloc(e->bg.current_bg_name, bgname.len + 1);
-	if (next_bg_name) {
-		cpymo_str_copy(next_bg_name, bgname.len + 1, bgname);
-		e->bg.current_bg_name = next_bg_name;
-	}
+	assert(e->bg.current_bg_name == NULL);
+	e->bg.current_bg_name = cpymo_str_copy_malloc_trim_memory(e, bgname);
 
 	cpymo_scroll *s = &e->scroll;
 	cpymo_scroll_reset(s);
 
-	error_t err = cpymo_assetloader_load_bg_image(&s->img, &s->w, &s->h, bgname, &e->assetloader);
+	error_t err = cpymo_assetloader_load_bg_image(
+		&s->img, &s->w, &s->h, bgname, &e->assetloader);
+	if (err == CPYMO_ERR_OUT_OF_MEM) {
+		cpymo_engine_trim_memory(e);
+		err = cpymo_assetloader_load_bg_image(
+			&s->img, &s->w, &s->h, bgname, &e->assetloader);
+	}
+
 	if (err != CPYMO_ERR_SUCC) {
 		s->img = NULL;
 		return err;

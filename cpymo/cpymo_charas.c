@@ -19,12 +19,12 @@ void cpymo_charas_free(cpymo_charas *c)
 		free(c->anime_pos);
 }
 
-static void cpymo_charas_gc(cpymo_charas *p)
+void cpymo_charas_gc(cpymo_charas *p, bool trim_memory)
 {
 	struct cpymo_chara *pcur = p->chara, **ppcur = &p->chara;
 	while (pcur) {
 		struct cpymo_chara *pnext = pcur->next;
-		if (!pcur->alive && cpymo_tween_value(&pcur->alpha) <= 0.0001f) {
+		if (!pcur->alive && (trim_memory || cpymo_tween_value(&pcur->alpha) <= 0.0001f)) {
 			*ppcur = pnext;
 
 			cpymo_backend_image_free(pcur->img);
@@ -66,7 +66,7 @@ static bool cpymo_charas_wait_all_tween(cpymo_engine *e, float delta_time)
 		pcur = pcur->next;
 	}
 
-	cpymo_charas_gc(&e->charas);
+	cpymo_charas_gc(&e->charas, false);
 
 	return !waiting;
 }
@@ -158,12 +158,18 @@ error_t cpymo_charas_new_chara(
 		cpymo_tween_to(&ch->alpha, 0, time);
 	}
 
-	ch = (struct cpymo_chara *)malloc(
-		sizeof(struct cpymo_chara) + filename.len + 1);
+	ch = (struct cpymo_chara *)cpymo_utils_malloc_trim_memory(
+		e, sizeof(struct cpymo_chara) + filename.len + 1);
 	if (ch == NULL) return CPYMO_ERR_OUT_OF_MEM;
 	cpymo_str_copy(ch->chara_name, filename.len + 1, filename);
 
-	err = cpymo_assetloader_load_chara_image(&ch->img, &ch->img_w, &ch->img_h, filename, &e->assetloader);
+	err = cpymo_assetloader_load_chara_image(
+		&ch->img, &ch->img_w, &ch->img_h, filename, &e->assetloader);
+	if (err == CPYMO_ERR_OUT_OF_MEM) {
+		cpymo_engine_trim_memory(e);
+		err = cpymo_assetloader_load_chara_image(
+			&ch->img, &ch->img_w, &ch->img_h, filename, &e->assetloader);
+	}
 	if (err != CPYMO_ERR_SUCC) {
 		free(ch);
 
@@ -276,7 +282,7 @@ static void cpymo_charas_stop_all_tween(cpymo_engine *e)
 		chara = chara->next;
 	}
 
-	cpymo_charas_gc(&e->charas);
+	cpymo_charas_gc(&e->charas, false);
 }
 
 void cpymo_charas_wait(cpymo_engine *e)

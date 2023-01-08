@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "cpymo_color.h"
+#include "cpymo_utils.h"
 
 typedef struct {
 	const char *begin;
@@ -17,6 +18,12 @@ void cpymo_str_trim_end(cpymo_str *span);
 void cpymo_str_trim(cpymo_str *span);
 void cpymo_str_copy(char *dst, size_t buffer_size, cpymo_str span);
 char *cpymo_str_copy_malloc(cpymo_str str);
+
+#ifndef CPYMO_TOOL
+struct cpymo_engine;
+char *cpymo_str_copy_malloc_trim_memory(struct cpymo_engine *e, cpymo_str str);
+#endif
+
 int cpymo_str_atoi(cpymo_str span);
 float cpymo_str_atof(cpymo_str span);
 cpymo_color cpymo_str_as_color(cpymo_str span);

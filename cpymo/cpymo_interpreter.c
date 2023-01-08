@@ -286,7 +286,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	D("title") {
 		POP_ARG(title);
 
-		char *buf = cpymo_str_copy_malloc(title);
+		char *buf = cpymo_str_copy_malloc_trim_memory(engine, title);
 		if (buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 		free(engine->title);
@@ -1340,6 +1340,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		bool isloop = !cpymo_str_equals_str(isloop_s, "0");
 
 		error_t err = cpymo_audio_bgm_play(engine, filename, isloop);
+		if (err == CPYMO_ERR_OUT_OF_MEM) {
+			cpymo_engine_trim_memory(engine);
+			err = cpymo_audio_bgm_play(engine, filename, isloop);
+		}
+
 		CPYMO_THROW(err);
 		
 

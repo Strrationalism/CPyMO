@@ -429,8 +429,8 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 
 	cpymo_floating_hint_draw(&engine->floating_hint);
 	cpymo_flash_draw(engine);
-	cpymo_fade_draw(engine);
 	cpymo_bg_draw_transform_effect(engine);
+	cpymo_fade_draw(engine);
 
 	cpymo_text_draw(engine);
 	cpymo_say_draw(engine);
@@ -440,3 +440,16 @@ void cpymo_engine_draw(const cpymo_engine *engine)
 	#endif
 }
 
+void cpymo_engine_trim_memory(cpymo_engine *e)
+{
+	extern void cpymo_bg_transfer_operate(cpymo_engine *e);
+	cpymo_bg_transfer_operate(e);
+
+	extern void cpymo_charas_gc(cpymo_charas *p, bool trim_memory);
+	cpymo_charas_gc(&e->charas, true);
+
+	cpymo_anime_off(&e->anime);
+
+	cpymo_audio_se_stop(e);
+	cpymo_audio_vo_stop(e);
+}
