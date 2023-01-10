@@ -120,9 +120,14 @@ static inline bool cpymo_input_foward_key_just_released(cpymo_engine *e)
 #ifdef ENABLE_TEXT_EXTRACT
 void cpymo_engine_extract_text(cpymo_engine *e, cpymo_str str);
 void cpymo_engine_extract_text_submit(cpymo_engine *e);
+
+static inline void cpymo_engine_extract_text_cstr(cpymo_engine *e, const char *str)
+{ cpymo_engine_extract_text(e, cpymo_str_pure(str)); }
+
 #else
 #define cpymo_engine_extract_text(A, B)
 #define cpymo_engine_extract_text_submit(A)
+#define cpymo_engine_extract_text_cstr(A, B)
 #endif
 
 #endif
