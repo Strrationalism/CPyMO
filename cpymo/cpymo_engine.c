@@ -175,6 +175,13 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 	// default config
 	out->config_skip_already_read_only = true;
 
+	// text extract buffer
+	#ifdef ENABLE_TEXT_EXTRACT
+	out->text_extract_buffer = NULL;
+	out->text_extract_buffer_size = 0;
+	out->text_extract_buffer_maxsize = 0;
+	#endif
+
 	// load config
 	err = cpymo_save_config_load(out);
 	if (err != CPYMO_ERR_SUCC && err != CPYMO_ERR_CAN_NOT_OPEN_FILE) {
@@ -241,6 +248,10 @@ void cpymo_engine_free(cpymo_engine *engine)
 	cpymo_assetloader_free(&engine->assetloader);
 	if (engine->title) free(engine->title);
 	cpymo_audio_free(&engine->audio);
+
+	#ifdef ENABLE_TEXT_EXTRACT
+	if (engine->text_extract_buffer) free(engine->text_extract_buffer);
+	#endif
 }
 
 bool cpymo_engine_skipping(cpymo_engine *e)
@@ -387,3 +398,30 @@ void cpymo_engine_trim_memory(cpymo_engine *e)
 	cpymo_audio_se_stop(e);
 	cpymo_audio_vo_stop(e);
 }
+
+#ifdef ENABLE_TEXT_EXTRACT
+void cpymo_engine_extract_text(cpymo_engine *e, cpymo_str str)
+{
+	size_t new_size = e->text_extract_buffer_size + str.len + 1;
+	if (e->text_extract_buffer_maxsize < new_size) {
+		new_size *= 2;
+		char *new_buf = (char *)realloc(e->text_extract_buffer, new_size);
+		if (new_buf == NULL) return;
+		e->text_extract_buffer = new_buf;
+		e->text_extract_buffer_maxsize = new_size;
+	}
+
+	memcpy(
+		e->text_extract_buffer + e->text_extract_buffer_size, 
+		str.begin, str.len);
+	e->text_extract_buffer_size += str.len;
+}
+
+void cpymo_engine_extract_text_submit(cpymo_engine *e)
+{
+	e->text_extract_buffer[e->text_extract_buffer_size] = '\0';
+	cpymo_backend_text_extract(e->text_extract_buffer);
+	e->text_extract_buffer_size = 0;
+}
+
+#endif
