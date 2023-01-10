@@ -219,17 +219,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			name_or_text.len = 0;
 		}
 
-#ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = (char *)malloc(name_or_text.len + text.len + 2);
-		if (full_text) {
-			memset(full_text, 0, name_or_text.len + text.len + 2);
-			strncpy(full_text, name_or_text.begin, name_or_text.len);
-			if (name_or_text.len) strcat(full_text, "\n");
-			strncat(full_text, text.begin, text.len);
-			cpymo_backend_text_extract(full_text);
-			free(full_text);
-		}
-#endif
+		cpymo_engine_extract_text(engine, name_or_text);
+		if (name_or_text.len)
+			cpymo_engine_extract_text_cstr(engine, "\n");
+		cpymo_engine_extract_text(engine, text);
+		cpymo_engine_extract_text_submit(engine);
 
 		if (IS_EMPTY(text)) {
 			text = cpymo_str_pure(" ");
