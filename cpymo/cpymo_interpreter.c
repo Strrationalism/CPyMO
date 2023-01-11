@@ -251,13 +251,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(show_immediately_str);
 		bool show_immediately = cpymo_str_atoi(show_immediately_str) != 0;
 
-#ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = cpymo_str_copy_malloc(content);
-		if (full_text) {
-			cpymo_backend_text_extract(full_text);
-			free(full_text);
-		}
-#endif
+		cpymo_engine_extract_text(engine, content);
+		cpymo_engine_extract_text_submit(engine);
 
 		return cpymo_text_new(engine, x1, y1, x2, y2, col, fontsize, content, show_immediately);
 	}

@@ -397,6 +397,12 @@ void cpymo_engine_trim_memory(cpymo_engine *e)
 
 	cpymo_audio_se_stop(e);
 	cpymo_audio_vo_stop(e);
+
+	#ifdef ENABLE_TEXT_EXTRACT
+	e->text_extract_buffer_maxsize = 0;
+	e->text_extract_buffer_size = 0;
+	free(e->text_extract_buffer);
+	#endif
 }
 
 #ifdef ENABLE_TEXT_EXTRACT
