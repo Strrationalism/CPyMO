@@ -180,8 +180,8 @@ static bool cpymo_bg_wait_for_progression_fade(cpymo_engine *engine, float delta
 static void cpymo_bg_calc_pos(
 	cpymo_engine *e,
 	cpymo_bg *bg,
-	float w,
-	float h,
+	int w,
+	int h,
 	float *x,
 	float *y)
 {
