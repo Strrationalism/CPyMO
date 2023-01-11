@@ -402,6 +402,7 @@ void cpymo_engine_trim_memory(cpymo_engine *e)
 	e->text_extract_buffer_size = 0;
 	e->text_extract_buffer_maxsize = 0;
 	free(e->text_extract_buffer);
+	e->text_extract_buffer = NULL;
 	#endif
 }
 
