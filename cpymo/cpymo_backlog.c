@@ -242,25 +242,24 @@ static error_t cpymo_backlog_ui_update(cpymo_engine *e, float dt, void *selected
 }
 
 #ifdef ENABLE_TEXT_EXTRACT
+static void cpymo_backlog_ui_extract_text(cpymo_engine *e, size_t index)
+{
+	if (e->backlog.records[index].text) {
+		if (e->backlog.records[index].name_str) {
+			cpymo_engine_extract_text_cstr(
+				e, e->backlog.records[index].name_str);
+			cpymo_engine_extract_text_cstr(e, "\n");
+		}
+		cpymo_engine_extract_text_cstr(e, e->backlog.records[index].text);
+		cpymo_engine_extract_text_submit(e);
+	}
+}
+
 static error_t cpymo_backlog_ui_selection_changed(cpymo_engine *e, void *selected)
 {
 	if (selected) {
 		size_t index = (size_t)DEC(selected);
-		if (e->backlog.records[index].text) {
-			if (e->backlog.records[index].name_str) {
-				char *extract_text = (char *)malloc(
-					strlen(e->backlog.records[index].name_str) + 2 +
-					strlen(e->backlog.records[index].text));
-				sprintf(extract_text, "%s\n%s",
-					e->backlog.records[index].name_str,
-					e->backlog.records[index].text);
-				cpymo_backend_text_extract(extract_text);
-				free(extract_text);
-			}
-			else {
-				cpymo_backend_text_extract(e->backlog.records[index].text);
-			}
-		}
+		cpymo_backlog_ui_extract_text(e, index);
 	}
 	return CPYMO_ERR_SUCC;
 }
@@ -293,19 +292,7 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 #ifdef ENABLE_TEXT_EXTRACT
 	cpymo_list_ui_set_selection_changed_callback(
 		e, &cpymo_backlog_ui_selection_changed);
-	if (e->backlog.records[first].name_str) {
-		char *extract_text = (char *)malloc(
-			strlen(e->backlog.records[first].name_str) + 2 +
-			strlen(e->backlog.records[first].text));
-		sprintf(extract_text, "%s\n%s",
-			e->backlog.records[first].name_str,
-			e->backlog.records[first].text);
-		cpymo_backend_text_extract(extract_text);
-		free(extract_text);
-	}
-	else {
-		cpymo_backend_text_extract(e->backlog.records[first].text);
-	}
+	cpymo_backlog_ui_extract_text(e, first);
 #endif
 
 	ui->press_key_down_to_close = true;

@@ -28,6 +28,8 @@ float cpymo_backend_text_width(
 
 #ifdef ENABLE_TEXT_EXTRACT
 void cpymo_backend_text_extract(const char *text);
+#else
+#define cpymo_backend_text_extract(A)
 #endif
 
 #endif
