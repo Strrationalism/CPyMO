@@ -179,7 +179,8 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 			cpymo_engine_request_redraw(e);
 
 			if (ui->selection >= 0)
-				cpymo_backend_text_extract(ui->selection == 0 ? l->msgbox_ok : l->msgbox_cancel);
+				cpymo_backend_text_extract(
+					ui->selection == 0 ? l->msgbox_ok : l->msgbox_cancel);
 		}
 	}
 

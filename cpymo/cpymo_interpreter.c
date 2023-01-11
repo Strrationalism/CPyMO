@@ -285,9 +285,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		if (strlen(engine->title) <= 0)
 			CONT_NEXTLINE;
 
-#ifdef ENABLE_TEXT_EXTRACT
 		cpymo_backend_text_extract(engine->title);
-#endif
 
 		return cpymo_floating_hint_start(
 			engine,
