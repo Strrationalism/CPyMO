@@ -219,17 +219,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			name_or_text.len = 0;
 		}
 
-#ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = (char *)malloc(name_or_text.len + text.len + 2);
-		if (full_text) {
-			memset(full_text, 0, name_or_text.len + text.len + 2);
-			strncpy(full_text, name_or_text.begin, name_or_text.len);
-			if (name_or_text.len) strcat(full_text, "\n");
-			strncat(full_text, text.begin, text.len);
-			cpymo_backend_text_extract(full_text);
-			free(full_text);
-		}
-#endif
+		cpymo_engine_extract_text(engine, name_or_text);
+		if (name_or_text.len)
+			cpymo_engine_extract_text_cstr(engine, "\n");
+		cpymo_engine_extract_text(engine, text);
+		cpymo_engine_extract_text_submit(engine);
 
 		if (IS_EMPTY(text)) {
 			text = cpymo_str_pure(" ");
@@ -257,13 +251,8 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		POP_ARG(show_immediately_str);
 		bool show_immediately = cpymo_str_atoi(show_immediately_str) != 0;
 
-#ifdef ENABLE_TEXT_EXTRACT
-		char *full_text = cpymo_str_copy_malloc(content);
-		if (full_text) {
-			cpymo_backend_text_extract(full_text);
-			free(full_text);
-		}
-#endif
+		cpymo_engine_extract_text(engine, content);
+		cpymo_engine_extract_text_submit(engine);
 
 		return cpymo_text_new(engine, x1, y1, x2, y2, col, fontsize, content, show_immediately);
 	}
@@ -283,7 +272,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	D("title") {
 		POP_ARG(title);
 
-		char *buf = cpymo_str_copy_malloc(title);
+		char *buf = cpymo_str_copy_malloc_trim_memory(engine, title);
 		if (buf == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
 		free(engine->title);
@@ -296,9 +285,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		if (strlen(engine->title) <= 0)
 			CONT_NEXTLINE;
 
-#ifdef ENABLE_TEXT_EXTRACT
 		cpymo_backend_text_extract(engine->title);
-#endif
 
 		return cpymo_floating_hint_start(
 			engine,
@@ -1337,6 +1324,11 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		bool isloop = !cpymo_str_equals_str(isloop_s, "0");
 
 		error_t err = cpymo_audio_bgm_play(engine, filename, isloop);
+		if (err == CPYMO_ERR_OUT_OF_MEM) {
+			cpymo_engine_trim_memory(engine);
+			err = cpymo_audio_bgm_play(engine, filename, isloop);
+		}
+
 		CPYMO_THROW(err);
 		
 

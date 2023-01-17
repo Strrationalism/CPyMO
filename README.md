@@ -786,6 +786,13 @@ CPyMO ASCII ART仅支持键盘操作：
 用于将PyMO API公开到[YukimiScript](github.com/Strrationalism/YukimiScript)语言中，    
 使得YukimiScript语言可以访问PyMO/CPyMO引擎的各项功能。    
 
+# 关于“Song of PyMO”
+
+此乐曲在支持启动音乐的平台作为CPyMO的启动音乐使用，为CPyMO软件的一部分。    
+乐谱文件可使用Muse Score 4打开。    
+
+作曲：许兴逸
+
 # 贡献者
 
 * PyMO原作者
