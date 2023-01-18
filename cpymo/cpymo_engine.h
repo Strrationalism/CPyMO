@@ -62,6 +62,11 @@ struct cpymo_engine {
 	bool ignore_next_mouse_button_flag;
 
 	bool config_skip_already_read_only;
+
+#ifdef ENABLE_TEXT_EXTRACT
+	char *text_extract_buffer;
+	size_t text_extract_buffer_size, text_extract_buffer_maxsize;
+#endif
 };
 
 typedef struct cpymo_engine cpymo_engine;
@@ -121,6 +126,19 @@ static inline bool cpymo_input_foward_key_just_released(cpymo_engine *e)
 		cpymo_engine_skipping(e) ||
 		e->input.mouse_wheel_delta < 0;
 }
+
+#ifdef ENABLE_TEXT_EXTRACT
+void cpymo_engine_extract_text(cpymo_engine *e, cpymo_str str);
+void cpymo_engine_extract_text_submit(cpymo_engine *e);
+
+static inline void cpymo_engine_extract_text_cstr(cpymo_engine *e, const char *str)
+{ cpymo_engine_extract_text(e, cpymo_str_pure(str)); }
+
+#else
+#define cpymo_engine_extract_text(A, B)
+#define cpymo_engine_extract_text_submit(A)
+#define cpymo_engine_extract_text_cstr(A, B)
+#endif
 
 #endif
 

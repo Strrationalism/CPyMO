@@ -640,18 +640,10 @@ void cpymo_select_img_configuare_end_select_text(
 		}
 	}
 
-#ifdef ENABLE_TEXT_EXTRACT
-	const char *hint_header = cpymo_localization_get(e)->visual_help_selection;
-	size_t hint_header_len = strlen(hint_header);
-	const char *hint_content = sel->selections[sel->current_selection].original_text;
-	size_t hint_content_len = strlen(hint_content);
-	char *full_first_hint = (char *)malloc(1 + hint_header_len + hint_content_len);
-	if (full_first_hint) {
-		strcpy(full_first_hint, hint_header);
-		strcpy(full_first_hint + hint_header_len, hint_content);
-		cpymo_backend_text_extract(full_first_hint);
-		free(full_first_hint);
-	}
-#endif
+	cpymo_engine_extract_text_cstr(
+		e, cpymo_localization_get(e)->visual_help_selection);
+	cpymo_engine_extract_text_cstr(
+		e, sel->selections[sel->current_selection].original_text);
+	cpymo_engine_extract_text_submit(e);
 }
 
