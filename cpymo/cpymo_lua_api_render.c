@@ -22,6 +22,8 @@ error_t cpymo_lua_api_render_class_image_constructor(
 {
     cpymo_lua_api_render_class_image *img = lua_newuserdata(
         l, sizeof(cpymo_lua_api_render_class_image));
+    if (img == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
     img->image = image;
     img->w = w;
     img->h = h;
@@ -50,6 +52,45 @@ static int cpymo_lua_api_render_class_image_get_size(lua_State *l)
     return 2;
 }
 
+static int cpymo_lua_api_render_class_image_draw(lua_State *l)
+{
+    const void *draw_type;
+    error_t err = cpymo_lua_pop_lightuserdata(l, &draw_type);
+    CPYMO_LUA_THROW(l, err);
+
+    float alpha;
+    err = cpymo_lua_pop_float(l, &alpha);
+    CPYMO_LUA_THROW(l, err);
+
+    float srcx = 0, srcy = 0, srcw, srch;
+    bool src_is_nil = lua_isnil(l, -1);
+    if (!src_is_nil) {
+        err = cpymo_lua_pop_rect(l, &srcx, &srcy, &srcw, &srch);
+        CPYMO_LUA_THROW(l, err);
+    }
+    else lua_pop(l, 1);
+
+    float dstx = 0, dsty = 0, dstw, dsth;
+    err = cpymo_lua_pop_rect(l, &dstx, &dsty, &dstw, &dsth);
+    CPYMO_LUA_THROW(l, err);
+    
+    cpymo_lua_api_render_class_image *img =
+        (cpymo_lua_api_render_class_image *)lua_touserdata(l, -1);
+    lua_pop(l, 1);
+
+    if (src_is_nil) {
+        srcw = (float)img->w;
+        srch = (float)img->h;
+    }
+
+    cpymo_backend_image_draw(
+        dstx, dsty, dstw, dsth, img->image,
+        srcx, srcy, srcw, srch, alpha, 
+        (enum cpymo_backend_image_draw_type)draw_type);
+
+    return 0;
+}
+
 static int cpymo_lua_api_render_class_image_free(lua_State *l)
 {
     cpymo_lua_api_render_class_image *img = 
@@ -73,6 +114,7 @@ void cpymo_lua_api_render_register(lua_State *l)
     lua_newtable(l);
     const luaL_Reg funcs_class_image[] = {
         { "get_size", &cpymo_lua_api_render_class_image_get_size },
+        { "draw", &cpymo_lua_api_render_class_image_draw },
         { "free", &cpymo_lua_api_render_class_image_free },
         { NULL, NULL }
     };

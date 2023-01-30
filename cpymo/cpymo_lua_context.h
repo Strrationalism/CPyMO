@@ -65,6 +65,21 @@ void cpymo_lua_actor_draw_main(
         return 0; \
     }
 
+error_t cpymo_lua_pop_float(
+    lua_State *l,
+    float *v);
+
+error_t cpymo_lua_pop_lightuserdata(
+    lua_State *l,
+    const void **v);
+
+error_t cpymo_lua_pop_rect(
+    lua_State *l,
+    float *x,
+    float *y,
+    float *w,
+    float *h);
+
 #ifdef LEAKCHECK
 void cpymo_lua_context_leakcheck(cpymo_lua_context *l);
 #endif

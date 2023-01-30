@@ -271,4 +271,84 @@ void cpymo_lua_context_leakcheck(cpymo_lua_context *l)
 }
 #endif
 
+#define POPCHECK(L) \
+    if (lua_gettop(L) < 0) return CPYMO_ERR_INVALID_ARG;
+
+error_t cpymo_lua_pop_float(
+    lua_State *l,
+    float *v)
+{
+    POPCHECK(l);
+
+    int succeed;
+    lua_Number x = lua_tonumberx(l, -1, &succeed);
+    if (!succeed) return CPYMO_ERR_INVALID_ARG;
+
+    lua_pop(l, 1);
+
+    if (succeed) *v = (float)x;
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_lua_pop_lightuserdata(
+    lua_State *l,
+    const void **v)
+{
+    POPCHECK(l);
+
+    if (lua_type(l, -1) != LUA_TLIGHTUSERDATA)
+        return CPYMO_ERR_INVALID_ARG;
+    
+    *v = lua_topointer(l, -1);
+    lua_pop(l, 1);
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_lua_pop_rect(
+    lua_State *l,
+    float *x,
+    float *y,
+    float *w,
+    float *h)
+{
+    POPCHECK(l);
+    
+    int succeed[4];
+
+    if (!lua_istable(l, -1)) 
+        return CPYMO_ERR_INVALID_ARG;
+
+    
+    lua_Number rect[4];
+
+    lua_getfield(l, -1, "x");
+    rect[0] = lua_tonumberx(l, -1, succeed);
+    lua_pop(l, 1);
+
+    lua_getfield(l, -1, "y");
+    rect[1] = lua_tonumberx(l, -1, succeed + 1);
+    lua_pop(l, 1);
+
+    lua_getfield(l, -1, "w");
+    rect[2] = lua_tonumberx(l, -1, succeed + 2);
+    lua_pop(l, 1);
+
+    lua_getfield(l, -1, "h");
+    rect[3] = lua_tonumberx(l, -1, succeed + 3);
+    lua_pop(l, 1);
+
+    if (!succeed[0] || !succeed[1] || !succeed[2] || !succeed[3])
+        return CPYMO_ERR_INVALID_ARG;
+    
+    *x = (float)rect[0];
+    *y = (float)rect[1];
+    *w = (float)rect[2];
+    *h = (float)rect[3];
+    lua_pop(l, 1);
+
+    return CPYMO_ERR_SUCC;
+}
+
 #endif

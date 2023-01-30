@@ -11,6 +11,7 @@ error_t cpymo_lua_api_render_class_image_constructor(
 static int cpymo_lua_api_asset_load_bg(lua_State *l)
 {
     cpymo_str bg_name = cpymo_str_pure(lua_tostring(l, -1));
+    lua_pop(l, 1);
 
     cpymo_engine *e = cpymo_lua_state_get_engine(l);
 

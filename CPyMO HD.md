@@ -84,6 +84,19 @@ Actor是一种在游戏中可以被作为游戏物体执行的对象，它具有
 CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时将不会执行`main` actor。
 
 
+## 工具类型
+
+工具类型是一种Lua表，用于在Lua端和C端交换数据。
+
+### rect
+
+rect表示一个矩形，具有以下字段：
+
+* `x: number` 
+* `y: number`
+* `w: number`
+* `h: number`
+
 
 ## Lua API
 
@@ -122,6 +135,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 这个类包含以下成员：
 
 * `get_size() : number, number` - 获取大小
+* `draw(dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧
 * `free()` - 手动释放其内存
 
 ### `cpymo.asset`
