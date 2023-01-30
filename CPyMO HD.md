@@ -100,6 +100,23 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 * `request_redraw()` - 请求这一帧刷新屏幕。
 
+#### `cpymo.render.semantic`
+
+这个包内包含了一些绘图语义：
+
+* `bg` - 背景
+* `chara` - 立绘
+* `ui_bg` - UI层背景
+* `ui_element_bg` - UI元素的背景
+* `ui_element` - UI元素
+* `text_say` - 对话文本
+* `text_say_textbox` - 对话文本框
+* `text_text` - text命令生成的文本
+* `titledate_bg` - title_dsp命令与date命令生成的背景
+* `titledate_text` - title_dsp命令与date命令生成的文本
+* `sel_img` - 选项
+* `effect` - 后处理特效
+
 #### 类`cpymo_render_image`
 
 这个类包含以下成员：

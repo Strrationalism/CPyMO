@@ -68,7 +68,7 @@ static int cpymo_lua_api_render_class_image_free(lua_State *l)
 
 void cpymo_lua_api_render_register(lua_State *l)
 {
-    // class `image`
+    // class `cpymo_render_image`
     luaL_newmetatable(l, "cpymo_render_image");
     lua_newtable(l);
     const luaL_Reg funcs_class_image[] = {
@@ -82,16 +82,38 @@ void cpymo_lua_api_render_register(lua_State *l)
     lua_setfield(l, -2, "__gc");
     lua_pop(l, 1);
 
-    lua_newtable(l);
+    // package `cpymo`
+    lua_newtable(l); {
+        const luaL_Reg funcs[] = {
+            { "request_redraw", &cpymo_lua_api_render_request_redraw },
+            { NULL, NULL }
+        };
+        luaL_setfuncs(l, funcs, 0);
 
-    // basic
-    const luaL_Reg funcs[] = {
-        { "request_redraw", &cpymo_lua_api_render_request_redraw },
-        { NULL, NULL }
-    };
-    luaL_setfuncs(l, funcs, 0);
+        lua_newtable(l); {
+            #define BIND(DRAW_TYPE) \
+                lua_pushlightuserdata( \
+                    l, \
+                    (void *)cpymo_backend_image_draw_type_ ## DRAW_TYPE); \
+                lua_setfield(l, -2, #DRAW_TYPE);
+
+            BIND(bg);
+            BIND(chara);
+            BIND(ui_bg);
+            BIND(ui_element_bg);
+            BIND(ui_element);
+            BIND(text_say);
+            BIND(text_say_textbox);
+            BIND(text_text);
+            BIND(titledate_bg);
+            BIND(titledate_text);
+            BIND(sel_img);
+            BIND(effect);
+
+            #undef BIND
+        } lua_setfield(l, -2, "semantic");
     
-    lua_setfield(l, -2, "render");
+    } lua_setfield(l, -2, "render");
 }
 
 
