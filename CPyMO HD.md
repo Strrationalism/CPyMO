@@ -140,4 +140,7 @@ rect表示一个矩形，具有以下字段：
 
 ### `cpymo.asset`
 
-* `load_bg(bg_name : string) : cpymo_render_image` - 加载背景图像
+* `load_bg(bg_name : string) : cpymo_render_image` - 加载bg图像
+* `load_chara(chara_name : string) : cpymo_render_image` - 加载chara图像
+* `load_system_image(image_name : string) : cpymo_render_image` - 加载system图像
+
