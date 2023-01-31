@@ -44,8 +44,9 @@ MAKE_LOAD_IMG_FUNC(system, cpymo_assetloader_load_system_image_no_mask);
 
 #undef MAKE_LOAD_IMG_FUNC
 
-void cpymo_lua_api_asset_register(lua_State *l)
+void cpymo_lua_api_asset_register(cpymo_lua_context *ctx)
 {
+    lua_State *l = ctx->lua_state;
     lua_newtable(l);
 
     // basic
@@ -57,6 +58,7 @@ void cpymo_lua_api_asset_register(lua_State *l)
     };
     luaL_setfuncs(l, funcs, 0);
 
+    cpymo_lua_mark_table_readonly(ctx);
     lua_setfield(l, -2, "asset");
 }
 

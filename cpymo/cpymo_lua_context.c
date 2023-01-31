@@ -18,8 +18,9 @@
 static const char *cpymo_lua_actor_children_table_name = "children";
 
 static void cpymo_lua_context_create_cpymo_package(
-    lua_State *l, cpymo_engine *e)
+    cpymo_lua_context *ctx, cpymo_engine *e)
 {
+    lua_State *l = ctx->lua_state;
     lua_newtable(l);
     
     lua_pushlightuserdata(l, e);
@@ -34,16 +35,32 @@ static void cpymo_lua_context_create_cpymo_package(
     lua_pushnumber(l, (lua_Number)0);
     lua_setfield(l, -2, "delta_time");
 
-    void cpymo_lua_api_render_register(lua_State *);
-    cpymo_lua_api_render_register(l);
+    void cpymo_lua_api_render_register(cpymo_lua_context *);
+    cpymo_lua_api_render_register(ctx);
 
-    void cpymo_lua_api_asset_register(lua_State *l);
-    cpymo_lua_api_asset_register(l);
+    void cpymo_lua_api_asset_register(cpymo_lua_context *);
+    cpymo_lua_api_asset_register(ctx);
 
-    void cpymo_lua_api_ui_register(lua_State *l);
-    cpymo_lua_api_ui_register(l);
+    void cpymo_lua_api_ui_register(cpymo_lua_context *);
+    cpymo_lua_api_ui_register(ctx);
 
+    cpymo_lua_mark_table_readonly(ctx);
     lua_setglobal(l, "cpymo");
+}
+
+static int cpymo_lua_readonly_table_newindex(lua_State *l)
+{
+    CPYMO_LUA_PANIC(l, "Don\'t write value to cpymo package.");
+}
+
+static int cpymo_lua_context_create_readonly_metatable(lua_State *l)
+{
+    lua_newtable(l);
+
+    lua_pushcfunction(l, &cpymo_lua_readonly_table_newindex);
+    lua_setfield(l, -2, "__newindex");
+
+    return luaL_ref(l, LUA_REGISTRYINDEX);
 }
 
 error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
@@ -57,7 +74,11 @@ error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
     if (l->lua_state == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
     luaL_openlibs(l->lua_state);
-    cpymo_lua_context_create_cpymo_package(l->lua_state, e);
+
+    l->readonly_metatable = 
+        cpymo_lua_context_create_readonly_metatable(l->lua_state);
+
+    cpymo_lua_context_create_cpymo_package(l, e);
     
     return CPYMO_ERR_SUCC;
 }
@@ -186,6 +207,12 @@ error_t cpymo_lua_tree_boardcast(
     }
 
     return CPYMO_ERR_SUCC;
+}
+
+void cpymo_lua_mark_table_readonly(cpymo_lua_context *l)
+{
+    lua_rawgeti(l->lua_state, LUA_REGISTRYINDEX, l->readonly_metatable);
+    lua_setmetatable(l->lua_state, -2);
 }
 
 static int cpymo_lua_actor_update_arg_setter(

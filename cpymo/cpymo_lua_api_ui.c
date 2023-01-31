@@ -59,8 +59,10 @@ static int cpymo_lua_api_ui_exit(lua_State *l)
     return 0;
 }
 
-void cpymo_lua_api_ui_register(lua_State *l)
+void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
+    lua_State *l = ctx->lua_state;
+
     lua_newtable(l);
 
     // basic
@@ -71,6 +73,7 @@ void cpymo_lua_api_ui_register(lua_State *l)
     };
     luaL_setfuncs(l, funcs, 0);
 
+    cpymo_lua_mark_table_readonly(ctx);
     lua_setfield(l, -2, "ui");
 }
 

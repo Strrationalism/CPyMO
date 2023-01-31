@@ -107,8 +107,10 @@ static int cpymo_lua_api_render_class_image_free(lua_State *l)
     return 0;
 }
 
-void cpymo_lua_api_render_register(lua_State *l)
+void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
 {
+    lua_State *l = ctx->lua_state;
+
     // class `cpymo_render_image`
     luaL_newmetatable(l, "cpymo_render_image");
     lua_newtable(l);
@@ -153,8 +155,11 @@ void cpymo_lua_api_render_register(lua_State *l)
             BIND(effect);
 
             #undef BIND
+
+            cpymo_lua_mark_table_readonly(ctx);
         } lua_setfield(l, -2, "semantic");
     
+        cpymo_lua_mark_table_readonly(ctx);
     } lua_setfield(l, -2, "render");
 }
 

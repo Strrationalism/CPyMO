@@ -12,6 +12,7 @@ struct cpymo_engine;
 
 typedef struct {
     lua_State *lua_state;
+    int readonly_metatable;
 } cpymo_lua_context;
 
 error_t cpymo_lua_context_init(
@@ -39,6 +40,8 @@ error_t cpymo_lua_tree_boardcast(
     const char *postorder_function_name,
     int (*postorder_arg_setter)(lua_State *l, void *userdata),
     void *postorder_arg_setter_userdata);
+
+void cpymo_lua_mark_table_readonly(cpymo_lua_context *l);
 
 error_t cpymo_lua_actor_update(
     cpymo_lua_context *l,
