@@ -134,9 +134,9 @@ rect表示一个矩形，具有以下字段：
 
 这个类包含以下成员：
 
-* `get_size() : number, number` - 获取大小
-* `draw(dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧
-* `free()` - 手动释放其内存
+* `get_size(self) : number, number` - 获取大小
+* `draw(self, dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧
+* `free(self)` - 手动释放其内存
 
 ### `cpymo.asset`
 
