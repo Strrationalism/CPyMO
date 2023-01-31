@@ -59,11 +59,14 @@ error_t cpymo_lua_actor_update_main(
 void cpymo_lua_actor_draw_main(
     const cpymo_lua_context *l);
 
-#define CPYMO_LUA_THROW(L, X) \
-    if ((X) != CPYMO_ERR_SUCC) { \
-        luaL_error(L, cpymo_error_message(X)); \
+#define CPYMO_LUA_PANIC(L, MSG) \
+    { \
+        luaL_error(L, MSG); \
         return 0; \
     }
+
+#define CPYMO_LUA_THROW(L, X) \
+    { if ((X) != CPYMO_ERR_SUCC) CPYMO_LUA_PANIC(L, cpymo_error_message(X)); }
 
 error_t cpymo_lua_pop_float(
     lua_State *l,

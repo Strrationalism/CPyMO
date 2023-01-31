@@ -40,6 +40,9 @@ static void cpymo_lua_context_create_cpymo_package(
     void cpymo_lua_api_asset_register(lua_State *l);
     cpymo_lua_api_asset_register(l);
 
+    void cpymo_lua_api_ui_register(lua_State *l);
+    cpymo_lua_api_ui_register(l);
+
     lua_setglobal(l, "cpymo");
 }
 
@@ -73,7 +76,7 @@ cpymo_engine *cpymo_lua_state_get_engine(lua_State *l)
     lua_getglobal(l, "cpymo");
     lua_getfield(l, -1, "engine");
     void *e = lua_touserdata(l, -1);
-    lua_pop(l, 1);
+    lua_pop(l, 2);
     return (cpymo_engine *)e;
 }
 

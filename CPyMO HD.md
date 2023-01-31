@@ -144,3 +144,7 @@ rect表示一个矩形，具有以下字段：
 * `load_chara(chara_name : string) : cpymo_render_image` - 加载chara图像
 * `load_system_image(image_name : string) : cpymo_render_image` - 加载system图像
 
+### `cpymo.ui`
+
+* `enter(ui : actor)` - 进入一层UI
+* `exit()` - 退出当前UI
