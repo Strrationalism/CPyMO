@@ -28,8 +28,9 @@ static void cpymo_music_box_deleter(cpymo_engine *e, void *ui_)
 {
 	cpymo_music_box *box = (cpymo_music_box *)ui_;
 
-	for (uintptr_t i = 0; i < box->music_count; ++i)
-		cpymo_backend_text_free(box->music_title[i]);
+	if (box->music_title)
+		for (uintptr_t i = 0; i < box->music_count; ++i)
+			cpymo_backend_text_free(box->music_title[i]);
 
 #ifdef ENABLE_TEXT_EXTRACT
 	if (box->music_title_text) {
@@ -39,8 +40,8 @@ static void cpymo_music_box_deleter(cpymo_engine *e, void *ui_)
 	}
 #endif
 
-	free(box->music_list);
-	free(box->music_filename);
+	if (box->music_list) free(box->music_list);
+	if (box->music_filename) free(box->music_filename);
 }
 
 static void *cpymo_music_box_get_next(const cpymo_engine *e, const void *ui_data, const void *cur)
@@ -112,11 +113,20 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	cpymo_list_ui_enable_loop(e);
 
 	box->music_list = NULL;
+	box->music_filename = NULL;
+	box->music_title = NULL;
+	#ifdef ENABLE_TEXT_EXTRACT
+	box->music_title_text = NULL;
+	#endif
+
 	size_t music_list_size = 0;
 	err = cpymo_assetloader_load_script(
 		&box->music_list, &music_list_size, 
 		"music_list", &e->assetloader);
-	CPYMO_THROW(err);
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_ui_exit(e);
+		return err;
+	}
 
 	cpymo_parser p;
 	cpymo_parser_init(&p, box->music_list, music_list_size);
