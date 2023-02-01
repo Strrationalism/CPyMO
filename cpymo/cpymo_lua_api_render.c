@@ -88,7 +88,7 @@ static int cpymo_lua_api_render_class_image_draw(lua_State *l)
 
     cpymo_backend_image_draw(
         dstx, dsty, dstw, dsth, img->image,
-        srcx, srcy, srcw, srch, alpha, 
+        srcx, srcy, srcw, srch, alpha / 255.0f, 
         (enum cpymo_backend_image_draw_type)draw_type);
 
     return 0;
@@ -108,6 +108,28 @@ static int cpymo_lua_api_render_class_image_free(lua_State *l)
         img->image = NULL;
     }
 
+    return 0;
+}
+
+static int cpymo_lua_api_render_fill_rect(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 3);
+
+    const void *draw_type;
+    error_t err = cpymo_lua_pop_lightuserdata(l, &draw_type);
+    CPYMO_LUA_THROW(l, err);
+
+    cpymo_color col;
+    float alpha;
+    err = cpymo_lua_pop_color(l, &col, &alpha);
+    CPYMO_LUA_THROW(l, err);
+
+    float r[4];
+    err = cpymo_lua_pop_rect(l, r, r + 1, r + 2, r + 3);
+    CPYMO_LUA_THROW(l, err);
+
+    cpymo_backend_image_fill_rects(r, 1, col, alpha, 
+        (enum cpymo_backend_image_draw_type)draw_type);
     return 0;
 }
 
@@ -132,10 +154,11 @@ void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
     lua_setfield(l, -2, "__close");
     lua_pop(l, 1);
 
-    // package `cpymo`
+    // package `cpymo.render`
     lua_newtable(l); {
         const luaL_Reg funcs[] = {
             { "request_redraw", &cpymo_lua_api_render_request_redraw },
+            { "fill_rect", &cpymo_lua_api_render_fill_rect },
             { NULL, NULL }
         };
         luaL_setfuncs(l, funcs, 0);

@@ -1481,9 +1481,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		CPYMO_THROW(err);
 
 		err = cpymo_lua_context_execute(&engine->lua, 0, 0);
-		CPYMO_THROW(err);
-
-		CONT_NEXTLINE;
+		return err;
 	}
 #endif
 	

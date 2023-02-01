@@ -95,6 +95,11 @@ error_t cpymo_lua_pop_rect(
     float *w,
     float *h);
 
+error_t cpymo_lua_pop_color(
+    lua_State *l,
+    cpymo_color *color,
+    float *alpha);
+
 #ifdef LEAKCHECK
 void cpymo_lua_context_leakcheck(cpymo_lua_context *l);
 #endif

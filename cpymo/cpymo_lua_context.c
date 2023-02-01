@@ -485,7 +485,7 @@ error_t cpymo_lua_pop_rect(
 
     lua_getfield(l, -1, "h");
     rect[3] = lua_tonumberx(l, -1, succeed + 3);
-    lua_pop(l, 1);
+    lua_pop(l, 2);
 
     if (!succeed[0] || !succeed[1] || !succeed[2] || !succeed[3])
         return CPYMO_ERR_INVALID_ARG;
@@ -494,7 +494,47 @@ error_t cpymo_lua_pop_rect(
     *y = (float)rect[1];
     *w = (float)rect[2];
     *h = (float)rect[3];
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_lua_pop_color(
+    lua_State *l,
+    cpymo_color *col,
+    float *alpha)
+{
+    POPCHECK(l);
+
+    int succeed[4];
+
+    if (!lua_istable(l, -1)) return CPYMO_ERR_INVALID_ARG;
+
+    lua_Number color[4];
+
+    lua_getfield(l, -1, "r");
+    color[0] = lua_tonumberx(l, -1, succeed);
     lua_pop(l, 1);
+
+    lua_getfield(l, -1, "g");
+    color[1] = lua_tonumberx(l, -1, succeed + 1);
+    lua_pop(l, 1);
+
+    lua_getfield(l, -1, "b");
+    color[2] = lua_tonumberx(l, -1, succeed + 2);
+    lua_pop(l, 1);
+
+    succeed[3] = 1;
+    if (lua_getfield(l, -1, "a") == LUA_TNIL) color[3] = 255.0f;
+    else color[3] = lua_tonumberx(l, -1, succeed + 3);
+    lua_pop(l, 2);
+
+    if (!succeed[0] || !succeed[1] || !succeed[2] || !succeed[3])
+        return CPYMO_ERR_INVALID_ARG;
+
+    col->r = (uint8_t)color[0];
+    col->g = (uint8_t)color[1];
+    col->b = (uint8_t)color[2];
+    *alpha = color[3] / 255.0f;
 
     return CPYMO_ERR_SUCC;
 }
