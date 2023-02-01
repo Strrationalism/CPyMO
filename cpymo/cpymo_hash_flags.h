@@ -17,6 +17,7 @@ void cpymo_hash_flags_init(cpymo_hash_flags *);
 void cpymo_hash_flags_free(cpymo_hash_flags *);
 
 error_t cpymo_hash_flags_add(cpymo_hash_flags *, cpymo_hash_flag);
+void cpymo_hash_flags_del(cpymo_hash_flags *, cpymo_hash_flag);
 bool cpymo_hash_flags_check(cpymo_hash_flags *, cpymo_hash_flag);
 
 size_t cpymo_hash_flags_count(cpymo_hash_flags *);
