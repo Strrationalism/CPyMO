@@ -1,6 +1,7 @@
 #include "cpymo_prelude.h"
 #if CPYMO_FEATURE_LEVEL >= 1
 #include "cpymo_engine.h"
+#include "cpymo_msgbox_ui.h"
 
 #include <lauxlib.h>
 #include <lualib.h>
@@ -61,6 +62,18 @@ static int cpymo_lua_api_ui_exit(lua_State *l)
     return 0;
 }
 
+static int cpymo_lua_api_ui_msgbox(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+    if (!lua_isstring(l, -1)) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    error_t err = cpymo_msgbox_ui_enter(
+        cpymo_lua_state_get_engine(l),
+        cpymo_str_pure(lua_tostring(l, -1)), 
+        NULL, NULL);
+    CPYMO_LUA_THROW(l, err);
+    return 0;
+}
+
 void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -71,6 +84,7 @@ void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
     const luaL_Reg funcs[] = {
         { "enter", &cpymo_lua_api_ui_enter },
         { "exit", &cpymo_lua_api_ui_exit },
+        { "msgbox", &cpymo_lua_api_ui_msgbox },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);

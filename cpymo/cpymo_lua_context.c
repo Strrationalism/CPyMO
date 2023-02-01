@@ -66,6 +66,15 @@ static void cpymo_lua_context_vars_register(lua_State *l)
     lua_setfield(l, -2, "vars");
 }
 
+static int cpymo_lua_api_is_skipping(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 0);
+    lua_pushboolean(
+        l, 
+        cpymo_engine_skipping(cpymo_lua_state_get_engine(l)));
+    return 1;
+}
+
 static void cpymo_lua_context_create_cpymo_package(
     cpymo_lua_context *ctx, cpymo_engine *e)
 {
@@ -80,6 +89,9 @@ static void cpymo_lua_context_create_cpymo_package(
 
     lua_pushcfunction(l, &cpymo_lua_api_cpymo_readonly);
     lua_setfield(l, -2, "readonly");
+
+    lua_pushcfunction(l, &cpymo_lua_api_is_skipping);
+    lua_setfield(l, -2, "is_skipping");
 
     void cpymo_lua_api_render_register(cpymo_lua_context *);
     cpymo_lua_api_render_register(ctx);

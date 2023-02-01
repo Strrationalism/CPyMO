@@ -106,6 +106,7 @@ rect表示一个矩形，具有以下字段：
 * `feature_level: int` - 当前运行在哪个Feature Level的引擎上
   - 可能会大于`gameconfig.txt`中的值，这种情况下可以访问更高级别的功能
 * `readonly(table) : userdata` - 创建表的只读句柄，可以通过该句柄读取表的内容，但不能写入
+* `is_skipping() : bool` - 检查是否正在跳过
 * `vars: userdata` - 这个表包含了所有的PyMO变量，仅可在其中读写整数
 
 ### `cpymo.render`
@@ -149,3 +150,4 @@ rect表示一个矩形，具有以下字段：
 
 * `enter(ui: actor)` - 进入一层UI
 * `exit()` - 退出当前UI
+* `msgbox(msg: string)` - 弹出一个消息框
