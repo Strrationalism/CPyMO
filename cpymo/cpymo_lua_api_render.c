@@ -7,6 +7,7 @@
 
 static int cpymo_lua_api_render_request_redraw(lua_State *l)
 {
+    CPYMO_LUA_ARG_COUNT(l, 0);
     cpymo_engine *e = cpymo_lua_state_get_engine(l);
     if (e) cpymo_engine_request_redraw(e);
     return 0;
@@ -35,6 +36,7 @@ error_t cpymo_lua_api_render_class_image_constructor(
 
 static int cpymo_lua_api_render_class_image_get_size(lua_State *l)
 {
+    CPYMO_LUA_ARG_COUNT(l, 1);
     cpymo_lua_api_render_class_image *img = 
         (cpymo_lua_api_render_class_image *)lua_touserdata(l, -1);
 
@@ -54,6 +56,7 @@ static int cpymo_lua_api_render_class_image_get_size(lua_State *l)
 
 static int cpymo_lua_api_render_class_image_draw(lua_State *l)
 {
+    CPYMO_LUA_ARG_COUNT(l, 5);
     const void *draw_type;
     error_t err = cpymo_lua_pop_lightuserdata(l, &draw_type);
     CPYMO_LUA_THROW(l, err);
@@ -93,6 +96,7 @@ static int cpymo_lua_api_render_class_image_draw(lua_State *l)
 
 static int cpymo_lua_api_render_class_image_free(lua_State *l)
 {
+    CPYMO_LUA_ARG_COUNT(l, 1);
     cpymo_lua_api_render_class_image *img = 
         (cpymo_lua_api_render_class_image *)lua_touserdata(l, 1);
     

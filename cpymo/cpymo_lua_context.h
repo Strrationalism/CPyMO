@@ -71,6 +71,12 @@ void cpymo_lua_actor_draw_main(
         return 0; \
     }
 
+#define CPYMO_LUA_ARG_COUNT(L, COUNT) \
+    { \
+        if (lua_gettop(L) != COUNT) \
+            CPYMO_LUA_PANIC(L, "This function needs " #COUNT " argument(s)."); \
+    }
+
 #define CPYMO_LUA_THROW(L, X) \
     { if ((X) != CPYMO_ERR_SUCC) CPYMO_LUA_PANIC(L, cpymo_error_message(X)); }
 

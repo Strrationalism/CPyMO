@@ -37,6 +37,7 @@ static void cpymo_lua_ui_delete(cpymo_engine *e, void *ui)
 
 static int cpymo_lua_api_ui_enter(lua_State *l)
 {
+    CPYMO_LUA_ARG_COUNT(l, 1);
     cpymo_engine *e = cpymo_lua_state_get_engine(l);
     cpymo_lua_ui *ui = NULL;
 
@@ -55,6 +56,7 @@ static int cpymo_lua_api_ui_enter(lua_State *l)
 
 static int cpymo_lua_api_ui_exit(lua_State *l)
 { 
+    CPYMO_LUA_ARG_COUNT(l, 0);
     cpymo_ui_exit(cpymo_lua_state_get_engine(l)); 
     return 0;
 }

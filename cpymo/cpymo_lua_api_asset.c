@@ -11,6 +11,7 @@ error_t cpymo_lua_api_render_class_image_constructor(
 #define MAKE_LOAD_IMG_FUNC(ASSET_TYPE, FUNC) \
     static int cpymo_lua_api_asset_load_ ## ASSET_TYPE (lua_State *l) \
     { \
+        CPYMO_LUA_ARG_COUNT(l, 1); \
         const char *ass_name_cstr = lua_tostring(l, -1); \
         if (ass_name_cstr == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG); \
         cpymo_str ass_name = cpymo_str_pure(ass_name_cstr); \
