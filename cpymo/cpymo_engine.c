@@ -409,10 +409,8 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	cpymo_lua_context_leakcheck(&engine->lua);
 	#endif
 
-	return err;
-
-
 	#undef REDRAW
+	return err;
 }
 
 void cpymo_engine_draw(const cpymo_engine *engine)
@@ -469,6 +467,10 @@ void cpymo_engine_trim_memory(cpymo_engine *e)
 	e->text_extract_buffer_maxsize = 0;
 	free(e->text_extract_buffer);
 	e->text_extract_buffer = NULL;
+	#endif
+
+	#if CPYMO_FEATURE_LEVEL >= 1
+	cpymo_lua_gc_full(&e->lua);
 	#endif
 }
 

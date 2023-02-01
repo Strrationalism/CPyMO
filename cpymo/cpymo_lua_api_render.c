@@ -94,7 +94,7 @@ static int cpymo_lua_api_render_class_image_draw(lua_State *l)
 static int cpymo_lua_api_render_class_image_free(lua_State *l)
 {
     cpymo_lua_api_render_class_image *img = 
-        (cpymo_lua_api_render_class_image *)lua_touserdata(l, -1);
+        (cpymo_lua_api_render_class_image *)lua_touserdata(l, 1);
     
     if (img) {
         img->w = 0;
@@ -124,6 +124,8 @@ void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
     lua_setfield(l, -2, "__index");
     lua_pushcfunction(l, &cpymo_lua_api_render_class_image_free);
     lua_setfield(l, -2, "__gc");
+    lua_pushcfunction(l, &cpymo_lua_api_render_class_image_free);
+    lua_setfield(l, -2, "__close");
     lua_pop(l, 1);
 
     // package `cpymo`

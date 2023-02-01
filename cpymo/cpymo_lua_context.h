@@ -13,6 +13,7 @@ struct cpymo_engine;
 typedef struct {
     lua_State *lua_state;
     int readonly_metatable;
+    struct cpymo_engine *engine;
 } cpymo_lua_context;
 
 error_t cpymo_lua_context_init(
@@ -20,6 +21,8 @@ error_t cpymo_lua_context_init(
     struct cpymo_engine *e);
 
 void cpymo_lua_context_free(cpymo_lua_context *l);
+
+void cpymo_lua_gc_full(cpymo_lua_context *l);
 
 struct cpymo_engine *cpymo_lua_state_get_engine(lua_State *l);
 

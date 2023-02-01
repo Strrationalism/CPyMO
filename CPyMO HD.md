@@ -103,9 +103,9 @@ rect表示一个矩形，具有以下字段：
 所有的CPyMO Lua API都存储在包`cpymo`中，以下为`cpymo`包中的内容：
 
 * `gamedir : string` - 表示游戏所在文件夹
-* `engine : userdata` - 指向所属的引擎`cpymo_engine`结构体的指针
 * `feature_level` - 当前运行在哪个Feature Level的引擎上
   - 可能会大于`gameconfig.txt`中的值，这种情况下可以访问更高级别的功能
+* `readonly(table) : table_view` - 创建表的只读句柄，可以通过该句柄读取表的内容，但不能写入
 
 ### `cpymo.render`
 
@@ -140,11 +140,11 @@ rect表示一个矩形，具有以下字段：
 
 ### `cpymo.asset`
 
-* `load_bg(bg_name : string) : cpymo_render_image` - 加载bg图像
-* `load_chara(chara_name : string) : cpymo_render_image` - 加载chara图像
-* `load_system_image(image_name : string) : cpymo_render_image` - 加载system图像
+* `load_bg(bg_name: string) : cpymo_render_image` - 加载bg图像
+* `load_chara(chara_name: string) : cpymo_render_image` - 加载chara图像
+* `load_system_image(image_name: string) : cpymo_render_image` - 加载system图像
 
 ### `cpymo.ui`
 
-* `enter(ui : actor)` - 进入一层UI
+* `enter(ui: actor)` - 进入一层UI
 * `exit()` - 退出当前UI

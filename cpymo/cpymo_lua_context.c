@@ -12,19 +12,28 @@
 
 #include <lauxlib.h>
 #include <lualib.h>
+#include <lgc.h>
 #include <assert.h>
 #include "cpymo_engine.h"
 
 static const char *cpymo_lua_actor_children_table_name = "children";
+
+
+static inline cpymo_lua_context *cpymo_lua_state_get_lua_context(lua_State *l)
+{ return *(cpymo_lua_context **)lua_getextraspace(l); }
+
+static int cpymo_lua_api_cpymo_readonly(lua_State *l)
+{
+    if (!lua_istable(l, -1)) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    cpymo_lua_mark_table_readonly(cpymo_lua_state_get_lua_context(l));
+    return 1;
+}
 
 static void cpymo_lua_context_create_cpymo_package(
     cpymo_lua_context *ctx, cpymo_engine *e)
 {
     lua_State *l = ctx->lua_state;
     lua_newtable(l);
-    
-    lua_pushlightuserdata(l, e);
-    lua_setfield(l, -2, "engine");
 
     lua_pushstring(l, e->assetloader.gamedir);
     lua_setfield(l, -2, "gamedir");
@@ -32,8 +41,8 @@ static void cpymo_lua_context_create_cpymo_package(
     lua_pushinteger(l, CPYMO_FEATURE_LEVEL);
     lua_setfield(l, -2, "feature_level");
 
-    lua_pushnumber(l, (lua_Number)0);
-    lua_setfield(l, -2, "delta_time");
+    lua_pushcfunction(l, &cpymo_lua_api_cpymo_readonly);
+    lua_setfield(l, -2, "readonly");
 
     void cpymo_lua_api_render_register(cpymo_lua_context *);
     cpymo_lua_api_render_register(ctx);
@@ -50,15 +59,69 @@ static void cpymo_lua_context_create_cpymo_package(
 
 static int cpymo_lua_readonly_table_newindex(lua_State *l)
 {
-    CPYMO_LUA_PANIC(l, "Don\'t write value to cpymo package.");
+    CPYMO_LUA_PANIC(l, "This table is read-only.");
+}
+
+static int cpymo_lua_readonly_table_index(lua_State *l)
+{
+    const char *key = lua_tostring(l, -1);
+    int ref = *(int *)lua_touserdata(l, -2);
+    lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
+    lua_getfield(l, -1, key);    
+    return 1;
+}
+
+static int cpymo_lua_readonly_table_len(lua_State *l)
+{
+    int ref = *(int *)lua_touserdata(l, -1);
+    lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
+    lua_len(l, -1);
+    return 1;
+}
+
+static int cpymo_lua_readonly_table_tostring(lua_State *l)
+{
+    int ref = *(int *)lua_touserdata(l, -1);
+    lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
+    size_t len;
+    luaL_tolstring(l, -1, &len);
+    return 1;
+}
+
+static int cpymo_lua_readonly_table_gc(lua_State *l)
+{
+    int ref = *(int *)lua_touserdata(l, -1);
+    luaL_unref(l, LUA_REGISTRYINDEX, ref);
+    return 0;
+}
+
+static int cpymo_lua_readonly_table_pairs(lua_State *l)
+{
+    int ref = *(int *)lua_touserdata(l, -1);
+    lua_pop(l, 1);
+
+    lua_getglobal(l, "pairs");
+    lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
+
+    lua_call(l, 1, 3);
+    return 3;
 }
 
 static int cpymo_lua_context_create_readonly_metatable(lua_State *l)
 {
     lua_newtable(l);
 
-    lua_pushcfunction(l, &cpymo_lua_readonly_table_newindex);
-    lua_setfield(l, -2, "__newindex");
+    const luaL_Reg funcs[] = {
+        { "__newindex", &cpymo_lua_readonly_table_newindex },
+        { "__index", &cpymo_lua_readonly_table_index },
+        { "__len", &cpymo_lua_readonly_table_len },
+        { "__tostring", &cpymo_lua_readonly_table_tostring },
+        { "__gc", &cpymo_lua_readonly_table_gc },
+        { "__pairs", &cpymo_lua_readonly_table_pairs },
+        { NULL, NULL }
+    };
+
+    luaL_setfuncs(l, funcs, 0);
 
     return luaL_ref(l, LUA_REGISTRYINDEX);
 }
@@ -70,8 +133,12 @@ error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
         return CPYMO_ERR_SUCC;
     }
 
+    l->engine = e;
+
     l->lua_state = luaL_newstate();
     if (l->lua_state == NULL) return CPYMO_ERR_OUT_OF_MEM;
+    
+    *(cpymo_lua_context **)lua_getextraspace(l->lua_state) = l;
 
     luaL_openlibs(l->lua_state);
 
@@ -92,14 +159,11 @@ void cpymo_lua_context_free(cpymo_lua_context *l)
     } 
 }
 
+void cpymo_lua_gc_full(cpymo_lua_context *l)
+{ luaC_fullgc(l->lua_state, true); }
+
 cpymo_engine *cpymo_lua_state_get_engine(lua_State *l)
-{
-    lua_getglobal(l, "cpymo");
-    lua_getfield(l, -1, "engine");
-    void *e = lua_touserdata(l, -1);
-    lua_pop(l, 2);
-    return (cpymo_engine *)e;
-}
+{ return cpymo_lua_state_get_lua_context(l)->engine; }
 
 error_t cpymo_lua_error_conv(int lua_error)
 {
@@ -211,6 +275,9 @@ error_t cpymo_lua_tree_boardcast(
 
 void cpymo_lua_mark_table_readonly(cpymo_lua_context *l)
 {
+    int ref = luaL_ref(l->lua_state, LUA_REGISTRYINDEX);
+    int *userdata = (int *)lua_newuserdata(l->lua_state, sizeof(ref));
+    *userdata = ref;
     lua_rawgeti(l->lua_state, LUA_REGISTRYINDEX, l->readonly_metatable);
     lua_setmetatable(l->lua_state, -2);
 }
