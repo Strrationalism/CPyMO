@@ -29,13 +29,13 @@ typedef struct {
 } cpymo_msgbox_ui;
 
 
-static error_t cpymo_msgbox_ui_okcancel_finish(cpymo_engine *e, bool okcancel_callback)
+static error_t cpymo_msgbox_ui_okcancel_finish(cpymo_engine *e, bool is_ok)
 {
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)cpymo_ui_data(e);
 	error_t(*func)(cpymo_engine *, void *, bool) = ui->okcancel_callback;
 	void *data = ui->okcancel_callback_data;
 	cpymo_ui_exit(e);
-	return func(e, data, okcancel_callback);
+	return func ? func(e, data, is_ok) : CPYMO_ERR_SUCC;
 }
 
 static void cpymo_msgbox_ui_get_btn_rect(
@@ -107,7 +107,7 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 		e, &ui->mouse_button, dt, e->input.mouse_button);
 	
 	if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mbs == cpymo_key_hold_result_holding) {
-		cpymo_ui_exit(e);
+		cpymo_msgbox_ui_okcancel_finish(e, false);
 		return CPYMO_ERR_SUCC;
 	}
 
