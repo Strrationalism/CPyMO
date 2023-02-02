@@ -348,9 +348,10 @@ static error_t create_window_and_renderer(int width, int height, SDL_Window **wi
 
 
 #ifdef ENABLE_EXIT_CONFIRM
-static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
+static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data, bool exit)
 {
-	return CPYMO_ERR_NO_MORE_CONTENT;
+	*(bool *)data = false;
+	return exit ? CPYMO_ERR_NO_MORE_CONTENT : CPYMO_ERR_SUCC;
 }
 
 static void cpymo_exit_msgbox_on_closing(bool will_call_confirm, void *userdata)
@@ -634,7 +635,7 @@ START:
 						cpymo_str_pure(
 							cpymo_localization_get(&engine)->exit_confirm),
 						&cpymo_exit_confirm,
-						NULL);
+						&exit_msgbox_opened);
 
 					if (err != CPYMO_ERR_SUCC) {
 						SDL_Log("[Error] Can not show message box: %s", 
@@ -642,10 +643,6 @@ START:
 					}
 
 					exit_msgbox_opened = true;
-					cpymo_msgbox_ui_set_on_closing(
-						&engine,
-						&cpymo_exit_msgbox_on_closing, 
-						(void *)&exit_msgbox_opened);
 				}
 
 				#else

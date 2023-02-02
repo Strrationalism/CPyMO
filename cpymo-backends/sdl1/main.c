@@ -272,9 +272,9 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 #ifdef ENABLE_EXIT_CONFIRM
 #include <cpymo_msgbox_ui.h>
 #include <cpymo_localization.h>
-static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data)
+static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data, bool exit)
 {
-	return CPYMO_ERR_NO_MORE_CONTENT;
+	return exit ? CPYMO_ERR_NO_MORE_CONTENT : CPYMO_ERR_SUCC;
 }
 #endif
 
