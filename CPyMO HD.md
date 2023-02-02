@@ -114,7 +114,9 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `gamedir: string` - 表示游戏所在文件夹
 * `feature_level: int` - 当前运行在哪个Feature Level的引擎上
   - 可能会大于`gameconfig.txt`中的值，这种情况下可以访问更高级别的功能
-* `vars: userdata` - 这个表包含了所有的PyMO变量，仅可在其中读写整数，不可遍历
+* `screen_width: int` - 屏幕宽度，用于确定绘图和鼠标的坐标系，读取自`gameconfig.txt`的`imagesize`字段
+* `screen_height: int` - 屏幕高度，用于确定绘图和鼠标的坐标系，读取自`gameconfig.txt`的`imagesize`字段
+* `actors: table` - 一个actor表，需要用户将actor放入其中，引擎将会运行其中的actor (TODO)
 * `readonly(table) : userdata` - 创建表的只读句柄，可以通过该句柄读取表的内容，但不能写入
 * `is_skipping() : bool` - 检查是否正在跳过
 * `extract_text(string)` - 导出游戏文本以供游戏在CUI模式下运行或提供给视障人员，需要多次调用后使用`extract_text_submit`来进行一次导出
@@ -123,12 +125,13 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 ### `cpymo.render`
 
-供Lua绘制的屏幕空间的左上角坐标为`(0, 0)`，屏幕的长度和宽度由`gameconfig.txt`中`imagesizew`和`imagesizeh`字段定义。
+供Lua绘制的屏幕空间的左上角坐标为`(0, 0)`，屏幕的长度和宽度由`gameconfig.txt`中`imagesize`字段定义。
 
 这个包用于存储与渲染有关的功能，以下为此包内容：
 
 * `request_redraw()` - 请求绘制新一帧
 * `fill_rect(dst: rect, color, semantic)` - 在下一帧绘制一个实心矩形
+* `create_text(text: string, fontsize: number) : cpymo_render_text` - 创建一个可供渲染的文本（TODO）
 
 #### `cpymo.render.semantic`
 
@@ -149,11 +152,23 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 #### 类`cpymo_render_image`
 
+你可以使用`<close>`在声明中标记该值。
+
 这个类包含以下成员：
 
 * `get_size(self) : number, number` - 获取大小
 * `draw(self, dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧，其中alpha范围在0~255之间
 * `free(self)` - 手动释放其内存
+
+#### 类`cpymo_render_text` (TODO)
+
+你可以使用`<close>`在声明中标记该值。
+
+这个类包含以下成员：
+
+* `get_width() : number` - 获得宽度
+* `draw(x: number, y_baseline: number, color, semantic)` - 使用给定颜色将此文本绘制到下一帧
+* `free(self)` - 手动释放内存
 
 ### `cpymo.asset`
 
@@ -207,3 +222,25 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 该包内存放了上一帧的输入，与`cpymo.input`内容相同。
 
+### `cpymo.script`（TODO)
+
+该包用于与PyMO脚本解释器交互：
+
+* `vars` - 这个表包含了所有的PyMO变量，仅可在其中读写整数，不可遍历
+* `commands` - 这个表包含了除`label`、`if`两个命令外其他所有的命令，参数全部都会被转换为字符串后传入
+  - 需要特殊实现的命令：`goto`、`change`、`ret`、`sel`
+  - 对这个表进行写入可以重载pymo命令，但上述六个命令不能重载
+* `call_string(script_name: string, script: string)` - 调用Lua端传来的字符串形式的PyMO脚本，需要给定用于调试的脚本名称
+* `change_string(script_name: string, script: string)` - 切换到Lua端传来的字符串形式的PyMO脚本，需用给定用于调试的脚本名称
+
+### `cpymo.save` (TODO)
+
+* `save_callback: () -> string` - 存档时调用该回调，需要由用户设置，由用户设置一个字符串，存档时将会将该字符串存入到存档中
+* `load_callback: string -> ()` - 读档时调用该回调，需要由用户设置，读取由用户设置的那个字符串
+* `global_savedata: string` - 你可以从这里读写全局存档中保存的字符串，写入时不一定会立刻保存
+* `global_save()` - 立刻保存全局存档
+* `config_data: string` - 全局设置中保存的字符串，写入时不一定会立刻保存
+* `config_save()` - 立刻保存设置
+* `open_read_savedata(filename: string) : io.file` - 以读取的方式打开自定义存档文件
+* `open_write_savedata(filename: string) : io.file` - 以创建并写入的方式打开自定义存档文件
+* `save(id: int)` - 保存存档到`id`号存档槽，其中0号槽为自动存档
