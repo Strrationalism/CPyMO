@@ -274,6 +274,7 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 #include <cpymo_localization.h>
 static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data, bool exit)
 {
+    *(bool *)data = false;
 	return exit ? CPYMO_ERR_NO_MORE_CONTENT : CPYMO_ERR_SUCC;
 }
 #endif
@@ -416,6 +417,10 @@ int main(int argc, char **argv)
     Uint32 prev_time = SDL_GetTicks();
     int ret = 0;
 
+    #ifdef ENABLE_EXIT_CONFIRM
+    bool exit_okcancel_box_opened = false;
+    #endif
+
     while (1) {
         bool redraw_system = false;
         SDL_Event event;
@@ -427,20 +432,23 @@ int main(int argc, char **argv)
                 extern bool playing_movie;
                 if (playing_movie) goto EXIT;
                 #endif
-				
-				if (cpymo_ui_enabled(&engine))
-                	cpymo_ui_exit(&engine);
 
-				err = cpymo_msgbox_ui_enter(
-					&engine,
-					cpymo_str_pure(
-						cpymo_localization_get(&engine)->exit_confirm),
-					&cpymo_exit_confirm,
-					NULL);
-				if (err != CPYMO_ERR_SUCC) {
-					printf("[Error] Can not show message box: %s", 
-						cpymo_error_message(err));
-				}
+                if (!exit_okcancel_box_opened)
+                {
+                    err = cpymo_msgbox_ui_enter(
+                        &engine,
+                        cpymo_str_pure(
+                            cpymo_localization_get(&engine)->exit_confirm),
+                        &cpymo_exit_confirm,
+                        &exit_okcancel_box_opened);
+
+                    if (err != CPYMO_ERR_SUCC) {
+                        printf("[Error] Can not show message box: %s", 
+                            cpymo_error_message(err));
+                    }
+
+                    exit_okcancel_box_opened = true;
+                }
 				#else
 				goto EXIT;
 				#endif
