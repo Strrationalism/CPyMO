@@ -406,7 +406,8 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 	REDRAW;
 
 	#if CPYMO_FEATURE_LEVEL >= 1 && defined LEAKCHECK
-	cpymo_lua_context_leakcheck(&engine->lua);
+	if (engine->feature_level >= 1) 
+		cpymo_lua_context_leakcheck(&engine->lua);
 	#endif
 
 	#undef REDRAW
@@ -470,7 +471,8 @@ void cpymo_engine_trim_memory(cpymo_engine *e)
 	#endif
 
 	#if CPYMO_FEATURE_LEVEL >= 1
-	cpymo_lua_gc_full(&e->lua);
+	if (e->feature_level >= 1) 
+		cpymo_lua_gc_full(&e->lua);
 	#endif
 }
 
