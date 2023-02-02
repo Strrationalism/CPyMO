@@ -307,3 +307,11 @@ void cpymo_str_hash_append_cstr(uint64_t *hash, const char *s)
 		cpymo_str_hash_step(hash, ch);
 }
 
+uint64_t cpymo_str_hash_cstr(const char *cstr)
+{
+	uint64_t hash;
+	cpymo_str_hash_init(&hash);
+	cpymo_str_hash_append_cstr(&hash, cstr);
+	return hash;
+}
+

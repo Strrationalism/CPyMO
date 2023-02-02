@@ -47,5 +47,6 @@ void cpymo_str_hash_step(uint64_t *hash, char ch);
 void cpymo_str_hash_append_cstr(uint64_t *hash, const char *s);
 void cpymo_str_hash_append(
 	uint64_t *hash, cpymo_str span);
+uint64_t cpymo_str_hash_cstr(const char *cstr);
 
 #endif
