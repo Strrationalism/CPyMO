@@ -19,6 +19,10 @@ CFLAGS += \
 	-I../../stb \
 	-I../include
 
+ifeq ($(ENABLE_EXIT_CONFIRM), 1)
+CFLAGS += -DENABLE_EXIT_CONFIRM
+endif
+
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -DDEBUG
 else
