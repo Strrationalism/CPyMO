@@ -1,4 +1,7 @@
-﻿#ifndef DISABLE_MOVIE
+﻿#include <stdbool.h>
+bool playing_movie = false;
+
+#ifndef DISABLE_MOVIE
 #include <cpymo_prelude.h>
 #include "cpymo_backend_movie.h"
 #include "cpymo_import_sdl2.h"
@@ -13,7 +16,6 @@ static SDL_FRect draw_target;
 static SDL_Rect draw_target;
 #endif
 
-bool playing_movie = false;
 
 enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play() {
 	return cpymo_backend_movie_how_to_play_send_surface;
