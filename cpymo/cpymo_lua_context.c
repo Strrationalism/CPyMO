@@ -203,6 +203,12 @@ static error_t cpymo_lua_context_create_cpymo_package(
     lua_pushinteger(l, CPYMO_FEATURE_LEVEL);
     lua_setfield(l, -2, "feature_level");
 
+    lua_pushinteger(l, e->gameconfig.imagesize_w);
+    lua_setfield(l, -2, "screen_width");
+
+    lua_pushinteger(l, e->gameconfig.imagesize_h);
+    lua_setfield(l, -2, "screen_height");
+
     const luaL_Reg cpymo_funcs[] = {
         { "readonly", &cpymo_lua_api_cpymo_readonly },
         { "is_skipping", &cpymo_lua_api_cpymo_is_skipping },
