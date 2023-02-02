@@ -166,6 +166,9 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `enter(ui: actor)` - 进入一层UI
 * `exit()` - 退出当前UI
 * `msgbox(msg: string)` - 弹出一个消息框
+* `okcancelbox(msg: string, callback: bool -> void)` 
+  - 弹出“确定/取消”框，当关闭此框时调用`callback`
+  - 若选择了“确定”，则`callback`会被传入`true`，其他情况下传入`false`
 
 ### `cpymo.flags`
 

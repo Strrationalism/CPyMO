@@ -74,6 +74,52 @@ static int cpymo_lua_api_ui_msgbox(lua_State *l)
     return 0;
 }
 
+typedef struct {
+    lua_State *l;
+    int callback_ref;
+} cpymo_lua_api_ui_okcancelbox_data;
+
+static error_t cpymo_lua_api_ui_okcancelbox_cb(cpymo_engine *e, void *x, bool c)
+{
+    cpymo_lua_api_ui_okcancelbox_data d = 
+        *(cpymo_lua_api_ui_okcancelbox_data *)x;
+    free(x);
+    
+    lua_rawgeti(d.l, LUA_REGISTRYINDEX, d.callback_ref);
+    luaL_unref(d.l, LUA_REGISTRYINDEX, d.callback_ref);
+    lua_pushboolean(d.l, c);
+    return cpymo_lua_context_execute(
+        cpymo_lua_state_get_lua_context(d.l), 1, 0);
+}
+
+static int cpymo_lua_api_ui_okcancelbox(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 2);
+    if (!lua_isfunction(l, -1)) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    if (!lua_isstring(l, -2)) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    const char *msg = lua_tostring(l, -2);
+
+    cpymo_lua_api_ui_okcancelbox_data *data = 
+        malloc(sizeof(cpymo_lua_api_ui_okcancelbox_data));
+    if (data == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_OUT_OF_MEM);
+
+    error_t err = cpymo_msgbox_ui_enter(
+        cpymo_lua_state_get_engine(l),
+        cpymo_str_pure(msg),
+        &cpymo_lua_api_ui_okcancelbox_cb,
+        (void *)data);
+    if (err != CPYMO_ERR_SUCC) {
+        free(data);
+        CPYMO_LUA_THROW(l, err);
+    }
+
+    data->l = l;
+    data->callback_ref = luaL_ref(l, LUA_REGISTRYINDEX);
+
+    return CPYMO_ERR_SUCC;
+}
+
 void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -85,6 +131,7 @@ void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
         { "enter", &cpymo_lua_api_ui_enter },
         { "exit", &cpymo_lua_api_ui_exit },
         { "msgbox", &cpymo_lua_api_ui_msgbox },
+        { "okcancelbox", &cpymo_lua_api_ui_okcancelbox },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);

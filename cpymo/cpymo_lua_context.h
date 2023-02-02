@@ -26,6 +26,8 @@ void cpymo_lua_gc_full(cpymo_lua_context *l);
 
 struct cpymo_engine *cpymo_lua_state_get_engine(lua_State *l);
 
+cpymo_lua_context *cpymo_lua_state_get_lua_context(lua_State *l);
+
 error_t cpymo_lua_context_push_lua_code(
     cpymo_lua_context *l, cpymo_str lua_code);
 

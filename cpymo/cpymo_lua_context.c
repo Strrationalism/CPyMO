@@ -19,7 +19,7 @@
 static const char *cpymo_lua_actor_children_table_name = "children";
 
 
-static inline cpymo_lua_context *cpymo_lua_state_get_lua_context(lua_State *l)
+cpymo_lua_context *cpymo_lua_state_get_lua_context(lua_State *l)
 { return *(cpymo_lua_context **)lua_getextraspace(l); }
 
 static int cpymo_lua_readonly_table_newindex(lua_State *l)
