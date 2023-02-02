@@ -102,6 +102,9 @@ static void cpymo_lua_context_create_cpymo_package(
     void cpymo_lua_api_ui_register(cpymo_lua_context *);
     cpymo_lua_api_ui_register(ctx);
 
+    void cpymo_lua_api_flags_register(cpymo_lua_context *ctx);
+    cpymo_lua_api_flags_register(ctx);
+
     cpymo_lua_context_vars_register(ctx->lua_state);
 
     cpymo_lua_mark_table_readonly(ctx);

@@ -163,3 +163,16 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `enter(ui: actor)` - 进入一层UI
 * `exit()` - 退出当前UI
 * `msgbox(msg: string)` - 弹出一个消息框
+
+### `cpymo.flags`
+
+该包内的功能用于管理Flag，每个Flag由一个字符串组成，可检查其存在或不存在。    
+这些Flag是全局的，将会在全局存档中保存。    
+这里的Flag最终使用一个Hash值表示，不保证可靠。
+
+* `set(flag: string)` - 设置一个flag
+* `check(flag: string) : bool` - 检查这个flag是否存在
+* `unset(flag: string)` - 取消一个flag
+* `unlock_cg(cg_name: string)` - 解锁一个CG
+* `lock_cg(cg_name: string)` - 重新锁定一个CG
+* `cg_unlocked(cg_name: string) : bool` 检查这个CG是否被锁定
