@@ -69,7 +69,7 @@ static void cpymo_lua_context_vars_register(lua_State *l)
     lua_setfield(l, -2, "vars");
 }
 
-static int cpymo_lua_api_is_skipping(lua_State *l)
+static int cpymo_lua_api_cpymo_is_skipping(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 0);
     lua_pushboolean(
@@ -168,10 +168,33 @@ static error_t cpymo_lua_api_input_register(cpymo_lua_context *ctx)
     return CPYMO_ERR_SUCC;
 }
 
+static int cpymo_lua_api_cpymo_exit(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 0);
+    cpymo_engine_exit(cpymo_lua_state_get_engine(l));
+    return 0;
+}
+
+static int cpymo_lua_api_cpymo_extract_text(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+    const char *str = lua_tostring(l, -1);
+    if (str == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    cpymo_engine_extract_text_cstr(cpymo_lua_state_get_engine(l), cstr);
+    return 0;
+}
+
+static int cpymo_lua_api_cpymo_extract_text_submit(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 0);
+    cpymo_engine_extract_text_submit(cpymo_lua_state_get_engine(l));
+    return 0;
+}
+
 static error_t cpymo_lua_context_create_cpymo_package(
     cpymo_lua_context *ctx, cpymo_engine *e)
 {
-    lua_State *l = ctx->lua_state;
+    lua_State *l = ctx->lua_state; 
     lua_newtable(l);
 
     lua_pushstring(l, e->assetloader.gamedir);
@@ -180,11 +203,15 @@ static error_t cpymo_lua_context_create_cpymo_package(
     lua_pushinteger(l, CPYMO_FEATURE_LEVEL);
     lua_setfield(l, -2, "feature_level");
 
-    lua_pushcfunction(l, &cpymo_lua_api_cpymo_readonly);
-    lua_setfield(l, -2, "readonly");
-
-    lua_pushcfunction(l, &cpymo_lua_api_is_skipping);
-    lua_setfield(l, -2, "is_skipping");
+    const luaL_Reg cpymo_funcs[] = {
+        { "readonly", &cpymo_lua_api_cpymo_readonly },
+        { "is_skipping", &cpymo_lua_api_cpymo_is_skipping },
+        { "extract_text", &cpymo_lua_api_cpymo_extract_text },
+        { "extract_text_submit", &cpymo_lua_api_cpymo_extract_text_submit },
+        { "exit", &cpymo_lua_api_cpymo_exit },
+        { NULL, NULL }
+    };
+    luaL_setfuncs(l, cpymo_funcs, 0);
 
     void cpymo_lua_api_render_register(cpymo_lua_context *);
     cpymo_lua_api_render_register(ctx);

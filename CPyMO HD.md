@@ -114,9 +114,12 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `gamedir: string` - 表示游戏所在文件夹
 * `feature_level: int` - 当前运行在哪个Feature Level的引擎上
   - 可能会大于`gameconfig.txt`中的值，这种情况下可以访问更高级别的功能
+* `vars: userdata` - 这个表包含了所有的PyMO变量，仅可在其中读写整数，不可遍历
 * `readonly(table) : userdata` - 创建表的只读句柄，可以通过该句柄读取表的内容，但不能写入
 * `is_skipping() : bool` - 检查是否正在跳过
-* `vars: userdata` - 这个表包含了所有的PyMO变量，仅可在其中读写整数
+* `extract_text(string)` - 导出游戏文本以供游戏在CUI模式下运行或提供给视障人员，需要多次调用后使用`extract_text_submit`来进行一次导出
+* `extract_text_submit()` - 提交一次`extract_text`导出的文本
+* `exit()` - 退出游戏
 
 ### `cpymo.render`
 
