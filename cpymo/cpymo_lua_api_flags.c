@@ -10,15 +10,11 @@ static int cpymo_lua_api_flags_set(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *x = lua_tostring(l, -1);
-    if (x == NULL) return CPYMO_ERR_INVALID_ARG;
-
-    uint64_t hash;
-    cpymo_str_hash_init(&hash);
-    cpymo_str_hash_append_cstr(&hash, x);
+    if (x == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     error_t err = cpymo_hash_flags_add(
         &cpymo_lua_state_get_engine(l)->flags,
-        hash);
+        cpymo_str_hash_cstr(x));
     CPYMO_LUA_THROW(l, err);
 
     return 0;
@@ -28,15 +24,11 @@ static int cpymo_lua_api_flags_unset(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *x = lua_tostring(l, -1);
-    if (x == NULL) return CPYMO_ERR_INVALID_ARG;
-
-    uint64_t hash;
-    cpymo_str_hash_init(&hash);
-    cpymo_str_hash_append_cstr(&hash, x);
+    if (x == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     cpymo_hash_flags_del(
         &cpymo_lua_state_get_engine(l)->flags,
-        hash);
+        cpymo_str_hash_cstr(x));
 
     return 0;
 }
@@ -45,15 +37,11 @@ static int cpymo_lua_api_flags_check(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *x = lua_tostring(l, -1);
-    if (x == NULL) return CPYMO_ERR_INVALID_ARG;
-
-    uint64_t hash;
-    cpymo_str_hash_init(&hash);
-    cpymo_str_hash_append_cstr(&hash, x);
+    if (x == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     bool checked = cpymo_hash_flags_check(
         &cpymo_lua_state_get_engine(l)->flags,
-        hash);
+        cpymo_str_hash_cstr(x));
 
     lua_pushboolean(l, checked);
     return 1;    
@@ -64,7 +52,8 @@ static int cpymo_lua_api_flags_unlock_cg(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *x = lua_tostring(l, -1);
-    if (x == NULL) return CPYMO_ERR_INVALID_ARG;
+    if (x == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    
     error_t err = cpymo_album_cg_unlock(
         cpymo_lua_state_get_engine(l), cpymo_str_pure(x));
     CPYMO_THROW(err);
@@ -75,7 +64,7 @@ static int cpymo_lua_api_flags_lock_cg(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *x = lua_tostring(l, -1);
-    if (x == NULL) return CPYMO_ERR_INVALID_ARG;
+    if (x == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     cpymo_hash_flags_del(
         &cpymo_lua_state_get_engine(l)->flags,
@@ -88,7 +77,7 @@ static int cpymo_lua_api_flags_cg_unlocked(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *x = lua_tostring(l, -1);
-    if (x == NULL) return CPYMO_ERR_INVALID_ARG;
+    if (x == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     bool checked = cpymo_hash_flags_check(
         &cpymo_lua_state_get_engine(l)->flags,
