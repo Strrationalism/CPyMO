@@ -180,7 +180,7 @@ static int cpymo_lua_api_cpymo_extract_text(lua_State *l)
     CPYMO_LUA_ARG_COUNT(l, 1);
     const char *str = lua_tostring(l, -1);
     if (str == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
-    cpymo_engine_extract_text_cstr(cpymo_lua_state_get_engine(l), cstr);
+    cpymo_engine_extract_text_cstr(cpymo_lua_state_get_engine(l), str);
     return 0;
 }
 
