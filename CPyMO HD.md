@@ -109,14 +109,16 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 ## Lua API
 
-所有的CPyMO Lua API都存储在包`cpymo`中，以下为`cpymo`包中的内容：
+所有的CPyMO Lua API都存储在包`cpymo`中。
+
+### `cpymo`
 
 * `gamedir: string` - 表示游戏所在文件夹
 * `feature_level: int` - 当前运行在哪个Feature Level的引擎上
   - 可能会大于`gameconfig.txt`中的值，这种情况下可以访问更高级别的功能
 * `screen_width: int` - 屏幕宽度，用于确定绘图和鼠标的坐标系，读取自`gameconfig.txt`的`imagesize`字段
 * `screen_height: int` - 屏幕高度，用于确定绘图和鼠标的坐标系，读取自`gameconfig.txt`的`imagesize`字段
-* `set_main_actor(actor | nil)` - 设置主actor (TODO)
+* `set_main_actor(actor | nil)` - 设置主actor
 * `readonly(table) : userdata` - 创建表的只读句柄，可以通过该句柄读取表的内容，但不能写入
 * `is_skipping() : bool` - 检查是否正在跳过
 * `extract_text(string)` - 导出游戏文本以供游戏在CUI模式下运行或提供给视障人员，需要多次调用后使用`extract_text_submit`来进行一次导出

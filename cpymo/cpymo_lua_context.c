@@ -191,6 +191,19 @@ static int cpymo_lua_api_cpymo_extract_text_submit(lua_State *l)
     return 0;
 }
 
+static int cpymo_lua_api_cpymo_set_main_actor(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1)
+    if (!lua_istable(l, -1) && !lua_isnil(l, -1)) 
+        CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    
+    cpymo_lua_context *ctx = cpymo_lua_state_get_lua_context(l);
+    luaL_unref(l, LUA_REGISTRYINDEX, ctx->main_actor);
+    ctx->main_actor = luaL_ref(l, LUA_REGISTRYINDEX);
+
+    return 0;
+}
+
 static error_t cpymo_lua_context_create_cpymo_package(
     cpymo_lua_context *ctx, cpymo_engine *e)
 {
@@ -210,6 +223,7 @@ static error_t cpymo_lua_context_create_cpymo_package(
     lua_setfield(l, -2, "screen_height");
 
     const luaL_Reg cpymo_funcs[] = {
+        { "set_main_actor", &cpymo_lua_api_cpymo_set_main_actor },
         { "readonly", &cpymo_lua_api_cpymo_readonly },
         { "is_skipping", &cpymo_lua_api_cpymo_is_skipping },
         { "extract_text", &cpymo_lua_api_cpymo_extract_text },
@@ -326,6 +340,7 @@ error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
 
     l->readonly_metatable = 
         cpymo_lua_context_create_readonly_metatable(l->lua_state);
+    l->main_actor = LUA_REFNIL;
 
     error_t err = cpymo_lua_context_create_cpymo_package(l, e);
     CPYMO_THROW(err);
@@ -509,7 +524,7 @@ void cpymo_lua_actor_free(
 
 void cpymo_lua_get_main_actor(cpymo_lua_context *l)
 {
-    lua_getglobal(l->lua_state, "main");
+    lua_rawgeti(l->lua_state, LUA_REGISTRYINDEX, l->main_actor);
 }
 
 error_t cpymo_lua_actor_update_main(
