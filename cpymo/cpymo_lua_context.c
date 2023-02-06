@@ -33,42 +33,6 @@ static int cpymo_lua_api_cpymo_readonly(lua_State *l)
     return 1;
 }
 
-static int cpymo_lua_api_vars_index(lua_State *l)
-{
-    cpymo_val v = cpymo_vars_get(
-        &cpymo_lua_state_get_engine(l)->vars, 
-        cpymo_str_pure(lua_tostring(l, -1)));
-    lua_pushinteger(l, (lua_Integer)v);
-    return 1;
-}
-
-static int cpymo_lua_api_vars_newindex(lua_State *l)
-{
-    int succeed;
-    cpymo_val v = (cpymo_val)lua_tointegerx(l, -1, &succeed);
-    if (!succeed) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
-    const char *k = lua_tostring(l, -2);
-    error_t err = cpymo_vars_set(
-        &cpymo_lua_state_get_engine(l)->vars, 
-        cpymo_str_pure(k), v);
-    CPYMO_LUA_THROW(l, err);
-    return 0;
-}
-
-static void cpymo_lua_context_vars_register(lua_State *l)
-{
-    lua_newtable(l);
-    lua_newtable(l);
-
-    lua_pushcfunction(l, &cpymo_lua_api_vars_index);
-    lua_setfield(l, -2, "__index");
-    lua_pushcfunction(l, &cpymo_lua_api_vars_newindex);
-    lua_setfield(l, -2, "__newindex");
-
-    lua_setmetatable(l, -2);
-    lua_setfield(l, -2, "vars");
-}
-
 static int cpymo_lua_api_cpymo_is_skipping(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 0);
@@ -245,7 +209,8 @@ static error_t cpymo_lua_context_create_cpymo_package(
     void cpymo_lua_api_flags_register(cpymo_lua_context *ctx);
     cpymo_lua_api_flags_register(ctx);
 
-    cpymo_lua_context_vars_register(ctx->lua_state);
+    void cpymo_lua_api_script_register(cpymo_lua_context *ctx);
+    cpymo_lua_api_script_register(ctx);
 
     error_t err = cpymo_lua_api_input_register(ctx);
     CPYMO_THROW(err);

@@ -226,19 +226,18 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 该包内存放了上一帧的输入，与`cpymo.input`内容相同。
 
-### `cpymo.script`（TODO)
+### `cpymo.script`
 
 该包用于与PyMO脚本解释器交互：
 
 * `vars` - 这个表包含了所有的PyMO变量，仅可在其中读写整数，不可遍历
-* `overrides` - 这个表包含了所有新增或重载的PyMO脚本命令，可以在这里覆盖原有PyMO命令或添加新的脚本命令
+* `overrides` - 这个表包含了所有新增或重载的PyMO脚本命令，可以在这里覆盖原有PyMO命令或添加新的脚本命令（TODO)
   - 对于重载的命令，所有的PyMO参数都会以字符串传入
   - 如重载`bg`命令，则需要重载为`function cpymo.script.overrides.bg(name, transition, time, x, y)`，所有的参数均为字符串，且返回值无意义
   - 如果调用重载命令后，引擎判断不需要刷新帧，则会立刻执行下一条命令，如果需要刷新帧（如调用了`cpymo.request_redraw()`或产生了其他引擎认为需要刷新的情况），
   - 则将会在下一帧继续执行后面的PyMO代码
-* `require_call(script: string)` - 在PyMO调用栈上压入指定代码，以在下次PyMO代码执行时执行目标代码，可最后添加ret命令以返回原先正在执行的代码
-* `require_change(script: string)` - 在PyMO调用栈顶部栈帧切换为指定代码，以在下次PyMO代码执行时执行目标代码
-* `set_wait(finished: () -> bool, finish_callback: () -> ())` 
+* `require_call(script: string)` - 在PyMO调用栈上压入指定代码，以在下次PyMO代码执行时执行目标代码，可最后添加ret命令以返回原先正在执行的代码（TODO）
+* `set_wait(finished: () -> bool, finish_callback: () -> ())` （TODO）
   - 将会使得PyMO解释器每帧执行一次`finished`，
   - 在其返回`true`之前不会继续工作，
   - 一旦`finished`返回`true`，则会调用`finish_callback`，并继续执行后面的PyMO代码
