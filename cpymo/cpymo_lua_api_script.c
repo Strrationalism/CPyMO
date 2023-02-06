@@ -79,6 +79,63 @@ static int cpymo_lua_api_script_push_code(lua_State *l)
     return 0;
 }
 
+
+static bool cpymo_lua_api_script_wait_wait(cpymo_engine *e, float d)
+{
+    lua_rawgeti(
+        e->lua.lua_state, 
+        LUA_REGISTRYINDEX, 
+        e->lua.script_wait_function_id);
+
+    lua_pushnumber(e->lua.lua_state, d);
+    error_t err = cpymo_lua_context_execute(&e->lua, 1, 1);
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] %s.", cpymo_error_message(err));
+        return false;
+    }
+
+    bool ret = (bool)lua_toboolean(e->lua.lua_state, -1);
+    lua_pop(e->lua.lua_state, 1);
+    return ret;
+}
+
+static error_t cpymo_lua_api_script_wait_callback(cpymo_engine *e)
+{
+    lua_State *l = e->lua.lua_state;
+    lua_rawgeti(l, LUA_REGISTRYINDEX, e->lua.script_wait_callback_id);
+    luaL_unref(l, LUA_REGISTRYINDEX, e->lua.script_wait_function_id);
+    luaL_unref(l, LUA_REGISTRYINDEX, e->lua.script_wait_callback_id);
+    e->lua.script_wait_function_id = LUA_REFNIL;
+    e->lua.script_wait_callback_id = LUA_REFNIL;
+
+    if (lua_isnil(l, -1)) {
+        lua_pop(l, 1);
+        return CPYMO_ERR_SUCC;
+    }
+    else 
+        return cpymo_lua_context_execute(&e->lua, 0, 0);
+}
+
+static int cpymo_lua_api_script_wait(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 2);
+    if (!(lua_isfunction(l, -1) || lua_isnil(l, -1)))
+        CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+    if (!lua_isfunction(l, -2)) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    cpymo_lua_context *ctx = cpymo_lua_state_get_lua_context(l);
+
+    ctx->script_wait_callback_id = luaL_ref(l, LUA_REGISTRYINDEX);
+    ctx->script_wait_function_id = luaL_ref(l, LUA_REGISTRYINDEX);
+
+    cpymo_wait_register_with_callback(
+        &ctx->engine->wait,
+        &cpymo_lua_api_script_wait_wait,
+        &cpymo_lua_api_script_wait_callback);
+
+    return 0;
+}
+
 void cpymo_lua_api_script_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -88,6 +145,7 @@ void cpymo_lua_api_script_register(cpymo_lua_context *ctx)
     // basic
     const luaL_Reg funcs[] = {
         { "push_code", &cpymo_lua_api_script_push_code },
+        { "wait", &cpymo_lua_api_script_wait },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);

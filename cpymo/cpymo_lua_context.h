@@ -15,6 +15,9 @@ typedef struct {
     int readonly_metatable;
     int main_actor;
     struct cpymo_engine *engine;
+
+    int script_wait_function_id;
+    int script_wait_callback_id;
 } cpymo_lua_context;
 
 error_t cpymo_lua_context_init(

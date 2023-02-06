@@ -237,8 +237,8 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
   - 如果调用重载命令后，引擎判断不需要刷新帧，则会立刻执行下一条命令，如果需要刷新帧（如调用了`cpymo.request_redraw()`或产生了其他引擎认为需要刷新的情况），
   - 则将会在下一帧继续执行后面的PyMO代码
 * `push_code(pymo_code: string)` - 将PyMO代码压入栈中，在下次PyMO解释器执行时执行PyMO代码`pymo_code`
-* `set_wait(finished: () -> bool, finish_callback: () -> ())` （TODO）
-  - 将会使得PyMO解释器每帧执行一次`finished`，
+* `wait(finished: (delta_time: number) -> bool, finish_callback: () -> ())` 
+  - 将会使得PyMO解释器每帧执行一次`finished`，参数为已经经过的时间
   - 在其返回`true`之前不会继续工作，
   - 一旦`finished`返回`true`，则会调用`finish_callback`，并继续执行后面的PyMO代码
 

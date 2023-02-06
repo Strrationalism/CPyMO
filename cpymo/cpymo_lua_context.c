@@ -306,6 +306,8 @@ error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
     l->readonly_metatable = 
         cpymo_lua_context_create_readonly_metatable(l->lua_state);
     l->main_actor = LUA_REFNIL;
+    l->script_wait_callback_id = LUA_REFNIL;
+    l->script_wait_function_id = LUA_REFNIL;
 
     error_t err = cpymo_lua_context_create_cpymo_package(l, e);
     CPYMO_THROW(err);
