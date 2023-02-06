@@ -236,7 +236,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
   - 如重载`bg`命令，则需要重载为`function cpymo.script.overrides.bg(name, transition, time, x, y)`，所有的参数均为字符串，且返回值无意义
   - 如果调用重载命令后，引擎判断不需要刷新帧，则会立刻执行下一条命令，如果需要刷新帧（如调用了`cpymo.request_redraw()`或产生了其他引擎认为需要刷新的情况），
   - 则将会在下一帧继续执行后面的PyMO代码
-* `require_call(script: string)` - 在PyMO调用栈上压入指定代码，以在下次PyMO代码执行时执行目标代码，可最后添加ret命令以返回原先正在执行的代码（TODO）
+* `push_code(pymo_code: string)` - 将PyMO代码压入栈中，在下次PyMO解释器执行时执行PyMO代码`pymo_code`
 * `set_wait(finished: () -> bool, finish_callback: () -> ())` （TODO）
   - 将会使得PyMO解释器每帧执行一次`finished`，
   - 在其返回`true`之前不会继续工作，
