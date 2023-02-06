@@ -133,7 +133,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 * `request_redraw()` - 请求绘制新一帧
 * `fill_rect(dst: rect, color, semantic)` - 在下一帧绘制一个实心矩形
-* `create_text(text: string, fontsize: number) : cpymo_render_text` - 创建一个可供渲染的文本（TODO）
+* `create_text(text: string, fontsize: number) : cpymo_render_text` - 创建一个可供渲染的文本图像缓存
 
 #### `cpymo.render.semantic`
 
@@ -154,6 +154,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 #### 类`cpymo_render_image`
 
+该类表示一个可以渲染到画面上的图像。    
 你可以使用`<close>`在声明中标记该值。
 
 这个类包含以下成员：
@@ -162,14 +163,15 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `draw(self, dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧，其中alpha范围在0~255之间
 * `free(self)` - 手动释放其内存
 
-#### 类`cpymo_render_text` (TODO)
+#### 类`cpymo_render_text`
 
+该类表示一个可以渲染到画面上的文本。    
 你可以使用`<close>`在声明中标记该值。
 
 这个类包含以下成员：
 
-* `get_width() : number` - 获得宽度
-* `draw(x: number, y_baseline: number, color, semantic)` - 使用给定颜色将此文本绘制到下一帧
+* `get_size(self) : number, number` - 获得大致宽度和fontsize，这些值仅供估算大小，具体值由字体系统的实现决定
+* `draw(self, x: number, y_baseline: number, color, semantic)` - 使用给定颜色将此文本绘制到下一帧
 * `free(self)` - 手动释放内存
 
 ### `cpymo.asset`
