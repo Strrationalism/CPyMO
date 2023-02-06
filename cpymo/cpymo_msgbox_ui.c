@@ -34,6 +34,8 @@ static error_t cpymo_msgbox_ui_okcancel_finish(cpymo_engine *e, bool is_ok)
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)cpymo_ui_data(e);
 	error_t(*func)(cpymo_engine *, void *, bool) = ui->okcancel_callback;
 	void *data = ui->okcancel_callback_data;
+	ui->okcancel_callback = NULL;
+	ui->okcancel_callback_data = NULL;
 	cpymo_ui_exit(e);
 	return func ? func(e, data, is_ok) : CPYMO_ERR_SUCC;
 }
@@ -255,6 +257,12 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 static void cpymo_msgbox_ui_delete(struct cpymo_engine *e, void *ui_data)
 {
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
+
+	if (ui->okcancel_callback) {
+		ui->okcancel_callback(e, ui->okcancel_callback_data, false);
+		ui->okcancel_callback = NULL;
+		ui->okcancel_callback_data = NULL;
+	}
 	
 	if (ui->message) cpymo_backend_text_free(ui->message);
 	if (ui->confirm_btn) cpymo_backend_text_free(ui->confirm_btn);
