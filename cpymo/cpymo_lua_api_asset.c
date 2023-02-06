@@ -45,6 +45,29 @@ MAKE_LOAD_IMG_FUNC(system, cpymo_assetloader_load_system_image_no_mask);
 
 #undef MAKE_LOAD_IMG_FUNC
 
+static int cpymo_lua_api_asset_load_system_masktrans(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+    const char *masktrans_name = lua_tostring(l, -1);
+    if (masktrans_name == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    cpymo_backend_masktrans masktrans;
+    error_t err = cpymo_assetloader_load_system_masktrans(
+        &masktrans, cpymo_str_pure(masktrans_name), 
+        &cpymo_lua_state_get_engine(l)->assetloader);
+    CPYMO_LUA_THROW(l, err);
+
+    error_t cpymo_lua_api_render_class_masktrans_constructor(
+        lua_State *l, cpymo_backend_masktrans masktrans);
+    err = cpymo_lua_api_render_class_masktrans_constructor(l, masktrans);
+    if (err != CPYMO_ERR_SUCC) {
+        cpymo_backend_masktrans_free(masktrans);
+        CPYMO_LUA_THROW(l, err);
+    }
+
+    return 1;
+}
+
 void cpymo_lua_api_asset_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -55,6 +78,7 @@ void cpymo_lua_api_asset_register(cpymo_lua_context *ctx)
         { "load_bg", &cpymo_lua_api_asset_load_bg },
         { "load_chara", &cpymo_lua_api_asset_load_chara },
         { "load_system_image", &cpymo_lua_api_asset_load_system },
+        { "load_system_masktrans", &cpymo_lua_api_asset_load_system_masktrans },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);

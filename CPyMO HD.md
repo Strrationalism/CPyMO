@@ -174,11 +174,26 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `draw(self, x: number, y_baseline: number, color, semantic)` - 使用给定颜色将此文本绘制到下一帧
 * `free(self)` - 手动释放内存
 
+#### 类`cpymo_render_masktrans`
+
+该类表示一个过场遮罩。    
+并不是所有的平台都支持创建此对象，**所有返回该对象的函数都有可能返回关于平台不支持的异常**。    
+你可以使用`<close>`在声明中标记该值。    
+
+这个类包含以下成员：
+
+* `draw(self, lerp: number, inverse: bool)`
+  - 将该对象绘制到全屏幕上
+  - 其中`lerp`处在0~1之间，表示从全可见到全不可见的中间插值状态
+  - 如果`inverse`为`true`则会翻转每个像素
+* `free(self)` - 手动释放其内存
+
 ### `cpymo.asset`
 
 * `load_bg(bg_name: string) : cpymo_render_image` - 加载bg图像
 * `load_chara(chara_name: string) : cpymo_render_image` - 加载chara图像
 * `load_system_image(image_name: string) : cpymo_render_image` - 加载system图像
+* `load_system_masktrans(masktrans_name: string) : cpymo_render_masktrans` - 加载过场遮罩
 
 ### `cpymo.ui`
 

@@ -19,7 +19,7 @@ typedef struct {
     float fontsize;
 } cpymo_lua_api_render_class_text;
 
-error_t cpymo_lua_api_render_class_text_constructor(
+static error_t cpymo_lua_api_render_class_text_constructor(
     lua_State *l,
     cpymo_backend_text backend_text,
     float width,
@@ -118,11 +118,13 @@ static int cpymo_lua_api_render_class_text_draw(lua_State *l)
     cpymo_lua_api_render_class_text *text_obj = 
         (cpymo_lua_api_render_class_text *)lua_touserdata(l, -1);
     
-    cpymo_backend_text_draw(
-        text_obj->text,
-        x, y_baseline,
-        col, alpha,
-        (enum cpymo_backend_image_draw_type)draw_type);
+    if (text_obj->text)
+        cpymo_backend_text_draw(
+            text_obj->text,
+            x, y_baseline,
+            col, alpha,
+            (enum cpymo_backend_image_draw_type)draw_type);
+
     return 0;
 }
 
@@ -199,10 +201,11 @@ static int cpymo_lua_api_render_class_image_draw(lua_State *l)
         srch = (float)img->h;
     }
 
-    cpymo_backend_image_draw(
-        dstx, dsty, dstw, dsth, img->image,
-        srcx, srcy, srcw, srch, alpha / 255.0f, 
-        (enum cpymo_backend_image_draw_type)draw_type);
+    if (img->image)
+        cpymo_backend_image_draw(
+            dstx, dsty, dstw, dsth, img->image,
+            srcx, srcy, srcw, srch, alpha / 255.0f, 
+            (enum cpymo_backend_image_draw_type)draw_type);
 
     return 0;
 }
@@ -246,6 +249,56 @@ static int cpymo_lua_api_render_fill_rect(lua_State *l)
     return 0;
 }
 
+error_t cpymo_lua_api_render_class_masktrans_constructor(
+    lua_State *l, cpymo_backend_masktrans masktrans)
+{
+    cpymo_backend_masktrans *masktrans_luaobj =
+        (cpymo_backend_masktrans *)lua_newuserdata(
+            l, sizeof(cpymo_backend_masktrans));
+    if (masktrans_luaobj == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_OUT_OF_MEM);
+    *masktrans_luaobj = masktrans;
+
+    luaL_getmetatable(l, "cpymo_render_masktrans");
+    lua_setmetatable(l, -2);
+
+    return CPYMO_ERR_SUCC;
+}
+
+static int cpymo_lua_api_render_class_masktrans_draw(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 3);
+    if (!lua_isboolean(l, -1)) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    int succ;
+    bool inverse = lua_toboolean(l, -1);
+    float lerp = lua_tonumberx(l, -2, &succ);
+    if (!succ) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    cpymo_backend_masktrans *lua_obj = 
+        (cpymo_backend_masktrans *)lua_touserdata(l, -3);
+    
+    if (*lua_obj) 
+        cpymo_backend_masktrans_draw(
+            *lua_obj, cpymo_utils_clampf(lerp, 0.0f, 1.0f), inverse);
+
+    return 0;
+}
+
+static int cpymo_lua_api_render_class_masktrans_free(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+
+    cpymo_backend_masktrans *lua_obj = 
+        (cpymo_backend_masktrans *)lua_touserdata(l, -1);
+
+    if (*lua_obj) {
+        cpymo_backend_masktrans_free(*lua_obj);
+        *lua_obj = NULL;
+    }
+
+    return 0;
+}
+
 void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -260,11 +313,13 @@ void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs_class_image, 0);
+    cpymo_lua_mark_table_readonly(ctx);
     lua_setfield(l, -2, "__index");
     lua_pushcfunction(l, &cpymo_lua_api_render_class_image_free);
     lua_setfield(l, -2, "__gc");
     lua_pushcfunction(l, &cpymo_lua_api_render_class_image_free);
     lua_setfield(l, -2, "__close");
+    cpymo_lua_mark_table_readonly(ctx);
     lua_pop(l, 1);
 
     // class `cpymo_render_text`
@@ -277,13 +332,33 @@ void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs_class_text, 0);
+    cpymo_lua_mark_table_readonly(ctx);
     lua_setfield(l, -2, "__index");
     lua_pushcfunction(l, &cpymo_lua_api_render_class_text_free);
     lua_setfield(l, -2, "__gc");
     lua_pushcfunction(l, &cpymo_lua_api_render_class_text_free);
     lua_setfield(l, -2, "__close");
+    cpymo_lua_mark_table_readonly(ctx);
     lua_pop(l, 1);
 
+    // class `cpymo_render_masktrans`
+    luaL_newmetatable(l, "cpymo_render_masktrans");
+    lua_newtable(l);
+    const luaL_Reg funcs_class_masktrans[] = {
+        { "draw", &cpymo_lua_api_render_class_masktrans_draw },
+        { "free", &cpymo_lua_api_render_class_masktrans_free },
+        { NULL, NULL }
+    };
+    luaL_setfuncs(l, funcs_class_masktrans, 0);
+    cpymo_lua_mark_table_readonly(ctx);
+    lua_setfield(l, -2, "__index");
+    lua_pushcfunction(l, &cpymo_lua_api_render_class_masktrans_free);
+    lua_setfield(l, -2, "__gc");
+    lua_pushcfunction(l, &cpymo_lua_api_render_class_masktrans_free);
+    lua_setfield(l, -2, "__close");
+    cpymo_lua_mark_table_readonly(ctx);
+    lua_pop(l, 1);
+    
     // package `cpymo.render`
     lua_newtable(l); {
         const luaL_Reg funcs[] = {
