@@ -106,6 +106,15 @@ error_t cpymo_lua_pop_color(
     cpymo_color *color,
     float *alpha);
 
+#define CPYMO_LUA_MAKE_BIND_SIMPLE(BIND_FUNC_NAME, CPYMO_FUNC_NO_ARG_RETURN_ERR) \
+    static int BIND_FUNC_NAME (lua_State *l) { \
+        CPYMO_LUA_ARG_COUNT(l, 0); \
+        error_t err = \
+            CPYMO_FUNC_NO_ARG_RETURN_ERR(cpymo_lua_state_get_engine(l)); \
+        CPYMO_LUA_THROW(l, err); \
+        return 0; \
+    }
+
 #ifdef LEAKCHECK
 void cpymo_lua_context_leakcheck(cpymo_lua_context *l);
 #endif

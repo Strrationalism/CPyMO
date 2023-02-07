@@ -2,6 +2,14 @@
 #if CPYMO_FEATURE_LEVEL >= 1
 #include "cpymo_engine.h"
 #include "cpymo_msgbox_ui.h"
+#include "cpymo_album.h"
+#include "cpymo_backlog.h"
+#include "cpymo_config_ui.h"
+#include "cpymo_list_ui.h"
+#include "cpymo_movie.h"
+#include "cpymo_music_box.h"
+#include "cpymo_rmenu.h"
+#include "cpymo_save_ui.h"
 
 #include <lauxlib.h>
 #include <lualib.h>
@@ -120,6 +128,20 @@ static int cpymo_lua_api_ui_okcancelbox(lua_State *l)
     return CPYMO_ERR_SUCC;
 }
 
+CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_backlog, cpymo_backlog_ui_enter);
+CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_config, cpymo_config_ui_enter);
+CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_musicbox, cpymo_music_box_enter);
+CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_rmenu, cpymo_rmenu_enter);
+
+static inline error_t cpymo_lua_api_open_save_internal(cpymo_engine *e) 
+{ return cpymo_save_ui_enter(e, false); }
+CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_save_ui, cpymo_lua_api_open_save_internal);
+
+static inline error_t cpymo_lua_api_open_load_internal(cpymo_engine *e) 
+{ return cpymo_save_ui_enter(e, true); }
+CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_load_ui, cpymo_lua_api_open_load_internal);
+
+
 void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -132,6 +154,12 @@ void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
         { "exit", &cpymo_lua_api_ui_exit },
         { "msgbox", &cpymo_lua_api_ui_msgbox },
         { "okcancelbox", &cpymo_lua_api_ui_okcancelbox },
+        { "open_backlog", &cpymo_lua_api_ui_open_backlog },
+        { "open_config", &cpymo_lua_api_ui_open_config },
+        { "open_musicbox", &cpymo_lua_api_ui_open_musicbox },
+        { "open_rmenu", &cpymo_lua_api_ui_open_rmenu },
+        { "open_save_ui", &cpymo_lua_api_ui_open_save_ui },
+        { "open_load_ui", &cpymo_lua_api_ui_open_load_ui },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);

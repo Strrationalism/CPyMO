@@ -229,6 +229,13 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
   - 弹出“确定/取消”框，当关闭此框时调用`callback`
   - 若选择了“确定”，则`callback`会被传入`true`，其他情况下传入`false`
 
+* `open_backlog()` - 打开对话历史记录
+* `open_config()` - 打开设置界面
+* `open_musicbox()` - 打开音乐鉴赏界面
+* `open_rmenu()` - 打开右键菜单
+* `open_save_ui()` - 打开存档界面
+* `open_load_ui()` - 打开读档界面
+
 ### `cpymo.flags`
 
 该包内的功能用于管理Flag，每个Flag由一个字符串组成，可检查其存在或不存在。    
