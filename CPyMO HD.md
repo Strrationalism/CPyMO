@@ -161,7 +161,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 * `get_size(self) : number, number` - 获取大小
 * `draw(self, dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧，其中alpha范围在0~255之间
-* `free(self)` - 手动释放其内存
+* `free(self)` - 手动销毁该对象
 
 #### 类`cpymo_render_text`
 
@@ -172,7 +172,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 * `get_size(self) : number, number` - 获得大致宽度和fontsize，这些值仅供估算大小，具体值由字体系统的实现决定
 * `draw(self, x: number, y_baseline: number, color, semantic)` - 使用给定颜色将此文本绘制到下一帧
-* `free(self)` - 手动释放内存
+* `free(self)` - 手动销毁该对象
 
 #### 类`cpymo_render_masktrans`
 
@@ -186,7 +186,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
   - 将该对象绘制到全屏幕上
   - 其中`lerp`处在0~1之间，表示从全可见到全不可见的中间插值状态
   - 如果`inverse`为`true`则会翻转每个像素
-* `free(self)` - 手动释放其内存
+* `free(self)` - 手动销毁该对象
 
 ### `cpymo.asset`
 
@@ -194,6 +194,18 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `load_chara(chara_name: string) : cpymo_render_image` - 加载chara图像
 * `load_system_image(image_name: string) : cpymo_render_image` - 加载system图像
 * `load_system_masktrans(masktrans_name: string) : cpymo_render_masktrans` - 加载过场遮罩
+* `open_package(path: string) : cpymo_asset_package` - 打开指定路径处的数据包
+
+#### 类`cpymo_asset_package`
+
+该类表示一个被打开的数据包。    
+你可以使用`<close>`在声明中标记该值。    
+
+该类包含以下成员：
+
+* `load_string(self, filename: string) : string` - 从数据包中加载字符串
+* `load_image(self, filename: string) : cpymo_render_image` - 从数据包中加载图片
+* `free(self)` - 手动销毁该对象
 
 ### `cpymo.ui`
 
