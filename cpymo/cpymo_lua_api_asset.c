@@ -4,7 +4,7 @@
 
 #include <lauxlib.h>
 #include <lualib.h>
-
+#include <stb_image.h>
 #include <string.h>
 
 error_t cpymo_lua_api_render_class_image_constructor(
@@ -64,6 +64,37 @@ static int cpymo_lua_api_asset_load_system_masktrans(lua_State *l)
     err = cpymo_lua_api_render_class_masktrans_constructor(l, masktrans);
     if (err != CPYMO_ERR_SUCC) {
         cpymo_backend_masktrans_free(masktrans);
+        CPYMO_LUA_THROW(l, err);
+    }
+
+    return 1;
+}
+
+error_t cpymo_lua_api_render_class_image_constructor(
+    lua_State *l, cpymo_backend_image image, int w, int h);
+
+static int cpymo_lua_api_asset_load_image(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+    const char *path = lua_tostring(l, -1);
+    if (path == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    int w, h, c;
+    stbi_uc *uc = stbi_load(path, &w, &h, &c, 4);
+    if (uc == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_BAD_FILE_FORMAT);
+
+    cpymo_backend_image img;
+    error_t err = cpymo_backend_image_load(
+        &img, (void *)uc, w, h, cpymo_backend_image_format_rgba);
+    if (err != CPYMO_ERR_SUCC) {
+        free(uc);
+        CPYMO_LUA_THROW(l, err);
+    }
+
+    err = cpymo_lua_api_render_class_image_constructor(
+        l, img, w, h);
+    if (err != CPYMO_ERR_SUCC) {
+        cpymo_backend_image_free(img);
         CPYMO_LUA_THROW(l, err);
     }
 
@@ -165,8 +196,6 @@ static int cpymo_lua_api_asset_class_package_load_image(lua_State *l)
         CPYMO_LUA_THROW(l, err);
     }
 
-    error_t cpymo_lua_api_render_class_image_constructor(
-        lua_State *l, cpymo_backend_image image, int w, int h);
     err = cpymo_lua_api_render_class_image_constructor(l, img, w, h);
     if (err != CPYMO_ERR_SUCC) {
         cpymo_backend_image_free(img);
@@ -206,6 +235,7 @@ void cpymo_lua_api_asset_register(cpymo_lua_context *ctx)
         { "load_chara", &cpymo_lua_api_asset_load_chara },
         { "load_system_image", &cpymo_lua_api_asset_load_system },
         { "load_system_masktrans", &cpymo_lua_api_asset_load_system_masktrans },
+        { "load_image", &cpymo_lua_api_asset_load_image },
         { "open_package", &cpymo_lua_api_asset_open_package },
         { NULL, NULL }
     };

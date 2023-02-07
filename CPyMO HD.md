@@ -190,11 +190,20 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 ### `cpymo.asset`
 
-* `load_bg(bg_name: string) : cpymo_render_image` - 加载bg图像
-* `load_chara(chara_name: string) : cpymo_render_image` - 加载chara图像
-* `load_system_image(image_name: string) : cpymo_render_image` - 加载system图像
-* `load_system_masktrans(masktrans_name: string) : cpymo_render_masktrans` - 加载过场遮罩
-* `open_package(path: string) : cpymo_asset_package` - 打开指定路径处的数据包
+* `load_bg(bg_name: string) : cpymo_render_image` 
+  - 通过不带扩展名和路径的名称加载bg图像
+* `load_chara(chara_name: string) : cpymo_render_image` 
+  - 通过不带扩展名和路径的名称加载chara图像
+* `load_system_image(image_name: string) : cpymo_render_image` 
+  - 通过不带扩展名和路径的名称加载system图像
+* `load_system_masktrans(masktrans_name: string) : cpymo_render_masktrans` 
+  - 通过不带扩展名和路径的名称加载过场遮罩
+* `load_image(path: string) : cpymo_render_image` 
+  - 从指定路径加载图片，需要扩展名
+  - 请在路径开头处增加`cpymo.gamedir`确保访问正确的目录
+* `open_package(path: string) : cpymo_asset_package` 
+  - 打开指定路径处的数据包
+  - 请在路径开头处增加`cpymo.gamedir`确保访问正确的目录
 
 #### 类`cpymo_asset_package`
 
@@ -203,8 +212,12 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 该类包含以下成员：
 
-* `load_string(self, filename: string) : string` - 从数据包中加载字符串
-* `load_image(self, filename: string) : cpymo_render_image` - 从数据包中加载图片
+* `load_string(self, filename: string) : string` 
+  - 从数据包中加载字符串
+  - 其中文件名不带扩展名
+* `load_image(self, filename: string) : cpymo_render_image` 
+  - 从数据包中加载图片
+  - 其中文件名不带扩展名
 * `free(self)` - 手动销毁该对象
 
 ### `cpymo.ui`
@@ -225,8 +238,10 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `set(flag: string)` - 设置一个flag
 * `check(flag: string) : bool` - 检查这个flag是否存在
 * `unset(flag: string)` - 取消一个flag
-* `unlock_cg(cg_name: string)` - 解锁一个CG
-* `lock_cg(cg_name: string)` - 重新锁定一个CG
+* `unlock_cg(cg_name: string)` 
+  - 解锁一个CG，不带扩展名
+  - 仅`gameconfig.txt`中符合`cgprefix`条件的图片可被解锁
+* `lock_cg(cg_name: string)` - 重新锁定一个CG，不带扩展名
 * `cg_unlocked(cg_name: string) : bool` 检查这个CG是否被锁定
 
 
