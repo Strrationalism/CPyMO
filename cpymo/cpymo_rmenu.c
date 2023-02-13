@@ -131,8 +131,9 @@ static void cpymo_rmenu_delete(cpymo_engine *e, void *ui_data)
 	cpymo_select_img_free(&r->menu);
 }
 
-error_t cpymo_rmenu_restart_game(cpymo_engine *e, void *data)
+error_t cpymo_rmenu_restart_game(cpymo_engine *e, void *data, bool confirm)
 {
+	if (!confirm) return CPYMO_ERR_SUCC;
 	char *gamedir = 
 		cpymo_str_copy_malloc(cpymo_str_pure(e->assetloader.gamedir));
 	if (gamedir == NULL) return CPYMO_ERR_OUT_OF_MEM;

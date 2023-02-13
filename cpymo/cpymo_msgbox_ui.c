@@ -23,33 +23,21 @@ typedef struct {
 
 	int selection;
 
-	error_t(*confirm)(cpymo_engine *e, void *data);
-	void *confirm_data;
+	error_t(*okcancel_callback)(cpymo_engine *e, void *data, bool);
+	void *okcancel_callback_data;
 	cpymo_key_hold mouse_button;
-
-	cpymo_msgbox_ui_on_closing on_closing;
-	void *on_closing_userdata;
-	bool will_call_confirm;
 } cpymo_msgbox_ui;
 
-void cpymo_msgbox_ui_set_on_closing(
-	struct cpymo_engine *e,
-	cpymo_msgbox_ui_on_closing on_closing,
-	void *userdata)
-{
-	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)cpymo_ui_data(e);
-	ui->on_closing = on_closing;
-	ui->on_closing_userdata = userdata;
-}
 
-static error_t cpymo_msgbox_ui_confirm(cpymo_engine *e)
+static error_t cpymo_msgbox_ui_okcancel_finish(cpymo_engine *e, bool is_ok)
 {
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)cpymo_ui_data(e);
-	error_t(*func)(cpymo_engine *, void *) = ui->confirm;
-	void *data = ui->confirm_data;
-	ui->will_call_confirm = true;
+	error_t(*func)(cpymo_engine *, void *, bool) = ui->okcancel_callback;
+	void *data = ui->okcancel_callback_data;
+	ui->okcancel_callback = NULL;
+	ui->okcancel_callback_data = NULL;
 	cpymo_ui_exit(e);
-	return func(e, data);
+	return func ? func(e, data, is_ok) : CPYMO_ERR_SUCC;
 }
 
 static void cpymo_msgbox_ui_get_btn_rect(
@@ -121,7 +109,7 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 		e, &ui->mouse_button, dt, e->input.mouse_button);
 	
 	if (CPYMO_INPUT_JUST_RELEASED(e, cancel) || mbs == cpymo_key_hold_result_holding) {
-		cpymo_ui_exit(e);
+		cpymo_msgbox_ui_okcancel_finish(e, false);
 		return CPYMO_ERR_SUCC;
 	}
 
@@ -154,22 +142,12 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 	}
 	else if (CPYMO_INPUT_JUST_RELEASED(e, ok)) {
 		cpymo_engine_request_redraw(e);
-		if (ui->selection == 0) {
-			return cpymo_msgbox_ui_confirm(e);
-		}
-		else if (ui->selection == 1) {
-			cpymo_ui_exit(e);
-			return CPYMO_ERR_SUCC;
-		}
+		return cpymo_msgbox_ui_okcancel_finish(e, !ui->selection);
 	}
 	else if (CPYMO_INPUT_JUST_RELEASED(e, mouse_button)) {
 		cpymo_engine_request_redraw(e);
 		int mouse_sel = cpymo_msgbox_ui_get_mouse_selection(e);
-		if (mouse_sel == 0) return cpymo_msgbox_ui_confirm(e);
-		else if (mouse_sel == 1) {
-			cpymo_ui_exit(e);
-			return CPYMO_ERR_SUCC;
-		}
+		return cpymo_msgbox_ui_okcancel_finish(e, !mouse_sel);
 	}
 
 	if (cpymo_input_mouse_moved(e)) {
@@ -279,15 +257,20 @@ static void cpymo_msgbox_ui_draw(const cpymo_engine *e, const void *ui_data)
 static void cpymo_msgbox_ui_delete(struct cpymo_engine *e, void *ui_data)
 {
 	cpymo_msgbox_ui *ui = (cpymo_msgbox_ui *)ui_data;
+
+	if (ui->okcancel_callback) {
+		ui->okcancel_callback(e, ui->okcancel_callback_data, false);
+		ui->okcancel_callback = NULL;
+		ui->okcancel_callback_data = NULL;
+	}
 	
-	if (ui->on_closing)
-		ui->on_closing(ui->will_call_confirm, ui->on_closing_userdata);
 	if (ui->message) cpymo_backend_text_free(ui->message);
 	if (ui->confirm_btn) cpymo_backend_text_free(ui->confirm_btn);
 	if (ui->cancel_btn) cpymo_backend_text_free(ui->cancel_btn);
 }
 
-static error_t cpymo_msgbox_ui_default_confirm(struct cpymo_engine *e, void *data)
+static error_t cpymo_msgbox_ui_default_confirm(
+	struct cpymo_engine *e, void *d, bool b)
 {
 	return CPYMO_ERR_SUCC;
 }
@@ -295,8 +278,8 @@ static error_t cpymo_msgbox_ui_default_confirm(struct cpymo_engine *e, void *dat
 error_t cpymo_msgbox_ui_enter(
 	cpymo_engine *e, 
 	cpymo_str message, 
-	error_t(*confirm)(cpymo_engine *e, void *data), 
-	void * confirm_data)
+	error_t(*okcancel_callback)(cpymo_engine *e, void *data, bool is_confirm), 
+	void * okcancel_callback_data)
 {
 	cpymo_msgbox_ui *ui = NULL;
 	error_t err = cpymo_ui_enter(
@@ -314,12 +297,9 @@ error_t cpymo_msgbox_ui_enter(
 	ui->cancel_btn_width = 0;
 	ui->confirm_btn_width = 0;
 
-	ui->confirm = confirm;
-	ui->confirm_data = confirm_data;
-	ui->selection = confirm ? -1 : 0;
-	ui->on_closing = NULL;
-	ui->on_closing_userdata = NULL;
-	ui->will_call_confirm = false;
+	ui->okcancel_callback = okcancel_callback;
+	ui->okcancel_callback_data = okcancel_callback_data;
+	ui->selection = okcancel_callback ? -1 : 0;
 	cpymo_key_hold_init(&ui->mouse_button, e->input.mouse_button);
 
 	float fontsize = cpymo_gameconfig_font_size(&e->gameconfig);
@@ -342,7 +322,7 @@ error_t cpymo_msgbox_ui_enter(
 		return err;
 	}
 
-	if (confirm) {
+	if (okcancel_callback) {
 		err = cpymo_backend_text_create(
 			&ui->cancel_btn,
 			&ui->cancel_btn_width,
@@ -354,7 +334,7 @@ error_t cpymo_msgbox_ui_enter(
 		}
 	}
 	else {
-		ui->confirm = &cpymo_msgbox_ui_default_confirm;
+		ui->okcancel_callback = &cpymo_msgbox_ui_default_confirm;
 	}
 
 	cpymo_engine_extract_text(e, message);

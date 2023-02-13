@@ -968,6 +968,11 @@ error_t cpymo_album_enter(
 		&album->album_list_text_size, 
 		script_name, &e->assetloader);
 
+	if (err != CPYMO_ERR_SUCC) {
+		cpymo_ui_exit(e);
+		return err;
+	}
+
 	cpymo_parser parser;
 	cpymo_parser_init(&parser, album->album_list_text, album->album_list_text_size);
 	do {
@@ -978,8 +983,6 @@ error_t cpymo_album_enter(
 			if (page_id > album->page_count) album->page_count = page_id;
 		}
 	} while (cpymo_parser_next_line(&parser));
-
-	CPYMO_THROW(err);
 
 	album->current_bg_name = e->bg.current_bg_name;
 	e->bg.current_bg_name = NULL;

@@ -53,7 +53,10 @@ error_t cpymo_interpreter_init_script(
 
 	if (out->script == NULL) {
 		error_t err = cpymo_script_load(&out->script, script_name, loader);
-		CPYMO_THROW(err);
+		if (err != CPYMO_ERR_SUCC) {
+			out->own_script = false;
+			return err;
+		}
 	}
 
 	cpymo_interpreter_init(out, out->script, out->own_script, caller);
@@ -835,10 +838,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		err = cpymo_interpreter_init_script(
 			interpreter, script_name, &engine->assetloader, caller);
 		if (own_script) cpymo_script_free(script);
-		if (err != CPYMO_ERR_SUCC) {
-			cpymo_interpreter_free(caller);
-			return err;
-		}
+		CPYMO_THROW(err);
 
 		CONT_WITH_CURRENT_CONTEXT;
 	}

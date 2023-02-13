@@ -33,6 +33,13 @@ error_t cpymo_hash_flags_add(cpymo_hash_flags *fs, cpymo_hash_flag f)
 	return CPYMO_ERR_SUCC;
 }
 
+void cpymo_hash_flags_del(cpymo_hash_flags *fs, cpymo_hash_flag f)
+{
+	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)fs->flags;
+	if (hmdel(flags, f))
+		fs->dirty = true;
+}
+
 bool cpymo_hash_flags_check(cpymo_hash_flags *fs, cpymo_hash_flag f)
 {
 	cpymo_hash_flags_internal *flags = (cpymo_hash_flags_internal *)fs->flags;
