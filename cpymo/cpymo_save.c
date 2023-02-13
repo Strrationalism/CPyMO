@@ -117,8 +117,8 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 
 				int32_t cid = (int32_t)chara->chara_id;
 				int32_t layer = (int32_t)chara->layer;
-				int32_t x = (int32_t)chara->pos_x.end_value;
-				int32_t y = (int32_t)chara->pos_y.end_value;
+				int32_t x = (int32_t)(chara->pos_x.end_value / e->gameconfig.imagesize_w * (1 << 30));
+				int32_t y = (int32_t)(chara->pos_y.end_value / e->gameconfig.imagesize_h * (1 << 30));
 
 				uint32_t chara_params[] = {
 					PACK32(cid),
@@ -445,8 +445,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 			cid,
 			layer,
 			0,
-			(float)x,
-			(float)y,
+			(float)x / (1 << 30) * e->gameconfig.imagesize_w,
+			(float)y / (1 << 30) * e->gameconfig.imagesize_h,
 			1.0f,
 			0);
 	}
