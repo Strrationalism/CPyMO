@@ -648,7 +648,7 @@ error_t cpymo_lua_pop_color(
     col->r = (uint8_t)color[0];
     col->g = (uint8_t)color[1];
     col->b = (uint8_t)color[2];
-    *alpha = color[3] / 255.0f;
+    *alpha = (float)color[3] / 255.0f;
 
     return CPYMO_ERR_SUCC;
 }

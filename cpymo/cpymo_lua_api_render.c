@@ -46,7 +46,7 @@ static int cpymo_lua_api_render_create_text(lua_State *l)
     if (str == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     int succeed;
-    float fontsize = lua_tonumberx(l, -1, &succeed);
+    float fontsize = (float)lua_tonumberx(l, -1, &succeed);
     if (!succeed) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
 
     cpymo_backend_text out_text;
@@ -123,7 +123,7 @@ static int cpymo_lua_api_render_class_text_draw(lua_State *l)
             text_obj->text,
             x, y_baseline,
             col, alpha,
-            (enum cpymo_backend_image_draw_type)draw_type);
+            (enum cpymo_backend_image_draw_type)(intptr_t)draw_type);
 
     return 0;
 }
@@ -204,8 +204,8 @@ static int cpymo_lua_api_render_class_image_draw(lua_State *l)
     if (img->image)
         cpymo_backend_image_draw(
             dstx, dsty, dstw, dsth, img->image,
-            srcx, srcy, srcw, srch, alpha / 255.0f, 
-            (enum cpymo_backend_image_draw_type)draw_type);
+            (int)srcx, (int)srcy, (int)srcw, (int)srch, alpha / 255.0f, 
+            (enum cpymo_backend_image_draw_type)(intptr_t)draw_type);
 
     return 0;
 }
@@ -245,7 +245,7 @@ static int cpymo_lua_api_render_fill_rect(lua_State *l)
     CPYMO_LUA_THROW(l, err);
 
     cpymo_backend_image_fill_rects(r, 1, col, alpha, 
-        (enum cpymo_backend_image_draw_type)draw_type);
+        (enum cpymo_backend_image_draw_type)(intptr_t)draw_type);
     return 0;
 }
 
