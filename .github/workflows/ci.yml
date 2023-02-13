@@ -463,7 +463,7 @@ jobs:
             cmake-flags: "-A Win32 -DCMAKE_GENERATOR_PLATFORM=Win32"
             vcpkg-path: "D:/a/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
           - tuple: win-arm
-            os: windows-latest
+            os: windows-2019
             triplet: arm-windows-static
             arch: amd64_arm
             package-name: "Windows ARM"
