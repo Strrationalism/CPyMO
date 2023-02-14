@@ -93,12 +93,15 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	// BG
 	{
 		WRITE_STR(e->bg.current_bg_name);
-		int32_t bg_x = (int32_t)e->bg.current_bg_x;
-		int32_t bg_y = (int32_t)e->bg.current_bg_y;
+		int32_t bg_x, bg_y;
 
 		if (e->scroll.img) {
-			bg_x = (int32_t)e->scroll.ex;
-			bg_y = (int32_t)e->scroll.ey;
+			bg_x = (int32_t)(e->scroll.ex / e->gameconfig.imagesize_w * (1 << 16));
+			bg_y = (int32_t)(e->scroll.ey / e->gameconfig.imagesize_h * (1 << 16));
+		}
+		else {
+			bg_x = (int32_t)(e->bg.current_bg_x / e->gameconfig.imagesize_w * (1 << 16));
+			bg_y = (int32_t)(e->bg.current_bg_y / e->gameconfig.imagesize_h * (1 << 16));
 		}
 
 		uint32_t pos[] = { PACK32(bg_x), PACK32(bg_y) };
@@ -117,8 +120,8 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 
 				int32_t cid = (int32_t)chara->chara_id;
 				int32_t layer = (int32_t)chara->layer;
-				int32_t x = (int32_t)(chara->pos_x.end_value / e->gameconfig.imagesize_w * (1 << 30));
-				int32_t y = (int32_t)(chara->pos_y.end_value / e->gameconfig.imagesize_h * (1 << 30));
+				int32_t x = (int32_t)(chara->pos_x.end_value / e->gameconfig.imagesize_w * (1 << 16));
+				int32_t y = (int32_t)(chara->pos_y.end_value / e->gameconfig.imagesize_h * (1 << 16));
 
 				uint32_t chara_params[] = {
 					PACK32(cid),
@@ -145,8 +148,8 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 
 			int32_t all_frames = (int32_t)e->anime.all_frame;
 			int32_t interval = (int32_t)(e->anime.interval * 1000.0f);
-			int32_t x = (int32_t)e->anime.draw_x;
-			int32_t y = (int32_t)e->anime.draw_y;
+			int32_t x = (int32_t)(e->anime.draw_x / e->gameconfig.imagesize_w * (1 << 16));
+			int32_t y = (int32_t)(e->anime.draw_y / e->gameconfig.imagesize_h * (1 << 16));
 
 			uint32_t anime_params[] = {
 				PACK32(all_frames),
@@ -419,8 +422,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 			cpymo_str_pure("BG_NOFADE"),
 			0, 0, 0);
 
-		e->bg.current_bg_x = (float)CAST(int32_t, bg_params[0]);
-		e->bg.current_bg_y = (float)CAST(int32_t, bg_params[1]);
+		e->bg.current_bg_x = (float)CAST(int32_t, bg_params[0]) / (1 << 16) * e->gameconfig.imagesize_w;
+		e->bg.current_bg_y = (float)CAST(int32_t, bg_params[1]) / (1 << 16) * e->gameconfig.imagesize_h;
 	}
 
 	// CHARA
@@ -445,8 +448,8 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 			cid,
 			layer,
 			0,
-			(float)x / (1 << 30) * e->gameconfig.imagesize_w,
-			(float)y / (1 << 30) * e->gameconfig.imagesize_h,
+			((float)x) / (1 << 16) * e->gameconfig.imagesize_w,
+			((float)y) / (1 << 16) * e->gameconfig.imagesize_h,
 			1.0f,
 			0);
 	}
@@ -463,7 +466,14 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		int32_t x = CAST(int32_t, anime_params[2]);
 		int32_t y = CAST(int32_t, anime_params[3]);
 
-		cpymo_anime_on(e, all_frames, cpymo_str_pure(strbuf), (float)x, (float)y, interval, true);
+		cpymo_anime_on(
+			e, 
+			all_frames, 
+			cpymo_str_pure(strbuf), 
+			((float)x) / (1 << 16) * e->gameconfig.imagesize_w, 
+			((float)y) / (1 << 16) * e->gameconfig.imagesize_h, 
+			interval, 
+			true);
 	}
 
 	// LOCAL VARS
