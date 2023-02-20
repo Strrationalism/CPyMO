@@ -254,6 +254,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 ### `cpymo.input`
 
+#### `cpymo.input.now`
 该包不可使用pairs遍历，表示当前帧引擎所获取的输入。
 
 其中以下值为`bool`类型：
@@ -271,7 +272,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `mouse_x`, `mouse_y` - 鼠标坐标/触摸坐标，仅在`mouse_position_usable`为`true`时可用
 * `mouse_wheel_delta` - 鼠标滚轮在上一瞬间滑动量
 
-### `cpymo.prev_input`
+#### `cpymo.input.prev`
 
 该包内存放了上一帧的输入，与`cpymo.input`内容相同。
 
