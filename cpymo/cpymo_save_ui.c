@@ -81,8 +81,10 @@ static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
 	uintptr_t save_id = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(selected);
 
 	if (ui->is_load_ui) {
-		if (!ui->items[save_id].is_empty_save)
+		if (!ui->items[save_id].is_empty_save) {
+			cpymo_list_ui_ignore_key_hold_exit_onetime(e);
 			return cpymo_save_ui_load_savedata_yesnobox(e, (unsigned short)save_id);
+		}
 		else return CPYMO_ERR_SUCC;
 	}
 	else {

@@ -49,6 +49,12 @@ typedef struct cpymo_list_ui {
 	float mouse_touch_move_y_sum;
 } cpymo_list_ui;
 
+void cpymo_list_ui_ignore_key_hold_exit_onetime(struct cpymo_engine *e)
+{
+	cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
+	cpymo_key_hold_init(&ui->key_mouse_button, true);
+}
+
 static inline float cpymo_list_ui_get_y(const cpymo_engine *e, int relative_to_current)
 {
 	const cpymo_list_ui *ui = (cpymo_list_ui *)cpymo_ui_data_const(e);
