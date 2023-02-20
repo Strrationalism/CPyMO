@@ -30,6 +30,8 @@ error_t cpymo_list_ui_enter(
 	bool from_bottom_to_top,
 	size_t nodes_per_screen);
 
+void cpymo_list_ui_ignore_key_hold_exit_onetime(struct cpymo_engine *e);
+
 void cpymo_list_ui_set_allow_exit(struct cpymo_engine *e, bool b);
 
 void cpymo_list_ui_set_selection_relative_to_cur(struct cpymo_engine *e, int c);
