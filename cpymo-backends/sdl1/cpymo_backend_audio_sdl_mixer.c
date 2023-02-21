@@ -67,7 +67,7 @@ bool cpymo_audio_channel_is_playing(size_t cid, cpymo_audio_system *s)
 	if (cid == CPYMO_AUDIO_CHANNEL_BGM)
 		return Mix_PlayingMusic();
 #endif
-	return Mix_Playing((int)CHUNK_ID(cid));
+	return Mix_Playing((int)(cid - 1));
 }
 
 bool cpymo_audio_channel_is_looping(size_t cid, cpymo_audio_system *s)
