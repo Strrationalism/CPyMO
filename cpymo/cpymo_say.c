@@ -284,8 +284,10 @@ bool cpymo_say_wait_process_auto_mode(cpymo_engine *e, float dt, bool prev_wait_
 
 	if (e->say.auto_mode_timer < 0) e->say.auto_mode_timer = AUTO_MODE_TIME;
 	
-	//if (!e->audio.channels[CPYMO_AUDIO_CHANNEL_VO].enabled) 
-	if (!e->input.hide_window && !e->input.hide_window)
+	if (!cpymo_audio_channel_is_playing(CPYMO_AUDIO_CHANNEL_VO, &e->audio) &&
+		(!cpymo_audio_channel_is_playing(CPYMO_AUDIO_CHANNEL_SE, &e->audio) || 
+			cpymo_audio_channel_is_looping(CPYMO_AUDIO_CHANNEL_SE, &e->audio)) &&
+		!e->input.hide_window && !e->input.hide_window)
 		e->say.auto_mode_timer -= dt;
 
 	return e->say.auto_mode_timer < 0;

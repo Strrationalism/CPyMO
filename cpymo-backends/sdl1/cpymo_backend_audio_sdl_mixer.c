@@ -1,4 +1,4 @@
-﻿#include <cpymo_prelude.h>
+﻿#include <cpymo_prelude.h> 
 #ifdef ENABLE_SDL_MIXER_AUDIO_BACKEND
 #include <cpymo_engine.h>
 #include <SDL/SDL_mixer.h>
@@ -61,7 +61,19 @@ void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol
     else 
         Mix_Volume(cid - 1, vol);
 }
+bool cpymo_audio_channel_is_playing(size_t cid, cpymo_audio_system *s)
+{
+#ifndef DISABLE_SDL2_MIXER_MUSIC
+	if (cid == CPYMO_AUDIO_CHANNEL_BGM)
+		return Mix_PlayingMusic();
+#endif
+	return Mix_Playing((int)CHUNK_ID(cid));
+}
 
+bool cpymo_audio_channel_is_looping(size_t cid, cpymo_audio_system *s)
+{
+	return false;
+}
 
 bool cpymo_audio_enabled(struct cpymo_engine *e)
 {
