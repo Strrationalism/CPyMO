@@ -507,6 +507,10 @@ jobs:
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.3.1
       if: ${{ runner.os != 'Windows' }}
+      
+    - name: Setup pkg-config
+      if: ${{ runner.os == 'macOS' }}
+      run: brew install pkg-config
         
     - name: Donwload vcpkg
       run: git clone --depth 1 --branch 2022.11.14 -- https://github.com/microsoft/vcpkg

@@ -140,7 +140,7 @@ static error_t cpymo_msgbox_ui_update(cpymo_engine *e, void *ui_data, float dt)
 		ui->selection = cpymo_msgbox_ui_get_mouse_selection(e);
 		cpymo_engine_request_redraw(e);
 	}
-	else if (CPYMO_INPUT_JUST_RELEASED(e, ok)) {
+	else if (CPYMO_INPUT_JUST_RELEASED(e, ok) && ui->selection != -1) {
 		cpymo_engine_request_redraw(e);
 		return cpymo_msgbox_ui_okcancel_finish(e, !ui->selection);
 	}
