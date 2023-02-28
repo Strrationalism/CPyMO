@@ -157,6 +157,24 @@ static int cpymo_lua_api_ui_play_movie(lua_State *l)
 }
 
 
+static int cpymo_lua_api_ui_open_album(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+    const char *ui_image_name = lua_tostring(l, -1);
+    const char *ui_list_name = lua_tostring(l, -2);
+    if (ui_image_name == NULL || ui_list_name == NULL)
+        CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    error_t err = cpymo_album_enter(
+        cpymo_lua_state_get_engine(l),
+        cpymo_str_pure(ui_list_name),
+        cpymo_str_pure(ui_image_name),
+        0);
+    CPYMO_LUA_THROW(l, err);
+    return 0;
+}
+
+
 void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -175,6 +193,7 @@ void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
         { "open_rmenu", &cpymo_lua_api_ui_open_rmenu },
         { "open_save_ui", &cpymo_lua_api_ui_open_save_ui },
         { "open_load_ui", &cpymo_lua_api_ui_open_load_ui },
+        { "open_album", &cpymo_lua_api_ui_open_album },
         { "play_movie", &cpymo_lua_api_ui_play_movie },
         { NULL, NULL }
     };
