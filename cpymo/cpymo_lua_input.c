@@ -6,16 +6,25 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
+#define D_KEYS \
+    D_BOOL(mouse_button); \
+    D_BOOL(up); D_BOOL(down); D_BOOL(left); D_BOOL(right); \
+    D_BOOL(ok); D_BOOL(cancel); D_BOOL(hide_window); D_BOOL(skip); \
+    D_BOOL(mouse_position_useable); \
+    \
+    D_FLOAT(mouse_x); D_FLOAT(mouse_y); D_FLOAT(mouse_wheel_delta); \
+
 // Make key name hash variable
 #define MKV(KEY_NAME) \
     static uint64_t cpymo_lua_api_input_keyname_hash_ ## KEY_NAME = 0;
+#define D_BOOL(X) MKV(X)
+#define D_FLOAT(X) MKV(X)
 
-MKV(up); MKV(down); MKV(left); MKV(right);
-MKV(mouse_position_useable); MKV(mouse_x); MKV(mouse_y);
-MKV(mouse_button); MKV(mouse_wheel_delta);
-MKV(ok); MKV(cancel); MKV(hide_window); MKV(skip);
+D_KEYS;
 
 #undef MKV
+#undef D_BOOL
+#undef D_FLOAT
 
 int cpymo_lua_readonly_table_newindex(lua_State *l);
 
@@ -41,16 +50,61 @@ static int cpymo_lua_api_input_index(lua_State *l)
             return 1; \
         }
 
-    D_BOOL(mouse_button);
-    D_BOOL(up); D_BOOL(down); D_BOOL(left); D_BOOL(right);
-    D_BOOL(ok); D_BOOL(cancel); D_BOOL(hide_window); D_BOOL(skip);
-    D_BOOL(mouse_position_useable);
-
-    D_FLOAT(mouse_x); D_FLOAT(mouse_y); D_FLOAT(mouse_wheel_delta);
+    D_KEYS;
     #undef D_BOOL
     #undef D_FLOAT
 
     CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+}
+
+static int cpymo_lua_api_just_pressed_index(lua_State *l)
+{
+    const char *key = lua_tostring(l, -1);
+    if (key == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    uint64_t key_hash = cpymo_str_hash_cstr(key);
+    
+    cpymo_engine *e = cpymo_lua_state_get_engine(l);
+    #define D_BOOL(K) \
+        if (key_hash == cpymo_lua_api_input_keyname_hash_ ## K) { \
+            lua_pushboolean(l, CPYMO_INPUT_JUST_PRESSED(e, K)); \
+            return 1; \
+        }
+    #define D_FLOAT(...)
+    D_KEYS;
+    #undef D_BOOL
+    #undef D_FLOAT
+
+    CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+}
+
+static int cpymo_lua_api_just_released_index(lua_State *l)
+{
+    const char *key = lua_tostring(l, -1);
+    if (key == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    uint64_t key_hash = cpymo_str_hash_cstr(key);
+    
+    cpymo_engine *e = cpymo_lua_state_get_engine(l);
+    #define D_BOOL(K) \
+        if (key_hash == cpymo_lua_api_input_keyname_hash_ ## K) { \
+            lua_pushboolean(l, CPYMO_INPUT_JUST_RELEASED(e, K)); \
+            return 1; \
+        }
+    #define D_FLOAT(...)
+    D_KEYS;
+    #undef D_BOOL
+    #undef D_FLOAT
+
+    CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+}
+
+static int cpymo_lua_api_mouse_moved(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 0);
+    cpymo_engine *e = cpymo_lua_state_get_engine(l);
+    lua_pushboolean(l, cpymo_input_mouse_moved(e));
+    return 1;
 }
 
 error_t cpymo_lua_api_input_register(cpymo_lua_context *ctx)
@@ -59,13 +113,14 @@ error_t cpymo_lua_api_input_register(cpymo_lua_context *ctx)
     #define MKV(KEY_NAME) \
         cpymo_lua_api_input_keyname_hash_ ## KEY_NAME = \
             cpymo_str_hash_cstr(#KEY_NAME);
+    #define D_BOOL(X) MKV(X)
+    #define D_FLOAT(X) MKV(X)
 
-    MKV(up); MKV(down); MKV(left); MKV(right);
-    MKV(mouse_position_useable); MKV(mouse_x); MKV(mouse_y);
-    MKV(mouse_button); MKV(mouse_wheel_delta);
-    MKV(ok); MKV(cancel); MKV(hide_window); MKV(skip);
+    D_KEYS;
 
     #undef MKV
+    #undef D_BOOL
+    #undef D_FLOAT
 
     lua_State *l = ctx->lua_state;
 
@@ -95,6 +150,27 @@ error_t cpymo_lua_api_input_register(cpymo_lua_context *ctx)
         lua_rawgeti(l, LUA_REGISTRYINDEX, metatable);
         lua_setmetatable(l, -2);
         lua_setfield(l, -2, "prev");
+
+        lua_newtable(l);
+        lua_newtable(l);
+        lua_pushcfunction(l, &cpymo_lua_readonly_table_newindex);
+        lua_setfield(l, -2, "__newindex");
+        lua_pushcfunction(l, &cpymo_lua_api_just_pressed_index);
+        lua_setfield(l, -2, "__index");
+        lua_setmetatable(l, -2);
+        lua_setfield(l, -2, "just_pressed");
+
+        lua_newtable(l);
+        lua_newtable(l);
+        lua_pushcfunction(l, &cpymo_lua_readonly_table_newindex);
+        lua_setfield(l, -2, "__newindex");
+        lua_pushcfunction(l, &cpymo_lua_api_just_released_index);
+        lua_setfield(l, -2, "__index");
+        lua_setmetatable(l, -2);
+        lua_setfield(l, -2, "just_released");
+
+        lua_pushcfunction(l, &cpymo_lua_api_mouse_moved);
+        lua_setfield(l, -2, "mouse_moved");
 
         luaL_unref(l, LUA_REGISTRYINDEX, metatable);
     }

@@ -263,6 +263,8 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 ### `cpymo.input`
 
+* `mouse_moved() : bool` - 当鼠标移动时返回`true`
+
 #### `cpymo.input.now`
 该包不可使用pairs遍历，表示当前帧引擎所获取的输入。
 
@@ -284,6 +286,14 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 #### `cpymo.input.prev`
 
 该包内存放了上一帧的输入，与`cpymo.input`内容相同。
+
+#### `cpymo.input.just_pressed`
+
+该包内存放了所有刚刚按下的按钮，包括上述`cpymo.input.now`中所有bool类型的值。
+
+#### `cpymo.input.just_released`
+
+该包内存放了所有刚刚松开的按钮，包括上述`cpymo.input.now`中所有bool类型的值。
 
 ### `cpymo.script`
 
