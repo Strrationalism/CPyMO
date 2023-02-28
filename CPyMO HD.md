@@ -243,6 +243,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
   - `list_name`为CG列表的文件名
   - `bg_image`为system目录下背景图的文件名
   - 该命令在有提前渲染好的缓存图片的情况下会调用缓存图片，否则会创建缓存图片
+* `open_load_yesnobox(save_id: int)` - 打开读档的“是否”对话框
 
 ### `cpymo.flags`
 

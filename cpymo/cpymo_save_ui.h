@@ -10,4 +10,6 @@ error_t cpymo_save_ui_enter(struct cpymo_engine *, bool is_load_ui);
 
 error_t cpymo_save_ui_load_savedata_yesnobox(struct cpymo_engine *e, unsigned short save_id);
 
+error_t cpymo_save_ui_save_savedata_yesnobox(struct cpymo_engine *e, unsigned short save_id);
+
 #endif

@@ -47,7 +47,7 @@ static void cpymo_save_ui_draw_node(const cpymo_engine *e, const void *node_to_d
 static error_t cpymo_save_confirm(cpymo_engine *e, void *data, bool confirm)
 {
 	if (!confirm) return CPYMO_ERR_SUCC;
-	uintptr_t save_id = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(data);
+	uintptr_t save_id = (uintptr_t)data;
 	error_t err = cpymo_save_write(e, (unsigned short)save_id);
 
 	const cpymo_localization *l = cpymo_localization_get(e);
@@ -74,6 +74,21 @@ static error_t cpymo_save_confirm(cpymo_engine *e, void *data, bool confirm)
 	return err;
 }
 
+error_t cpymo_save_ui_save_savedata_yesnobox(cpymo_engine *e, unsigned short save_id)
+{
+	char *msg = NULL;
+	const cpymo_localization *l = cpymo_localization_get(e);
+	error_t err = l->save_are_you_sure_save_to(&msg, (int)save_id);
+	CPYMO_THROW(err);
+	err = cpymo_msgbox_ui_enter(
+		e,
+		cpymo_str_pure(msg),
+		&cpymo_save_confirm,
+		(void *)(uintptr_t)save_id);
+	free(msg);
+	return err;
+}
+
 static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
 {
 	cpymo_save_ui *ui = (cpymo_save_ui *)cpymo_list_ui_data(e);
@@ -88,17 +103,7 @@ static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
 		else return CPYMO_ERR_SUCC;
 	}
 	else {
-		char *msg = NULL;
-		const cpymo_localization *l = cpymo_localization_get(e);
-		error_t err = l->save_are_you_sure_save_to(&msg, (int)save_id);
-		CPYMO_THROW(err);
-		err = cpymo_msgbox_ui_enter(
-			e,
-			cpymo_str_pure(msg),
-			&cpymo_save_confirm,
-			selected);
-		free(msg);
-		return err;
+		return cpymo_save_ui_save_savedata_yesnobox(e, (unsigned short)save_id);
 	}
 }
 

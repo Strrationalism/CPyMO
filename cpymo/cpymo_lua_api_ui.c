@@ -174,6 +174,23 @@ static int cpymo_lua_api_ui_open_album(lua_State *l)
     return 0;
 }
 
+static int cpymo_lua_ui_open_load_yesnobox(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+
+    float save_id;
+    error_t err = cpymo_lua_pop_float(l, &save_id);
+    CPYMO_LUA_THROW(l, err);
+
+    if (save_id < 0) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    err = cpymo_save_ui_load_savedata_yesnobox(
+        cpymo_lua_state_get_engine(l),
+        (unsigned short)save_id);
+    CPYMO_LUA_THROW(l, err);
+
+    return 0;
+}
 
 void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
@@ -195,6 +212,7 @@ void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
         { "open_load_ui", &cpymo_lua_api_ui_open_load_ui },
         { "open_album", &cpymo_lua_api_ui_open_album },
         { "play_movie", &cpymo_lua_api_ui_play_movie },
+        { "open_load_yesnobox", &cpymo_lua_ui_open_load_yesnobox },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);
