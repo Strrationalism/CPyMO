@@ -142,6 +142,21 @@ static inline error_t cpymo_lua_api_open_load_internal(cpymo_engine *e)
 CPYMO_LUA_MAKE_BIND_SIMPLE(cpymo_lua_api_ui_open_load_ui, cpymo_lua_api_open_load_internal);
 
 
+static int cpymo_lua_api_ui_play_movie(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+    const char *name = lua_tostring(l, -1);
+    if (name == NULL) CPYMO_LUA_THROW(l, CPYMO_ERR_INVALID_ARG);
+
+    error_t err = cpymo_movie_play(
+        cpymo_lua_state_get_engine(l),
+        cpymo_str_pure(name));
+    CPYMO_LUA_THROW(l, err);
+
+    return 0;
+}
+
+
 void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -160,6 +175,7 @@ void cpymo_lua_api_ui_register(cpymo_lua_context *ctx)
         { "open_rmenu", &cpymo_lua_api_ui_open_rmenu },
         { "open_save_ui", &cpymo_lua_api_ui_open_save_ui },
         { "open_load_ui", &cpymo_lua_api_ui_open_load_ui },
+        { "play_movie", &cpymo_lua_api_ui_play_movie },
         { NULL, NULL }
     };
     luaL_setfuncs(l, funcs, 0);
