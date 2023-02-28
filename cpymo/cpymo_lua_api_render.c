@@ -13,6 +13,26 @@ static int cpymo_lua_api_render_request_redraw(lua_State *l)
     return 0;
 }
 
+static int cpymo_lua_api_render_get_fontsize(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 0);
+    cpymo_engine *e = cpymo_lua_state_get_engine(l);
+
+    lua_pushnumber(l, 
+        cpymo_gameconfig_font_size(
+            &e->gameconfig));
+
+    return 1;
+}
+
+static int cpymo_lua_api_render_get_fontsize_raw(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 0);
+    cpymo_engine *e = cpymo_lua_state_get_engine(l);
+    lua_pushnumber(l, e->gameconfig.fontsize);
+    return 1;
+}
+
 typedef struct {
     cpymo_backend_text text;
     float width;
@@ -365,6 +385,8 @@ void cpymo_lua_api_render_register(cpymo_lua_context *ctx)
             { "request_redraw", &cpymo_lua_api_render_request_redraw },
             { "fill_rect", &cpymo_lua_api_render_fill_rect },
             { "create_text", &cpymo_lua_api_render_create_text },
+            { "get_fontsize", &cpymo_lua_api_render_get_fontsize },
+            { "get_fontsize_raw", &cpymo_lua_api_render_get_fontsize_raw },
             { NULL, NULL }
         };
         luaL_setfuncs(l, funcs, 0);

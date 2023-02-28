@@ -159,6 +159,8 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 这个类包含以下成员：
 
+* `get_fontsize() : number` - 获取字体大小（根据屏幕缩放过）
+* `get_fontsize_raw() : number` - 获取字体大小（原始值）
 * `get_size(self) : number, number` - 获取大小
 * `draw(self, dst: rect, src: rect | nil, alpha: number, semantic)` - 绘制此图像到下一帧，其中alpha范围在0~255之间
 * `free(self)` - 手动销毁该对象
