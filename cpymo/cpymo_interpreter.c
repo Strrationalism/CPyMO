@@ -204,6 +204,10 @@ void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
 		{ longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }	\
 	else return CPYMO_ERR_NO_MORE_CONTENT; }
 
+#if CPYMO_FEATURE_LEVEL >= 1
+#include <lauxlib.h>
+#endif
+
 static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
 {
 	error_t err;
@@ -222,7 +226,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 	err = cpymo_lua_context_pymo_override(
 		&engine->lua, command, &interpreter->script_parser);
 	if (err == CPYMO_ERR_SUCC) {
-		if (engine->redraw || script_wait_function_id != LUA_REFNIL) 
+		if (engine->redraw || engine->lua.script_wait_function_ref != LUA_REFNIL) 
 			return CPYMO_ERR_SUCC;
 		CONT_NEXTLINE;
 	}

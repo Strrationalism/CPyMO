@@ -16,8 +16,8 @@ typedef struct {
     int main_actor;
     struct cpymo_engine *engine;
 
-    int script_wait_function_id;
-    int script_wait_callback_id;
+    int script_wait_function_ref;
+    int script_wait_callback_ref;
     int script_commands_table_ref;
 } cpymo_lua_context;
 

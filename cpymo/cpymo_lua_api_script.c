@@ -85,7 +85,7 @@ static bool cpymo_lua_api_script_wait_wait(cpymo_engine *e, float d)
     lua_rawgeti(
         e->lua.lua_state, 
         LUA_REGISTRYINDEX, 
-        e->lua.script_wait_function_id);
+        e->lua.script_wait_function_ref);
 
     lua_pushnumber(e->lua.lua_state, d);
     error_t err = cpymo_lua_context_execute(&e->lua, 1, 1);
@@ -102,11 +102,11 @@ static bool cpymo_lua_api_script_wait_wait(cpymo_engine *e, float d)
 static error_t cpymo_lua_api_script_wait_callback(cpymo_engine *e)
 {
     lua_State *l = e->lua.lua_state;
-    lua_rawgeti(l, LUA_REGISTRYINDEX, e->lua.script_wait_callback_id);
-    luaL_unref(l, LUA_REGISTRYINDEX, e->lua.script_wait_function_id);
-    luaL_unref(l, LUA_REGISTRYINDEX, e->lua.script_wait_callback_id);
-    e->lua.script_wait_function_id = LUA_REFNIL;
-    e->lua.script_wait_callback_id = LUA_REFNIL;
+    lua_rawgeti(l, LUA_REGISTRYINDEX, e->lua.script_wait_callback_ref);
+    luaL_unref(l, LUA_REGISTRYINDEX, e->lua.script_wait_function_ref);
+    luaL_unref(l, LUA_REGISTRYINDEX, e->lua.script_wait_callback_ref);
+    e->lua.script_wait_function_ref = LUA_REFNIL;
+    e->lua.script_wait_callback_ref = LUA_REFNIL;
 
     if (lua_isnil(l, -1)) {
         lua_pop(l, 1);
@@ -125,8 +125,8 @@ static int cpymo_lua_api_script_wait(lua_State *l)
 
     cpymo_lua_context *ctx = cpymo_lua_state_get_lua_context(l);
 
-    ctx->script_wait_callback_id = luaL_ref(l, LUA_REGISTRYINDEX);
-    ctx->script_wait_function_id = luaL_ref(l, LUA_REGISTRYINDEX);
+    ctx->script_wait_callback_ref = luaL_ref(l, LUA_REGISTRYINDEX);
+    ctx->script_wait_function_ref = luaL_ref(l, LUA_REGISTRYINDEX);
 
     cpymo_wait_register_with_callback(
         &ctx->engine->wait,
