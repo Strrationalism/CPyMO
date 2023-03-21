@@ -18,6 +18,7 @@ typedef struct {
 
     int script_wait_function_id;
     int script_wait_callback_id;
+    int script_commands_table_ref;
 } cpymo_lua_context;
 
 error_t cpymo_lua_context_init(

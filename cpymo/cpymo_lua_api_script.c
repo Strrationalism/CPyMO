@@ -136,6 +136,50 @@ static int cpymo_lua_api_script_wait(lua_State *l)
     return 0;
 }
 
+error_t cpymo_lua_context_pymo_override(
+    cpymo_lua_context *ctx,
+    cpymo_str command,
+    cpymo_parser *pymo_parser)
+{
+    if (ctx->lua_state == NULL) return CPYMO_ERR_NOT_FOUND;
+
+    lua_rawgeti(
+        ctx->lua_state, 
+        LUA_REGISTRYINDEX, 
+        ctx->script_commands_table_ref);
+
+    if (lua_pushlstring(ctx->lua_state, command.begin, command.len) == NULL)
+        return CPYMO_ERR_OUT_OF_MEM;
+
+    int type = lua_gettable(ctx->lua_state, -2);
+    if (type == LUA_TNIL) {
+        lua_pop(ctx->lua_state, 2);
+        return CPYMO_ERR_NOT_FOUND;
+    }
+    else if (type != LUA_TFUNCTION) {
+        lua_pop(ctx->lua_state, 2);
+        puts("[Error] Command handler is not a function.");
+        return CPYMO_ERR_INVALID_ARG;
+    }
+
+    int args = 0;
+    while (cpymo_parser_curline_peek(pymo_parser) != '\0')
+    {
+        cpymo_str arg = 
+            cpymo_parser_curline_pop_commacell(pymo_parser);
+        if (lua_pushlstring(ctx->lua_state, arg.begin, arg.len) == NULL) {
+            lua_pop(ctx->lua_state, args + 2);
+            return CPYMO_ERR_OUT_OF_MEM;
+        }
+
+        args++;
+    }
+    
+    error_t err = cpymo_lua_context_execute(ctx, args, 0);
+    lua_pop(ctx->lua_state, 1);
+    return err;
+}
+
 void cpymo_lua_api_script_register(cpymo_lua_context *ctx)
 {
     lua_State *l = ctx->lua_state;
@@ -151,6 +195,15 @@ void cpymo_lua_api_script_register(cpymo_lua_context *ctx)
     luaL_setfuncs(l, funcs, 0);
 
     cpymo_lua_context_vars_register(ctx->lua_state);
+
+    lua_newtable(ctx->lua_state);
+    ctx->script_commands_table_ref = 
+        luaL_ref(ctx->lua_state, LUA_REGISTRYINDEX);
+    lua_rawgeti(
+        ctx->lua_state, 
+        LUA_REGISTRYINDEX, 
+        ctx->script_commands_table_ref);
+    lua_setfield(ctx->lua_state, -2, "commands");
 
     cpymo_lua_mark_table_readonly(ctx);
     lua_setfield(l, -2, "script");

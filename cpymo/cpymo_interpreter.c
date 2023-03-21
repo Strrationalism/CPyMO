@@ -212,6 +212,25 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 		CONT_NEXTLINE;
 	}
 
+	#if CPYMO_FEATURE_LEVEL >= 1
+	/*** PyMO -> Lua FFI ***/
+	extern error_t cpymo_lua_context_pymo_override(
+		cpymo_lua_context *ctx,
+		cpymo_str command,
+		cpymo_parser *pymo_parser);
+
+	err = cpymo_lua_context_pymo_override(
+		&engine->lua, command, &interpreter->script_parser);
+	if (err == CPYMO_ERR_SUCC) {
+		if (engine->redraw || script_wait_function_id != LUA_REFNIL) 
+			return CPYMO_ERR_SUCC;
+		CONT_NEXTLINE;
+	}
+	
+	if (err != CPYMO_ERR_NOT_FOUND) return err;
+
+	#endif
+
 	/*** I. Text ***/
 	D("say") {
 		cpymo_fade_reset(&engine->fade);
