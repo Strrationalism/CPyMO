@@ -445,7 +445,7 @@ START:
 #ifdef __IOS__
     extern const char* get_ios_directory();
     const char *game_selector_dir = get_ios_directory();
-    cpymo_game_selector_item  *item = get_game_list(game_selector_dir);
+    cpymo_game_selector_item *item = get_game_list(game_selector_dir);
 #else
 	cpymo_game_selector_item *item = get_game_list(GAME_SELECTOR_DIR);
 #endif
@@ -455,8 +455,9 @@ START:
 		cpymo_game_selector_item *item2 = get_game_list(GAME_SELECTOR_DIR_2);
 		if (item == NULL) item = item2;
 		else {
-			while (item->next != NULL) item = item->next;
-			item->next = item2;
+			cpymo_game_selector_item *slot = item;
+			while (slot->next != NULL) slot = slot->next;
+			slot->next = item2;
 		}
 	}
 #endif
