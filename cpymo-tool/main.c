@@ -9,9 +9,7 @@
 #include <stdbool.h>
 #include <cpymo_error.h>
 #include <cpymo_parser.h>
-#include "cpymo_tool_package.h"
-#include "cpymo_tool_resize.h"
-#include "cpymo_tool_pack_images.h"
+#include <stdint.h>
 #include "cpymo_tool_image.h"
 
 #define STBI_NO_PSD
@@ -28,6 +26,12 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
+extern int cpymo_tool_invoke_generate_album_ui(int argc, const char **argv);
+extern int cpymo_tool_invoke_pack(int argc, const char **argv);
+extern int cpymo_tool_invoke_unpack(int argc, const char **argv);
+extern int cpymo_tool_invoke_resize_image(int argc, const char **argv);
+extern int cpymo_tool_invoke_pack_spritesheet(int argc, const char **argv);
+
 int help() {
 	printf("cpymo-tool\n");
 	printf("Development tool for PyMO and CPyMO.\n");
@@ -39,12 +43,12 @@ int help() {
 	printf("    cpymo-tool pack <out-pak-file> --file-list <file-list.txt>\n");
 	printf("Resize image:\n");
 	printf(
-		"    cpymo-tool resize \n"
+		"    cpymo-tool resize-image \n"
 		"        <src-image-file> <dst-image-file> <resize-ratio-w> <resize-ratio-h>\n"
 		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
-	printf("Pack images to single image:\n");
+	printf("Pack spritesheet:\n");
 	printf(
-		"    cpymo-tool pack-images\n"
+		"    cpymo-tool pack-spritesheet\n"
 		"        <output-file> <num-of-cols> <input-files...>\n"
 		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
 	printf("Generate album UI image cache:\n");
@@ -72,10 +76,10 @@ int main(int argc, const char **argv) {
 			ret = cpymo_tool_invoke_unpack(argc, argv);
 		else if (strcmp(argv[1], "pack") == 0)
 			ret = cpymo_tool_invoke_pack(argc, argv);
-		else if (strcmp(argv[1], "resize") == 0)
-			ret = cpymo_tool_invoke_resize(argc, argv);
-		else if (strcmp(argv[1], "pack-images") == 0)
-			ret = cpymo_tool_invoke_pack_images(argc, argv);
+		else if (strcmp(argv[1], "resize-image") == 0)
+			ret = cpymo_tool_invoke_resize_image(argc, argv);
+		else if (strcmp(argv[1], "pack-spritesheet") == 0)
+			ret = cpymo_tool_invoke_pack_spritesheet(argc, argv);
 		else if (strcmp(argv[1], "gen-album-cache") == 0)
 			ret = cpymo_tool_invoke_generate_album_ui(argc, argv);
 		else ret = help();

@@ -1,5 +1,4 @@
 ﻿#include <cpymo_prelude.h>
-#include "cpymo_tool_resize.h"
 #include <stdbool.h>
 #include <cpymo_error.h>
 #include <stb_image.h>
@@ -41,7 +40,7 @@ static error_t cpymo_tool_resize_image(
 extern int help();
 extern int process_err(error_t);
 
-int cpymo_tool_invoke_resize(int argc, const char ** argv)
+int cpymo_tool_invoke_resize_image(int argc, const char ** argv)
 {
 	const char *src_file = NULL;
 	const char *dst_file = NULL;
