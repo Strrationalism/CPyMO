@@ -1,12 +1,11 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "cpymo_tool_prelude.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <cpymo_package.h>
-#include <endianness.h>
-#include <cpymo_utils.h>
-#include "cpymo_tool_package.h"
+#include "../cpymo/cpymo_package.h"
+#include "../cpymo/cpymo_utils.h"
+#include "../endianness.h/endianness.h"
 
 static error_t cpymo_tool_unpack(const char *pak_path, const char *extension, const char *out_path) {
 	cpymo_package pkg;

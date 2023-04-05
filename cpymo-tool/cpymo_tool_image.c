@@ -1,13 +1,13 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "cpymo_tool_prelude.h"
 #include "cpymo_tool_image.h"
-#include <cpymo_utils.h>
-#include <cpymo_gameconfig.h>
-#include <cpymo_assetloader.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <stb_image_write.h>
-#include <stb_image_resize.h>
+#include "../cpymo/cpymo_utils.h"
+#include "../cpymo/cpymo_gameconfig.h"
+#include "../cpymo/cpymo_assetloader.h"
+#include "../stb/stb_image_write.h"
+#include "../stb/stb_image_resize.h"
 
 error_t cpymo_tool_image_load_from_file(cpymo_tool_image *out, const char *filename, bool load_mask)
 {

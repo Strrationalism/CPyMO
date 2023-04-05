@@ -4,17 +4,7 @@ BUILD_DIR = build.Win32
 TARGET = cpymo-tool.exe
 !endif
 
-SRC = \
-	*.c \
-	../cpymo/cpymo_error.c \
-	../cpymo/cpymo_package.c \
-	../cpymo/cpymo_parser.c \
-	../cpymo/cpymo_utils.c \
-	../cpymo/cpymo_color.c \
-	../cpymo/cpymo_gameconfig.c \
-	../cpymo/cpymo_assetloader.c \
-	../cpymo/cpymo_str.c \
-	../cpymo/cpymo_album.c
+SRC = *.c
 
 build: $(TARGET)
 	@echo Built $(TARGET)
@@ -35,7 +25,6 @@ $(TARGET): $(SRC) dirs
 		-I../stb \
 		-I../endianness.h \
 		/DNDEBUG \
-		/DCPYMO_TOOL \
 		/utf-8 \
 		/O2 /Os /MP /nologo \
 		/link /RELEASE
