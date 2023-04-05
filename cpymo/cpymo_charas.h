@@ -1,7 +1,7 @@
 #ifndef INCLUDE_CPYMO_CHARAS
 #define INCLUDE_CPYMO_CHARAS
 
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 #include "cpymo_tween.h"
 #include "cpymo_parser.h"
 

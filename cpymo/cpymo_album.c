@@ -1,7 +1,7 @@
 ﻿#include "cpymo_prelude.h"
-#include <stb_image_resize.h>
-#include <stb_image_write.h>
-#include <stb_image.h>
+#include "../stb/stb_image_resize.h"
+#include "../stb/stb_image_write.h"
+#include "../stb/stb_image.h"
 #include <memory.h>
 #include <string.h>
 #include <math.h>
@@ -191,7 +191,7 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 #endif
 
 #ifndef CPYMO_TOOL
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 #include "cpymo_album.h"
 #include "cpymo_key_hold.h"
 #include "cpymo_engine.h"

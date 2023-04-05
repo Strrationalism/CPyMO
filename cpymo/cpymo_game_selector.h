@@ -3,8 +3,8 @@
 
 #include "cpymo_error.h"
 #include <stddef.h>
-#include <cpymo_backend_text.h>
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_text.h"
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 
 struct cpymo_engine;
 

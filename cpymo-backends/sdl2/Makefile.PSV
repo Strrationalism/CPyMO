@@ -12,11 +12,7 @@ OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND
 CC := arm-vita-eabi-gcc
 
 CFLAGS := \
-	-I$(CURDIR)/../include \
-	-I$(CURDIR)/../../cpymo \
-	-I$(CURDIR)/../../stb \
 	-I$(CURDIR)/build.FFmpeg.PSV/include \
-	-I$(CURDIR)/../../endianness.h \
 	-D__PSV__ \
 	-DUSE_GAME_SELECTOR \
 	-DGAME_SELECTOR_DIR="\"ux0:/pymogames/\"" \

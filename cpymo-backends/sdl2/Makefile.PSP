@@ -12,10 +12,6 @@ OBJS_BACKEND := $(patsubst %.c, $(BUILD_DIR_BACKEND)/%.o, $(notdir $(SRC_BACKEND
 
 CFLAGS := \
 	-G0 -G0 -Wall -O3 \
-	-I../include \
-	-I../../cpymo \
-	-I../../stb -I../../endianness.h \
-	-I. \
 	-I$(PSPDEV)/psp/include -DDISABLE_MOVIE \
 	-I$(PSPDEV)/psp/sdk/include \
 	-I./build.FFmpeg.PSP/include \

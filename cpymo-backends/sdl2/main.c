@@ -6,17 +6,15 @@
 #define STB_LEAKCHECK_IMPLEMENTATION
 #endif
 
-#include <cpymo_prelude.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../../cpymo/cpymo_localization.h"
+#include "../../cpymo/cpymo_msgbox_ui.h"
+#include "../include/cpymo_backend_text.h"
+#include "cpymo_import_sdl2.h"
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <cpymo_error.h>
-#include "cpymo_import_sdl2.h"
-#include <cpymo_engine.h>
-#include <cpymo_localization.h>
-#include <cpymo_msgbox_ui.h>
-#include <cpymo_interpreter.h>
-#include <string.h>
-#include <cpymo_backend_text.h>
 #include <time.h>
 
 #if (!(defined DISABLE_FFMPEG_AUDIO) && !(defined DISABLE_FFMPEG_MOVIE))
@@ -24,7 +22,7 @@
 #endif
 
 #define STB_DS_IMPLEMENTATION
-#include <stb_ds.h>
+#include "../../stb/stb_ds.h"
 
 #ifndef DISABLE_STB_IMAGE
 #define STBI_NO_PSD
@@ -33,16 +31,16 @@
 #define STBI_NO_PIC
 #define STBI_NO_PNM
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../../stb/stb_image.h"
 
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image_resize.h>
+#include "../../stb/stb_image_resize.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include "../../stb/stb_image_write.h"
 #endif
 
-#include <cpymo_backend_audio.h>
+#include "../include/cpymo_backend_audio.h"
 
 #if defined __SWITCH__
 #include <switch.h>
@@ -120,7 +118,7 @@ const char *get_emscripten_game_dir(void) {
 	return EMSCRIPTEN_GAMEDIR;
 }
 
-#include <cpymo_save_global.h>
+#include "../../cpymo/cpymo_save_global.h"
 
 EMSCRIPTEN_KEEPALIVE
 void reload_global_save(void) {
@@ -185,7 +183,7 @@ static void save_last_selected_game_dir(const char *gamedir)
 #endif
 
 #ifdef USE_GAME_SELECTOR
-#include <cpymo_game_selector.h>
+#include "../../cpymo/cpymo_game_selector.h"
 
 cpymo_game_selector_item *get_game_list(const char *game_selector_dir);
 

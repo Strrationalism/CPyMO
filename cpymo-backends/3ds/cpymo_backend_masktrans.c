@@ -1,9 +1,9 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_masktrans.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../include/cpymo_backend_masktrans.h"
+#include "../include/cpymo_backend_image.h"
 #include <stdio.h>
 #include <3ds.h>
 #include <citro2d.h>
-#include <cpymo_backend_image.h>
 #include <stdlib.h>
 #include "utils.h"
 

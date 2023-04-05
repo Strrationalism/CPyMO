@@ -23,10 +23,6 @@ CC := emcc
 EM_FLAGS := -s USE_SDL=2 
 
 CFLAGS := \
-	-I$(CURDIR)/../include \
-	-I$(CURDIR)/../../cpymo \
-	-I$(CURDIR)/../../stb \
-	-I$(CURDIR)/../../endianness.h \
 	-D__EMSCRIPTEN__ \
 	-DEMSCRIPTEN_GAMEDIR="\"$(BUILD_GAME_DIR)\"" \
 	-DNDEBUG \

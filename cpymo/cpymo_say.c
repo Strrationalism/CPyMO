@@ -396,6 +396,8 @@ static error_t cpymo_say_wait_text_read_callback(cpymo_engine *e)
 		say->active = false;
 	}
 
+	cpymo_engine_request_redraw(e);	
+
 	return CPYMO_ERR_SUCC;
 }
 

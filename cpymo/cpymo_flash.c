@@ -1,7 +1,7 @@
 ﻿#include "cpymo_prelude.h"
 #include "cpymo_flash.h"
 #include "cpymo_engine.h"
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 
 static error_t cpymo_flash_callback(cpymo_engine *engine)
 {

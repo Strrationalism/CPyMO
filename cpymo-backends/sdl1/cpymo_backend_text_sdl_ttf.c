@@ -1,5 +1,5 @@
-#include <cpymo_prelude.h>
-#include <cpymo_backend_text.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../include/cpymo_backend_text.h"
 
 #ifdef ENABLE_SDL_TTF
 #include <cpymo_engine.h>

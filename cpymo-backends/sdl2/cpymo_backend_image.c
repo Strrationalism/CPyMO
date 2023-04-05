@@ -1,13 +1,13 @@
-﻿#include <cpymo_prelude.h>
-#include "cpymo_backend_image.h"
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_utils.h"
+#include "../include/cpymo_backend_image.h"
 #include "cpymo_import_sdl2.h"
 #include <assert.h>
-#include "cpymo_utils.h"
 
 extern SDL_Renderer * renderer;
 
 #ifdef ENABLE_SCREEN_FORCE_CENTERED
-#include <cpymo_engine.h>
+#include "../../cpymo/cpymo_engine.h"
 extern cpymo_engine engine;
 #endif
 
@@ -218,8 +218,8 @@ void cpymo_backend_image_fill_rects(const float * xywh, size_t count, cpymo_colo
 bool cpymo_backend_image_album_ui_writable() { return true; }
 
 #ifdef ENABLE_SDL2_IMAGE
-#include <cpymo_package.h>
-#include <cpymo_assetloader.h>
+#include "../../cpymo/cpymo_package.h"
+#include "../../cpymo/cpymo_assetloader.h"
 #include <SDL2/SDL_image.h>
 
 error_t cpymo_assetloader_load_icon_pixels(

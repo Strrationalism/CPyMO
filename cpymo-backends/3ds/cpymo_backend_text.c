@@ -1,9 +1,9 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_text.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_parser.h"
+#include "../include/cpymo_backend_text.h"
 #include <stdlib.h>
 #include <3ds.h>
 #include <citro2d.h>
-#include <cpymo_parser.h>
 
 static C2D_Font font;
 

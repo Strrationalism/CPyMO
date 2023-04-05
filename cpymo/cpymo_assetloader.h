@@ -35,8 +35,8 @@ error_t cpymo_assetloader_load_icon_pixels(
 
 #ifndef CPYMO_TOOL
 
-#include <cpymo_backend_image.h>
-#include <cpymo_backend_masktrans.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
+#include "../cpymo-backends/include/cpymo_backend_masktrans.h"
 error_t cpymo_assetloader_load_bg_image(cpymo_backend_image *img, int *w, int *h, cpymo_str name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_chara_image(cpymo_backend_image *img, int *w, int *h, cpymo_str name, const cpymo_assetloader *loader);
 error_t cpymo_assetloader_load_system_masktrans(cpymo_backend_masktrans *out, cpymo_str name, const cpymo_assetloader *loader);

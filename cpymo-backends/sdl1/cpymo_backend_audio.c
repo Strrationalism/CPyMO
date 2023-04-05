@@ -1,9 +1,9 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_engine.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
 #ifndef DISABLE_FFMPEG_AUDIO
 
 #include <SDL/SDL.h>
-#include <cpymo_backend_audio.h>
+#include "../include/cpymo_backend_audio.h"
 
 #ifndef DEFAULT_CHANNELS
 #define DEFAULT_CHANNELS 2

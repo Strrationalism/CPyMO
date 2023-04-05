@@ -17,7 +17,7 @@ const extern bool enhanced_3ds_display_mode;
 #endif
 
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
-#include <cpymo_android.h>
+#include "../cpymo-backends/android/app/src/main/cpp/include/cpymo_android.h"
 #endif
 
 typedef struct {

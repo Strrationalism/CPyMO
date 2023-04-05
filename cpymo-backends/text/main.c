@@ -8,15 +8,15 @@
 #define STB_LEAKCHECK_IMPLEMENTATION
 #endif
 
-#include <cpymo_prelude.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include <cpymo_backend_image.h>
-#include <cpymo_backend_masktrans.h>
-#include <cpymo_backend_text.h>
-#include <cpymo_engine.h>
+#include "../include/cpymo_backend_image.h"
+#include "../include/cpymo_backend_masktrans.h"
+#include "../include/cpymo_backend_text.h"
 
 cpymo_engine engine;
 
@@ -154,7 +154,7 @@ static uint64_t millis()
 #endif
 
 #define STB_DS_IMPLEMENTATION
-#include <stb_ds.h>
+#include "../../stb/stb_ds.h"
 
 static uint64_t prev;
 static float get_delta_time() {

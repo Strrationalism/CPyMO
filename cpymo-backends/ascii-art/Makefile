@@ -15,12 +15,7 @@ CFLAGS += \
 	-DDISABLE_AUDIO \
 	-DDISABLE_MOVIE \
 	-DNDEBUG \
-	-O3 \
-	-I../software \
-	-I../../cpymo \
-	-I../../endianness.h \
-	-I../../stb \
-	-I../include
+	-O3
 
 ifeq ($(LEAKCHECK), 1)
 CFLAGS += -DLEAKCHECK

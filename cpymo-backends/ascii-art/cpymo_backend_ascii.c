@@ -1,13 +1,13 @@
-#include <cpymo_prelude.h>
-#include <cpymo_error.h>
-#include <cpymo_color.h>
-#include <cpymo_utils.h>
-#include <cpymo_backend_software.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_error.h"
+#include "../../cpymo/cpymo_color.h"
+#include "../../cpymo/cpymo_utils.h"
+#include "../software/cpymo_backend_software.h"
+#include "../../stb/stb_ds.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stb_ds.h>
 
 #ifndef ASCII_TABLE
 #define ASCII_TABLE " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8B@$"
