@@ -19,7 +19,7 @@ TARGET		:=	boot
 BUILD		:=	build.Wii
 SOURCES		:= . ../../cpymo
 DATA		:=	data
-INCLUDES	:= ../../cpymo ../../stb ../../endianness.h ../include
+INCLUDES	:= 
 
 #---------------------------------------------------------------------------------
 # options for code generation

@@ -1,6 +1,6 @@
-#include <cpymo_prelude.h>
-#include <cpymo_backend_software.h>
-#include <cpymo_backend_masktrans.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../include/cpymo_backend_masktrans.h"
+#include "cpymo_backend_software.h"
 #include <stddef.h>
 #include <stdlib.h>
 

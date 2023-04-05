@@ -3,7 +3,7 @@
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
 #include "cpymo_localization.h"
-#include <stb_image.h>
+#include "../stb/stb_image.h"
 #include <assert.h>
 #include <string.h>
 

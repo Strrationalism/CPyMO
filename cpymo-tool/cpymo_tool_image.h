@@ -1,3 +1,6 @@
+#ifndef INCLUDE_CPYMO_TOOL_IMAGE
+#define INCLUDE_CPYMO_TOOL_IMAGE
+
 #include "../stb/stb_image.h"
 #include "../cpymo/cpymo_error.h"
 #include "../cpymo/cpymo_parser.h"
@@ -23,4 +26,6 @@ error_t cpymo_tool_image_save_to_file_with_mask(
 	bool create_mask);
 
 error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename);
+
+#endif
 

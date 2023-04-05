@@ -1,9 +1,9 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
 #ifdef ENABLE_SDL2_MIXER_AUDIO_BACKEND
 #include "cpymo_import_sdl2.h"
 #include <SDL2/SDL_mixer.h>
-#include <cpymo_audio.h>
-#include <cpymo_engine.h>
+#include "../../cpymo/cpymo_audio.h"
+#include "../../cpymo/cpymo_engine.h"
 
 static bool enabled = false;
 

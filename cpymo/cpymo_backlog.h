@@ -3,7 +3,7 @@
 
 #include "cpymo_parser.h"
 #include "cpymo_error.h"
-#include <cpymo_backend_text.h>
+#include "../cpymo-backends/include/cpymo_backend_text.h"
 
 struct cpymo_backlog_record;
 

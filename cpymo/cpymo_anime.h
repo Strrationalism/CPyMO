@@ -1,7 +1,7 @@
 #ifndef INCLUDE_CPYMO_ANIME
 #define INCLUDE_CPYMO_ANIME
 
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 #include "cpymo_parser.h"
 
 struct cpymo_engine;

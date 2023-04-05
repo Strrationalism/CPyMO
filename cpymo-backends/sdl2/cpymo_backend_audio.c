@@ -1,9 +1,8 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../include/cpymo_backend_audio.h"
 #include "cpymo_import_sdl2.h"
 #include <stdbool.h>
-#include <cpymo_error.h>
-#include <cpymo_backend_audio.h>
-#include <cpymo_engine.h>
 #include <assert.h>
 
 #ifdef ENABLE_SDL2_MIXER_AUDIO_BACKEND

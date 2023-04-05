@@ -1,6 +1,6 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
 #ifndef DISABLE_MOVIE
-#include <cpymo_backend_movie.h>
+#include "../include/cpymo_backend_movie.h"
 #include <SDL/SDL.h>
 #include <stdbool.h>
 #include <libswscale/swscale.h>

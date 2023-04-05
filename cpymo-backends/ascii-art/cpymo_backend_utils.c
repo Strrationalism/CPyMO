@@ -1,4 +1,4 @@
-#include <cpymo_prelude.h>
+#include "../../cpymo/cpymo_prelude.h"
 #include <stdint.h>
 #include <unistd.h>
 

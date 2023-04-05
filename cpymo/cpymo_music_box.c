@@ -3,7 +3,7 @@
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
 #include "cpymo_parser.h"
-#include <cpymo_backend_text.h>
+#include "../cpymo-backends/include/cpymo_backend_text.h"
 #include <assert.h>
 #include <stdlib.h>
 

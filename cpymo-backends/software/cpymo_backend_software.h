@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stb_truetype.h>
+#include "../../stb/stb_truetype.h"
 
 typedef struct {
     size_t w, h, line_stride, pixel_stride;

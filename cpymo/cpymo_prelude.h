@@ -2,7 +2,7 @@
 #define INCLUDE_CPYMO_PRELUDE
 
 #ifdef LEAKCHECK
-#include <stb_leakcheck.h>
+#include "../stb/stb_leakcheck.h"
 #endif
 
 #endif

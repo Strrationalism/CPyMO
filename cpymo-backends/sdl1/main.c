@@ -12,24 +12,24 @@
 #define STB_LEAKCHECK_IMPLEMENTATION
 #endif
 
-#include <cpymo_prelude.h>
+#include "../../cpymo/cpymo_prelude.h"
 #include <stdio.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../../stb/stb_image.h"
 
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image_resize.h>
+#include "../../stb/stb_image_resize.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include "../../stb/stb_image_write.h"
 
 #define STB_DS_IMPLEMENTATION
-#include <stb_ds.h>
+#include "../../stb/stb_ds.h"
 
 #include <SDL/SDL.h>
-#include <cpymo_engine.h>
-#include <cpymo_error.h>
+#include "../../cpymo/cpymo_engine.h"
+#include "../../cpymo/cpymo_error.h"
 #include <time.h>
 
 cpymo_engine engine;
@@ -164,7 +164,7 @@ static void ensure_save_dir(const char *gamedir)
 }
 
 #ifdef USE_GAME_SELECTOR
-#include <cpymo_game_selector.h>
+#include "../../cpymo/cpymo_game_selector.h"
 
 #include <dirent.h>
 
@@ -270,8 +270,8 @@ cpymo_game_selector_item *get_game_list(const char *game_selector_dir)
 #endif
 
 #ifdef ENABLE_EXIT_CONFIRM
-#include <cpymo_msgbox_ui.h>
-#include <cpymo_localization.h>
+#include "../../cpymo/cpymo_msgbox_ui.h"
+#include "../../cpymo/cpymo_localization.h"
 static error_t cpymo_exit_confirm(struct cpymo_engine *e, void *data, bool exit)
 {
     *(bool *)data = false;

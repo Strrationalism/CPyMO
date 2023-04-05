@@ -2,7 +2,7 @@
 #include "cpymo_hash_flags.h"
 #include <stdlib.h>
 #include <assert.h>
-#include <stb_ds.h>
+#include "../stb/stb_ds.h"
 
 typedef struct {
 	cpymo_hash_flag key;

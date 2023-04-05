@@ -1,11 +1,11 @@
-﻿#include <stdbool.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include <stdbool.h>
 bool playing_movie = false;
 
 #ifndef DISABLE_MOVIE
-#include <cpymo_prelude.h>
-#include "cpymo_backend_movie.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../include/cpymo_backend_movie.h"
 #include "cpymo_import_sdl2.h"
-#include <cpymo_engine.h>
 
 static SDL_Texture *tex = NULL;
 extern SDL_Renderer *renderer;

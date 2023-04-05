@@ -1,8 +1,8 @@
 #ifndef INCLUDE_CPYMO_FLOATING_HINT
 #define INCLUDE_CPYMO_FLOATING_HINT
 
-#include <cpymo_backend_image.h>
-#include <cpymo_backend_text.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
+#include "../cpymo-backends/include/cpymo_backend_text.h"
 #include "cpymo_parser.h"
 
 struct cpymo_engine;

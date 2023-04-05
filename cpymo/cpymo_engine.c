@@ -1,15 +1,12 @@
 ﻿#include "cpymo_prelude.h"
 #include "cpymo_engine.h"
 #include "cpymo_interpreter.h"
-#include <cpymo_backend_image.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <cpymo_backend_input.h>
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_save_global.h"
-#include <cpymo_backend_input.h>
 #include "cpymo_localization.h"
 
 static void cpymo_logo() {
