@@ -216,7 +216,7 @@ if (Test-Path $gamedir/chara) {
 
 Convert-Images "system" "png" "png" "$gamedir/system" "$outdir/system"
 
-if ($spec.Movie -and (Test-Path "$gamedir/video") -and ($gameconfig["playvideo"].Trim() -eq "1")) {
+if ($spec.Movie -and (Test-Path "$gamedir/video")) {
     $gameconfig["playvideo"] = 1
 
     md "$outdir/video"
