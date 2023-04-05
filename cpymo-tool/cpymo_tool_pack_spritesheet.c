@@ -1,5 +1,4 @@
 ﻿#include "cpymo_tool_prelude.h"
-#include "../cpymo/cpymo_prelude.h"
 #include "cpymo_tool_image.h"
 #include <stdlib.h>
 #include <string.h>
