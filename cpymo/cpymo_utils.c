@@ -70,20 +70,16 @@ void cpymo_utils_replace_str_newline_n(char *str)
 
 void cpymo_utils_replace_cr(char *text, size_t len)
 {
-	#define REPLACE text[i] = '\n'
-
 	for (size_t i = 0; i < len; ++i) {
 		if (text[i] == '\r') {
 			if (i + 1 < len) {
-				if (text[i + 1] != '\n') { REPLACE; }
+				if (text[i + 1] != '\n') { text[i] = '\n'; }
 			}
 			else {
-				REPLACE;
+				text[i] = '\n';
 			}
 		}
 	}
-
-	#undef REPLACE
 }
 
 void cpymo_utils_attach_mask_to_rgba(void *rgba_, void *mask_, int w, int h)

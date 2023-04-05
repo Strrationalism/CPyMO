@@ -3,8 +3,8 @@
 #include "cpymo_save_global.h"
 #include "cpymo_engine.h"
 #include "cpymo_msgbox_ui.h"
-#include <cpymo_backend_save.h>
-#include <endianness.h>
+#include "../cpymo-backends/include/cpymo_backend_save.h"
+#include "../endianness.h/endianness.h"
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>

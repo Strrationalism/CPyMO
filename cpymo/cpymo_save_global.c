@@ -2,8 +2,8 @@
 #include "cpymo_save_global.h"
 #include "cpymo_engine.h"
 #include <string.h>
-#include <cpymo_backend_save.h>
-#include <endianness.h>
+#include "../cpymo-backends/include/cpymo_backend_save.h"
+#include "../endianness.h/endianness.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>

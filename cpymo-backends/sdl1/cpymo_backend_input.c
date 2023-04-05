@@ -1,6 +1,6 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_input.h>
-#include <cpymo_engine.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../include/cpymo_backend_input.h"
 #include <string.h>
 #include <SDL/SDL_events.h>
 

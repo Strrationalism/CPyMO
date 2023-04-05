@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+#define CHARA_BUF_SIZE 64
+
 void cpymo_interpreter_init(
 	cpymo_interpreter *out, 
 	cpymo_script *script, 
@@ -129,8 +131,8 @@ RETRY:
 
 static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont);
 
-#define CPYMO_EXEC_CONTVAL_OK 1
-#define CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED 2
+#define EXEC_CONTVAL_OK 1
+#define EXEC_CONTVAL_INTERPRETER_UPDATED 2
 
 error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_engine *engine)
 {
@@ -138,8 +140,8 @@ error_t cpymo_interpreter_execute_step(cpymo_interpreter * interpreter, cpymo_en
 
 	switch (setjmp(cont)) {
 	case 0: break;
-	case CPYMO_EXEC_CONTVAL_OK: break;
-	case CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED: interpreter = engine->interpreter; break;
+	case EXEC_CONTVAL_OK: break;
+	case EXEC_CONTVAL_INTERPRETER_UPDATED: interpreter = engine->interpreter; break;
 	default: return CPYMO_ERR_INVALID_ARG;
 	}
 
@@ -194,11 +196,11 @@ void cpymo_interpreter_checkpoint(cpymo_interpreter * interpreter)
 	float OUT_X = cpymo_str_atof(IN_X) / 100.0f * engine->gameconfig.imagesize_w; \
 	float OUT_Y = cpymo_str_atof(IN_Y) / 100.0f * engine->gameconfig.imagesize_h;
 
-#define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }
+#define CONT_WITH_CURRENT_CONTEXT { longjmp(cont, EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }
 
 #define CONT_NEXTLINE { \
 	if (cpymo_parser_next_line(&interpreter->script_parser))	\
-		{ longjmp(cont, CPYMO_EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }	\
+		{ longjmp(cont, EXEC_CONTVAL_OK); return CPYMO_ERR_UNKNOWN; }	\
 	else return CPYMO_ERR_NO_MORE_CONTENT; }
 
 static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *interpreter, cpymo_engine *engine, jmp_buf cont)
@@ -299,8 +301,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			cpymo_color_white,
 			1.0f);
 	}
-
-#define CHARA_BUF_SIZE 64
 
 	/*** II. Video ***/
 	D("chara") {
@@ -978,7 +978,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 
 		engine->interpreter = callee;
 
-		longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
+		longjmp(cont, EXEC_CONTVAL_INTERPRETER_UPDATED);
 		return CPYMO_ERR_UNKNOWN;
 	}
 
@@ -994,7 +994,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			cpymo_script_free(interpreter->script);
 		free(interpreter);
 
-		longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
+		longjmp(cont, EXEC_CONTVAL_INTERPRETER_UPDATED);
 		return CPYMO_ERR_UNKNOWN;
 	}
 
@@ -1404,7 +1404,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 					return CPYMO_ERR_NO_MORE_CONTENT;
 				}
 
-				longjmp(cont, CPYMO_EXEC_CONTVAL_INTERPRETER_UPDATED);
+				longjmp(cont, EXEC_CONTVAL_INTERPRETER_UPDATED);
 				return CPYMO_ERR_UNKNOWN;
 			}
 			else {

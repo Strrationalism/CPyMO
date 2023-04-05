@@ -1,16 +1,15 @@
-﻿#include <cpymo_prelude.h>
-#include "cpymo_tool_pack_images.h"
+﻿#include "cpymo_tool_prelude.h"
 #include "cpymo_tool_image.h"
-#include <cpymo_parser.h>
-#include <cpymo_error.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "../cpymo/cpymo_parser.h"
+#include "../cpymo/cpymo_error.h"
 
 extern int help();
 extern int process_err(error_t);
 
-static error_t cpymo_tool_pack_images(
+static error_t cpymo_tool_pack_spritesheet(
 	bool load_mask,
 	bool create_mask,
 	const char *output_file,
@@ -66,7 +65,7 @@ CLEAN:
 	return err;
 }
 
-int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
+int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 {
 	bool load_mask = false;
 	bool create_mask = false;
@@ -145,7 +144,7 @@ int cpymo_tool_invoke_pack_images(int argc, const char ** argv)
 		}
 	}
 
-	error_t err = cpymo_tool_pack_images(
+	error_t err = cpymo_tool_pack_spritesheet(
 		load_mask,
 		create_mask,
 		output_file,

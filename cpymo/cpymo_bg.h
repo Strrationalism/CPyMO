@@ -1,8 +1,8 @@
 #ifndef INCLUDE_CPYMO_BG
 #define INCLUDE_CPYMO_BG
 
-#include <cpymo_backend_image.h>
-#include <cpymo_backend_masktrans.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
+#include "../cpymo-backends/include/cpymo_backend_masktrans.h"
 #include "cpymo_parser.h"
 #include "cpymo_tween.h"
 

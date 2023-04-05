@@ -1,17 +1,17 @@
-﻿#include <cpymo_prelude.h>
-#include "cpymo_tool_resize.h"
+﻿#include "cpymo_tool_prelude.h"
+#include "cpymo_tool_image.h"
 #include <stdbool.h>
-#include <cpymo_error.h>
-#include <stb_image.h>
-#include <stb_image_resize.h>
-#include <stb_image_write.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <cpymo_utils.h>
 #include <stdint.h>
-#include <cpymo_parser.h>
-#include "cpymo_tool_image.h"
+#include "../cpymo/cpymo_error.h"
+#include "../cpymo/cpymo_parser.h"
+#include "../cpymo/cpymo_utils.h"
+#include "../stb/stb_image.h"
+#include "../stb/stb_image_resize.h"
+#include "../stb/stb_image_write.h"
+
 
 static error_t cpymo_tool_resize_image(
     const char *input_file, 
@@ -41,7 +41,7 @@ static error_t cpymo_tool_resize_image(
 extern int help();
 extern int process_err(error_t);
 
-int cpymo_tool_invoke_resize(int argc, const char ** argv)
+int cpymo_tool_invoke_resize_image(int argc, const char ** argv)
 {
 	const char *src_file = NULL;
 	const char *dst_file = NULL;

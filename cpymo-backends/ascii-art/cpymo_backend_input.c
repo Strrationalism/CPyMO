@@ -1,5 +1,5 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_input.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../include/cpymo_backend_input.h"
 #include <string.h>
 #include <ctype.h>
 

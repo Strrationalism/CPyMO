@@ -69,7 +69,7 @@ static error_t chs_version(char **out_str, cpymo_pymo_version v)
 		"当前支持的PyMO版本为 %d.%d，\n"
 		"但该游戏需要的PyMO版本为 %d.%d，\n"
 		"该游戏也许不会正常执行。", 
-		CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR,
+		cpymo_pymo_version_current.major, cpymo_pymo_version_current.minor,
 		v.major, v.minor);
 	return CPYMO_ERR_SUCC;
 }
@@ -132,7 +132,7 @@ static error_t cht_version(char **out_str, cpymo_pymo_version v)
 		"當前支持的PyMO版本為 %d.%d，\n"
 		"但該遊戲需要的PyMO版本為 %d.%d，\n"
 		"該遊戲也許不會正常執行。", 
-		CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR,
+		cpymo_pymo_version_current.major, cpymo_pymo_version_current.minor,
 		v.major, v.minor);
 	return CPYMO_ERR_SUCC;
 }
@@ -193,7 +193,7 @@ static error_t enu_version(char **out_str, cpymo_pymo_version v)
 	sprintf(*out_str, 
 		"The currently supported\nPyMO version is %d.%d,\n"
 		"But the pymo version\nrequired for this game is %d.%d.",
-		CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR,
+		cpymo_pymo_version_current.major, cpymo_pymo_version_current.minor,
 		v.major, v.minor);
 	return CPYMO_ERR_SUCC;
 }
@@ -240,12 +240,12 @@ const cpymo_localization enu = {
 	"Are you sure you want to quit the game?"
 };
 
-#ifndef DEFAULT_LANG
-#define DEFAULT_LANG chs
+#ifndef CPYMO_LANG
+#define CPYMO_LANG chs
 #endif
 
 const cpymo_localization *cpymo_localization_get(struct cpymo_engine *e)
 {
-	return &DEFAULT_LANG;
+	return &CPYMO_LANG;
 }
 

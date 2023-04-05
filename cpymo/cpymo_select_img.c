@@ -9,7 +9,7 @@
 #include <string.h>
 
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
-#include <cpymo_android.h>
+#include "../cpymo-backends/android/app/src/main/cpp/include/cpymo_android.h"
 #endif
 
 typedef struct cpymo_select_img_selection{
@@ -323,12 +323,6 @@ static error_t cpymo_select_img_ok(cpymo_engine *e, int sel, uint64_t hash, cpym
 	return err;
 }
 
-#ifndef ENABLE_TEXT_EXTRACT
-#define CALL_VISUALLY_IMPAIRED(X)
-#else
-#define CALL_VISUALLY_IMPAIRED(X) cpymo_backend_text_extract(X)
-#endif
-
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
 #define CALL_VISUALLY_PLAY_SOUND(X) cpymo_android_play_sound(X)
 #else
@@ -346,7 +340,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 			cpymo_engine_request_redraw(e);
 
 			CALL_VISUALLY_PLAY_SOUND(SOUND_SELECT);
-			CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
+			cpymo_backend_text_extract(o->selections[o->current_selection].original_text);
 		}
 
 		if (cpymo_key_pluse_output(&o->key_up)) {
@@ -354,7 +348,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 			cpymo_engine_request_redraw(e);
 
 			CALL_VISUALLY_PLAY_SOUND(SOUND_SELECT);
-			CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
+			cpymo_backend_text_extract(o->selections[o->current_selection].original_text);
 		}
 
 		if (cpymo_input_mouse_moved(e) && e->input.mouse_position_useable) {
@@ -365,7 +359,7 @@ error_t cpymo_select_img_update(cpymo_engine *e, cpymo_select_img *o, float dt)
 						cpymo_engine_request_redraw(e);
 
 						CALL_VISUALLY_PLAY_SOUND(SOUND_SELECT);
-						CALL_VISUALLY_IMPAIRED(o->selections[o->current_selection].original_text);
+						cpymo_backend_text_extract(o->selections[o->current_selection].original_text);
 					}
 				}
 			}

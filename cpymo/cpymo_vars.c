@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
-#include <stb_ds.h>
+#include "../stb/stb_ds.h"
 
 struct cpymo_var {
     char *key;

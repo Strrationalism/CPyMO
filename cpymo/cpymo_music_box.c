@@ -3,12 +3,9 @@
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
 #include "cpymo_parser.h"
-#include <cpymo_backend_text.h>
+#include "../cpymo-backends/include/cpymo_backend_text.h"
 #include <assert.h>
 #include <stdlib.h>
-
-#define ENCODE_NODE(INDEX) CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX)
-#define DECODE_NODE(PTR) CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR)
 
 typedef struct {
 	char *music_list;
@@ -47,21 +44,21 @@ static void cpymo_music_box_deleter(cpymo_engine *e, void *ui_)
 static void *cpymo_music_box_get_next(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
 	cpymo_music_box *box = (cpymo_music_box *)ui_data;
-	uintptr_t index = DECODE_NODE(cur) + 1;
+	uintptr_t index = cpymo_list_ui_encode_uint_node_dec(cur) + 1;
 	if (index >= box->music_count) return NULL;
-	else return ENCODE_NODE(index);
+	else return cpymo_list_ui_encode_uint_node_enc(index);
 }
 
 static void *cpymo_music_box_get_prev(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	uintptr_t index = DECODE_NODE(cur);
+	uintptr_t index = cpymo_list_ui_encode_uint_node_dec(cur);
 	if (index == 0) return NULL;
-	else return ENCODE_NODE(index - 1);
+	else return cpymo_list_ui_encode_uint_node_enc(index - 1);
 }
 
 static void cpymo_musicbox_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
-	uintptr_t node_index = DECODE_NODE(node_to_draw);
+	uintptr_t node_index = cpymo_list_ui_encode_uint_node_dec(node_to_draw);
 	const cpymo_music_box *box = (cpymo_music_box *)cpymo_list_ui_data_const(e);
 	
 	cpymo_backend_text text = box->music_title[node_index];
@@ -74,7 +71,7 @@ static error_t cpymo_musicbox_ok(struct cpymo_engine *e, void *selected)
 {
 	const cpymo_music_box *box = (cpymo_music_box *)cpymo_list_ui_data_const(e);
 
-	uintptr_t node_index = DECODE_NODE(selected);
+	uintptr_t node_index = cpymo_list_ui_encode_uint_node_dec(selected);
 	cpymo_audio_bgm_play(e, box->music_filename[node_index], true);
 	return CPYMO_ERR_SUCC;
 }
@@ -85,7 +82,7 @@ static error_t cpymo_musicbox_visual_help_selection_change(cpymo_engine *e, void
 	const cpymo_music_box *box = (cpymo_music_box *)cpymo_list_ui_data_const(e);
 	
 	if (box->music_title_text) {
-		uintptr_t node_index = DECODE_NODE(selected);
+		uintptr_t node_index = cpymo_list_ui_encode_uint_node_dec(selected);
 		if (box->music_title_text[node_index])
 			cpymo_backend_text_extract(box->music_title_text[node_index]);
 	}
@@ -206,7 +203,7 @@ error_t cpymo_music_box_enter(cpymo_engine *e)
 	} while (cpymo_parser_next_line(&p) && i < box->music_count);
 
 	assert(i == box->music_count);
-	cpymo_list_ui_set_current_node(e, ENCODE_NODE(0));
+	cpymo_list_ui_set_current_node(e, cpymo_list_ui_encode_uint_node_enc(0));
 
 	return CPYMO_ERR_SUCC;
 }

@@ -1,10 +1,10 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
 #include <3ds.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cpymo_backend_audio.h>
-#include <cpymo_engine.h>
+#include "../include/cpymo_backend_audio.h"
 
 static bool audio_enabled = false;
 

@@ -1,9 +1,9 @@
-#include <cpymo_prelude.h>
+#include "../../cpymo/cpymo_prelude.h"
 #ifndef DISABLE_STB_TRUETYPE
 
-#include <cpymo_error.h>
-#include <cpymo_utils.h>
-#include <cpymo_parser.h>
+#include "../../cpymo/cpymo_error.h"
+#include "../../cpymo/cpymo_utils.h"
+#include "../../cpymo/cpymo_parser.h"
 #include <stdio.h>
 
 #ifdef __ANDROID__
@@ -11,7 +11,7 @@
 #endif
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <stb_truetype.h>
+#include "../../stb/stb_truetype.h"
 
 #ifdef __UWP__
 #include <malloc.h>

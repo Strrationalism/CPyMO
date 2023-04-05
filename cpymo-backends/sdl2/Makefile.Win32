@@ -64,10 +64,6 @@ $(BUILD_DIR)/cpymo.res: dirs $(RC_FILE)
 
 $(TARGET): $(SRC) dirs $(BUILD_DIR)/cpymo.res
 	@$(CC) $(SRC) $(BUILD_DIR)/cpymo.res /Fe$(TARGET) /Fo$(BUILD_DIR)/ $(CFLAGS) \
-		-I../../cpymo \
-		-I../include \
-		-I../../stb \
-		-I../../endianness.h \
 		-I$(SDL2)/include/ \
 		-DNDEBUG \
 		/utf-8 \
