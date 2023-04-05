@@ -6,28 +6,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-const cpymo_pymo_version version = 
-	{ CPYMO_PYMO_VERSION_MAJOR, CPYMO_PYMO_VERSION_MINOR };
-
-bool cpymo_pymo_version_compatible(cpymo_pymo_version v)
-{
-	if (v.major < version.major) return true;
-	if (v.major == version.major && v.minor <= version.minor) return true;
-	return false;
-}
+const cpymo_pymo_version cpymo_pymo_version_current = 
+	{ 1, 2 };
 
 static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_str key, cpymo_parser *parser) 
 {
 	size_t magic_key_len;
-	#define SPAN cpymo_str
-	#define SETUP(FIELD, SPAN) cpymo_str_copy(o->FIELD, sizeof(o->FIELD), SPAN)
-	#define SETUP_EXT(FIELD, SPAN) if(SPAN.begin[0] == '.') { SPAN.begin++; SPAN.len--; } SETUP(FIELD, SPAN)
-	#define POP cpymo_parser_curline_pop_commacell(parser)
-	#define D(KEY) magic_key_len = strlen(KEY); if (magic_key_len == key.len && 0 == strncmp(KEY,key.begin , magic_key_len))
+	#define SETUP(FIELD, cpymo_str) \
+		cpymo_str_copy(o->FIELD, sizeof(o->FIELD), cpymo_str)
+	#define SETUP_EXT(FIELD, cpymo_str) \
+		if(cpymo_str.begin[0] == '.') { cpymo_str.begin++; cpymo_str.len--; } SETUP(FIELD, cpymo_str)
+	#define D(KEY) \
+		magic_key_len = strlen(KEY); \
+		if (magic_key_len == key.len && \
+			0 == strncmp(KEY,key.begin , magic_key_len))
 
 	D("gametitle") {
-		SPAN span = POP;
-		SETUP(gametitle, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP(gametitle, cpymo_str);
 		cpymo_utils_replace_str_newline_n(o->gametitle);
 		return;
 	}
@@ -46,123 +42,135 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_str key, cpymo_
 	}
 
 	D("bgformat") {
-		SPAN span = POP;
-		SETUP_EXT(bgformat, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP_EXT(bgformat, cpymo_str);
 		return;
 	}
 
 	D("charaformat") {
-		SPAN span = POP;
-		SETUP_EXT(charaformat, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP_EXT(charaformat, cpymo_str);
 		return;
 	}
 
 	D("charamaskformat") {
-		SPAN span = POP;
-		SETUP_EXT(charamaskformat, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP_EXT(charamaskformat, cpymo_str);
 		return;
 	}
 
 	D("bgmformat") {
-		SPAN span = POP;
-		SETUP_EXT(bgmformat, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP_EXT(bgmformat, cpymo_str);
 		return;
 	}
 
 	D("seformat") {
-		SPAN span = POP;
-		SETUP_EXT(seformat, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP_EXT(seformat, cpymo_str);
 		return;
 	}
 
 	D("voiceformat") {
-		SPAN span = POP;
-		SETUP_EXT(voiceformat, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP_EXT(voiceformat, cpymo_str);
 		return;
 	}
 
 	D("fontsize") {
-		o->fontsize = cpymo_utils_clamp(cpymo_str_atoi(POP), 4, 1024);
+		o->fontsize = cpymo_utils_clamp(cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)), 4, 1024);
 		return;
 	}
 
 	D("hint") {
-		o->hint = cpymo_str_atoi(POP) > 0 ? 1 : 0;
+		o->hint = cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)) > 0;
 		return;
 	}
 
 	D("grayselected") {
-		o->hint = cpymo_str_atoi(POP) > 0 ? 1 : 0;
+		o->hint = cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)) > 0;
 		return;
 	}
 
 	D("playvideo") {
-		o->playvideo = cpymo_str_atoi(POP) > 0 ? 1 : 0;
+		o->playvideo = cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)) > 0;
 		return;
 	}
 
 	D("textspeed") {
-		o->textspeed = cpymo_utils_clamp(cpymo_str_atoi(POP), 0, 5);
+		o->textspeed = cpymo_utils_clamp(cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)), 0, 5);
 		return;
 	}
 
 	D("bgmvolume") {
-		o->bgmvolume = cpymo_utils_clamp(cpymo_str_atoi(POP), 0, 10);
+		o->bgmvolume = cpymo_utils_clamp(cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)), 0, 10);
 		return;
 	}
 
 	D("vovolume") {
-		o->vovolume = cpymo_utils_clamp(cpymo_str_atoi(POP), 0, 10);
+		o->vovolume = cpymo_utils_clamp(cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)), 0, 10);
 		return;
 	}
 
 	D("startscript") {
-		SPAN span = POP;
-		SETUP(startscript, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP(startscript, cpymo_str);
 		return;
 	}
 
 	D("nameboxorig") {
-		o->nameboxorg_x = cpymo_utils_clamp(cpymo_str_atoi(POP), -1024, 1024);
-		o->nameboxorg_y = cpymo_utils_clamp(cpymo_str_atoi(POP), -1024, 1024);
+		o->nameboxorg_x = cpymo_utils_clamp(cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)), -1024, 1024);
+		o->nameboxorg_y = cpymo_utils_clamp(cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser)), -1024, 1024);
 		return;
 	}
 
 	D("cgprefix") {
-		SPAN span = POP;
-		SETUP(cgprefix, span);
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		SETUP(cgprefix, cpymo_str);
 		return;
 	}
 
 	D("textcolor") {
-		o->textcolor = cpymo_str_as_color(POP);
+		o->textcolor = cpymo_str_as_color(
+			cpymo_parser_curline_pop_commacell(parser));
 		return;
 	}
 
 	D("msgtb") {
-		o->msgtb_t = cpymo_str_atoi(POP);
-		o->msgtb_b = cpymo_str_atoi(POP);
+		o->msgtb_t = cpymo_str_atoi(cpymo_parser_curline_pop_commacell(parser));
+		o->msgtb_b = cpymo_str_atoi(cpymo_parser_curline_pop_commacell(parser));
 		return;
 	}
 
 	D("msglr") {
-		o->msglr_l = cpymo_str_atoi(POP);
-		o->msglr_r = cpymo_str_atoi(POP);
+		o->msglr_l = cpymo_str_atoi(cpymo_parser_curline_pop_commacell(parser));
+		o->msglr_r = cpymo_str_atoi(cpymo_parser_curline_pop_commacell(parser));
 		return;
 	}
 
 	D("namealign") {
-		SPAN span = POP;
-		if (span.len >= 1) {
-			if (span.begin[0] == 'l' || span.begin[0] == 'L') o->namealign = 1;
-			else if (span.begin[0] == 'r' || span.begin[0] == 'R') o->namealign = 2;
+		cpymo_str cpymo_str = cpymo_parser_curline_pop_commacell(parser);
+		if (cpymo_str.len >= 1) {
+			if (cpymo_str.begin[0] == 'l' || cpymo_str.begin[0] == 'L') o->namealign = 1;
+			else if (cpymo_str.begin[0] == 'r' || cpymo_str.begin[0] == 'R') o->namealign = 2;
 		}
 		return;
 	}
 
 	D("imagesize") {
-		o->imagesize_w = cpymo_str_atoi(POP);
-		o->imagesize_h = cpymo_str_atoi(POP);
+		o->imagesize_w = cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser));
+		o->imagesize_h = cpymo_str_atoi(
+			cpymo_parser_curline_pop_commacell(parser));
 
 		if (o->imagesize_w == 0) o->imagesize_w = 800;
 		if (o->imagesize_h == 0) o->imagesize_h = 600;
@@ -171,23 +179,21 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_str key, cpymo_
 	}
 
 	D("platform") {
-		cpymo_str plat = POP;
+		cpymo_str plat = cpymo_parser_curline_pop_commacell(parser);
 		cpymo_str_trim(&plat);
 		SETUP(platform, plat);
 		return;
 	}
 
 	D("scripttype") {
-		cpymo_str s = POP;
+		cpymo_str s = cpymo_parser_curline_pop_commacell(parser);
 		cpymo_str_trim(&s);
 		SETUP(scripttype, s);
 		return;
 	}
 
-	#undef SPAN
 	#undef SETUP
 	#undef SETUP_EXT
-	#undef POP
 	#undef D
 }
 
@@ -228,7 +234,8 @@ error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream,
 	return CPYMO_ERR_SUCC;
 }
 
-error_t cpymo_gameconfig_parse_from_file(cpymo_gameconfig *out_config, const char * path)
+error_t cpymo_gameconfig_parse_from_file(
+	cpymo_gameconfig *out_config, const char * path)
 {
 	char *buf = NULL;
 	size_t len;

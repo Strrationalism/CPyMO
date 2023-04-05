@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define ALREADY_READ_TEXT_ALPHA 0.6f
-const float static auto_mode_time = 2.0f;
+const static float already_read_text_alpha = 0.6f;
+const static float auto_mode_time = 2.0f;
 
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
@@ -168,7 +168,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 				name_x, namebox_y + cpymo_gameconfig_font_size(&e->gameconfig),
 				e->gameconfig.textcolor,
 				e->say.current_say_is_already_read ? 
-					ALREADY_READ_TEXT_ALPHA : 1, 
+					already_read_text_alpha : 1, 
 				cpymo_backend_image_draw_type_text_say);
 		}
 
@@ -501,7 +501,7 @@ error_t cpymo_say_start(cpymo_engine *e, cpymo_str name, cpymo_str text)
 
 	const float text_alpha = 
 		e->say.current_say_is_already_read ? 
-			ALREADY_READ_TEXT_ALPHA : 1.0f;
+			already_read_text_alpha : 1.0f;
 
 	error_t err;
 	ENABLE_TEXTBOX(
