@@ -1,7 +1,7 @@
 ﻿#include "cpymo_prelude.h"
 #include "cpymo_bg.h"
 #include "cpymo_engine.h"
-#include <stb_image.h>
+#include "../stb/stb_image.h"
 #include <math.h>
 #include <assert.h>
 

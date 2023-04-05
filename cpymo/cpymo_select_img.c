@@ -9,7 +9,7 @@
 #include <string.h>
 
 #ifdef ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY
-#include <cpymo_android.h>
+#include "../cpymo-backends/android/app/src/main/cpp/include/cpymo_android.h"
 #endif
 
 typedef struct cpymo_select_img_selection{

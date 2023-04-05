@@ -13,7 +13,7 @@
 
 #ifndef DISABLE_FFMPEG_MOVIE
 #include <assert.h>
-#include <cpymo_backend_movie.h>
+#include "../cpymo-backends/include/cpymo_backend_movie.h"
 
 #ifdef __CXX
 extern "C" {

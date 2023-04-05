@@ -21,9 +21,6 @@ else ()
 endif (FFMPEG_FOUND)
 
 include_directories (${FFMPEG_INCLUDE_DIRS})
-include_directories ("./stb/")
-include_directories ("./endianness.h/")
-include_directories ("cpymo-backends/include/")
 
 add_subdirectory ("cpymo")
 add_subdirectory ("cpymo-tool")

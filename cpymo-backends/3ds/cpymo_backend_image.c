@@ -1,17 +1,16 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_image.h>
-#include <cpymo_engine.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../../cpymo/cpymo_utils.h"
 #include <3ds.h>
 #include <citro3d.h>
 #include <citro2d.h>
 #include <assert.h>
-#include <cpymo_utils.h>
 
 #define FASTEST_FILTER STBIR_FILTER_BOX
 #define STBIR_DEFAULT_FILTER_DOWNSAMPLE  FASTEST_FILTER
 #define STBIR_DEFAULT_FILTER_UPSAMPLE    FASTEST_FILTER
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image_resize.h>
+#include "../../stb/stb_image_resize.h"
 
 #include "utils.h"
 

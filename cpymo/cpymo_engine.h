@@ -1,7 +1,7 @@
 #ifndef INCLUDE_CPYMO_ENGINE
 #define INCLUDE_CPYMO_ENGINE
 
-#include <cpymo_backend_input.h>
+#include "../cpymo-backends/include/cpymo_backend_input.h"
 #include "cpymo_assetloader.h"
 #include "cpymo_gameconfig.h"
 #include "cpymo_error.h"

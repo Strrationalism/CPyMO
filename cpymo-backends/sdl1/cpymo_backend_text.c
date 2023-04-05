@@ -1,12 +1,12 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
 
 #ifndef ENABLE_SDL_TTF
-#include <cpymo_backend_text.h>
 #include <SDL/SDL.h>
-#include <stb_truetype.h>
-#include <cpymo_backend_image.h>
-#include <cpymo_utils.h>
-#include <cpymo_engine.h>
+#include "../../stb/stb_truetype.h"
+#include "../include/cpymo_backend_text.h"
+#include "../include/cpymo_backend_image.h"
+#include "../../cpymo/cpymo_utils.h"
+#include "../../cpymo/cpymo_engine.h"
 
 const extern stbtt_fontinfo font;
 const extern cpymo_engine engine;

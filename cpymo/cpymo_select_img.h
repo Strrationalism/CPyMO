@@ -2,8 +2,8 @@
 #define INCLUDE_CPYMO_SELECT_IMG
 
 #include <stdbool.h>
-#include <cpymo_backend_image.h>
-#include <cpymo_backend_text.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
+#include "../cpymo-backends/include/cpymo_backend_text.h"
 #include "cpymo_parser.h"
 #include "cpymo_tween.h"
 #include "cpymo_assetloader.h"

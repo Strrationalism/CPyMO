@@ -5,7 +5,7 @@
 #include <string.h>
 #include <memory.h>
 #include <assert.h>
-#include <stb_image.h>
+#include "../stb/stb_image.h"
 
 error_t cpymo_assetloader_init(cpymo_assetloader * out, const cpymo_gameconfig * config, const char * gamedir)
 {

@@ -1,7 +1,7 @@
 ﻿#include "cpymo_prelude.h"
 #include "cpymo_fade.h"
 #include "cpymo_engine.h"
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 
 void cpymo_fade_draw(const cpymo_engine *engine)
 {

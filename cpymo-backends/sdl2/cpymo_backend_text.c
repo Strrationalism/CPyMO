@@ -1,15 +1,15 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
 #ifndef DISABLE_STB_TRUETYPE
 
-#include <cpymo_backend_text.h>
-#include <stb_truetype.h>
+#include "../../cpymo/cpymo_utils.h"
+#include "../../cpymo/cpymo_parser.h"
+#include "../../stb/stb_truetype.h"
+#include "../include/cpymo_backend_text.h"
+#include "../include/cpymo_backend_image.h"
+#include "cpymo_import_sdl2.h"
 #include <stdlib.h>
-#include <cpymo_parser.h>
-#include <cpymo_backend_image.h>
 #include <memory.h>
 #include <math.h>
-#include <cpymo_utils.h>
-#include "cpymo_import_sdl2.h"
 #include <assert.h>
 
 extern stbtt_fontinfo font;

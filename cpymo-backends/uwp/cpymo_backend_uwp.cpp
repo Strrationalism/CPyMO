@@ -1,10 +1,10 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_game_selector.h"
 #include <string>
 #include <cvt/wstring>
 #include <codecvt>
 #include <assert.h>
 #include <SDL.h>
-#include <cpymo_game_selector.h>
 
 using namespace Windows::Storage;
 

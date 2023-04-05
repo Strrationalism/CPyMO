@@ -13,11 +13,7 @@ CFLAGS += \
 	-DENABLE_TEXT_EXTRACT \
 	-DDISABLE_STB_IMAGE \
 	-DLOW_FRAME_RATE \
-	-O3 \
-	-I../../cpymo \
-	-I../../endianness.h \
-	-I../../stb \
-	-I../include
+	-O3
 
 ifeq ($(LEAKCHECK), 1)
 CFLAGS += -DLEAKCHECK

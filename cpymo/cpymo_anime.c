@@ -1,7 +1,7 @@
 ﻿#include "cpymo_prelude.h"
 #include "cpymo_anime.h"
 #include "cpymo_engine.h"
-#include <stb_image.h>
+#include "../stb/stb_image.h"
 #include <string.h>
 void cpymo_anime_draw(const cpymo_anime *anime)
 {

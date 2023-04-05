@@ -1,9 +1,9 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_image.h>
-#include <cpymo_backend_masktrans.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../include/cpymo_backend_image.h"
+#include "../include/cpymo_backend_masktrans.h"
 #include <stdlib.h>
 #include <SDL/SDL.h>
-#include <cpymo_engine.h>
 
 #ifdef ENABLE_SDL_IMAGE
 #include <SDL/SDL_image.h>

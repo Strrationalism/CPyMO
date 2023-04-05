@@ -1,7 +1,7 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
 #ifdef ENABLE_SDL2_TTF
-#include <cpymo_engine.h>
-#include <cpymo_utils.h>
+#include "../../cpymo/cpymo_engine.h"
+#include "../../cpymo/cpymo_utils.h"
 #include <SDL2/SDL_ttf.h>
 #include "../include/cpymo_backend_text.h"
 
