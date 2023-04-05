@@ -56,7 +56,7 @@ int help() {
 		"    cpymo-tool resize-image \n"
 		"        <src-image-file> <dst-image-file> <resize-ratio-w> <resize-ratio-h>\n"
 		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
-	printf("Pack spritesheet:\n");
+	printf("Pack images into spritesheet:\n");
 	printf(
 		"    cpymo-tool pack-spritesheet\n"
 		"        <output-file> <num-of-cols> <input-files...>\n"
