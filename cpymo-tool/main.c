@@ -1,16 +1,21 @@
-﻿#ifdef LEAKCHECK
-#define STB_LEAKCHECK_IMPLEMENTATION
-#endif
+﻿#include "cpymo_tool_prelude.h"
 
-#include <cpymo_prelude.h>
+// import modules from CPyMO
+#include "../cpymo/cpymo_error.c"
+#include "../cpymo/cpymo_package.c"
+#include "../cpymo/cpymo_parser.c"
+#include "../cpymo/cpymo_utils.c"
+#include "../cpymo/cpymo_color.c"
+#include "../cpymo/cpymo_gameconfig.c"
+#include "../cpymo/cpymo_assetloader.c"
+#include "../cpymo/cpymo_album.c"
+#include "../cpymo/cpymo_str.c"
+
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
-#include <cpymo_error.h>
-#include <cpymo_parser.h>
 #include <stdint.h>
-#include "cpymo_tool_image.h"
 
 #define STBI_NO_PSD
 #define STBI_NO_TGA
@@ -18,13 +23,18 @@
 #define STBI_NO_PIC
 #define STBI_NO_PNM
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../stb/stb_image.h"
 
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image_resize.h>
+#include "../stb/stb_image_resize.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include "../stb/stb_image_write.h"
+
+#ifdef LEAKCHECK
+#define STB_LEAKCHECK_IMPLEMENTATION
+#include "../stb/stb_leakcheck.h"
+#endif
 
 extern int cpymo_tool_invoke_generate_album_ui(int argc, const char **argv);
 extern int cpymo_tool_invoke_pack(int argc, const char **argv);

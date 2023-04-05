@@ -1,10 +1,11 @@
-﻿#include <cpymo_prelude.h>
+﻿#include "cpymo_tool_prelude.h"
+#include "../cpymo/cpymo_prelude.h"
 #include "cpymo_tool_image.h"
-#include <cpymo_parser.h>
-#include <cpymo_error.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "../cpymo/cpymo_parser.h"
+#include "../cpymo/cpymo_error.h"
 
 extern int help();
 extern int process_err(error_t);

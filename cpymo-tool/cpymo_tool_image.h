@@ -1,6 +1,6 @@
-#include <stb_image.h>
-#include <cpymo_error.h>
-#include <cpymo_parser.h>
+#include "../stb/stb_image.h"
+#include "../cpymo/cpymo_error.h"
+#include "../cpymo/cpymo_parser.h"
 
 typedef struct {
 	stbi_uc *pixels;
