@@ -368,6 +368,7 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 
 		return CPYMO_ERR_SUCC;
 	}
+#undef CHARA_BUF_SIZE
 
 	D("chara_cls") {
 		POP_ARG(id_str); ENSURE(id_str);

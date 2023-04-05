@@ -1,5 +1,5 @@
-#ifndef INCLUDE_cpymo_str
-#define INCLUDE_cpymo_str
+#ifndef INCLUDE_CPYMO_STR
+#define INCLUDE_CPYMO_STR
 
 #include <stddef.h>
 #include <stdbool.h>
