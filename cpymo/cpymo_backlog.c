@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+#include "cpymo_prelude.h"
 #include "cpymo_backlog.h"
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
