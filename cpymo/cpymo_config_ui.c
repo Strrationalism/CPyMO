@@ -26,12 +26,12 @@ typedef struct {
 	cpymo_key_pluse left, right, ok, mouse_button;
 } cpymo_config_ui;
 
-const static size_t item_bgm_vol = 0;
-const static size_t item_se_vol = 1;
-const static size_t item_vo_vol = 2;
-const static size_t item_text_speed = 3;
-const static size_t item_font_size = 4;
-const static size_t item_skip_already_readonly = 5;
+#define ITEM_BGM_VOL 0
+#define ITEM_SE_VOL 1
+#define ITEM_VO_VOL 2
+#define ITEM_TEXT_SPEED 3
+#define ITEM_FONT_SIZE 4
+#define ITEM_SKIP_ALREADY_READ_ONLY 5
 
 const static float side_padding = 16;
 
@@ -287,7 +287,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 
 		
 	INIT_ITEM(
-		item_bgm_vol, 
+		ITEM_BGM_VOL, 
 		l->config_bgmvol, 
 		0, 
 		10, 
@@ -297,7 +297,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		item_se_vol, 
+		ITEM_SE_VOL, 
 		l->config_sevol, 
 		0, 
 		10, 
@@ -307,7 +307,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		item_vo_vol, 
+		ITEM_VO_VOL, 
 		l->config_vovol, 
 		0, 
 		10, 
@@ -317,7 +317,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		item_text_speed, 
+		ITEM_TEXT_SPEED, 
 		l->config_sayspeed, 
 		min_say_speed, 
 		5, 
@@ -325,7 +325,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		text_speed_inc_dec_btn);
 
 	INIT_ITEM(
-		item_font_size, 
+		ITEM_FONT_SIZE, 
 		l->config_fontsize, 
 		12, 
 		32, 
@@ -333,7 +333,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		item_skip_already_readonly, 
+		ITEM_SKIP_ALREADY_READ_ONLY, 
 		l->config_skip_mode, 
 		0, 
 		1, 
@@ -349,12 +349,12 @@ static void cpymo_config_ui_extract_setting_title(cpymo_engine *e, int item_id)
 	const cpymo_localization *l = cpymo_localization_get(e);
 	const char *p = NULL;
 	switch (item_id) {
-	case item_bgm_vol: p = l->config_bgmvol; break;
-	case item_se_vol: p = l->config_sevol; break;
-	case item_vo_vol: p = l->config_vovol; break;
-	case item_font_size: p = l->config_fontsize; break;
-	case item_text_speed: p = l->config_sayspeed; break;
-	case item_skip_already_readonly: p = l->config_skip_mode; break;
+	case ITEM_BGM_VOL: p = l->config_bgmvol; break;
+	case ITEM_SE_VOL: p = l->config_sevol; break;
+	case ITEM_VO_VOL: p = l->config_vovol; break;
+	case ITEM_FONT_SIZE: p = l->config_fontsize; break;
+	case ITEM_TEXT_SPEED: p = l->config_sayspeed; break;
+	case ITEM_SKIP_ALREADY_READ_ONLY: p = l->config_skip_mode; break;
 	default: assert(false);
 	}
 
@@ -382,20 +382,20 @@ static error_t cpymo_config_ui_set_value(
 	char val_str_buf[8];
 	const char *val_str = val_str_buf;
 	switch (item_index) {
-	case item_bgm_vol:	
-	case item_se_vol:
-	case item_vo_vol:
+	case ITEM_BGM_VOL:	
+	case ITEM_SE_VOL:
+	case ITEM_VO_VOL:
 		if (val) sprintf(val_str_buf, "%d0%%", val);
 		else val_str = "0%";
 		break;
-	case item_font_size:
+	case ITEM_FONT_SIZE:
 		sprintf(val_str_buf, "%d", val);
 		break;
-	case item_text_speed:
+	case ITEM_TEXT_SPEED:
 		assert(val >= 0 && val <= 5);
 		val_str = l->config_sayspeeds[val];
 		break;
-	case item_skip_already_readonly:
+	case ITEM_SKIP_ALREADY_READ_ONLY:
 		assert(val == 0 || val == 1);
 		val_str = l->config_skip_modes[val];
 		break;
@@ -409,7 +409,7 @@ static error_t cpymo_config_ui_set_value(
 #endif
 
 	error_t err = CPYMO_ERR_SUCC;
-	if (!refreshing && item_index == item_font_size) goto JUST_REFRESH;
+	if (!refreshing && item_index == ITEM_FONT_SIZE) goto JUST_REFRESH;
 	
 	err = cpymo_backend_text_create(
 		&item->show_value, 
@@ -424,23 +424,23 @@ static error_t cpymo_config_ui_set_value(
 
 JUST_REFRESH:
 	switch (item_index) {
-	case item_bgm_vol:
+	case ITEM_BGM_VOL:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, (float)val / 10.0f);
 		break;
-	case item_se_vol:
+	case ITEM_SE_VOL:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio, (float)val / 10.0f);
 		break;
-	case item_vo_vol:
+	case ITEM_VO_VOL:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, (float)val / 10.0f);
 		break;
-	case item_font_size:
+	case ITEM_FONT_SIZE:
 		e->gameconfig.fontsize = (uint16_t)val;
 		cpymo_config_ui_refresh_items(e);
 		break;
-	case item_text_speed:
+	case ITEM_TEXT_SPEED:
 		e->gameconfig.textspeed = (unsigned)val;
 		break;
-	case item_skip_already_readonly:
+	case ITEM_SKIP_ALREADY_READ_ONLY:
 		e->config_skip_already_read_only = val > 0;
 		break;
 	default: assert(false);
@@ -636,7 +636,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		&cpymo_config_ui_ok,
 		&cpymo_config_ui_deleter,
 
-		cpymo_list_ui_encode_uint_node_enc(item_bgm_vol),
+		cpymo_list_ui_encode_uint_node_enc(ITEM_BGM_VOL),
 		&cpymo_config_ui_get_next_item,
 		&cpymo_config_ui_get_prev_item,
 		false,
