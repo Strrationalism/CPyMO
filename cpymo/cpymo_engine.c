@@ -21,8 +21,6 @@ static void cpymo_logo() {
 	puts("\\____/_/    \\__, /_/  /_/\\____/");
 	puts("           /____/");
 	puts("");
-	puts("https://github.com/Strrationalism/CPyMO");
-	puts("");
 }
 
 static error_t cpymo_engine_non_pymo_warning(cpymo_engine *e) 
