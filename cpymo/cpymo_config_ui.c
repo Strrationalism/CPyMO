@@ -26,28 +26,28 @@ typedef struct {
 	cpymo_key_pluse left, right, ok, mouse_button;
 } cpymo_config_ui;
 
-#define ITEM_BGM_VOL 0
-#define ITEM_SE_VOL 1
-#define ITEM_VO_VOL 2
-#define ITEM_TEXT_SPEED 3
-#define ITEM_FONT_SIZE 4
-#define ITEM_SKIP_ALREADY_READ_ONLY 5
+const static size_t item_bgm_vol = 0;
+const static size_t item_se_vol = 1;
+const static size_t item_vo_vol = 2;
+const static size_t item_text_speed = 3;
+const static size_t item_font_size = 4;
+const static size_t item_skip_already_readonly = 5;
 
-#define LR_PADDING 16
+const static float side_padding = 16;
 
 static void *cpymo_config_ui_get_next_item(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	uintptr_t x = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
+	uintptr_t x = cpymo_list_ui_encode_uint_node_dec(cur);
 
 	if (x >= CONFIG_ITEMS - 1) return NULL;
-	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC((x + 1));
+	else return cpymo_list_ui_encode_uint_node_enc((x + 1));
 }
 
 static void *cpymo_config_ui_get_prev_item(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	uintptr_t x = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
+	uintptr_t x = cpymo_list_ui_encode_uint_node_dec(cur);
 	if (x == 0) return NULL;
-	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC((x - 1));
+	else return cpymo_list_ui_encode_uint_node_enc((x - 1));
 }
 
 static inline void cpymo_config_ui_calc_layout(
@@ -85,7 +85,7 @@ static inline void cpymo_config_ui_calc_layout(
 	}
 
 	float right_edge = 
-		(float)e->gameconfig.imagesize_w - LR_PADDING;
+		(float)e->gameconfig.imagesize_w - side_padding;
 
 	*out_value_display_x = 
 		right_edge 
@@ -125,7 +125,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		dec_btn_x,
 		inc_dec_btn_symbol_y;
 
-	size_t item_index = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw);
+	size_t item_index = cpymo_list_ui_encode_uint_node_dec(node_to_draw);
 
 	cpymo_config_ui_calc_layout(
 		e, ui, 
@@ -139,7 +139,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 
 	if (item->show_name) {
 		cpymo_backend_text_draw(
-			item->show_name, LR_PADDING, text_y, cpymo_color_white, 1.0f,
+			item->show_name, side_padding, text_y, cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 	}
 
@@ -277,17 +277,17 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 	const cpymo_localization *l = cpymo_localization_get(e);
 
 	#ifdef LOW_FRAME_RATE
-	#define MIN_SAY_SPEED 5
+	const static int min_say_speed = t;
 	e->gameconfig.textspeed = 5;
-	#define TEXT_SPEED_INC_DEC_BTN false
+	const static bool text_speed_inc_dec_btn = false;
 	#else
-	#define MIN_SAY_SPEED 0
-	#define TEXT_SPEED_INC_DEC_BTN true
+	const static int min_say_speed = 0;
+	const static bool text_speed_inc_dec_btn = true;
 	#endif
 
 		
 	INIT_ITEM(
-		ITEM_BGM_VOL, 
+		item_bgm_vol, 
 		l->config_bgmvol, 
 		0, 
 		10, 
@@ -297,7 +297,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		ITEM_SE_VOL, 
+		item_se_vol, 
 		l->config_sevol, 
 		0, 
 		10, 
@@ -307,7 +307,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		ITEM_VO_VOL, 
+		item_vo_vol, 
 		l->config_vovol, 
 		0, 
 		10, 
@@ -317,15 +317,15 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		ITEM_TEXT_SPEED, 
+		item_text_speed, 
 		l->config_sayspeed, 
-		MIN_SAY_SPEED, 
+		min_say_speed, 
 		5, 
 		(int)e->gameconfig.textspeed,
-		TEXT_SPEED_INC_DEC_BTN);
+		text_speed_inc_dec_btn);
 
 	INIT_ITEM(
-		ITEM_FONT_SIZE, 
+		item_font_size, 
 		l->config_fontsize, 
 		12, 
 		32, 
@@ -333,14 +333,13 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		true);
 
 	INIT_ITEM(
-		ITEM_SKIP_ALREADY_READ_ONLY, 
+		item_skip_already_readonly, 
 		l->config_skip_mode, 
 		0, 
 		1, 
 		(int)e->config_skip_already_read_only,
 		false);
 	
-	#undef MIN_SAY_SPEED
 	#undef INIT_ITEM
 }
 
@@ -350,12 +349,12 @@ static void cpymo_config_ui_extract_setting_title(cpymo_engine *e, int item_id)
 	const cpymo_localization *l = cpymo_localization_get(e);
 	const char *p = NULL;
 	switch (item_id) {
-	case ITEM_BGM_VOL: p = l->config_bgmvol; break;
-	case ITEM_SE_VOL: p = l->config_sevol; break;
-	case ITEM_VO_VOL: p = l->config_vovol; break;
-	case ITEM_FONT_SIZE: p = l->config_fontsize; break;
-	case ITEM_TEXT_SPEED: p = l->config_sayspeed; break;
-	case ITEM_SKIP_ALREADY_READ_ONLY: p = l->config_skip_mode; break;
+	case item_bgm_vol: p = l->config_bgmvol; break;
+	case item_se_vol: p = l->config_sevol; break;
+	case item_vo_vol: p = l->config_vovol; break;
+	case item_font_size: p = l->config_fontsize; break;
+	case item_text_speed: p = l->config_sayspeed; break;
+	case item_skip_already_readonly: p = l->config_skip_mode; break;
 	default: assert(false);
 	}
 
@@ -383,20 +382,20 @@ static error_t cpymo_config_ui_set_value(
 	char val_str_buf[8];
 	const char *val_str = val_str_buf;
 	switch (item_index) {
-	case ITEM_BGM_VOL:	
-	case ITEM_SE_VOL:
-	case ITEM_VO_VOL:
+	case item_bgm_vol:	
+	case item_se_vol:
+	case item_vo_vol:
 		if (val) sprintf(val_str_buf, "%d0%%", val);
 		else val_str = "0%";
 		break;
-	case ITEM_FONT_SIZE:
+	case item_font_size:
 		sprintf(val_str_buf, "%d", val);
 		break;
-	case ITEM_TEXT_SPEED:
+	case item_text_speed:
 		assert(val >= 0 && val <= 5);
 		val_str = l->config_sayspeeds[val];
 		break;
-	case ITEM_SKIP_ALREADY_READ_ONLY:
+	case item_skip_already_readonly:
 		assert(val == 0 || val == 1);
 		val_str = l->config_skip_modes[val];
 		break;
@@ -410,7 +409,7 @@ static error_t cpymo_config_ui_set_value(
 #endif
 
 	error_t err = CPYMO_ERR_SUCC;
-	if (!refreshing && item_index == ITEM_FONT_SIZE) goto JUST_REFRESH;
+	if (!refreshing && item_index == item_font_size) goto JUST_REFRESH;
 	
 	err = cpymo_backend_text_create(
 		&item->show_value, 
@@ -425,23 +424,23 @@ static error_t cpymo_config_ui_set_value(
 
 JUST_REFRESH:
 	switch (item_index) {
-	case ITEM_BGM_VOL:
+	case item_bgm_vol:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_BGM, &e->audio, (float)val / 10.0f);
 		break;
-	case ITEM_SE_VOL:
+	case item_se_vol:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_SE, &e->audio, (float)val / 10.0f);
 		break;
-	case ITEM_VO_VOL:
+	case item_vo_vol:
 		cpymo_audio_set_channel_volume(CPYMO_AUDIO_CHANNEL_VO, &e->audio, (float)val / 10.0f);
 		break;
-	case ITEM_FONT_SIZE:
+	case item_font_size:
 		e->gameconfig.fontsize = (uint16_t)val;
 		cpymo_config_ui_refresh_items(e);
 		break;
-	case ITEM_TEXT_SPEED:
+	case item_text_speed:
 		e->gameconfig.textspeed = (unsigned)val;
 		break;
-	case ITEM_SKIP_ALREADY_READ_ONLY:
+	case item_skip_already_readonly:
 		e->config_skip_already_read_only = val > 0;
 		break;
 	default: assert(false);
@@ -490,7 +489,7 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_key_pluse_update(&ui->ok, dt, e->input.ok);
 	cpymo_key_pluse_update(&ui->mouse_button, dt, e->input.mouse_button);
 
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const int i = (int)cpymo_list_ui_encode_uint_node_dec(sel);
 
 	if (ui->items[i].show_inc_dec_button)
 	{
@@ -566,7 +565,7 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 static error_t cpymo_config_ui_ok(cpymo_engine *e, void *sel)
 {
 	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const int i = (int)cpymo_list_ui_encode_uint_node_dec(sel);
 
 	return ui->items[i].show_inc_dec_button ?
 		CPYMO_ERR_SUCC :
@@ -577,7 +576,7 @@ static error_t cpymo_config_ui_ok(cpymo_engine *e, void *sel)
 #ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
 {
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const int i = (int)cpymo_list_ui_encode_uint_node_dec(sel);
 	cpymo_config_ui_extract_setting_title(e, i);
 
 	return CPYMO_ERR_SUCC;
@@ -637,7 +636,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		&cpymo_config_ui_ok,
 		&cpymo_config_ui_deleter,
 
-		CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(ITEM_BGM_VOL),
+		cpymo_list_ui_encode_uint_node_enc(item_bgm_vol),
 		&cpymo_config_ui_get_next_item,
 		&cpymo_config_ui_get_prev_item,
 		false,

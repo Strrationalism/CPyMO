@@ -7,15 +7,20 @@
 #include "cpymo_error.h"
 #include "cpymo_color.h"
 
-#define CPYMO_PYMO_VERSION_MAJOR 1
-#define CPYMO_PYMO_VERSION_MINOR 2
 
 typedef struct {
 	uint16_t major;
 	uint16_t minor;
 } cpymo_pymo_version;
 
-bool cpymo_pymo_version_compatible(cpymo_pymo_version version);
+extern const cpymo_pymo_version cpymo_pymo_version_current;
+
+static inline bool cpymo_pymo_version_compatible(
+	cpymo_pymo_version game, cpymo_pymo_version engine) {
+	return
+		(game.major < engine.major) ||
+		(game.major == engine.major && game.minor <= engine.minor);
+}
 
 typedef struct {
 	char gametitle[256];
@@ -47,11 +52,6 @@ typedef struct {
 
 	cpymo_pymo_version engineversion;
 } cpymo_gameconfig;
-
-#define CPYMO_GAMECONFIG_NAMEALIGN_MIDDLE 0
-#define CPYMO_GAMECONFIG_NAMEALIGN_LEFT 1
-#define CPYMO_GAMECONFIG_NAMEALIGN_RIGHT 2
-
 error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream, size_t len);
 error_t cpymo_gameconfig_parse_from_file(cpymo_gameconfig *out_config, const char *path);
 
