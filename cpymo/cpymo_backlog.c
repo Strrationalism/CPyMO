@@ -193,10 +193,6 @@ static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)
 	return CPYMO_ERR_SUCC;
 }
 
-static void cpymo_backlog_ui_deleter(cpymo_engine *e, void *ui_)
-{
-}
-
 static void *cpymo_backlog_ui_get_next(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
 	size_t index = (size_t)DEC(cur);
@@ -279,7 +275,7 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 		sizeof(cpymo_backlog_ui),
 		&cpymo_backlog_ui_draw_node,
 		&cpymo_backlog_ui_ok,
-		&cpymo_backlog_ui_deleter,
+		&cpymo_ui_empty_deleter,
 		ENC(first),
 		&cpymo_backlog_ui_get_next,
 		&cpymo_backlog_ui_get_prev,
