@@ -149,10 +149,10 @@ function Convert-Images($asstype, $src_format, $dst_format, $src_dir, $dst_dir) 
         $dst_name = "$dst_dir/$name.$dst_format"
 
         if (-not (Transparent-Filter $asstype $name)) {
-            cpymo-tool resize "$($_.FullName)" "$($dst_name)" $ratio $ratio
+            cpymo-tool resize-image "$($_.FullName)" "$($dst_name)" $ratio $ratio
         }
         else {
-            cpymo-tool resize "$($_.FullName)" "$($dst_name)" $ratio $ratio $cpymo_tool_transparent_arg
+            cpymo-tool resize-image "$($_.FullName)" "$($dst_name)" $ratio $ratio $cpymo_tool_transparent_arg
         }
 
         
@@ -216,7 +216,7 @@ if (Test-Path $gamedir/chara) {
 
 Convert-Images "system" "png" "png" "$gamedir/system" "$outdir/system"
 
-if ($spec.Movie -and (Test-Path "$gamedir/video") -and ($gameconfig["playvideo"].Trim() -eq "1")) {
+if ($spec.Movie -and (Test-Path "$gamedir/video")) {
     $gameconfig["playvideo"] = 1
 
     md "$outdir/video"

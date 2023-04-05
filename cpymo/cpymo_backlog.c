@@ -1,4 +1,4 @@
-﻿#include "cpymo_prelude.h"
+#include "cpymo_prelude.h"
 #include "cpymo_backlog.h"
 #include "cpymo_engine.h"
 #include "cpymo_list_ui.h"
@@ -145,12 +145,10 @@ error_t cpymo_backlog_record_write_text(
 	return CPYMO_ERR_SUCC;
 }
 
-#define ENC(INDEX) CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX)
-#define DEC(PTR) CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR)
-
 static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
-	const cpymo_backlog_record *rec = &e->backlog.records[DEC(node_to_draw)];
+	const cpymo_backlog_record *rec = &e->backlog.records[
+		cpymo_list_ui_encode_uint_node_dec(node_to_draw)];
 
 	const float font_size = rec->font_size;
 	y += font_size;
@@ -185,7 +183,8 @@ static void cpymo_backlog_ui_draw_node(const cpymo_engine *e, const void *node_t
 
 static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)
 {
-	const cpymo_backlog_record *rec = &e->backlog.records[DEC(selected)];
+	const cpymo_backlog_record *rec = &e->backlog.records[
+		cpymo_list_ui_encode_uint_node_dec(selected)];
 	if (rec->vo_filename[0]) {
 		return cpymo_audio_vo_play(e, cpymo_str_pure(rec->vo_filename));
 	}
@@ -195,26 +194,26 @@ static error_t cpymo_backlog_ui_ok(struct cpymo_engine *e, void *selected)
 
 static void *cpymo_backlog_ui_get_next(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	size_t index = (size_t)DEC(cur);
+	size_t index = (size_t)cpymo_list_ui_encode_uint_node_dec(cur);
 	if (index) index--;
 	else index = CPYMO_BACKLOG_MAX_RECORDS - 1;
 
 	if (index == e->backlog.next_record_to_write) return NULL;
 	if (e->backlog.records[index].text == NULL) return NULL;
 
-	return ENC(index);
+	return cpymo_list_ui_encode_uint_node_enc(index);
 }
 
 static void *cpymo_backlog_ui_get_prev(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	size_t index = (size_t)DEC(cur);
+	size_t index = (size_t)cpymo_list_ui_encode_uint_node_dec(cur);
 	if (index >= CPYMO_BACKLOG_MAX_RECORDS - 1) index = 0;
 	else index++;
 
 	if (index == e->backlog.next_record_to_write) return NULL;
 	if (e->backlog.records[index].text == NULL) return NULL;
 
-	return ENC(index);
+	return cpymo_list_ui_encode_uint_node_enc(index);
 }
 
 typedef struct {
@@ -254,7 +253,7 @@ static void cpymo_backlog_ui_extract_text(cpymo_engine *e, size_t index)
 static error_t cpymo_backlog_ui_selection_changed(cpymo_engine *e, void *selected)
 {
 	if (selected) {
-		size_t index = (size_t)DEC(selected);
+		size_t index = (size_t)cpymo_list_ui_encode_uint_node_dec(selected);
 		cpymo_backlog_ui_extract_text(e, index);
 	}
 	return CPYMO_ERR_SUCC;
@@ -276,7 +275,7 @@ error_t cpymo_backlog_ui_enter(cpymo_engine *e)
 		&cpymo_backlog_ui_draw_node,
 		&cpymo_backlog_ui_ok,
 		&cpymo_ui_empty_deleter,
-		ENC(first),
+		cpymo_list_ui_encode_uint_node_enc(first),
 		&cpymo_backlog_ui_get_next,
 		&cpymo_backlog_ui_get_prev,
 		true,

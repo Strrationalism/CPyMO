@@ -15,7 +15,7 @@ const extern bool fill_screen;
 const extern bool enhanced_3ds_display_mode;
 #endif
 
-#define SLIDE_LIMIT 10.0f
+const static float slide_limit = 10.0f;
 
 typedef struct cpymo_list_ui {
 	cpymo_ui_deleter ui_data_deleter;
@@ -431,7 +431,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 			return CPYMO_ERR_SUCC;
 	}
 
-	if (mouse_button_state == cpymo_key_hold_result_just_hold && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
+	if (mouse_button_state == cpymo_key_hold_result_just_hold && ui->scroll_delta_y_sum < 5.0f && ui->mouse_touch_move_y_sum < slide_limit) {
 		if (ui->just_hold_callback) 
 			return ui->just_hold_callback(e);
 		else {
@@ -444,7 +444,7 @@ static error_t cpymo_list_ui_update(cpymo_engine *e, void *ui_data, float d)
 		error_t err = ui->ok(e, obj);
 		CPYMO_THROW(err);
 	}
-	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f && ui->mouse_touch_move_y_sum < SLIDE_LIMIT) {
+	else if (mouse_button_state == cpymo_key_hold_result_just_released && ui->mouse_key_press_time < 0.15f && ui->mouse_touch_move_y_sum < slide_limit) {
 		int selected = cpymo_list_ui_get_selection_relative_to_cur_by_mouse(e);
 		if (selected != INT_MAX) {
 			if (ui->selection_relative_to_cur != selected) {
@@ -486,7 +486,7 @@ static void cpymo_list_ui_draw(const cpymo_engine *e, const void *ui_data)
 	const cpymo_list_ui *ui = (cpymo_list_ui *)ui_data;
 
 	bool is_sliding = 
-		e->input.mouse_button && ui->scroll_delta_y_sum >= SLIDE_LIMIT;
+		e->input.mouse_button && ui->scroll_delta_y_sum >= slide_limit;
 	bool is_sliding_inertia = 
 		fabs(ui->scroll_speed) > 0.001f && !e->input.mouse_button;
 	if (!is_sliding && !is_sliding_inertia) {

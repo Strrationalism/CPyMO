@@ -33,21 +33,21 @@ typedef struct {
 #define ITEM_FONT_SIZE 4
 #define ITEM_SKIP_ALREADY_READ_ONLY 5
 
-#define LR_PADDING 16
+const static float side_padding = 16;
 
 static void *cpymo_config_ui_get_next_item(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	uintptr_t x = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
+	uintptr_t x = cpymo_list_ui_encode_uint_node_dec(cur);
 
 	if (x >= CONFIG_ITEMS - 1) return NULL;
-	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC((x + 1));
+	else return cpymo_list_ui_encode_uint_node_enc((x + 1));
 }
 
 static void *cpymo_config_ui_get_prev_item(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	uintptr_t x = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
+	uintptr_t x = cpymo_list_ui_encode_uint_node_dec(cur);
 	if (x == 0) return NULL;
-	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC((x - 1));
+	else return cpymo_list_ui_encode_uint_node_enc((x - 1));
 }
 
 static inline void cpymo_config_ui_calc_layout(
@@ -85,7 +85,7 @@ static inline void cpymo_config_ui_calc_layout(
 	}
 
 	float right_edge = 
-		(float)e->gameconfig.imagesize_w - LR_PADDING;
+		(float)e->gameconfig.imagesize_w - side_padding;
 
 	*out_value_display_x = 
 		right_edge 
@@ -125,7 +125,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 		dec_btn_x,
 		inc_dec_btn_symbol_y;
 
-	size_t item_index = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw);
+	size_t item_index = cpymo_list_ui_encode_uint_node_dec(node_to_draw);
 
 	cpymo_config_ui_calc_layout(
 		e, ui, 
@@ -139,7 +139,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 
 	if (item->show_name) {
 		cpymo_backend_text_draw(
-			item->show_name, LR_PADDING, text_y, cpymo_color_white, 1.0f,
+			item->show_name, side_padding, text_y, cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);
 	}
 
@@ -277,12 +277,12 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 	const cpymo_localization *l = cpymo_localization_get(e);
 
 	#ifdef LOW_FRAME_RATE
-	#define MIN_SAY_SPEED 5
+	const static int min_say_speed = t;
 	e->gameconfig.textspeed = 5;
-	#define TEXT_SPEED_INC_DEC_BTN false
+	const static bool text_speed_inc_dec_btn = false;
 	#else
-	#define MIN_SAY_SPEED 0
-	#define TEXT_SPEED_INC_DEC_BTN true
+	const static int min_say_speed = 0;
+	const static bool text_speed_inc_dec_btn = true;
 	#endif
 
 		
@@ -319,10 +319,10 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 	INIT_ITEM(
 		ITEM_TEXT_SPEED, 
 		l->config_sayspeed, 
-		MIN_SAY_SPEED, 
+		min_say_speed, 
 		5, 
 		(int)e->gameconfig.textspeed,
-		TEXT_SPEED_INC_DEC_BTN);
+		text_speed_inc_dec_btn);
 
 	INIT_ITEM(
 		ITEM_FONT_SIZE, 
@@ -340,7 +340,6 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 		(int)e->config_skip_already_read_only,
 		false);
 	
-	#undef MIN_SAY_SPEED
 	#undef INIT_ITEM
 }
 
@@ -490,7 +489,7 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 	cpymo_key_pluse_update(&ui->ok, dt, e->input.ok);
 	cpymo_key_pluse_update(&ui->mouse_button, dt, e->input.mouse_button);
 
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const int i = (int)cpymo_list_ui_encode_uint_node_dec(sel);
 
 	if (ui->items[i].show_inc_dec_button)
 	{
@@ -566,7 +565,7 @@ static error_t cpymo_config_ui_update(cpymo_engine *e, float dt, void *sel)
 static error_t cpymo_config_ui_ok(cpymo_engine *e, void *sel)
 {
 	cpymo_config_ui *ui = (cpymo_config_ui *)cpymo_list_ui_data(e);
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const int i = (int)cpymo_list_ui_encode_uint_node_dec(sel);
 
 	return ui->items[i].show_inc_dec_button ?
 		CPYMO_ERR_SUCC :
@@ -577,7 +576,7 @@ static error_t cpymo_config_ui_ok(cpymo_engine *e, void *sel)
 #ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_config_ui_visual_im_help_selection_changed_callback(cpymo_engine *e, void *sel)
 {
-	const int i = (int)CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(sel);
+	const int i = (int)cpymo_list_ui_encode_uint_node_dec(sel);
 	cpymo_config_ui_extract_setting_title(e, i);
 
 	return CPYMO_ERR_SUCC;
@@ -637,7 +636,7 @@ error_t cpymo_config_ui_enter(cpymo_engine *e)
 		&cpymo_config_ui_ok,
 		&cpymo_config_ui_deleter,
 
-		CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(ITEM_BGM_VOL),
+		cpymo_list_ui_encode_uint_node_enc(ITEM_BGM_VOL),
 		&cpymo_config_ui_get_next_item,
 		&cpymo_config_ui_get_prev_item,
 		false,

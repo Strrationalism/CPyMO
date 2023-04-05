@@ -126,7 +126,7 @@ static inline void cpymo_engine_extract_text_cstr(cpymo_engine *e, const char *s
 
 #else
 #define cpymo_engine_extract_text(A, B)
-#define cpymo_engine_extract_text_submit(A)
+static inline void cpymo_engine_extract_text_submit(cpymo_engine *e) {}
 #define cpymo_engine_extract_text_cstr(A, B)
 #endif
 

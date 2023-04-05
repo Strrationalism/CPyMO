@@ -6,9 +6,6 @@
 #include "cpymo_key_hold.h"
 #include <stdint.h>
 
-#define CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(INDEX) ((void *)((INDEX) + 1))
-#define CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(PTR) (((uintptr_t)(PTR)) - 1)
-
 typedef void *(*cpymo_list_ui_get_node)(const struct cpymo_engine *, const void *ui_data, const void *cur);
 typedef void (*cpymo_list_ui_draw_node)(const struct cpymo_engine *, const void *node_to_draw, float y);
 typedef error_t (*cpymo_list_ui_ok)(struct cpymo_engine *, void *selected);
@@ -57,5 +54,13 @@ void cpymo_list_ui_exit(struct cpymo_engine *e);
 void cpymo_list_ui_enable_loop(struct cpymo_engine *);
 
 const void *cpymo_list_ui_get_current_selected_const(const struct cpymo_engine *);
+
+static inline void *cpymo_list_ui_encode_uint_node_enc(uintptr_t idx) {
+	return ((void *)((idx) + 1));
+}
+
+static inline uintptr_t cpymo_list_ui_encode_uint_node_dec(const void *ptr) {
+	return (((uintptr_t)(ptr)) - 1);
+}
 
 #endif
