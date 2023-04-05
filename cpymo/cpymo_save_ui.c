@@ -9,7 +9,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_SAVES 31
+#ifndef CPYMO_MAX_SAVES
+#define CPYMO_MAX_SAVES 31
+#endif
 
 typedef struct {
 	cpymo_backend_text text;
@@ -20,20 +22,20 @@ typedef struct {
 } cpymo_save_ui_item;
 
 typedef struct {
-	cpymo_save_ui_item items[MAX_SAVES];
+	cpymo_save_ui_item items[CPYMO_MAX_SAVES];
 	bool is_load_ui;
 } cpymo_save_ui;
 
 #ifdef DISABLE_AUTOSAVE
-#define SAVE_UI_FIRST_SLOT 0
+const static size_t first_slot = 0;
 #else
-#define SAVE_UI_FIRST_SLOT 1
+const static size_t first_slot = 1;
 #endif
 
 static void cpymo_save_ui_draw_node(const cpymo_engine *e, const void *node_to_draw, float y)
 {
 	const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data_const(e);
-	const cpymo_save_ui_item *item = &ui->items[CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(node_to_draw)];
+	const cpymo_save_ui_item *item = &ui->items[cpymo_list_ui_encode_uint_node_dec(node_to_draw)];
 
 	cpymo_backend_text_draw(
 		item->text,
@@ -47,7 +49,7 @@ static void cpymo_save_ui_draw_node(const cpymo_engine *e, const void *node_to_d
 static error_t cpymo_save_confirm(cpymo_engine *e, void *data, bool confirm)
 {
 	if (!confirm) return CPYMO_ERR_SUCC;
-	uintptr_t save_id = (uintptr_t)data;
+	uintptr_t save_id = (uintptr_t)(data);
 	error_t err = cpymo_save_write(e, (unsigned short)save_id);
 
 	const cpymo_localization *l = cpymo_localization_get(e);
@@ -93,7 +95,7 @@ static error_t cpymo_save_ui_ok(cpymo_engine *e, void *selected)
 {
 	cpymo_save_ui *ui = (cpymo_save_ui *)cpymo_list_ui_data(e);
 
-	uintptr_t save_id = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(selected);
+	uintptr_t save_id = cpymo_list_ui_encode_uint_node_dec(selected);
 
 	if (ui->is_load_ui) {
 		if (!ui->items[save_id].is_empty_save) {
@@ -111,7 +113,7 @@ static void cpymo_save_ui_deleter(cpymo_engine *e, void *ui_data)
 {
 	cpymo_save_ui *ui = (cpymo_save_ui *)cpymo_list_ui_data(e);
 
-	for (size_t i = 0; i < MAX_SAVES; ++i) {
+	for (size_t i = 0; i < CPYMO_MAX_SAVES; ++i) {
 		if (ui->items[i].text) 
 			cpymo_backend_text_free(ui->items[i].text);
 #ifdef ENABLE_TEXT_EXTRACT
@@ -122,26 +124,26 @@ static void cpymo_save_ui_deleter(cpymo_engine *e, void *ui_data)
 
 static void* cpymo_save_ui_get_next(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
-	uintptr_t i = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
-	if (i >= MAX_SAVES - 1) 
+	uintptr_t i = cpymo_list_ui_encode_uint_node_dec(cur);
+	if (i >= CPYMO_MAX_SAVES - 1) 
 		return NULL;
-	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(i + 1);
+	else return cpymo_list_ui_encode_uint_node_enc(i + 1);
 }
 
 static void* cpymo_save_ui_get_prev(const cpymo_engine *e, const void *ui_data, const void *cur)
 {
 	const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data_const(e);
 
-	uintptr_t i = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
-	if (i == (ui->is_load_ui ? 0 : SAVE_UI_FIRST_SLOT)) return NULL;
-	else return CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(i - 1);
+	uintptr_t i = cpymo_list_ui_encode_uint_node_dec(cur);
+	if (i == (ui->is_load_ui ? 0 : first_slot)) return NULL;
+	else return cpymo_list_ui_encode_uint_node_enc(i - 1);
 }
 
 #ifdef ENABLE_TEXT_EXTRACT
 static error_t cpymo_save_ui_visual_impaired_selection_changed(cpymo_engine *e, void *cur)
 {
 	if (cur) {
-		uintptr_t i = CPYMO_LIST_UI_ENCODE_UINT_NODE_DEC(cur);
+		uintptr_t i = cpymo_list_ui_encode_uint_node_dec(cur);
 		const cpymo_save_ui *ui = (const cpymo_save_ui *)cpymo_list_ui_data(e);
 		cpymo_backend_text_extract(ui->items[i].orginal_text);
 	}
@@ -152,7 +154,7 @@ static error_t cpymo_save_ui_visual_impaired_selection_changed(cpymo_engine *e, 
 error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 {
 	cpymo_save_ui *ui = NULL;
-	uintptr_t first = is_load_ui ? 0 : SAVE_UI_FIRST_SLOT;
+	uintptr_t first = is_load_ui ? 0 : first_slot;
 	error_t err = cpymo_list_ui_enter(
 		e,
 		(void **)&ui,
@@ -160,7 +162,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 		&cpymo_save_ui_draw_node,
 		&cpymo_save_ui_ok,
 		&cpymo_save_ui_deleter,
-		CPYMO_LIST_UI_ENCODE_UINT_NODE_ENC(first),
+		cpymo_list_ui_encode_uint_node_enc(first),
 		&cpymo_save_ui_get_next,
 		&cpymo_save_ui_get_prev,
 		false,
@@ -176,7 +178,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 
 	ui->is_load_ui = is_load_ui;
 
-	for (size_t i = 0; i < MAX_SAVES; ++i) {
+	for (size_t i = 0; i < CPYMO_MAX_SAVES; ++i) {
 		ui->items[i].text = NULL;
 		ui->items[i].is_empty_save = false;
 	}
@@ -185,7 +187,7 @@ error_t cpymo_save_ui_enter(cpymo_engine *e, bool is_load_ui)
 	size_t characters = (size_t)((float)e->gameconfig.imagesize_w / fontsize * 1.3f);
 
 	char text_buf[1024];
-	for (size_t i = is_load_ui ? 0 : SAVE_UI_FIRST_SLOT; i < MAX_SAVES; ++i) {
+	for (size_t i = is_load_ui ? 0 : first_slot; i < CPYMO_MAX_SAVES; ++i) {
 		FILE *save = cpymo_save_open_read(e, (unsigned short)i);
 		cpymo_save_title title;
 		title.say_name = NULL;

@@ -1,15 +1,12 @@
 ﻿#include "cpymo_prelude.h"
 #include "cpymo_engine.h"
 #include "cpymo_interpreter.h"
-#include <cpymo_backend_image.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <cpymo_backend_input.h>
 #include "cpymo_msgbox_ui.h"
 #include "cpymo_save_global.h"
-#include <cpymo_backend_input.h>
 #include "cpymo_localization.h"
 
 static void cpymo_logo() {
@@ -23,11 +20,6 @@ static void cpymo_logo() {
 	puts("/ /___/ ____/ /_/ / /  / / /_/ /");
 	puts("\\____/_/    \\__, /_/  /_/\\____/");
 	puts("           /____/");
-	puts("");
-	puts("This software is licensed under AGPLv3.");
-	puts("You can only run copies of game that you LEGALLY own.");
-	puts("");
-	puts("https://github.com/Strrationalism/CPyMO");
 	puts("");
 }
 
@@ -241,7 +233,8 @@ error_t cpymo_engine_init(cpymo_engine *out, const char *gamedir)
 		cpymo_wait_callback_after_seconds(&out->wait, 0, &cpymo_engine_non_pymo_warning);
 	}
 
-	if (!cpymo_pymo_version_compatible(out->gameconfig.engineversion)) {
+	if (!cpymo_pymo_version_compatible(
+			out->gameconfig.engineversion, cpymo_pymo_version_current)) {
 		cpymo_wait_callback_after_seconds(
 			&out->wait, 0, 
 			&cpymo_engine_version_warning);
@@ -331,10 +324,8 @@ void cpymo_engine_exit(cpymo_engine *e)
 
 error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * redraw)
 {
-	#define REDRAW *redraw |= engine->redraw; engine->redraw = false
-
 	error_t err = CPYMO_ERR_SUCC;
-	REDRAW;
+	*redraw |= engine->redraw; engine->redraw = false;
 
 	engine->prev_input = engine->input;
 	engine->input = cpymo_input_snapshot();
@@ -403,14 +394,12 @@ error_t cpymo_engine_update(cpymo_engine *engine, float delta_time_sec, bool * r
 		}
 	}
 
-	REDRAW;
+	*redraw |= engine->redraw; engine->redraw = false;
 
 	#if CPYMO_FEATURE_LEVEL >= 1 && defined LEAKCHECK
 	if (engine->feature_level >= 1) 
 		cpymo_lua_context_leakcheck(&engine->lua);
 	#endif
-
-	#undef REDRAW
 	return err;
 }
 

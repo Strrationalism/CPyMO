@@ -4,8 +4,8 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <endianness.h>
-#include <stb_image.h>
+#include "../endianness.h/endianness.h"
+#include "../stb/stb_image.h"
 #include <assert.h>
 
 error_t cpymo_package_open(cpymo_package *out_package, const char * path)

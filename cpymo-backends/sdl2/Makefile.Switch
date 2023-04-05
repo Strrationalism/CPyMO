@@ -44,7 +44,7 @@ TARGET		:=	cpymo
 BUILD		:=	build.Switch
 SOURCES		:=	../sdl2 ../../cpymo
 #DATA		:=	data
-INCLUDES	:=	../include ../../cpymo ../../stb ../../endianness.h
+INCLUDES	:=	
 #ROMFS	:=	romfs
 
 #---------------------------------------------------------------------------------

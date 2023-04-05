@@ -1,8 +1,8 @@
-﻿#include <cpymo_prelude.h>
-#include <cpymo_backend_input.h>
+﻿#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../include/cpymo_backend_input.h"
 #include <3ds.h>
 #include <stdlib.h>
-#include <cpymo_engine.h>
 
 bool enhanced_3ds_display_mode_touch_ui_enabled(void);
 const extern bool enhanced_3ds_display_mode;

@@ -67,7 +67,4 @@ static inline bool cpymo_utils_point_in_rect_xywh(
 
 #define CPYMO_ARR_COUNT(ARR) (sizeof(ARR) / sizeof(ARR[0]))
 
-#define CPYMO_FOREACH_ARR(INDEX, ARR) \
-	for (size_t INDEX = 0; INDEX < CPYMO_ARR_COUNT(ARR); ++INDEX)
-
 #endif

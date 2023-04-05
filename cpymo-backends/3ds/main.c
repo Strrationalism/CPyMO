@@ -4,27 +4,27 @@
 #define STBI_NO_PIC
 #define STBI_NO_PNM
 
-#include <cpymo_prelude.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_engine.h"
+#include "../../cpymo/cpymo_game_selector.h"
 #include <3ds.h>
 #include <stdio.h>
-#include <cpymo_engine.h>
 #include <citro3d.h>
 #include <citro2d.h>
 #include <stdbool.h>
 #include <libavutil/log.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../../stb/stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include "../../stb/stb_image_write.h"
 
 #define STB_DS_IMPLEMENTATION
-#include <stb_ds.h>
+#include "../../stb/stb_ds.h"
 
-#include <cpymo_backend_text.h>
-#include <cpymo_backend_save.h>
-#include <cpymo_game_selector.h>
+#include "../include/cpymo_backend_text.h"
+#include "../include/cpymo_backend_save.h"
 
 cpymo_engine engine;
 C3D_RenderTarget *screen1, *screen2, *screen3 = NULL;

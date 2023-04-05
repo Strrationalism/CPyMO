@@ -2,9 +2,9 @@
 #if CPYMO_FEATURE_LEVEL >= 1
 #include "cpymo_engine.h"
 
+#include "../stb/stb_image.h"
 #include <lauxlib.h>
 #include <lualib.h>
-#include <stb_image.h>
 #include <string.h>
 
 error_t cpymo_lua_api_render_class_image_constructor(

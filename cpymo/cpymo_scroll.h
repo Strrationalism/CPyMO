@@ -1,7 +1,7 @@
 #ifndef INCLUDE_CPYMO_SCROLL
 #define INCLUDE_CPYMO_SCROLL
 
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 #include "cpymo_parser.h"
 #include "cpymo_tween.h"
 #include "cpymo_assetloader.h"

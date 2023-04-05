@@ -1,9 +1,9 @@
-#include <cpymo_prelude.h>
-#include <cpymo_error.h>
-#include <cpymo_color.h>
-#include <cpymo_str.h>
-#include <cpymo_backend_software.h>
-#include <cpymo_backend_text.h>
+#include "../../cpymo/cpymo_prelude.h"
+#include "../../cpymo/cpymo_error.h"
+#include "../../cpymo/cpymo_color.h"
+#include "../../cpymo/cpymo_str.h"
+#include "../include/cpymo_backend_text.h"
+#include "cpymo_backend_software.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>

@@ -1,8 +1,7 @@
 #ifndef INCLUDE_CPYMO_ENGINE
 #define INCLUDE_CPYMO_ENGINE
 
-#include "cpymo_prelude.h"
-#include <cpymo_backend_input.h>
+#include "../cpymo-backends/include/cpymo_backend_input.h"
 #include "cpymo_assetloader.h"
 #include "cpymo_gameconfig.h"
 #include "cpymo_error.h"
@@ -136,7 +135,7 @@ static inline void cpymo_engine_extract_text_cstr(cpymo_engine *e, const char *s
 
 #else
 #define cpymo_engine_extract_text(A, B)
-#define cpymo_engine_extract_text_submit(A)
+static inline void cpymo_engine_extract_text_submit(cpymo_engine *e) {}
 #define cpymo_engine_extract_text_cstr(A, B)
 #endif
 

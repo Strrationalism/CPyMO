@@ -13,11 +13,7 @@ CFLAGS += \
 	-DSCREEN_RESIZABLE \
 	-DLOAD_GAME_ICON \
 	-DTOGGLE_FULLSCREEN \
-	-DDISABLE_IMAGE_SCALING \
-	-I../../cpymo \
-	-I../../endianness.h \
-	-I../../stb \
-	-I../include
+	-DDISABLE_IMAGE_SCALING
 
 ifeq ($(ENABLE_EXIT_CONFIRM), 1)
 CFLAGS += -DENABLE_EXIT_CONFIRM

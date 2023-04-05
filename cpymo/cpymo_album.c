@@ -1,7 +1,7 @@
 ﻿#include "cpymo_prelude.h"
-#include <stb_image_resize.h>
-#include <stb_image_write.h>
-#include <stb_image.h>
+#include "../stb/stb_image_resize.h"
+#include "../stb/stb_image_write.h"
+#include "../stb/stb_image.h"
 #include <memory.h>
 #include <string.h>
 #include <math.h>
@@ -12,8 +12,8 @@
 #include <assert.h>
 #include <ctype.h>
 
-#define CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE 25
-#define CPYMO_ALBUM_SCROLL_TIME 3.0f
+#define ALBUM_MAX_CGS_SINGLE_PAGE 25
+const static float album_scroll_time = 3.0f;
 
 #ifdef CPYMO_TOOL
 bool cpymo_backend_image_album_ui_writable(void);
@@ -191,7 +191,7 @@ static error_t cpymo_album_generate_album_ui_image_pixels(
 #endif
 
 #ifndef CPYMO_TOOL
-#include <cpymo_backend_image.h>
+#include "../cpymo-backends/include/cpymo_backend_image.h"
 #include "cpymo_album.h"
 #include "cpymo_key_hold.h"
 #include "cpymo_engine.h"
@@ -280,7 +280,7 @@ typedef struct {
 
 	int current_cg_selection;
 
-	cpymo_album_cg_info cg_infos[CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE];
+	cpymo_album_cg_info cg_infos[ALBUM_MAX_CGS_SINGLE_PAGE];
 
 	char *album_list_text;
 	size_t album_list_text_size;
@@ -336,7 +336,7 @@ error_t cpymo_album_cg_unlock(cpymo_engine *e, cpymo_str cg_filename)
 
 static void cpymo_album_unload_page(cpymo_engine *e, cpymo_album *a)
 {
-	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
+	for (size_t i = 0; i < ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
 		if (a->cg_infos[i].title != NULL)
 			cpymo_backend_text_free(a->cg_infos[i].title);
 		a->cg_infos[i].title = NULL;
@@ -368,7 +368,7 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 	cpymo_parser album_list;
 	cpymo_parser_init(&album_list, a->album_list_text, a->album_list_text_size);
 	do {
-		if (a->cg_count >= CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE) break;
+		if (a->cg_count >= ALBUM_MAX_CGS_SINGLE_PAGE) break;
 
 		cpymo_str page_str = cpymo_parser_curline_pop_commacell(&album_list);
 		cpymo_str_trim(&page_str);
@@ -430,7 +430,7 @@ static error_t cpymo_album_load_page(cpymo_engine *e, cpymo_album *a)
 
 	} while (cpymo_parser_next_line(&album_list));
 
-	assert(a->cg_count <= CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE);
+	assert(a->cg_count <= ALBUM_MAX_CGS_SINGLE_PAGE);
 
 	cpymo_str span;
 	span.begin = a->album_list_text;
@@ -595,7 +595,7 @@ static void cpymo_album_showing_cg_next(
 					cpymo_tween_assign(&a->showing_cg_draw_src_progress, 0);
 					cpymo_tween_to(
 						&a->showing_cg_draw_src_progress, 
-						1.0f, CPYMO_ALBUM_SCROLL_TIME);
+						1.0f, album_scroll_time);
 				}
 			#else
 				a->showing_cg_show_end = false;
@@ -898,7 +898,7 @@ static void cpymo_album_deleter(cpymo_engine *e, void *a)
 			cpymo_backend_image_free(album->showing_cg_image);
 	}
 
-	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i)
+	for (size_t i = 0; i < ALBUM_MAX_CGS_SINGLE_PAGE; ++i)
 		if (album->cg_infos[i].title != NULL)
 			cpymo_backend_text_free(album->cg_infos[i].title);
 
@@ -955,7 +955,7 @@ error_t cpymo_album_enter(
 	album->cv_thumb_cover_w = 0;
 	album->cv_thumb_cover_h = 0;
 	
-	for (size_t i = 0; i < CPYMO_ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
+	for (size_t i = 0; i < ALBUM_MAX_CGS_SINGLE_PAGE; ++i) {
 		album->cg_infos[i].title = NULL;
 	}
 

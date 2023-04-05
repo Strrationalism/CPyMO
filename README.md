@@ -144,7 +144,8 @@ brew install libxcb
 * 若`ENABLE_EXIT_CONFIRM`环境变量为1或通过-a传入1，则会在退出游戏时询问是否要退出。
 * 若`LEAKCHECK`环境变量为1或通过-a传入1，则会启动stb_leakcheck进行内存泄漏检查。
 * 若`DISABLE_VSYNC`环境变量为1或通过-a传入1，则禁用垂直同步并以最高可能帧率运行。
-
+* 若`CPYMO_MAX_SAVES`传入，则根据这个值设置最大存档个数。
+* 若`CPYMO_LANG`传入，则根据这个值设置编译后的默认语言。
 
 # Nintendo 3DS 平台
 

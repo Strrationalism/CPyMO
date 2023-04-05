@@ -10,10 +10,6 @@ LDFLAGS :=
 CFLAGS := \
 	-DLIMIT_WINDOW_SIZE_TO_SCREEN \
 	-DCPYMO_FEATURE_LEVEL=1 \
-	-I../../cpymo \
-	-I../../endianness.h \
-	-I../../stb \
-	-I../include \
 	-I../../lua \
 	-DLINK_WITH_ONELUA
 

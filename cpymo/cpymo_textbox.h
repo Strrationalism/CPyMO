@@ -1,7 +1,7 @@
 #ifndef INCLUDE_CPYMO_TEXTBOX
 #define INCLUDE_CPYMO_TEXTBOX
 
-#include <cpymo_backend_text.h>
+#include "../cpymo-backends/include/cpymo_backend_text.h"
 #include "cpymo_backlog.h"
 
 struct cpymo_engine;
