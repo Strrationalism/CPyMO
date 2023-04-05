@@ -7,7 +7,7 @@
 #include <assert.h>
 
 #define ALREADY_READ_TEXT_ALPHA 0.6f
-#define AUTO_MODE_TIME 2.0f
+const float static auto_mode_time = 2.0f;
 
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
@@ -282,7 +282,7 @@ bool cpymo_say_wait_process_auto_mode(cpymo_engine *e, float dt, bool prev_wait_
 		return false;
 	}
 
-	if (e->say.auto_mode_timer < 0) e->say.auto_mode_timer = AUTO_MODE_TIME;
+	if (e->say.auto_mode_timer < 0) e->say.auto_mode_timer = auto_mode_time;
 	
 	if (!cpymo_audio_channel_is_playing(CPYMO_AUDIO_CHANNEL_VO, &e->audio) &&
 		(!cpymo_audio_channel_is_playing(CPYMO_AUDIO_CHANNEL_SE, &e->audio) || 
