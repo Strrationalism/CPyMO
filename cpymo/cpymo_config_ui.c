@@ -277,7 +277,7 @@ static void cpymo_config_ui_refresh_items(cpymo_engine *e)
 	const cpymo_localization *l = cpymo_localization_get(e);
 
 	#ifdef LOW_FRAME_RATE
-	const static int min_say_speed = t;
+	const static int min_say_speed = 5;
 	e->gameconfig.textspeed = 5;
 	const static bool text_speed_inc_dec_btn = false;
 	#else
