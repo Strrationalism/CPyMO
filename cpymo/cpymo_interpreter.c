@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+#define CHARA_BUF_SIZE 64
+
 void cpymo_interpreter_init(
 	cpymo_interpreter *out, 
 	cpymo_script *script, 
@@ -300,8 +302,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			1.0f);
 	}
 
-#define CHARA_BUF_SIZE 64
-
 	/*** II. Video ***/
 	D("chara") {
 		int chara_ids[CHARA_BUF_SIZE];
@@ -368,7 +368,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 
 		return CPYMO_ERR_SUCC;
 	}
-#undef CHARA_BUF_SIZE
 
 	D("chara_cls") {
 		POP_ARG(id_str); ENSURE(id_str);
