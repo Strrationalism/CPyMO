@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+#define CHARA_BUF_SIZE 64
+
 void cpymo_interpreter_init(
 	cpymo_interpreter *out, 
 	cpymo_script *script, 
@@ -299,8 +301,6 @@ static error_t cpymo_interpreter_dispatch(cpymo_str command, cpymo_interpreter *
 			cpymo_color_white,
 			1.0f);
 	}
-
-#define CHARA_BUF_SIZE 64
 
 	/*** II. Video ***/
 	D("chara") {
