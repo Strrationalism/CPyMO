@@ -324,7 +324,7 @@ jobs:
       uses: ilammy/setup-nasm@v1.3.1
         
     - name: Donwload vcpkg
-      run: git clone --depth 1 --branch 2022.11.14 -- https://github.com/microsoft/vcpkg
+      run: git clone --depth 1 --branch 2023.04.15 -- https://github.com/microsoft/vcpkg
 
     - name: Bootstrap vcpkg
       run: |
@@ -498,7 +498,7 @@ jobs:
       run: brew install pkg-config
         
     - name: Donwload vcpkg
-      run: git clone --depth 1 --branch 2022.11.14 -- https://github.com/microsoft/vcpkg
+      run: git clone --depth 1 --branch 2023.04.15 -- https://github.com/microsoft/vcpkg
 
     - name: Bootstrap vcpkg
       run: |
