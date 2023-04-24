@@ -86,7 +86,7 @@ jobs:
 
       - name: 'Build'
         run: |
-          sudo pacman -S wii-dev wii-sdl --noconfirm
+          sudo dkp-pacman -S wii-dev wii-sdl --noconfirm
           cd cpymo-backends/sdl1
           make -f Makefile.Wii -j
           mv wii-meta.xml meta.xml
