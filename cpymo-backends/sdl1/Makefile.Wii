@@ -51,7 +51,7 @@ LDFLAGS	=	-L$(PORTLIBS_PATH)/wii/lib -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lSDLmain -lSDL_mixer -lSDL -lSDL_image -lpng -ljpeg -lmad -lmodplug -lvorbisfile -lvorbis -logg -laesnd -lwiiuse -lbte -lwiikeyboard -lfat -logc -lstdc++ -lm -lz
+LIBS	:=	-Xlinker "-(" -lSDLmain -lSDL_mixer -lSDL -lSDL_image -lpng -ljpeg -lmad -lmodplug -lvorbisfile -lvorbis -logg -laesnd -lwiiuse -lbte -lwiikeyboard -lfat -logc -lstdc++ -lm -lz -Xlinker "-)"
 
 
 #---------------------------------------------------------------------------------
