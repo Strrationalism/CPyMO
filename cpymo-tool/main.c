@@ -31,6 +31,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../stb/stb_image_write.h"
 
+#define STB_DS_IMPLEMENTATION
+#include "../stb/stb_ds.h"
+
 #ifdef LEAKCHECK
 #define STB_LEAKCHECK_IMPLEMENTATION
 #include "../stb/stb_leakcheck.h"
@@ -76,7 +79,7 @@ int process_err(error_t e) {
 	}
 }
 
-int main(int argc, const char **argv) {
+int main22(int argc, const char **argv) {
 	int ret = 0;
 	if (argc < 2) {
 		ret = help();
