@@ -515,7 +515,7 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
 
     - name: Install SDL2
-      run: ./vcpkg/vcpkg install SDL2:${{ matrix.triplet }}
+      run: ./vcpkg/vcpkg install sdl2:${{ matrix.triplet }}
 
     - name: Install FFMPEG
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
