@@ -199,6 +199,33 @@ error_t cpymo_tool_asset_analyze(
     free(gameconfig_path);
     CPYMO_THROW(err);
 
+    cpymo_pymo_version engineversion = { 1, 2 };
+    if (!cpymo_pymo_version_compatible(
+        output->gameconfig.engineversion,
+        engineversion)) {
+        printf("[Error] Game requires engine %d.%d, not compatibled with pymo 1.2.",
+            output->gameconfig.engineversion.major,
+            output->gameconfig.engineversion.minor);
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+
+    if (strcmp(output->gameconfig.scripttype, "pymo")) {
+        printf("[Error] Script type %s is not compatible.\n",
+            output->gameconfig.scripttype);
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+
+    bool platform_supported =
+        strcmp(output->gameconfig.platform, "pygame") == 0 ||
+        strcmp(output->gameconfig.platform, "s60v3") == 0 ||
+        strcmp(output->gameconfig.platform, "s60v5") == 0;
+
+    if (!platform_supported) {
+        printf("[Error] Platform %s is not supported.\n",
+            output->gameconfig.platform);
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+
     output->bg = NULL;
     output->bgm = NULL;
     output->chara = NULL;
