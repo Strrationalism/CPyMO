@@ -9,6 +9,7 @@ struct cpymo_tool_asset_analyzer_string_hashset_item {
     const char *ext;
     bool mask;
     const char *mask_ext;
+    bool warning;
 };
 
 typedef struct {
