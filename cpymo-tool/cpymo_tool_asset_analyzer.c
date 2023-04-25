@@ -351,21 +351,24 @@ static void cpymo_tool_asset_analyze_single_command(
         cpymo_str hint_pic = cpymo_parser_curline_pop_commacell(parser);
         cpymo_str_trim(&hint_pic);
 
-        char *hint_pic_cstr = (char *)malloc(hint_pic.len + 2);
-        if (hint_pic_cstr == NULL) {
-            printf("[Error] Out of memory.\n");
-            return;
-        }
+        if (!cpymo_str_equals_str(hint_pic, "")) {
+            char *hint_pic_cstr = (char *)malloc(hint_pic.len + 2);
+            if (hint_pic_cstr == NULL) {
+                printf("[Error] Out of memory.\n");
+                return;
+            }
 
-        cpymo_str_copy(hint_pic_cstr, hint_pic.len + 2, hint_pic);
-        hint_pic_cstr[hint_pic.len + 1] = '\0';
-        for (char i = '0'; i < '4'; ++i) {
-            hint_pic_cstr[hint_pic.len] = i;
-            ADD_ASSET(r, system, cpymo_str_pure(hint_pic_cstr), 
-                "png", true, "png", true);
-        }
+            cpymo_str_copy(hint_pic_cstr, hint_pic.len + 2, hint_pic);
+            hint_pic_cstr[hint_pic.len + 1] = '\0';
+            for (char i = '0'; i < '4'; ++i) {
+                hint_pic_cstr[hint_pic.len] = i;
+                ADD_ASSET(r, system, cpymo_str_pure(hint_pic_cstr), 
+                    "png", true, "png", true);
+            }
 
-        free(hint_pic_cstr);
+            free(hint_pic_cstr);
+        }
+        
         return;
     }
     
@@ -518,21 +521,3 @@ static void cpymo_tool_asset_analyze_single_command(
     putchar('\n');
 }
 
-int main()
-{
-    cpymo_tool_asset_analyzer_result r;
-    error_t err = cpymo_tool_asset_analyze("C:/Users/85397/AppData/Roaming/Citra/sdmc/pymogames/DAICHYAN_android", &r);
-    if (err != CPYMO_ERR_SUCC) printf("%s\n", cpymo_error_message(err));
-    int len = shlen(r.system);
-    for (int i = 0; i < len; ++i) {
-        if (r.system == NULL) continue;
-        printf("%s\n", r.system[i].key);
-    }
-
-    cpymo_tool_asset_analyzer_free_result(&r);
-
-    #ifdef LEAKCHECK
-	stb_leakcheck_dumpmem();
-	#endif	
-    return 0;   
-}

@@ -79,7 +79,7 @@ int process_err(error_t e) {
 	}
 }
 
-int main22(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 	int ret = 0;
 	if (argc < 2) {
 		ret = help();
