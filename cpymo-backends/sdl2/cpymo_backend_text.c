@@ -47,8 +47,8 @@ error_t cpymo_backend_text_create(
     
     assert(t->width > 0 && t->height > 0);
 
-    t->height += 4; // MAGIC FOR MORE MEMORY
-    t->width += 2;  // MAGIC FOR EDGE CLAMP
+    t->height += 8; // MAGIC FOR MORE MEMORY
+    t->width += 4;  // MAGIC FOR EDGE CLAMP
     
     void *screen = malloc(t->width * t->height);
     if (screen == NULL) {
