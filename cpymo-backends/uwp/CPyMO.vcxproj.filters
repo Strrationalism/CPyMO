@@ -191,6 +191,9 @@
     <ClCompile Include="..\sdl2\main.c">
       <Filter>cpymo_backend_sdl2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cpymo\cpymo_str.c">
+      <Filter>cpymo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cpymo\cpymo_album.h">
@@ -317,6 +320,12 @@
       <Filter>cpymo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cpymo\cpymo_wait.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_prelude.h">
+      <Filter>cpymo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cpymo\cpymo_str.h">
       <Filter>cpymo</Filter>
     </ClInclude>
   </ItemGroup>
