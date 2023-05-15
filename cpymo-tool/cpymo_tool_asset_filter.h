@@ -18,17 +18,23 @@ typedef struct {
         } file;
     } input;
 
+    void *input_mask_file_buf;
+    size_t input_mask_len;
+
     // output
     bool output_to_package;
     union {
         struct {
             void **buf;
             size_t *len;
-            bool *free_buf_after_write;
+            void **mask_buf;
+            size_t *mask_len;
         } package;
 
         struct {
             const char *target_file_path;
+            const char *target_mask_path;
+            bool *mask_written;
         } file;
     } output;
 } cpymo_tool_asset_filter_io;
@@ -57,7 +63,15 @@ typedef struct {
         filter_video,
         filter_voice;
 
-    void *filter_userdata;
+    // filter function userdata
+    void
+        *filter_bg_userdata,
+        *filter_bgm_userdata,
+        *filter_chara_userdata,
+        *filter_se_userdata,
+        *filter_system_userdata,
+        *filter_video_userdata,
+        *filter_voice_userdata;
 
     cpymo_tool_asset_analyzer_result asset_list;
 } cpymo_tool_asset_filter;
@@ -72,5 +86,9 @@ void cpymo_tool_asset_filter_free(
 
 error_t cpymo_tool_asset_filter_run(
     cpymo_tool_asset_filter *);
+
+error_t cpymo_tool_asset_filter_function_copy(
+    cpymo_tool_asset_filter_io *io,
+    void *null);
 
 #endif
