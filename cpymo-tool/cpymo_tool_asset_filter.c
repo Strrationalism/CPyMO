@@ -1,6 +1,6 @@
 #include "cpymo_tool_prelude.h"
 #include "cpymo_tool_asset_filter.h"
-
+#include "../stb/stb_ds.h"
 
 error_t cpymo_tool_asset_filter_init(
     cpymo_tool_asset_filter *filter,
@@ -48,10 +48,20 @@ error_t cpymo_tool_asset_filter_function_copy(
     }
 
     if (io->output_to_package) {
-        io->output.package.buf = data;
-        io->output.package.len = len;
-        io->output.package.mask_buf = io->input_mask_file_buf;
-        io->output.package.mask_len = io->input_mask_len;
+        error_t err = cpymo_tool_package_packer_add_data(
+            io->output.package.packer, io->output.package.name, data, len);
+        if (err != CPYMO_ERR_SUCC) {
+            free(data);
+            return err;
+        }
+        free(data);
+
+        if (io->input_mask_file_buf) {
+            err = cpymo_tool_package_packer_add_data(
+                io->output.package.packer, io->output.package.mask_name,
+                io->input_mask_file_buf, io->input_mask_len);
+            CPYMO_THROW(err);
+        }
     }
     else {
         FILE *f = fopen(io->output.file.target_file_path, "wb");

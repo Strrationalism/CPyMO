@@ -3,6 +3,7 @@
 
 #include "../cpymo/cpymo_assetloader.h"
 #include "cpymo_tool_asset_analyzer.h"
+#include "cpymo_tool_package.h"
 
 typedef struct {
     // input
@@ -25,16 +26,14 @@ typedef struct {
     bool output_to_package;
     union {
         struct {
-            void **buf;
-            size_t *len;
-            void **mask_buf;
-            size_t *mask_len;
+            cpymo_tool_package_packer *packer;
+            cpymo_str name;
+            cpymo_str mask_name;
         } package;
 
         struct {
             const char *target_file_path;
             const char *target_mask_path;
-            bool *mask_written;
         } file;
     } output;
 } cpymo_tool_asset_filter_io;
