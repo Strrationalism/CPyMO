@@ -88,8 +88,12 @@ error_t cpymo_tool_package_packer_open(
 	if (packer->stream == NULL)
 		return CPYMO_ERR_CAN_NOT_OPEN_FILE;
 
-	for (long i = 0; i < packer->data_section_start_offset; ++i)
-		fputc(0, packer->stream);
+	for (long i = 0; i < packer->data_section_start_offset; ++i) {
+		if (fputc(0, packer->stream) == EOF) {
+			fclose(packer->stream);
+			return CPYMO_ERR_BAD_FILE_FORMAT;
+		}
+	}
 
 	return CPYMO_ERR_SUCC;
 }
@@ -103,7 +107,9 @@ error_t cpymo_tool_package_packer_add_data(
 	if (packer->current_file_count >= packer->max_file_count)
 		return CPYMO_ERR_NO_MORE_CONTENT;
 
-	fseek(packer->stream, packer->index_section_start_offset, SEEK_SET);
+	if (fseek(packer->stream, packer->index_section_start_offset, SEEK_SET))
+		return CPYMO_ERR_UNKNOWN;
+
 	char filename[32] = { '\0' };
 	cpymo_str_copy(filename, sizeof(filename), name);
 	size_t written = fwrite(filename, sizeof(filename), 1, packer->stream);
@@ -118,7 +124,9 @@ error_t cpymo_tool_package_packer_add_data(
 	if (written != 1) return CPYMO_ERR_UNKNOWN;
 	long new_index_offset = ftell(packer->stream);
 
-	fseek(packer->stream, packer->data_section_start_offset, SEEK_SET);
+	if (fseek(packer->stream, packer->data_section_start_offset, SEEK_SET))
+		return CPYMO_ERR_UNKNOWN;
+
 	written = fwrite(data, len, 1, packer->stream);
 	if (written != 1) return CPYMO_ERR_UNKNOWN;
 	long new_data_offset = ftell(packer->stream);
@@ -171,9 +179,10 @@ void cpymo_tool_package_packer_close(
     cpymo_tool_package_packer *packer)
 {
 	uint32_t filecount_le32 = end_htole32((uint32_t)packer->current_file_count);
-	fseek(packer->stream, 0, SEEK_SET);
-	fwrite(&filecount_le32, sizeof(filecount_le32), 1, packer->stream);
-	fclose(packer->stream);
+	if (fseek(packer->stream, 0, SEEK_SET)) abort();
+	if (fwrite(&filecount_le32, sizeof(filecount_le32), 1, packer->stream) != 1)
+		abort();
+	if (fclose(packer->stream)) abort();
 }
 
 static error_t cpymo_tool_pack(const char *out_pack_path, const char **files_to_pack, uint32_t file_count)
