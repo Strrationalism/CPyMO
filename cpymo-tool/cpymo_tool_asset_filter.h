@@ -10,8 +10,8 @@ typedef struct {
     bool input_is_package;
     union {
         struct {
-            const cpymo_package *pkg;
-            const cpymo_package_index file_index;
+            void *data_move_in;
+            size_t len;
         } package;
 
         struct {
@@ -19,16 +19,15 @@ typedef struct {
         } file;
     } input;
 
-    void *input_mask_file_buf;
+    void *input_mask_file_buf_movein;
     size_t input_mask_len;
 
     // output
     bool output_to_package;
     union {
         struct {
-            cpymo_tool_package_packer *packer;
-            cpymo_str name;
-            cpymo_str mask_name;
+            void **data_move_out, **mask_move_out;
+            size_t *len, *mask_len;
         } package;
 
         struct {
@@ -44,7 +43,6 @@ typedef error_t (*cpymo_tool_asset_filter_processor)(
 
 typedef struct {
     // input
-    const char *input_gamedir;
     cpymo_assetloader input_assetloader;
 
     // output
@@ -89,5 +87,8 @@ error_t cpymo_tool_asset_filter_run(
 error_t cpymo_tool_asset_filter_function_copy(
     cpymo_tool_asset_filter_io *io,
     void *null);
+
+error_t cpymo_tool_utils_writefile(
+    const char *path, const void *data, size_t len);
 
 #endif

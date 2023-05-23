@@ -1,109 +1,162 @@
 #include "cpymo_tool_prelude.h"
 #include "cpymo_tool_asset_filter.h"
+#include "cpymo_tool_asset_analyzer.h"
 #include "../stb/stb_ds.h"
 
 error_t cpymo_tool_asset_filter_init(
     cpymo_tool_asset_filter *filter,
     const char *input_gamedir,
-    const char *output_gamedir);
+    const char *output_gamedir)
+{
+    memset(filter, 0, sizeof(*filter));
+    filter->output_gamedir = output_gamedir;
+
+    error_t err = cpymo_tool_asset_analyze(input_gamedir, &filter->asset_list);
+    CPYMO_THROW(err);
+
+    err = cpymo_assetloader_init(
+        &filter->input_assetloader,
+        &filter->asset_list.gameconfig,
+        input_gamedir);
+    if (err != CPYMO_ERR_SUCC) {
+        cpymo_tool_asset_analyzer_free_result(&filter->asset_list);
+        return err;
+    }
+
+    return CPYMO_ERR_SUCC;
+}
 
 void cpymo_tool_asset_filter_free(
-    cpymo_tool_asset_filter *);
+    cpymo_tool_asset_filter *f)
+{
+    cpymo_assetloader_free(&f->input_assetloader);
+    cpymo_tool_asset_analyzer_free_result(&f->asset_list);
+}
 
-static error_t cpymo_tool_asset_filter_run_one_type_asset(
-    const struct cpymo_tool_asset_analyzer_string_hashset_item *assets,
-    const char *asset_type,
-    cpymo_tool_asset_filter_processor filter,
-    void *filter_userdata,
-    const char *input_gamedir,
-    cpymo_package *input_package,
-    const char *output_gamedir,
-    bool output_to_package);
+struct cpymo_tool_asset_filter_run_param
+{
+    const char *asstype;
+    cpymo_tool_asset_filter_processor filter_function;
+    void *filter_function_userdata;
+    const char *assext;
+    const char *maskext;
+    struct cpymo_tool_asset_analyzer_string_hashset_item *asset_list;
+    const cpymo_package *package;
+};
+
+static error_t cpymo_tool_asset_filter_run_single(
+    cpymo_tool_asset_filter *filter,
+    const struct cpymo_tool_asset_filter_run_param *param)
+{
+    return CPYMO_ERR_UNSUPPORTED;
+}
 
 error_t cpymo_tool_asset_filter_run(
-    cpymo_tool_asset_filter *);
+    cpymo_tool_asset_filter *f)
+{
+    struct cpymo_tool_asset_filter_run_param params[] = {
+        { "bg", f->filter_bg, f->filter_bg_userdata,
+          f->input_assetloader.game_config->bgformat, NULL, f->asset_list.bg,
+          f->input_assetloader.use_pkg_bg ? &f->input_assetloader.pkg_bg : NULL },
+
+        { "bgm", f->filter_bgm, f->filter_bgm_userdata,
+          f->input_assetloader.game_config->bgmformat, NULL, f->asset_list.bgm, NULL },
+
+        { "chara", f->filter_chara, f->filter_chara_userdata,
+          f->input_assetloader.game_config->charaformat,
+          f->input_assetloader.game_config->charamaskformat,
+          f->asset_list.chara,
+          f->input_assetloader.use_pkg_chara ? &f->input_assetloader.pkg_chara : NULL },
+
+        { "se", f->filter_se, f->filter_se_userdata,
+          f->input_assetloader.game_config->seformat, NULL, f->asset_list.se,
+          f->input_assetloader.use_pkg_se ? &f->input_assetloader.pkg_se : NULL },
+
+        { "system", f->filter_system, f->filter_system_userdata,
+          "png", "png", f->asset_list.system, NULL },
+
+        { "video", f->filter_video, f->filter_video_userdata,
+          "mp4", NULL, f->asset_list.video, NULL },
+
+        { "voice", f->filter_voice, f->filter_voice_userdata,
+          f->input_assetloader.game_config->voiceformat, NULL,
+          f->asset_list.voice,
+          f->input_assetloader.use_pkg_voice ? &f->input_assetloader.pkg_voice : NULL },
+
+        { "script", &cpymo_tool_asset_filter_function_copy, NULL,
+          "txt", NULL, f->asset_list.script, NULL }
+    };
+
+    for (size_t i = 0; i < CPYMO_ARR_COUNT(params); ++i) {
+        printf("Processing %s...", params[i].asstype);
+        error_t err = cpymo_tool_asset_filter_run_single(f, params + i);
+        CPYMO_THROW(err);
+    }
+
+    return CPYMO_ERR_SUCC;
+}
 
 error_t cpymo_tool_asset_filter_function_copy(
     cpymo_tool_asset_filter_io *io,
     void *null)
 {
-    char *data;
+    // input
+    void *data = NULL;
     size_t len;
+
     if (io->input_is_package) {
-        len = io->input.package.file_index.file_length;
-        data = (char *)malloc(io->input.package.file_index.file_length);
-
-        if (data == NULL) return CPYMO_ERR_OUT_OF_MEM;
-        error_t err = cpymo_package_read_file_from_index(
-            data, io->input.package.pkg, &io->input.package.file_index);
-
-        if (err != CPYMO_ERR_SUCC) {
-            free(data);
-            return err;
-        }
+        data = io->input.package.data_move_in;
+        len = io->input.package.len;
     }
     else {
-        error_t e = cpymo_utils_loadfile(io->input.file.path, &data, &len);
-        CPYMO_THROW(e);
+        error_t err = cpymo_utils_loadfile(
+            io->input.file.path, (char **)&data, &len);
+        CPYMO_THROW(err);
     }
 
+    // output
     if (io->output_to_package) {
-        error_t err = cpymo_tool_package_packer_add_data(
-            io->output.package.packer, io->output.package.name, data, len);
-        if (err != CPYMO_ERR_SUCC) {
-            free(data);
-            return err;
-        }
-        free(data);
-
-        if (io->input_mask_file_buf) {
-            err = cpymo_tool_package_packer_add_data(
-                io->output.package.packer, io->output.package.mask_name,
-                io->input_mask_file_buf, io->input_mask_len);
-            CPYMO_THROW(err);
-        }
+        *io->output.package.data_move_out = data;
+        *io->output.package.len = len;
+        *io->output.package.mask_move_out = io->input_mask_file_buf_movein;
+        *io->output.package.mask_len = io->input_mask_len;
     }
     else {
-        FILE *f = fopen(io->output.file.target_file_path, "wb");
-        if (f == NULL) {
-            free(data);
-            printf(
-                "[Error] Can not write file: %s.\n",
-                io->output.file.target_file_path);
-            return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+        error_t err = cpymo_tool_utils_writefile(
+            io->output.file.target_file_path, data, len);
+
+        if (io->output.file.target_mask_path && io->input_mask_file_buf_movein){
+            error_t errm = cpymo_tool_utils_writefile(
+                io->output.file.target_mask_path,
+                io->input_mask_file_buf_movein,
+                io->input_mask_len);
+            if (errm != CPYMO_ERR_SUCC)
+                printf("[Warning] Can not write mask file: %s(%s)",
+                    io->output.file.target_mask_path,
+                    cpymo_error_message(errm));
         }
 
-        size_t len_write = fwrite(data, len, 1, f);
-        fclose(f);
         free(data);
+        if (io->input_mask_file_buf_movein)
+            free(io->input_mask_file_buf_movein);
 
-        if (len_write != len) {
-            printf(
-                "[Error] Can not write file: %s.\n",
-                io->output.file.target_file_path);
-            return CPYMO_ERR_CAN_NOT_OPEN_FILE;
-        }
-
-        if (io->input_mask_file_buf) {
-            f = fopen(io->output.file.target_mask_path, "wb");
-            if (f == NULL) {
-                printf(
-                    "[Warning] Can not open target mask file: %s\n",
-                    io->output.file.target_mask_path);
-                return CPYMO_ERR_SUCC;
-            }
-
-            len_write = fwrite(io->input_mask_file_buf, io->input_mask_len, 1, f);
-            fclose(f);
-
-            if (len_write != io->input_mask_len) {
-                printf(
-                    "[Warning] Can not write mask file: %s\n",
-                    io->output.file.target_mask_path);
-                return CPYMO_ERR_SUCC;
-            }
-        }
+        CPYMO_THROW(err);
     }
 
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_utils_writefile(
+    const char *path, const void *data, size_t len)
+{
+    FILE *file = fopen(path, "wb");
+    if (file == NULL) return CPYMO_ERR_CAN_NOT_OPEN_FILE;
+
+    if (fwrite(data, len, 1, file) != 1) {
+        fclose(file);
+        return CPYMO_ERR_BAD_FILE_FORMAT;
+    }
+
+    if (fclose(file)) return CPYMO_ERR_BAD_FILE_FORMAT;
     return CPYMO_ERR_SUCC;
 }
