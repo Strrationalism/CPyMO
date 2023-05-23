@@ -302,7 +302,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `vars` - 这个表包含了所有的PyMO变量，仅可在其中读写整数，不可遍历
 * `commands` - 这个表包含了所有新增或重载的PyMO脚本命令，可以在这里覆盖原有PyMO命令或添加新的脚本命令
   - 所有的PyMO参数都会以字符串传入，未匹配成功的参数将以nil传入
-  - 如重载`bg`命令，则需要重载为`function cpymo.script.overrides.bg(name, transition, time, x, y)`，所有的参数均为字符串，且返回值无意义
+  - 如重载`bg`命令，则需要重载为`function cpymo.script.commands.bg(name, transition, time, x, y)`，所有的参数均为字符串，且返回值无意义
   - 如果调用重载命令后，引擎判断不需要刷新帧，则会立刻执行下一条命令，如果需要刷新帧（如调用了`cpymo.request_redraw()`或产生了其他引擎认为需要刷新的情况），
   - 则将会在下一帧继续执行后面的PyMO代码
   - 当你重载了PyMO命令之后，将不再可以执行原有的PyMO命令
