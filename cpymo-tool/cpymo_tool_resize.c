@@ -20,20 +20,22 @@ static error_t cpymo_tool_resize_image(
     double ratio_h, 
     bool load_mask, 
     bool create_mask, 
-    const char * out_format)
+    const char *out_format,
+	const char *mask_format)
 {
     cpymo_tool_image img;
-    error_t err = cpymo_tool_image_load_from_file(&img, input_file, load_mask);
+    error_t err = cpymo_tool_image_load_from_file(
+		&img, input_file, load_mask, mask_format);
 	CPYMO_THROW(err);
 
-    
 	cpymo_tool_image resized;
 	err = cpymo_tool_image_resize(&resized, &img, (size_t)(ratio_w * img.width), (size_t)(ratio_h * img.height));
 	cpymo_tool_image_free(img);
 	CPYMO_THROW(err);
 
     err = cpymo_tool_image_save_to_file_with_mask(
-		&resized, output_file, cpymo_str_pure(out_format), create_mask);
+		&resized, output_file, out_format,
+		create_mask, mask_format);
 	cpymo_tool_image_free(resized);
 	return err;
 }
@@ -121,16 +123,19 @@ int cpymo_tool_invoke_resize_image(int argc, const char ** argv)
 
 	if (strcmp(resize_ratio_w, "1") == 0 && strcmp(resize_ratio_h, "1") == 0) {
 		cpymo_tool_image img;
-		error_t err = cpymo_tool_image_load_from_file(&img, src_file, load_mask);
+		error_t err = cpymo_tool_image_load_from_file(
+			&img, src_file, load_mask, NULL);
 		if (err != CPYMO_ERR_SUCC) return process_err(err);
 
-		err = cpymo_tool_image_save_to_file_with_mask(&img, dst_file, cpymo_str_pure(out_format), create_mask);
+		err = cpymo_tool_image_save_to_file_with_mask(
+			&img, dst_file, out_format, create_mask, out_format);	// TODO: set mask format
 		cpymo_tool_image_free(img);
 		return process_err(err);
 	}
 
 	error_t err =
-		cpymo_tool_resize_image(src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format);
+		cpymo_tool_resize_image(
+			src_file, dst_file, ratio_w, ratio_h, load_mask, create_mask, out_format, out_format);
 	return process_err(err);
 }
 

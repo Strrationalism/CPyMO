@@ -9,7 +9,9 @@
 #include "../stb/stb_image_write.h"
 #include "../stb/stb_image_resize.h"
 
-error_t cpymo_tool_image_load_from_file(cpymo_tool_image *out, const char *filename, bool load_mask)
+error_t cpymo_tool_image_load_from_file(
+    cpymo_tool_image *out, const char *filename,
+    bool load_mask, const char *mask_format)
 {
     int w, h;
     stbi_uc *pixels = stbi_load(filename, &w, &h, NULL, 4);
@@ -22,7 +24,7 @@ error_t cpymo_tool_image_load_from_file(cpymo_tool_image *out, const char *filen
 
     if (load_mask) {
         char *mask_file_name = NULL;
-        error_t err = cpymo_tool_get_mask_name(&mask_file_name, filename);
+        error_t err = cpymo_tool_get_mask_name(&mask_file_name, filename, mask_format);
         if (err != CPYMO_ERR_SUCC) {
             printf("[Warning] Can not get mask name for image: %s(%s).\n", filename, cpymo_error_message(err));
             return CPYMO_ERR_SUCC;
@@ -132,8 +134,12 @@ void cpymo_tool_image_blit(cpymo_tool_image *dst, const cpymo_tool_image *src, i
     }
 }
 
-static error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const char *filename, cpymo_str format)
+static error_t cpymo_tool_image_save_to_file(
+    const cpymo_tool_image *img,
+    const char *filename,
+    const char *format_cstr)
 {
+    cpymo_str format = cpymo_str_pure(format_cstr);
     int e = 0;
     if (cpymo_str_equals_str_ignore_case(format, "jpg")) {
         e = stbi_write_jpg(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels, 100);
@@ -152,7 +158,12 @@ static error_t cpymo_tool_image_save_to_file(const cpymo_tool_image *img, const 
     else return CPYMO_ERR_UNKNOWN;
 }
 
-error_t cpymo_tool_image_save_to_file_with_mask(const cpymo_tool_image * img, const char * filename, cpymo_str format, bool create_mask)
+error_t cpymo_tool_image_save_to_file_with_mask(
+    const cpymo_tool_image * img,
+    const char * filename,
+    const char * format,
+    bool create_mask,
+    const char *mask_format)
 {
     if (!create_mask) {
         MASK_FAILED:
@@ -167,14 +178,14 @@ error_t cpymo_tool_image_save_to_file_with_mask(const cpymo_tool_image * img, co
         }
 
         char *mask_name = NULL;
-        err = cpymo_tool_get_mask_name(&mask_name, filename);
+        err = cpymo_tool_get_mask_name(&mask_name, filename, mask_format);
         if (err != CPYMO_ERR_SUCC) {
             cpymo_tool_image_free(mask);
             printf("[Warning] Can not get mask name: %s(%s).\n", filename, cpymo_error_message(err));
             goto MASK_FAILED;
         }
 
-        err = cpymo_tool_image_save_to_file(&mask, mask_name, format);
+        err = cpymo_tool_image_save_to_file(&mask, mask_name, mask_format);
         free(mask_name);
         cpymo_tool_image_free(mask);
 
@@ -194,20 +205,30 @@ error_t cpymo_tool_image_save_to_file_with_mask(const cpymo_tool_image * img, co
     }
 }
 
-error_t cpymo_tool_get_mask_name(char **out_mask_filename, const char *filename)
+error_t cpymo_tool_get_mask_name(
+    char **out_mask_filename, const char *filename, const char *mask_ext)
 {
-    *out_mask_filename = (char *)malloc(strlen(filename) + 1 + strlen("_mask"));
+    const char *file_ext = strrchr(filename, '.');
+    if (file_ext) file_ext++;
+    if (mask_ext == NULL) mask_ext = file_ext;
+
+    intptr_t filename_no_ext_len = file_ext - filename;
+    if (file_ext == NULL) filename_no_ext_len = strlen(filename);
+    assert(filename_no_ext_len >= 0);
+
+    *out_mask_filename = (char *)malloc(
+        filename_no_ext_len + 7 + (mask_ext == NULL ? 0 : strlen(mask_ext)));
     if (*out_mask_filename == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-    const char *ext = strrchr(filename, '.');
-    intptr_t filename_without_ext_len = ext - filename;
-    if (ext == NULL) filename_without_ext_len = strlen(filename);
-
-    assert(filename_without_ext_len >= 0);
-
-    strcpy(*out_mask_filename, filename);
-    strcpy(*out_mask_filename + filename_without_ext_len, "_mask");
-    if (ext) strcpy(*out_mask_filename + filename_without_ext_len + 5, ext);
+    memcpy(*out_mask_filename, filename, filename_no_ext_len);
+    memcpy(*out_mask_filename + filename_no_ext_len, "_mask", 6);
+    if (mask_ext) {
+        *out_mask_filename[filename_no_ext_len + 6] = '.';
+        memcpy(
+            *out_mask_filename + filename_no_ext_len + 7,
+            mask_ext,
+            strlen(mask_ext) + 1);
+    }
 
     return CPYMO_ERR_SUCC;
 }
