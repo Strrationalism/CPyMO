@@ -60,7 +60,7 @@ int help() {
 	printf(
 		"    cpymo-tool pack-spritesheet\n"
 		"        <output-file> <num-of-cols> <input-files...>\n"
-		"        [--load-mask [png/bmp/jpg]] [--create-mask [png/bmp/jpg]] [--out-format <png/bmp/jpg>]\n");
+		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
 	printf("Generate album UI image cache:\n");
 	printf(
 		"    cpymo-tool gen-album-cache <gamedir> [additional-album-lists...]\n");
