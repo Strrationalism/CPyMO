@@ -44,10 +44,58 @@ struct cpymo_tool_asset_filter_run_param
     const cpymo_package *package;
 };
 
+static error_t cpymo_tool_utils_mkdir(const char *gamedir, const char *assdir)
+{
+    return CPYMO_ERR_UNKNOWN;
+}
+
 static error_t cpymo_tool_asset_filter_run_single(
     cpymo_tool_asset_filter *filter,
     const struct cpymo_tool_asset_filter_run_param *param)
 {
+    cpymo_tool_asset_filter_io io;
+    memset(&io, 0, sizeof(io));
+
+    io.input_is_package = param->package != NULL;
+    io.output_to_package = io.input_is_package;
+
+    if (filter->use_force_pack_unpack_flag)
+        io.output_to_package = filter->force_pack_unpack_flag_packed;
+
+    size_t asset_count = shlenu(param->asset_list);
+    if (asset_count) {
+        error_t err = cpymo_tool_utils_mkdir(
+            filter->output_gamedir, param->asstype);
+        CPYMO_THROW(err);
+    }
+
+    for (size_t i = 0; i < asset_count; ++i) {
+        // setup input
+        io.input_mask_file_buf_movein = NULL;
+        io.input_mask_len = NULL;
+
+        if (io.input_is_package) {
+            io.input.package.data_move_in = NULL;
+            error_t err = cpymo_package_read_file(
+                &io.input.package.data_move_in,
+                &io.input.package.len,
+                param->package,
+                cpymo_str_pure(param->asset_list[i].key));
+            if (param->asset_list[i].warning && err != CPYMO_ERR_SUCC) {
+                printf("[Warning] Can not read file: %s(%s).\n",
+                    param->asset_list[i].key,
+                    cpymo_error_message(err));
+                continue;
+            }
+
+            if (param->asset_list[i].mask) {
+                // get mask filename
+            }
+        }
+        // setup output
+        // call filter
+        // collect output
+    }
     return CPYMO_ERR_UNSUPPORTED;
 }
 
