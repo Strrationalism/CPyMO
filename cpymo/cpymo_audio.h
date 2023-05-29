@@ -85,6 +85,9 @@ float cpymo_audio_get_channel_volume(size_t cid, const cpymo_audio_system *s);
 
 void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol);
 
+bool cpymo_audio_channel_is_playing(size_t cid, cpymo_audio_system *s);
+bool cpymo_audio_channel_is_looping(size_t cid, cpymo_audio_system *s);
+
 struct cpymo_engine;
 bool cpymo_audio_enabled(struct cpymo_engine *e);
 
