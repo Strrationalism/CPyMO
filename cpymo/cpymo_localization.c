@@ -78,6 +78,7 @@ const cpymo_localization chs = {
 	"确定",
 	"取消",
 
+	"自动",
 	"存档",
 	"读档",
 	"快进",
@@ -141,6 +142,7 @@ const cpymo_localization cht = {
 	"確定",
 	"取消",
 
+	"自動",
 	"保存進度",
 	"讀取進度",
 	"快進",
@@ -202,6 +204,7 @@ const cpymo_localization enu = {
 	"OK",
 	"Cancel",
 
+	"Auto",
 	"Save",
 	"Load",
 	"Skip",
