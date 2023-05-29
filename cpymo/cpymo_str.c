@@ -8,7 +8,10 @@ cpymo_str cpymo_str_pure(const char *s)
 {
 	cpymo_str r;
 	r.begin = s;
-	r.len = strlen(s);
+	if (r.begin)
+		r.len = strlen(s);
+	else
+		r.len = 0;
 	return r;
 }
 

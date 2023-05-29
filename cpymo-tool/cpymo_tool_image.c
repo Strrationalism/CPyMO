@@ -139,6 +139,10 @@ static error_t cpymo_tool_image_save_to_file(
     const char *filename,
     const char *format_cstr)
 {
+    if (!strcmp(format_cstr, "")) {
+        format_cstr = strrchr(filename, '.');
+        if (format_cstr) format_cstr++;
+    }
     cpymo_str format = cpymo_str_pure(format_cstr);
     int e = 0;
     if (cpymo_str_equals_str_ignore_case(format, "jpg")) {
@@ -151,6 +155,7 @@ static error_t cpymo_tool_image_save_to_file(
         e = stbi_write_png(filename, (int)img->width, (int)img->height, (int)img->channels, img->pixels, 0);
     }
     else {
+        printf("[Error] Unsupported format.\n");
         return CPYMO_ERR_UNSUPPORTED;
     }
 
@@ -170,6 +175,7 @@ error_t cpymo_tool_image_save_to_file_with_mask(
         return cpymo_tool_image_save_to_file(img, filename, format);
     }
     else {
+        if (mask_format == NULL) mask_format = format;
         cpymo_tool_image mask;
         error_t err = cpymo_tool_image_create_mask(&mask, img);
         if (err != CPYMO_ERR_SUCC) {
@@ -211,8 +217,9 @@ error_t cpymo_tool_get_mask_name(
     const char *file_ext = strrchr(filename, '.');
     if (file_ext) file_ext++;
     if (mask_ext == NULL) mask_ext = file_ext;
+    else if (!strcmp(mask_ext, "")) mask_ext = file_ext;
 
-    intptr_t filename_no_ext_len = file_ext - filename;
+    intptr_t filename_no_ext_len = file_ext - filename - 1;
     if (file_ext == NULL) filename_no_ext_len = strlen(filename);
     assert(filename_no_ext_len >= 0);
 
@@ -223,11 +230,8 @@ error_t cpymo_tool_get_mask_name(
     memcpy(*out_mask_filename, filename, filename_no_ext_len);
     memcpy(*out_mask_filename + filename_no_ext_len, "_mask", 6);
     if (mask_ext) {
-        *out_mask_filename[filename_no_ext_len + 6] = '.';
-        memcpy(
-            *out_mask_filename + filename_no_ext_len + 7,
-            mask_ext,
-            strlen(mask_ext) + 1);
+        strcat(*out_mask_filename, ".");
+        strcat(*out_mask_filename, mask_ext);
     }
 
     return CPYMO_ERR_SUCC;
