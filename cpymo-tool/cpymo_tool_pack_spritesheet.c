@@ -73,7 +73,7 @@ int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 	bool create_mask = false;
 	const char *output_file = NULL;
 	const char *num_of_cols = NULL;
-	const char *output_format;
+	const char *output_format = NULL;
 
 	size_t input_file_count = 0;
 	const char **input_files = (const char **)malloc(argc * sizeof(char **));
