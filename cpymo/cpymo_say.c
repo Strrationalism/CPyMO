@@ -7,6 +7,7 @@
 #include <assert.h>
 
 const static float already_read_text_alpha = 0.6f;
+const float static auto_mode_time = 2.0f;
 
 #define DISABLE_TEXTBOX(SAY) \
 	if (SAY->textbox_usable) { \
@@ -57,6 +58,8 @@ void cpymo_say_init(cpymo_say *out)
 	out->current_name = NULL;
 	out->current_text = NULL;
 	out->current_say_is_already_read = true;
+	out->auto_mode = false;
+	out->auto_mode_timer = -1;
 }
 
 void cpymo_say_free(cpymo_say *say)
@@ -269,6 +272,38 @@ graph TB
 
 static error_t cpymo_say_wait_text_fadein_callback(cpymo_engine *e);
 
+bool cpymo_say_wait_process_auto_mode(cpymo_engine *e, float dt, bool prev_wait_result)
+{
+	if (!e->say.auto_mode) return prev_wait_result;
+	
+	if (prev_wait_result) {
+		e->say.auto_mode = false;
+		e->say.auto_mode_timer = -1;
+		return false;
+	}
+
+	if (e->say.auto_mode_timer < 0) e->say.auto_mode_timer = auto_mode_time;
+	
+	if (!cpymo_audio_channel_is_playing(CPYMO_AUDIO_CHANNEL_VO, &e->audio) &&
+		(!cpymo_audio_channel_is_playing(CPYMO_AUDIO_CHANNEL_SE, &e->audio) || 
+			cpymo_audio_channel_is_looping(CPYMO_AUDIO_CHANNEL_SE, &e->audio)) &&
+		!e->input.hide_window && !e->input.hide_window)
+		e->say.auto_mode_timer -= dt;
+
+	return e->say.auto_mode_timer < 0;
+}
+
+void cpymo_say_stop_auto_mode(cpymo_engine *e)
+{
+	e->say.auto_mode = false;
+	e->say.auto_mode_timer = -1;
+	if (e->say.textbox_usable) {
+		e->say.textbox.timer = 0.0f;
+		e->say.textbox.draw_cursor = true;
+		cpymo_engine_request_redraw(e);
+	}
+}
+
 static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 {
 	assert(e->say.textbox_usable);
@@ -277,11 +312,17 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 		cpymo_key_hold_update(e, &e->say.key_mouse_button, dt, e->input.mouse_button);
 
 	if (e->say.hide_window) {
-		if (cpymo_input_foward_key_just_released(e)) {
-			e->say.hide_window = false;
-			cpymo_engine_request_redraw(e);
+		if (e->say.auto_mode) {
+			cpymo_say_stop_auto_mode(e);
+			return false;
 		}
-		return false;
+		else {
+			if (cpymo_input_foward_key_just_released(e)) {
+				e->say.hide_window = false;
+				cpymo_engine_request_redraw(e);
+			}
+			return false;
+		}
 	}
 
 	bool open_backlog_by_slide = false;
@@ -297,17 +338,26 @@ static bool cpymo_say_wait_text_reading(cpymo_engine *e, float dt)
 
 	if (CPYMO_INPUT_JUST_PRESSED(e, up) || 
 		e->input.mouse_wheel_delta > 0 ||
-		open_backlog_by_slide)
-		cpymo_backlog_ui_enter(e);
+		open_backlog_by_slide) {
+
+		if (!e->say.auto_mode) cpymo_backlog_ui_enter(e);
+		else cpymo_say_stop_auto_mode(e);
+
+		return false;
+	}
 	else if (
 		CPYMO_INPUT_JUST_RELEASED(e, cancel) || 
 		(mouse_button_state == cpymo_key_hold_result_just_hold && 
 		!e->ignore_next_mouse_button_flag)) {
-		cpymo_rmenu_enter(e);
+			
+		if (!e->say.auto_mode) cpymo_rmenu_enter(e);
+		else cpymo_say_stop_auto_mode(e);
+
 		return false;
 	}
 
-	return cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox) || e->skipping;
+	return cpymo_say_wait_process_auto_mode(e, dt, 
+		cpymo_textbox_wait_text_reading(e, dt, &e->say.textbox));
 }
 
 static bool cpymo_say_wait_text_fadein(cpymo_engine *e, float dt)

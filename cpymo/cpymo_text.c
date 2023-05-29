@@ -44,7 +44,9 @@ static bool cpymo_text_wait_fadein(cpymo_engine *e, float dt)
 static bool cpymo_text_wait_reading(cpymo_engine *e, float dt)
 {
 	assert(e->text.active_box);
-	return cpymo_textbox_wait_text_reading(e, dt, e->text.active_box);
+	bool cpymo_say_wait_process_auto_mode(cpymo_engine *e, float dt, bool prev_wait_result);
+	return cpymo_say_wait_process_auto_mode(e, dt, 
+		cpymo_textbox_wait_text_reading(e, dt, e->text.active_box));
 }
 
 static error_t cpymo_text_callback_read(cpymo_engine *e);

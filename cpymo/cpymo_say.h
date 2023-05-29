@@ -29,6 +29,9 @@ typedef struct {
 	char *current_name, *current_text;
 
 	bool current_say_is_already_read;
+
+	bool auto_mode;
+	float auto_mode_timer;
 } cpymo_say;
 
 void cpymo_say_init(cpymo_say *);
@@ -45,5 +48,7 @@ error_t cpymo_say_start(
 	cpymo_str text);
 
 void cpymo_say_hidewindow_until_click(struct cpymo_engine *e);
+
+void cpymo_say_stop_auto_mode(struct cpymo_engine *e);
 
 #endif

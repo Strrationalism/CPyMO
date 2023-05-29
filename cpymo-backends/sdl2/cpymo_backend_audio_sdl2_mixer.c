@@ -116,10 +116,30 @@ void cpymo_audio_set_channel_volume(size_t cid, cpymo_audio_system *s, float vol
 	}
 }
 
-bool cpymo_audio_enabled(struct cpymo_engine *e)
+bool cpymo_audio_channel_is_playing(size_t cid, cpymo_audio_system *s)
 {
-	return enabled;
+#ifndef DISABLE_SDL2_MIXER_MUSIC
+	if (cid == CPYMO_AUDIO_CHANNEL_BGM)
+		return Mix_PlayingMusic();
+#endif
+	return Mix_Playing((int)CHUNK_ID(cid));
 }
+
+bool cpymo_audio_channel_is_looping(size_t cid, cpymo_audio_system *s)
+{
+#ifndef DISABLE_SDL2_MIXER_MUSIC
+	if (cid == CPYMO_AUDIO_CHANNEL_BGM)
+		return true;
+#endif
+
+	if (cid == CPYMO_AUDIO_CHANNEL_SE)
+		return se_looping;
+
+	return false;
+}
+
+bool cpymo_audio_enabled(struct cpymo_engine *e)
+{ return enabled; }
 
 bool cpymo_audio_wait_se(struct cpymo_engine *e, float d)
 {
