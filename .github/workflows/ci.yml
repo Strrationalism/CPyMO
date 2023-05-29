@@ -14,7 +14,7 @@ jobs:
   build-switch:
     name: 'Nintendo Switch'
     runs-on: ubuntu-latest
-    container: devkitpro/devkita64:latest
+    container: devkitpro/devkita64:20230507
  
     steps:
     - uses: actions/checkout@v1
