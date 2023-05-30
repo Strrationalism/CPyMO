@@ -119,7 +119,7 @@ void cpymo_textbox_draw(
     if (tb->lines == NULL || tb->chars_pool == NULL || tb->chars_x_pool == NULL) 
         return;
 
-    if (tb->draw_cursor && e->say.msg_cursor) {
+    if (tb->draw_cursor && e->say.msg_cursor && !e->say.auto_mode) {
         float x = tb->w + tb->x - tb->char_size;
         float y = tb->lines[tb->max_lines - 1].y - tb->char_size;
         float wh = tb->char_size;
@@ -295,6 +295,7 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *wh
     if (cpymo_engine_skipping(e)) {
         cpymo_textbox_finalize(which_textbox);
         cpymo_engine_request_redraw(e);
+        cpymo_say_stop_auto_mode(e);
         return true;
     }
 
@@ -319,6 +320,7 @@ bool cpymo_textbox_wait_text_fadein(cpymo_engine *e, float dt, cpymo_textbox *wh
 
     if (cpymo_input_foward_key_just_released(e)) {
         cpymo_engine_request_redraw(e);
+        cpymo_say_stop_auto_mode(e);
         cpymo_textbox_finalize(which_textbox);
     }
 
@@ -344,11 +346,13 @@ bool cpymo_textbox_wait_text_reading(cpymo_engine *e, float dt, cpymo_textbox *t
         || e->input.mouse_wheel_delta < 0;
 
 #ifndef LOW_FRAME_RATE
-    tb->timer += dt;
-    while (tb->timer >= 0.5f) {
-        tb->timer -= 0.5f;
-        tb->draw_cursor = !tb->draw_cursor;
-        cpymo_engine_request_redraw(e);
+    if (!e->say.auto_mode) {
+        tb->timer += dt;
+        while (tb->timer >= 0.5f) {
+            tb->timer -= 0.5f;
+            tb->draw_cursor = !tb->draw_cursor;
+            cpymo_engine_request_redraw(e);
+        }
     }
 #endif
 

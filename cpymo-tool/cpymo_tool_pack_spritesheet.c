@@ -14,7 +14,7 @@ static error_t cpymo_tool_pack_spritesheet(
 	bool create_mask,
 	const char *output_file,
 	size_t cols,
-	cpymo_str output_format,
+	const char *output_format,
 	const char **input_files,
 	size_t input_file_count) 
 {
@@ -29,7 +29,8 @@ static error_t cpymo_tool_pack_spritesheet(
 
 	size_t max_width = 0, max_height = 0;
 	for (size_t i = 0; i < input_file_count; ++i) {
-		err = cpymo_tool_image_load_from_file(&imgs[i], input_files[i], load_mask);
+		err = cpymo_tool_image_load_from_file(
+			&imgs[i], input_files[i], load_mask, NULL);
 		if (err != CPYMO_ERR_SUCC) {
 			printf("[Error] Can not load image: %s(%s).\n", input_files[i], cpymo_error_message(err));
 			goto CLEAN;
@@ -54,7 +55,8 @@ static error_t cpymo_tool_pack_spritesheet(
 		cpymo_tool_image_blit(&image, imgs + i, (int)x, (int)y);
 	}
 
-	err = cpymo_tool_image_save_to_file_with_mask(&image, output_file, output_format, create_mask);
+	err = cpymo_tool_image_save_to_file_with_mask(
+		&image, output_file, output_format, create_mask, output_format);
 
 CLEAN:
 	for (size_t i = 0; i < input_file_count; ++i)
@@ -71,9 +73,7 @@ int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 	bool create_mask = false;
 	const char *output_file = NULL;
 	const char *num_of_cols = NULL;
-	cpymo_str output_format;
-	output_format.begin = NULL;
-	output_format.len = 0;
+	const char *output_format = NULL;
 
 	size_t input_file_count = 0;
 	const char **input_files = (const char **)malloc(argc * sizeof(char **));
@@ -98,7 +98,7 @@ int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 					return -1;
 				}
 
-				output_format = cpymo_str_pure(argv[i]);
+				output_format = argv[i];
 			}
 			else {
 				printf("[Error] Unknown option: %s\n", argv[i]);
@@ -114,18 +114,21 @@ int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 	if (output_file == NULL) {
 		printf("[Error] You must pass the output file path.\n");
 		help();
+		free(input_files);
 		return -1;
 	}
 
 	if (num_of_cols == NULL) {
 		printf("[Error] You must pass the col nums.\n");
 		help();
+		free(input_files);
 		return -1;
 	}
 
 	if (input_file_count < 1) {
 		printf("[Error] You must pass at least 1 input file.\n");
 		help();
+		free(input_files);
 		return -1;
 	}
 
@@ -133,15 +136,13 @@ int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 	if (num_of_cols_n < 1) {
 		printf("[Error] cols must big than 1.\n");
 		help();
+		free(input_files);
 		return -1;
 	}
 
-	if (output_format.begin == NULL) {
-		output_format.begin = strrchr(output_file, '.');
-		if (output_format.begin) {
-			output_format.begin++;
-			output_format.len = strlen(output_format.begin);
-		}
+	if (output_format == NULL) {
+		output_format = strrchr(output_file, '.');
+		if (output_format) output_format++;
 	}
 
 	error_t err = cpymo_tool_pack_spritesheet(
@@ -154,7 +155,7 @@ int cpymo_tool_invoke_pack_spritesheet(int argc, const char ** argv)
 		input_file_count);
 
 	free((void *)input_files);
-	
+
 	return process_err(err);
 }
 

@@ -8,7 +8,8 @@ typedef struct {
 	const char
 		*msgbox_ok,
 		*msgbox_cancel,
-
+		
+		*rmenu_auto,
 		*rmenu_save,
 		*rmenu_load,
 		*rmenu_skip,
