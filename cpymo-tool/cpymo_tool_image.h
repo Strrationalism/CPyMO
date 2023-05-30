@@ -29,6 +29,9 @@ error_t cpymo_tool_image_save_to_file_with_mask(
     bool create_mask,
     const char *mask_format);
 
+error_t cpymo_tool_get_mask_name_noext(
+    char **out_name, const char *assetname);
+
 error_t cpymo_tool_get_mask_name(
 	char **out_mask_filename,
 	const char *filename,

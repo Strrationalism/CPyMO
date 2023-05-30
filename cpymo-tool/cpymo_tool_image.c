@@ -211,6 +211,17 @@ error_t cpymo_tool_image_save_to_file_with_mask(
     }
 }
 
+error_t cpymo_tool_get_mask_name_noext(
+    char **out_name, const char *assetname)
+{
+    *out_name = (char *)malloc(strlen(assetname) + 6);
+    if (*out_name == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    strcpy(*out_name, assetname);
+    strcat(*out_name, "_mask");
+    return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_tool_get_mask_name(
     char **out_mask_filename, const char *filename, const char *mask_ext)
 {

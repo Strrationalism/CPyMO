@@ -1,4 +1,5 @@
 #include "cpymo_tool_prelude.h"
+#include "../stb/stb_ds.h"
 #include "cpymo_tool_image.h"
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_asset_analyzer.h"
@@ -73,6 +74,20 @@ static error_t cpymo_tool_asset_filter_run_single(
     if (asset_count) {
         error_t err = cpymo_tool_utils_mkdir(
             filter->output_gamedir, param->asstype);
+        CPYMO_THROW(err);
+    }
+
+    cpymo_tool_package_packer packer;
+    if (io.output_to_package) {
+        char *pack_path = (char *)malloc(
+            strlen(filter->output_gamedir)
+            + 1
+            + 2 * strlen(param->asstype)
+            + 6);
+        if (pack_path == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+        error_t err = cpymo_tool_package_packer_open(
+            &packer, pack_path, shlenu(param->asset_list));
         CPYMO_THROW(err);
     }
 
@@ -195,13 +210,50 @@ static error_t cpymo_tool_asset_filter_run_single(
         }
 
         // collect output
-        if (write_to_package) {
-            // TODO: WRITE TO PACKAGE
-        }
+        if (io.output_to_package) {
+            if (write_to_package) {
+                err = cpymo_tool_package_packer_add_data(
+                    &packer,
+                    cpymo_str_pure(param->asset_list[i].key),
+                    write_to_package,
+                    write_to_package_len);
+                if (err != CPYMO_ERR_SUCC) {
+                    printf("[Error] Can not write to package: %s/%s(%s).\n",
+                        param->asstype,
+                        param->asset_list[i].key,
+                        cpymo_error_message(err));
+                }
 
-        // clean
-        if (write_to_package) free(write_to_package);
-        if (write_to_package_mask) free(write_to_package_mask);
+                free(write_to_package);
+            }
+
+            if (write_to_package_mask) {
+                char *mask_name;
+                err = cpymo_tool_get_mask_name_noext(
+                    &mask_name, param->asset_list[i].key);
+                if (err == CPYMO_ERR_SUCC) {
+                    err = cpymo_tool_package_packer_add_data(
+                        &packer,
+                        cpymo_str_pure(mask_name),
+                        write_to_package_mask,
+                        write_to_package_mask_len);
+                    free(mask_name);
+                }
+
+                if (err != CPYMO_ERR_SUCC) {
+                    printf("[Error] Can not write mask to package: %s/%s(%s).\n",
+                        param->asstype,
+                        param->asset_list[i].key,
+                        cpymo_error_message(err));
+                }
+
+                free(write_to_package_mask);
+            }
+        }
+    }
+
+    if (io.output_to_package) {
+        cpymo_tool_package_packer_close(&packer);
     }
 
     return CPYMO_ERR_SUCC;
@@ -295,8 +347,8 @@ error_t cpymo_tool_asset_filter_function_copy(
 
         if (io->input_mask_file_buf_movein && io->input_mask_ext) {
             char *mask_name = NULL;
-            err = cpymo_tool_get_mask_name(
-                &mask_name, io->output.file.asset_name, NULL);
+            err = cpymo_tool_get_mask_name_noext(
+                &mask_name, io->output.file.asset_name);
             if (err != CPYMO_ERR_SUCC) {
                 printf("[Warning] Can not get mask name: %s/%s(%s).\n",
                     io->asset_type,
