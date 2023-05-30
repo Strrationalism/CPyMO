@@ -6,8 +6,12 @@
 #include "cpymo_tool_package.h"
 
 typedef struct {
+    const char *asset_type;
+    const cpymo_gameconfig *game_config;
+    const char *input_asset_ext, *input_mask_ext;
     // input
     bool input_is_package;
+    const char *input_gamedir;
     union {
         struct {
             void *data_move_in;
@@ -15,7 +19,7 @@ typedef struct {
         } package;
 
         struct {
-            const char *path;
+            const char *asset_name;
         } file;
     } input;
 
@@ -24,6 +28,7 @@ typedef struct {
 
     // output
     bool output_to_package;
+    const char *output_gamedir;
     union {
         struct {
             void **data_move_out, **mask_move_out;
@@ -31,14 +36,13 @@ typedef struct {
         } package;
 
         struct {
-            const char *target_file_path;
-            const char *target_mask_path;
+            const char *asset_name;
         } file;
     } output;
 } cpymo_tool_asset_filter_io;
 
 typedef error_t (*cpymo_tool_asset_filter_processor)(
-    cpymo_tool_asset_filter_io *io,
+    const cpymo_tool_asset_filter_io *io,
     void *userdata);
 
 typedef struct {
@@ -85,8 +89,18 @@ error_t cpymo_tool_asset_filter_run(
     cpymo_tool_asset_filter *);
 
 error_t cpymo_tool_asset_filter_function_copy(
-    cpymo_tool_asset_filter_io *io,
+    const cpymo_tool_asset_filter_io *io,
     void *null);
+
+error_t cpymo_tool_asset_filter_get_input_file_name(
+    char **out,
+    const cpymo_tool_asset_filter_io *io);
+
+error_t cpymo_tool_asset_filter_get_output_file_name(
+    char **out,
+    const cpymo_tool_asset_filter_io *io,
+    const char *asset_name,
+    const char *ext);
 
 error_t cpymo_tool_utils_writefile(
     const char *path, const void *data, size_t len);

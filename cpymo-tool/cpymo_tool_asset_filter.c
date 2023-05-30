@@ -1,4 +1,5 @@
 #include "cpymo_tool_prelude.h"
+#include "cpymo_tool_image.h"
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_asset_analyzer.h"
 #include "../stb/stb_ds.h"
@@ -58,6 +59,12 @@ static error_t cpymo_tool_asset_filter_run_single(
 
     io.input_is_package = param->package != NULL;
     io.output_to_package = io.input_is_package;
+    io.asset_type = param->asstype;
+    io.game_config = &filter->asset_list.gameconfig;
+    io.input_asset_ext = param->assext;
+    io.input_gamedir = filter->input_assetloader.gamedir;
+    io.input_mask_ext = param->maskext;
+    io.output_gamedir = filter->output_gamedir;
 
     if (filter->use_force_pack_unpack_flag)
         io.output_to_package = filter->force_pack_unpack_flag_packed;
@@ -72,12 +79,12 @@ static error_t cpymo_tool_asset_filter_run_single(
     for (size_t i = 0; i < asset_count; ++i) {
         // setup input
         io.input_mask_file_buf_movein = NULL;
-        io.input_mask_len = NULL;
+        io.input_mask_len = 0;
 
         if (io.input_is_package) {
             io.input.package.data_move_in = NULL;
             error_t err = cpymo_package_read_file(
-                &io.input.package.data_move_in,
+                (char **)&io.input.package.data_move_in,
                 &io.input.package.len,
                 param->package,
                 cpymo_str_pure(param->asset_list[i].key));
@@ -89,14 +96,115 @@ static error_t cpymo_tool_asset_filter_run_single(
             }
 
             if (param->asset_list[i].mask) {
-                // get mask filename
+                char *mask_name = (char *)malloc(
+                    strlen(param->asset_list[i].key) + 6);
+                if (mask_name == NULL) {
+                    printf("[Warning] Out of memory.\n");
+                    goto BREAK_SETUP_INPUT;
+                }
+
+                strcpy(mask_name, param->asset_list[i].key);
+                strcat(mask_name, "_mask");
+
+                error_t err = cpymo_package_read_file(
+                    (char **)&io.input_mask_file_buf_movein,
+                    &io.input_mask_len,
+                    param->package,
+                    cpymo_str_pure(mask_name));
+                if (err != CPYMO_ERR_SUCC) {
+                    printf("[Warning] Can not load mask from %s/%s.\n",
+                        param->asstype,
+                        mask_name);
+                    io.input_mask_file_buf_movein = NULL;
+                    io.input_mask_len = 0;
+                }
+
+                free(mask_name);
             }
         }
+        else {
+            io.input.file.asset_name = param->asset_list[i].key;
+            if (param->asset_list[i].mask) {
+                char *mask_path = (char *)malloc(
+                    strlen(filter->input_assetloader.gamedir)
+                    + 1
+                    + strlen(param->asstype)
+                    + 1
+                    + strlen(io.input.file.asset_name)
+                    + 6
+                    + strlen(param->maskext)
+                    + 1);
+                if (mask_path == NULL) {
+                    printf("[Warning] Out of memory.\n");
+                    goto BREAK_SETUP_INPUT;
+                }
+
+                strcpy(mask_path, filter->input_assetloader.gamedir);
+                strcat(mask_path, "/");
+                strcat(mask_path, param->asstype);
+                strcat(mask_path, "/");
+                strcat(mask_path, io.input.file.asset_name);
+                strcat(mask_path, "_mask.");
+                strcat(mask_path, param->maskext); 
+                
+                error_t err = cpymo_utils_loadfile(
+                    mask_path, 
+                    (char **)&io.input_mask_file_buf_movein,
+                    &io.input_mask_len);
+                free(mask_path);
+                if (err != CPYMO_ERR_SUCC) {
+                    printf("[Warning] Can not load mask for %s/%s.\n",
+                        param->asstype, io.input.file.asset_name);
+                    io.input_mask_file_buf_movein = NULL;
+                    io.input_mask_len = 0;
+                    goto BREAK_SETUP_INPUT;
+                }
+            }
+        }
+
+        BREAK_SETUP_INPUT:
+
         // setup output
+        void *write_to_package = NULL, *write_to_package_mask = NULL;
+        size_t write_to_package_len = 0, write_to_package_mask_len = 0;
+        if (io.output_to_package) {
+            io.output.package.data_move_out = &write_to_package;
+            io.output.package.len = &write_to_package_len;
+            io.output.package.mask_move_out = &write_to_package;
+            io.output.package.mask_len = &write_to_package_mask_len;
+        }
+        else {
+            io.output.file.asset_name = param->asset_list[i].key;
+        }
+
         // call filter
+        error_t err = 
+            param->filter_function(&io, param->filter_function_userdata);
+        if (err != CPYMO_ERR_SUCC) {
+            printf("[Warning] Can not filter asset: %s/%s(%s).",
+                param->asstype,
+                param->asset_list[i].key,
+                cpymo_error_message(err));
+
+            if (io.input_mask_file_buf_movein)
+                free(io.input_mask_file_buf_movein);
+                
+            if (io.input_is_package)
+                if (io.input.package.data_move_in)
+                    free(io.input.package.data_move_in);
+        }
+
         // collect output
+        if (write_to_package) {
+            // TODO: WRITE TO PACKAGE
+        }
+
+        // clean
+        if (write_to_package) free(write_to_package);
+        if (write_to_package_mask) free(write_to_package_mask);
     }
-    return CPYMO_ERR_UNSUPPORTED;
+
+    return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_tool_asset_filter_run(
@@ -145,7 +253,7 @@ error_t cpymo_tool_asset_filter_run(
 }
 
 error_t cpymo_tool_asset_filter_function_copy(
-    cpymo_tool_asset_filter_io *io,
+    const cpymo_tool_asset_filter_io *io,
     void *null)
 {
     // input
@@ -157,8 +265,12 @@ error_t cpymo_tool_asset_filter_function_copy(
         len = io->input.package.len;
     }
     else {
-        error_t err = cpymo_utils_loadfile(
-            io->input.file.path, (char **)&data, &len);
+        char *path = NULL;
+        error_t err = cpymo_tool_asset_filter_get_input_file_name(&path, io);
+        CPYMO_THROW(err);
+        err = cpymo_utils_loadfile(
+            path, (char **)&data, &len);
+        free(path);
         CPYMO_THROW(err);
     }
 
@@ -170,27 +282,108 @@ error_t cpymo_tool_asset_filter_function_copy(
         *io->output.package.mask_len = io->input_mask_len;
     }
     else {
-        error_t err = cpymo_tool_utils_writefile(
-            io->output.file.target_file_path, data, len);
+        char *out_path = NULL;
+        error_t err = cpymo_tool_asset_filter_get_output_file_name(
+            &out_path, io, io->output.file.asset_name, io->input_asset_ext);
+        CPYMO_THROW(err);
 
-        if (io->output.file.target_mask_path && io->input_mask_file_buf_movein){
-            error_t errm = cpymo_tool_utils_writefile(
-                io->output.file.target_mask_path,
-                io->input_mask_file_buf_movein,
-                io->input_mask_len);
-            if (errm != CPYMO_ERR_SUCC)
-                printf("[Warning] Can not write mask file: %s(%s)",
-                    io->output.file.target_mask_path,
-                    cpymo_error_message(errm));
-        }
+        err = cpymo_tool_utils_writefile(out_path, data, len);
+        free(out_path);
+        CPYMO_THROW(err);
 
         free(data);
+
+        if (io->input_mask_file_buf_movein && io->input_mask_ext) {
+            char *mask_name = NULL;
+            err = cpymo_tool_get_mask_name(
+                &mask_name, io->output.file.asset_name, NULL);
+            if (err != CPYMO_ERR_SUCC) {
+                printf("[Warning] Can not get mask name: %s/%s(%s).\n",
+                    io->asset_type,
+                    io->output.file.asset_name,
+                    cpymo_error_message(err));
+                goto MASK_WRITE_FAIL;
+            }
+
+            err = cpymo_tool_asset_filter_get_output_file_name(
+                &out_path, io, mask_name,
+                io->input_mask_ext);
+            free(mask_name);
+            if (err != CPYMO_ERR_SUCC) {
+                printf("[Warning] Can not get mask path: %s(%s)\n",
+                    io->output.file.asset_name,
+                    cpymo_error_message(err));
+                goto MASK_WRITE_FAIL;
+            }
+
+            err = cpymo_tool_utils_writefile(
+                out_path,
+                io->input_mask_file_buf_movein,
+                io->input_mask_len);
+            free(out_path);
+            if (err != CPYMO_ERR_SUCC)
+                printf("[Warning] Can not write mask file: %s(%s)",
+                    io->output.file.asset_name,
+                    cpymo_error_message(err));
+        }
+
+        MASK_WRITE_FAIL:
+
         if (io->input_mask_file_buf_movein)
             free(io->input_mask_file_buf_movein);
-
-        CPYMO_THROW(err);
     }
 
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_asset_filter_get_input_file_name(
+    char **out, const cpymo_tool_asset_filter_io *io)
+{
+    *out = (char *)malloc(
+        strlen(io->input_gamedir)
+        + 1
+        + strlen(io->asset_type)
+        + 1
+        + strlen(io->input.file.asset_name)
+        + 1
+        + strlen(io->input_asset_ext)
+        + 1);
+    if (*out == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    strcpy(*out, io->input_gamedir);
+    strcat(*out, "/");
+    strcat(*out, io->asset_type);
+    strcat(*out, "/");
+    strcat(*out, io->input.file.asset_name);
+    strcat(*out, ".");
+    strcat(*out, io->input_asset_ext);        
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_asset_filter_get_output_file_name(
+    char **out,
+    const cpymo_tool_asset_filter_io *io,
+    const char *asset_name,
+    const char *ext)
+{
+    *out = (char *)malloc(
+        strlen(io->output_gamedir)
+        + 1
+        + strlen(io->asset_type)
+        + 1
+        + strlen(asset_name)
+        + 1
+        + strlen(ext)
+        + 1);
+    if (*out == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    strcpy(*out, io->output_gamedir);
+    strcat(*out, "/");
+    strcat(*out, io->asset_type);
+    strcat(*out, "/");
+    strcat(*out, asset_name);
+    strcat(*out, ".");
+    strcat(*out, ext);
     return CPYMO_ERR_SUCC;
 }
 
