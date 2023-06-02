@@ -90,6 +90,11 @@ static void ensure_save_dir(const char *gamedir)
 	mkdir(save_dir, 0777);
 }
 
+void on_exit(void)
+{
+    puts("\033[?25h\033[?1049l");
+}
+
 int main(int argc, char **argv)
 {
     srand((unsigned)time(NULL));
@@ -129,7 +134,8 @@ int main(int argc, char **argv)
 
     int ret = 0;
 
-    printf("\033c");
+    atexit(&on_exit);
+    puts("\033[?25l\033[?1049h");
 
     extern float get_delta_time(void);
     get_delta_time();
