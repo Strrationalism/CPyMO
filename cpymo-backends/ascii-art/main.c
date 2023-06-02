@@ -152,6 +152,14 @@ int main(int argc, char **argv)
         }
 
         if (redraw) {
+            size_t cur_w, cur_h;
+            extern void get_winsize(size_t *w, size_t *h);
+            get_winsize(&cur_w, &cur_h);
+            if (cur_w != render_target.w || cur_h != render_target.h) {
+                free_context();
+                init_context();
+            }
+
             memset(
                 render_target.pixels, 
                 0, 
