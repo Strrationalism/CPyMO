@@ -40,33 +40,33 @@ static error_t init_context(void)
 {
     extern void get_winsize(size_t *w, size_t *h);
 
-    get_winsize(&render_target.w, &render_target.h);    
+    get_winsize(&render_target.w, &render_target.h);
     render_target.line_stride = render_target.w * 3;
     render_target.pixel_stride = 3;
     render_target.r_offset = 0;
     render_target.g_offset = 1;
     render_target.b_offset = 2;
     render_target.has_alpha_channel = false;
-    render_target.pixels = 
+    render_target.pixels =
         (uint8_t *)malloc(render_target.line_stride * render_target.h);
-    
+
     if (render_target.pixels == NULL) return CPYMO_ERR_OUT_OF_MEM;
-    
+
     context.logical_screen_w = (float)engine.gameconfig.imagesize_w;
     context.logical_screen_h = (float)engine.gameconfig.imagesize_h;
 
     context.scale_on_load_image = true;
-    context.scale_on_load_image_w_ratio = 
+    context.scale_on_load_image_w_ratio =
         (float)render_target.w / context.logical_screen_w;
-    context.scale_on_load_image_h_ratio = 
+    context.scale_on_load_image_h_ratio =
         (float)render_target.h / context.logical_screen_h;
     context.render_target = &render_target;
 
     extern stbtt_fontinfo font;
     context.font = &font;
-    
+
     cpymo_backend_software_set_context(&context);
-    
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -90,7 +90,7 @@ static void ensure_save_dir(const char *gamedir)
 	mkdir(save_dir, 0777);
 }
 
-void on_exit(void)
+static void atexit_handler(void)
 {
     puts("\033[?25h\033[?1049l");
 }
@@ -100,9 +100,9 @@ int main(int argc, char **argv)
     srand((unsigned)time(NULL));
 
     const char *gamedir = ".";
-    if (argc == 2) 
+    if (argc == 2)
         gamedir = argv[1];
-    
+
     error_t err = cpymo_engine_init(&engine, gamedir);
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] cpymo_engine_init: %s. \n", cpymo_error_message(err));
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
     err = cpymo_backend_font_init(gamedir);
     if (err != CPYMO_ERR_SUCC) {
-        printf("[Error] cpymo_backend_font_init: %s.\n", 
+        printf("[Error] cpymo_backend_font_init: %s.\n",
             cpymo_error_message(err));
         cpymo_engine_free(&engine);
         return -1;
@@ -127,14 +127,14 @@ int main(int argc, char **argv)
     err = init_context();
     if (err != CPYMO_ERR_SUCC) {
         cpymo_engine_free(&engine);
-        cpymo_backend_font_free();    
+        cpymo_backend_font_free();
         printf("[Error] init_context: %s.\n", cpymo_error_message(err));
         return -1;
     }
 
     int ret = 0;
 
-    atexit(&on_exit);
+    atexit(&atexit_handler);
     puts("\033[?25l\033[?1049h");
 
     extern float get_delta_time(void);
@@ -161,8 +161,8 @@ int main(int argc, char **argv)
             }
 
             memset(
-                render_target.pixels, 
-                0, 
+                render_target.pixels,
+                0,
                 render_target.line_stride * render_target.h);
 
             cpymo_engine_draw(&engine);
