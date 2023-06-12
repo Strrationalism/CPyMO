@@ -64,6 +64,15 @@ static inline bool cpymo_gameconfig_is_symbian(const cpymo_gameconfig *g)
 		&& (g->platform[3] == 'v' || g->platform[3] == 'V');
 }
 
+static inline bool cpymo_gameconfig_scripttype_is_pymo(const cpymo_gameconfig *g)
+{
+	return
+		g->scripttype[0] == 'p'
+		&& g->scripttype[1] == 'y'
+		&& g->scripttype[2] == 'm'
+		&& g->scripttype[3] == 'o';
+}
+
 static inline float cpymo_gameconfig_font_size(const cpymo_gameconfig *c)
 { return c->fontsize / 240.0f * c->imagesize_h * 0.8f; }
 

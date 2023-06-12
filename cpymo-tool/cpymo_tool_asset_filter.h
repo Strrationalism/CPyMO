@@ -31,8 +31,8 @@ typedef struct {
     const char *output_gamedir;
     union {
         struct {
-            void **data_move_out, **mask_move_out;
-            size_t *len, *mask_len;
+            void *data_move_out, *mask_move_out;
+            size_t len, mask_len;
         } package;
 
         struct {
@@ -42,7 +42,7 @@ typedef struct {
 } cpymo_tool_asset_filter_io;
 
 typedef error_t (*cpymo_tool_asset_filter_processor)(
-    const cpymo_tool_asset_filter_io *io,
+    cpymo_tool_asset_filter_io *io,
     void *userdata);
 
 typedef struct {
@@ -89,7 +89,7 @@ error_t cpymo_tool_asset_filter_run(
     cpymo_tool_asset_filter *);
 
 error_t cpymo_tool_asset_filter_function_copy(
-    const cpymo_tool_asset_filter_io *io,
+    cpymo_tool_asset_filter_io *io,
     void *null);
 
 error_t cpymo_tool_asset_filter_get_input_file_name(
@@ -104,5 +104,14 @@ error_t cpymo_tool_asset_filter_get_output_file_name(
 
 error_t cpymo_tool_utils_writefile(
     const char *path, const void *data, size_t len);
+
+error_t cpymo_tool_utils_copy(
+    const char *src_path,
+    const char *dst_path);
+
+error_t cpymo_tool_utils_copy_gamedir(
+    const char *src_gamedir,
+    const char *dst_gamedir,
+    const char *file_relative_path);
 
 #endif

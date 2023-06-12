@@ -46,13 +46,38 @@ struct cpymo_tool_asset_filter_run_param
     const cpymo_package *package;
 };
 
+
+#ifndef _WIN32
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
+
+#ifdef _WIN32
+#include <direct.h>
+#endif
+
 static error_t cpymo_tool_utils_mkdir(const char *gamedir, const char *assdir)
 {
-    return CPYMO_ERR_UNKNOWN;
+    char *full_path = (char *)malloc(strlen(gamedir) + strlen(assdir) + 2);
+    if (full_path == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    strcpy(full_path, gamedir);
+    strcat(full_path, "/");
+    strcat(full_path, assdir);
+
+    #ifdef _WIN32
+    _mkdir(full_path);
+    #else
+    mkdir(full_path, 0777);
+    #endif
+
+    free(full_path);
+
+    return CPYMO_ERR_SUCC;
 }
 
 static error_t cpymo_tool_asset_filter_run_single(
-    cpymo_tool_asset_filter *filter,
+    const cpymo_tool_asset_filter *filter,
     const struct cpymo_tool_asset_filter_run_param *param)
 {
     cpymo_tool_asset_filter_io io;
@@ -86,8 +111,16 @@ static error_t cpymo_tool_asset_filter_run_single(
             + 6);
         if (pack_path == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
+        strcpy(pack_path, filter->output_gamedir);
+        strcat(pack_path, "/");
+        strcat(pack_path, param->asstype);
+        strcat(pack_path, "/");
+        strcat(pack_path, param->asstype);
+        strcat(pack_path, ".pak");
+
         error_t err = cpymo_tool_package_packer_open(
             &packer, pack_path, shlenu(param->asset_list));
+        free(pack_path);
         CPYMO_THROW(err);
     }
 
@@ -160,10 +193,10 @@ static error_t cpymo_tool_asset_filter_run_single(
                 strcat(mask_path, "/");
                 strcat(mask_path, io.input.file.asset_name);
                 strcat(mask_path, "_mask.");
-                strcat(mask_path, param->maskext); 
-                
+                strcat(mask_path, param->maskext);
+
                 error_t err = cpymo_utils_loadfile(
-                    mask_path, 
+                    mask_path,
                     (char **)&io.input_mask_file_buf_movein,
                     &io.input_mask_len);
                 free(mask_path);
@@ -180,30 +213,30 @@ static error_t cpymo_tool_asset_filter_run_single(
         BREAK_SETUP_INPUT:
 
         // setup output
-        void *write_to_package = NULL, *write_to_package_mask = NULL;
-        size_t write_to_package_len = 0, write_to_package_mask_len = 0;
         if (io.output_to_package) {
-            io.output.package.data_move_out = &write_to_package;
-            io.output.package.len = &write_to_package_len;
-            io.output.package.mask_move_out = &write_to_package;
-            io.output.package.mask_len = &write_to_package_mask_len;
+            io.output.package.data_move_out = NULL;
+            io.output.package.len = 0;
+            io.output.package.mask_move_out = NULL;
+            io.output.package.mask_len = 0;
         }
         else {
             io.output.file.asset_name = param->asset_list[i].key;
         }
 
         // call filter
-        error_t err = 
+        error_t err =
             param->filter_function(&io, param->filter_function_userdata);
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Warning] Can not filter asset: %s/%s(%s).",
-                param->asstype,
-                param->asset_list[i].key,
-                cpymo_error_message(err));
+            if (param->asset_list[i].warning) {
+                printf("[Warning] Can not filter asset: %s/%s(%s).\n",
+                    param->asstype,
+                    param->asset_list[i].key,
+                    cpymo_error_message(err));
+            }
 
             if (io.input_mask_file_buf_movein)
                 free(io.input_mask_file_buf_movein);
-                
+
             if (io.input_is_package)
                 if (io.input.package.data_move_in)
                     free(io.input.package.data_move_in);
@@ -211,12 +244,12 @@ static error_t cpymo_tool_asset_filter_run_single(
 
         // collect output
         if (io.output_to_package) {
-            if (write_to_package) {
+            if (io.output.package.data_move_out) {
                 err = cpymo_tool_package_packer_add_data(
                     &packer,
                     cpymo_str_pure(param->asset_list[i].key),
-                    write_to_package,
-                    write_to_package_len);
+                    io.output.package.data_move_out,
+                    io.output.package.len);
                 if (err != CPYMO_ERR_SUCC) {
                     printf("[Error] Can not write to package: %s/%s(%s).\n",
                         param->asstype,
@@ -224,10 +257,10 @@ static error_t cpymo_tool_asset_filter_run_single(
                         cpymo_error_message(err));
                 }
 
-                free(write_to_package);
+                free(io.output.package.data_move_out);
             }
 
-            if (write_to_package_mask) {
+            if (io.output.package.mask_move_out) {
                 char *mask_name;
                 err = cpymo_tool_get_mask_name_noext(
                     &mask_name, param->asset_list[i].key);
@@ -235,8 +268,8 @@ static error_t cpymo_tool_asset_filter_run_single(
                     err = cpymo_tool_package_packer_add_data(
                         &packer,
                         cpymo_str_pure(mask_name),
-                        write_to_package_mask,
-                        write_to_package_mask_len);
+                        io.output.package.mask_move_out,
+                        io.output.package.mask_len);
                     free(mask_name);
                 }
 
@@ -247,7 +280,7 @@ static error_t cpymo_tool_asset_filter_run_single(
                         cpymo_error_message(err));
                 }
 
-                free(write_to_package_mask);
+                free(io.output.package.mask_move_out);
             }
         }
     }
@@ -295,17 +328,28 @@ error_t cpymo_tool_asset_filter_run(
           "txt", NULL, f->asset_list.script, NULL }
     };
 
+    error_t err = cpymo_tool_utils_mkdir(f->output_gamedir, "");
+    CPYMO_THROW(err);
+
+    #pragma omp parallel for
     for (size_t i = 0; i < CPYMO_ARR_COUNT(params); ++i) {
-        printf("Processing %s...", params[i].asstype);
-        error_t err = cpymo_tool_asset_filter_run_single(f, params + i);
-        CPYMO_THROW(err);
+        printf("Processing %s...\n", params[i].asstype);
+        err = cpymo_tool_asset_filter_run_single(f, params + i);
+
+        if (err != CPYMO_ERR_SUCC) {
+            printf("[Error] Error on processing %s: %s.\n",
+                cpymo_error_message(err));
+        }
+        else {
+            printf("%s OK!\n", params[i].asstype);
+        }
     }
 
     return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_tool_asset_filter_function_copy(
-    const cpymo_tool_asset_filter_io *io,
+    cpymo_tool_asset_filter_io *io,
     void *null)
 {
     // input
@@ -328,10 +372,10 @@ error_t cpymo_tool_asset_filter_function_copy(
 
     // output
     if (io->output_to_package) {
-        *io->output.package.data_move_out = data;
-        *io->output.package.len = len;
-        *io->output.package.mask_move_out = io->input_mask_file_buf_movein;
-        *io->output.package.mask_len = io->input_mask_len;
+        io->output.package.data_move_out = data;
+        io->output.package.len = len;
+        io->output.package.mask_move_out = io->input_mask_file_buf_movein;
+        io->output.package.mask_len = io->input_mask_len;
     }
     else {
         char *out_path = NULL;
@@ -408,7 +452,7 @@ error_t cpymo_tool_asset_filter_get_input_file_name(
     strcat(*out, "/");
     strcat(*out, io->input.file.asset_name);
     strcat(*out, ".");
-    strcat(*out, io->input_asset_ext);        
+    strcat(*out, io->input_asset_ext);
     return CPYMO_ERR_SUCC;
 }
 
@@ -452,4 +496,52 @@ error_t cpymo_tool_utils_writefile(
 
     if (fclose(file)) return CPYMO_ERR_BAD_FILE_FORMAT;
     return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_utils_copy(const char *src_path, const char *dst_path)
+{
+    char *buf = NULL;
+    size_t sz;
+    error_t err = cpymo_utils_loadfile(src_path, &buf, &sz);
+    CPYMO_THROW(err);
+
+    err = cpymo_tool_utils_writefile(dst_path, buf, sz);
+    free(buf);
+    CPYMO_THROW(err);
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_utils_copy_gamedir(
+    const char *src_gamedir,
+    const char *dst_gamedir,
+    const char *file_relative_path)
+{
+    size_t file_relative_path_len = strlen(file_relative_path);
+    char *src_path = (char *)malloc(
+        strlen(src_gamedir) + file_relative_path_len + 2);
+
+    char *dst_path = (char *)malloc(
+        strlen(dst_gamedir) + file_relative_path_len + 2);
+
+    error_t err = CPYMO_ERR_SUCC;
+
+    if (src_path == NULL || dst_path == NULL) {
+        err = CPYMO_ERR_OUT_OF_MEM;
+        goto END;
+    }
+
+    strcpy(src_path, src_gamedir);
+    strcpy(dst_path, dst_gamedir);
+    strcat(src_path, "/");
+    strcat(dst_path, "/");
+    strcat(src_path, file_relative_path);
+    strcat(dst_path, file_relative_path);
+
+    err = cpymo_tool_utils_copy(src_path, dst_path);
+
+END:
+    if (src_path) free(src_path);
+    if (dst_path) free(dst_path);
+    return err;
 }

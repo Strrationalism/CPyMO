@@ -203,13 +203,13 @@ error_t cpymo_tool_asset_analyze(
     if (!cpymo_pymo_version_compatible(
         output->gameconfig.engineversion,
         engineversion)) {
-        printf("[Error] Game requires engine %d.%d, not compatibled with pymo 1.2.",
+        printf("[Error] Game requires engine %d.%d, not compatible with pymo 1.2.",
             output->gameconfig.engineversion.major,
             output->gameconfig.engineversion.minor);
         return CPYMO_ERR_UNSUPPORTED;
     }
 
-    if (strcmp(output->gameconfig.scripttype, "pymo")) {
+    if (cpymo_gameconfig_scripttype_is_pymo(&output->gameconfig)) {
         printf("[Error] Script type %s is not compatible.\n",
             output->gameconfig.scripttype);
         return CPYMO_ERR_UNSUPPORTED;
