@@ -46,6 +46,42 @@ error_t cpymo_tool_image_load_from_file(
     return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_tool_image_load_from_memory(
+    cpymo_tool_image *out, void *memory, size_t len, bool is_mask)
+{
+    int w, h;
+    out->channels = is_mask ? 1 : 4;
+    stbi_uc *px = stbi_load_from_memory(memory, (int)len, &w, &h, NULL, out->channels);
+    if (px == NULL) return CPYMO_ERR_INVALID_ARG;
+
+    out->width = w;
+    out->height = h;
+    out->pixels = px;
+    return CPYMO_ERR_SUCC;
+}
+
+void cpymo_tool_image_attach_mask(cpymo_tool_image *img, const cpymo_tool_image *mask)
+{
+    cpymo_utils_attach_mask_to_rgba_ex(
+        img->pixels,
+        img->width,
+        img->height,
+        mask->pixels,
+        mask->width,
+        mask->height);
+}
+
+error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, void *mask_buf, size_t len)
+{
+    cpymo_tool_image mask;
+    error_t err = cpymo_tool_image_load_from_memory(&mask, mask_buf, len, true);
+    CPYMO_THROW(err);
+
+    cpymo_tool_image_attach_mask(img, &mask);
+    cpymo_tool_image_free(mask);
+    return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_tool_image_create(cpymo_tool_image * out, size_t w, size_t h, size_t channels)
 {
     stbi_uc *px = (stbi_uc *)malloc(w * h * channels);
@@ -209,6 +245,12 @@ error_t cpymo_tool_image_save_to_file_with_mask(
         if (err != CPYMO_ERR_SUCC) goto MASK_FAILED;
         return CPYMO_ERR_SUCC;
     }
+}
+
+error_t cpymo_tool_image_save_to_memory(const char *format, void **data, size_t *len)
+{
+    // TODO: Write to memory
+    return CPYMO_ERR_UNSUPPORTED;
 }
 
 error_t cpymo_tool_get_mask_name_noext(

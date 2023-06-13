@@ -28,5 +28,3 @@ error_t cpymo_tool_ffmpeg_search(const char **out_ffmpeg_command)
 
     return CPYMO_ERR_NOT_FOUND;
 }
-
-
