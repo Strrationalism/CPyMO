@@ -338,6 +338,7 @@ error_t cpymo_tool_asset_filter_run(
 
         if (err != CPYMO_ERR_SUCC) {
             printf("[Error] Error on processing %s: %s.\n",
+                params[i].asstype,
                 cpymo_error_message(err));
         }
         else {
