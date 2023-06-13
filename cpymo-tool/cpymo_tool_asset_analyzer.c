@@ -87,7 +87,7 @@ static error_t cpymo_tool_asset_analyze_single_script(
 
         for (size_t i = 0; i < CPYMO_ARR_COUNT(ignore_commands); ++i)
             if (cpymo_str_equals_str(command, ignore_commands[i])) 
-                goto NEXT_COMMAND;
+                continue;
 
         if (cpymo_str_equals_str(command, "change") 
             || cpymo_str_equals_str(command, "call"))
@@ -115,7 +115,6 @@ static error_t cpymo_tool_asset_analyze_single_script(
         cpymo_tool_asset_analyze_single_command(
             script_name, gamedir, command, &parser, result, system_asset_table);
 
-        NEXT_COMMAND:
     } while (cpymo_parser_next_line(&parser));
 
 
