@@ -117,7 +117,6 @@ static error_t cpymo_tool_asset_analyze_single_script(
 
     } while (cpymo_parser_next_line(&parser));
 
-
     free(script);
 
     return CPYMO_ERR_SUCC;
