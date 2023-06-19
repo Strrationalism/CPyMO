@@ -8,6 +8,7 @@
 #include "../cpymo/cpymo_assetloader.h"
 #include "../stb/stb_image_write.h"
 #include "../stb/stb_image_resize.h"
+#include "../stb/stb_ds.h"
 
 error_t cpymo_tool_image_load_from_file(
     cpymo_tool_image *out, const char *filename,
@@ -247,10 +248,62 @@ error_t cpymo_tool_image_save_to_file_with_mask(
     }
 }
 
-error_t cpymo_tool_image_save_to_memory(const char *format, void **data, size_t *len)
+static void cpymo_tool_image_write_memory_function(
+    void *context, void *data, int size)
 {
-    // TODO: Write to memory
-    return CPYMO_ERR_UNSUPPORTED;
+    uint8_t **ctx = (uint8_t **)context;
+    uint8_t *buf = *ctx;
+
+    void *dst = arraddnptr(buf, size);
+    memcpy(dst, data, (size_t)size);
+    *ctx = buf;
+}
+
+error_t cpymo_tool_image_save_to_memory(
+    const cpymo_tool_image img,
+    const char *format,
+    void **data,
+    size_t *len)
+{
+    void *buffer = NULL;
+    int ret;
+    if (!strcmp("bmp", format)) {
+        ret = stbi_write_bmp_to_func(
+            &cpymo_tool_image_write_memory_function,
+            &buffer,
+            img.width,
+            img.height,
+            (int)img.channels,
+            (void *)img.pixels);
+    }
+    else if (!strcmp("png", format)) {
+        ret = stbi_write_png_to_func(
+            &cpymo_tool_image_write_memory_function,
+            &buffer,
+            img.width,
+            img.height,
+            (int)img.channels,
+            (void *)img.pixels,
+            (int)img.width * img.channels);
+    }
+    else if (!strcmp("jpg", format)) {
+        ret = stbi_write_jpg_to_func(
+            &cpymo_tool_image_write_memory_function,
+            &buffer,
+            img.width,
+            img.height,
+            (int)img.channels,
+            (void *)img.pixels,
+            0);
+    }
+    else {
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+
+    *data = buffer;
+    *len = arrlenu(data);
+
+    return CPYMO_ERR_SUCC;
 }
 
 error_t cpymo_tool_get_mask_name_noext(

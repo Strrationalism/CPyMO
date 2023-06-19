@@ -24,7 +24,7 @@ error_t cpymo_tool_image_load_attach_mask_from_memory(
     cpymo_tool_image *img, void *mask_buf, size_t len);
 
 error_t cpymo_tool_image_detach_mask(
-    cpymo_tool_image *img, cpymo_tool_image *out_mask);
+    const cpymo_tool_image *img, cpymo_tool_image *out_mask);
 
 error_t cpymo_tool_image_create(cpymo_tool_image *out, size_t w, size_t h, size_t channels);
 void cpymo_tool_image_free(cpymo_tool_image img);
@@ -42,6 +42,7 @@ error_t cpymo_tool_image_save_to_file_with_mask(
     const char *mask_format);
 
 error_t cpymo_tool_image_save_to_memory(
+    const cpymo_tool_image img,
     const char *format,
     void **data,
     size_t *len);
