@@ -83,6 +83,27 @@ error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, voi
     return CPYMO_ERR_SUCC;
 }
 
+error_t cpymo_tool_image_detach_mask(const cpymo_tool_image *img, cpymo_tool_image *out_mask)
+{
+    out_mask->pixels = (stbi_uc *)malloc(out_mask->width * out_mask->height);
+    if (out_mask->pixels == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    out_mask->channels = 1;
+    out_mask->width = img->width;
+    out_mask->height = img->height;
+    size_t pixels_count = img->width * img->height;
+
+    if (img->channels == 3) {
+        memset(out_mask, 255, pixels_count);
+        return CPYMO_ERR_SUCC;
+    }
+
+    for (size_t p = 0; p < pixels_count; ++p)
+        out_mask->pixels[p] = img->pixels[p * img->channels + 3];
+
+    return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_tool_image_create(cpymo_tool_image * out, size_t w, size_t h, size_t channels)
 {
     stbi_uc *px = (stbi_uc *)malloc(w * h * channels);
@@ -353,12 +374,12 @@ static size_t cpymo_tool_generate_album_ui_get_max_page_id(
 
     cpymo_parser parser;
     cpymo_parser_init(
-        &parser, 
+        &parser,
         album_list_content_text.begin,
         album_list_content_text.len);
-    
+
     do {
-        cpymo_str page_id_str = 
+        cpymo_str page_id_str =
             cpymo_parser_curline_pop_commacell(&parser);
         cpymo_str_trim(&page_id_str);
         if (page_id_str.len == 0) continue;
@@ -370,10 +391,10 @@ static size_t cpymo_tool_generate_album_ui_get_max_page_id(
 }
 
 extern error_t cpymo_album_generate_album_ui_image_pixels(
-	void **out_image, 
-	cpymo_str album_list_text, 
+	void **out_image,
+	cpymo_str album_list_text,
 	cpymo_str output_cache_ui_file_name,
-	size_t page, 
+	size_t page,
 	cpymo_assetloader* loader,
 	size_t *ref_w, size_t *ref_h);
 
@@ -397,7 +418,7 @@ static void cpymo_tool_generate_album_ui_generate(
 
     cpymo_str album_list_content = {
         album_list_text,
-        album_list_text_size 
+        album_list_text_size
     };
 
     size_t max_page_id = cpymo_tool_generate_album_ui_get_max_page_id(
@@ -424,7 +445,7 @@ static void cpymo_tool_generate_album_ui_generate(
 }
 
 static int cpymo_tool_generate_album_ui(
-    const char *gamedir, 
+    const char *gamedir,
     const char **additional_album_lists,
     size_t additional_album_lists_count)
 {
@@ -436,7 +457,7 @@ static int cpymo_tool_generate_album_ui(
         sprintf(path, "%s/gameconfig.txt", gamedir);
         error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, path);
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not open file: %s(%s).\n", 
+            printf("[Error] Can not open file: %s(%s).\n",
                 path, cpymo_error_message(err));
             free(path);
             return err;
@@ -446,14 +467,14 @@ static int cpymo_tool_generate_album_ui(
 
         err = cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not init assetloader: %s %s.\n", 
+            printf("[Error] Can not init assetloader: %s %s.\n",
                 path, cpymo_error_message(err));
             return err;
         }
     }
 
     cpymo_tool_generate_album_ui_generate("album_list", true, &assetloader);
-    for (size_t i = 0; i < additional_album_lists_count; ++i) 
+    for (size_t i = 0; i < additional_album_lists_count; ++i)
         cpymo_tool_generate_album_ui_generate(
             additional_album_lists[i], false, &assetloader);
 

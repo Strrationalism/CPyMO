@@ -1,6 +1,9 @@
 #include "cpymo_tool_prelude.h"
 #include "cpymo_tool_image.h"
 #include "cpymo_tool_asset_filter.h"
+#include "cpymo_tool_ffmpeg.h"
+#include <string.h>
+#include <stdio.h>
 
 typedef struct {
     const char *name, *desc;
@@ -169,4 +172,69 @@ static error_t cpymo_tool_convert_image_processor(
         free(io->input_mask_file_buf_movein);
 
     return err;
+}
+
+struct cpymo_tool_convert_ffmpeg_processor_userdata
+{
+    const char *ffmpeg_command;
+    const char *out_ext;
+};
+
+static error_t cpymo_tool_convert_ffmpeg_processor(
+    cpymo_tool_asset_filter_io *io,
+    void *userdata)
+{
+    bool delete_input_file = false;
+    char *input_file = NULL;
+    error_t err = CPYMO_ERR_SUCC;
+    char *output_file = NULL;
+    bool delete_output_file = false;
+    bool package_output_file = false;
+    struct cpymo_tool_convert_ffmpeg_processor_userdata *u =
+        (struct cpymo_tool_convert_ffmpeg_processor_userdata *)userdata;
+
+    if (io->input_is_package) {
+        input_file = (char *)malloc(L_tmpnam);
+        if (input_file == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+        tempnam(input_file);
+        err = cpymo_tool_utils_writefile(
+            input_file, io->input.package.data_move_in, io->input.package.len);
+        if (err != CPYMO_ERR_SUCC) goto CLEAN;
+    }
+    else {
+        err = cpymo_tool_asset_filter_get_input_file_name(
+            &input_file, io);
+        if (err != CPYMO_ERR_SUCC) goto CLEAN;
+    }
+
+    if (io->output_to_package) {
+        output_file = (char *)malloc(L_tmpnam);
+        if (output_file == NULL) {
+            err = CPYMO_ERR_OUT_OF_MEM;
+            goto CLEAN;
+        }
+
+        tempnam(output_file);
+
+        delete_output_file = true;
+        package_output_file = true;
+    }
+    else {
+        err = cpymo_tool_asset_filter_get_output_file_name(
+            &output_file, io, io->output.file.asset_name, u->out_ext );
+        delete_output_file = false;
+    }
+
+    err = cpymo_tool_ffmpeg_call(
+        u->ffmpeg_command, input_file, output_file, u->out_ext);
+
+    CLEAN:
+    if (input_file) free(input_file);
+    if (delete_input_file) { /* TODO */}
+
+    if (output_file) free(output_file);
+    if (package_output_file) { /* TODO */}
+    if (delete_output_file) { /* TODO */ }
+    return CPYMO_ERR_SUCC;
 }

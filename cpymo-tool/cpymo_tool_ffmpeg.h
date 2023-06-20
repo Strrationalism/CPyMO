@@ -4,4 +4,10 @@
 
 error_t cpymo_tool_ffmpeg_search(const char **out_ffmpeg_command);
 
+error_t cpymo_tool_ffmpeg_call(
+    const char *ffmpeg_command,
+    const char *src,
+    const char *dst,
+    const char *fmt);
+
 #endif
