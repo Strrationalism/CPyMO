@@ -8,6 +8,7 @@ error_t cpymo_tool_ffmpeg_call(
     const char *ffmpeg_command,
     const char *src,
     const char *dst,
-    const char *fmt);
+    const char *fmt,
+    const char *flags4);
 
 #endif

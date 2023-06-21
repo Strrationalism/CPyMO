@@ -2,8 +2,12 @@
 #include "cpymo_tool_image.h"
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_ffmpeg.h"
+#include "cpymo_tool_gameconfig.h"
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
+
+typedef uint8_t cpymo_tool_convert_audio_support;
 
 typedef struct {
     const char *name, *desc;
@@ -15,7 +19,7 @@ typedef struct {
         *charaformat,
         *charamaskformat,
         *platform;
-    uint8_t audio_support;
+    cpymo_tool_convert_audio_support audio_support;
 } cpymo_tool_convert_spec;
 
 #define OGG 0x01
@@ -54,13 +58,9 @@ static const cpymo_tool_convert_spec cpymo_tool_convert_specs[] = {
       OGG | WAV },
 };
 
-#undef OGG
-#undef MP3
-#undef WAV
-
 struct cpymo_tool_convert_image_processor_userdata
 {
-    float scale_ratio;
+    double scale_ratio;
     const char *target_format;
     const char *mask_format;
 };
@@ -107,8 +107,8 @@ static error_t cpymo_tool_convert_image_processor(
 
     cpymo_tool_image resized;
     err = cpymo_tool_image_resize(&resized, &image,
-        (size_t)(u->scale_ratio * (float)image.width),
-        (size_t)(u->scale_ratio * (float)image.height));
+        (size_t)(u->scale_ratio * (double)image.width),
+        (size_t)(u->scale_ratio * (double)image.height));
     cpymo_tool_image_free(image);
 
     // write
@@ -178,6 +178,7 @@ struct cpymo_tool_convert_ffmpeg_processor_userdata
 {
     const char *ffmpeg_command;
     const char *out_ext;
+    const char *flags;
 };
 
 static error_t cpymo_tool_convert_ffmpeg_processor(
@@ -197,7 +198,7 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
         input_file = (char *)malloc(L_tmpnam);
         if (input_file == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-        tempnam(input_file);
+        tempnam(io->output_gamedir, input_file);
         err = cpymo_tool_utils_writefile(
             input_file, io->input.package.data_move_in, io->input.package.len);
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
@@ -215,26 +216,249 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
             goto CLEAN;
         }
 
-        tempnam(output_file);
+        tempnam(io->output_gamedir, output_file);
 
         delete_output_file = true;
         package_output_file = true;
     }
     else {
         err = cpymo_tool_asset_filter_get_output_file_name(
-            &output_file, io, io->output.file.asset_name, u->out_ext );
+            &output_file, io, io->output.file.asset_name, u->out_ext);
         delete_output_file = false;
     }
 
     err = cpymo_tool_ffmpeg_call(
-        u->ffmpeg_command, input_file, output_file, u->out_ext);
+        u->ffmpeg_command, input_file, output_file, u->out_ext, u->flags);
 
     CLEAN:
-    if (input_file) free(input_file);
-    if (delete_input_file) { /* TODO */}
+    if (input_file) {
+        if (delete_input_file)
+            remove(input_file);
+        free(input_file);
+    }
 
-    if (output_file) free(output_file);
-    if (package_output_file) { /* TODO */}
-    if (delete_output_file) { /* TODO */ }
-    return CPYMO_ERR_SUCC;
+    if (output_file) {
+        if (package_output_file) {
+            io->output.package.mask_len = 0;
+            io->output.package.mask_move_out = NULL;
+            io->output.package.data_move_out = NULL;
+            io->output.package.len = 0;
+
+            char *buf = NULL; size_t len;
+            err = cpymo_utils_loadfile(output_file, &buf, &len);
+            if (err == CPYMO_ERR_SUCC) {
+                io->output.package.data_move_out = buf;
+                io->output.package.len = 0;
+            }
+        }
+
+        if (delete_output_file)
+            remove(output_file);
+        free(output_file);
+    }
+
+    return err;
+}
+
+static error_t cpymo_tool_convert_find_spec(
+    const cpymo_tool_convert_spec **out_spec,
+    const char *spec_name)
+{
+    for (size_t i = 0; i < CPYMO_ARR_COUNT(cpymo_tool_convert_specs); ++i) {
+        if (!strcmp(spec_name, cpymo_tool_convert_specs[i].name)) {
+            *out_spec = cpymo_tool_convert_specs + i;
+            return CPYMO_ERR_SUCC;
+        }
+    }
+
+    printf("[Error] Spec %s not found.\n", spec_name);
+    return CPYMO_ERR_NOT_FOUND;
+}
+
+static double cpymo_tool_convert_scale(
+    size_t src_w, size_t src_h,
+    const cpymo_tool_convert_spec *spec)
+{
+    return (spec->screen_fit_support ? &fmax : &fmin)(
+        (double)spec->imagesize_w / (double)src_w,
+        (double)spec->imagesize_h / (double)src_h);
+}
+
+static bool cpymo_tool_convert_audio_supported(
+    cpymo_tool_convert_audio_support support_table,
+    cpymo_str format)
+{
+    #define TEST(FORMAT) \
+        ((support_table & FORMAT) && cpymo_str_equals_str_ignore_case(format, #FORMAT))
+    return TEST(WAV) || TEST(OGG) || TEST(MP3);
+}
+
+static void cpymo_tool_convert_configure_ffmpeg(
+    const char *ffmpeg_command,
+    const cpymo_tool_convert_spec *spec,
+    cpymo_tool_asset_filter_processor *processor,
+    void **userdata,
+    struct cpymo_tool_convert_ffmpeg_processor_userdata *u,
+    const char *current_format)
+{
+    *processor = &cpymo_tool_asset_filter_function_copy;
+    *userdata = NULL;
+    u->out_ext = current_format;
+
+    if (cpymo_tool_convert_audio_supported(
+        spec->audio_support,
+        cpymo_str_pure(current_format))
+        || spec->forced_audio_convert)
+    {
+        if (ffmpeg_command == NULL) {
+            printf("[Warning] ffmpeg not found, audio won\'t be converted.");
+            return;
+        }
+
+        *processor = &cpymo_tool_convert_ffmpeg_processor;
+        *userdata = u;
+        u->ffmpeg_command = ffmpeg_command;
+        u->flags = NULL;
+
+        if (u->flags && OGG) u->out_ext = "ogg";
+        else if (u->flags && MP3) u->out_ext = "mp3";
+        else u->out_ext = "wav";
+    }
+}
+
+static error_t cpymo_tool_convert(
+    const char *dst_gamedir,
+    const char *src_gamedir,
+    const cpymo_tool_convert_spec *spec)
+{
+    const char *ffmpeg_command;
+    error_t err = cpymo_tool_ffmpeg_search(&ffmpeg_command);
+    if (err != CPYMO_ERR_SUCC) ffmpeg_command = NULL;
+
+    cpymo_tool_asset_filter filter;
+    err = cpymo_tool_asset_filter_init(
+        &filter, src_gamedir, dst_gamedir);
+    CPYMO_THROW(err);
+
+    cpymo_gameconfig cfg = filter.asset_list.gameconfig;
+
+    filter.filter_bg = &cpymo_tool_convert_image_processor;
+    struct cpymo_tool_convert_image_processor_userdata u_bg;
+    u_bg.mask_format = NULL;
+    u_bg.target_format = spec->bgformat;
+    u_bg.scale_ratio = cpymo_tool_convert_scale(
+        cfg.imagesize_w, cfg.imagesize_h, spec);
+    filter.filter_bg_userdata = &u_bg;
+
+    struct cpymo_tool_convert_ffmpeg_processor_userdata u_bgm;
+    cpymo_tool_convert_configure_ffmpeg(
+        ffmpeg_command, spec, &filter.filter_bgm,
+        &filter.filter_bgm_userdata, &u_bgm, cfg.bgmformat);
+
+    filter.filter_chara = &cpymo_tool_convert_image_processor;
+    struct cpymo_tool_convert_image_processor_userdata u_chara = u_bg;
+    u_chara.target_format = spec->charaformat;
+    if (spec->use_mask) u_chara.mask_format = spec->charamaskformat;
+    filter.filter_chara_userdata = &u_chara;
+
+    struct cpymo_tool_convert_ffmpeg_processor_userdata u_se;
+    cpymo_tool_convert_configure_ffmpeg(
+        ffmpeg_command, spec, &filter.filter_se,
+        &filter.filter_se_userdata, &u_se, cfg.seformat);
+
+    filter.filter_system = &cpymo_tool_convert_image_processor;
+    struct cpymo_tool_convert_image_processor_userdata u_system = u_bg;
+    u_system.mask_format = spec->use_mask ? "png" : NULL;
+    u_system.target_format = "png";
+    filter.filter_system_userdata = &u_system;
+
+    char u_video_flag_str[256];
+    struct cpymo_tool_convert_ffmpeg_processor_userdata u_video;
+    if (ffmpeg_command == NULL) {
+        printf("[Warning] ffmpeg not found, video won\'t be converted.\n");
+        filter.filter_video = &cpymo_tool_asset_filter_function_copy;
+        filter.filter_video_userdata = NULL;
+    }
+    else {
+        filter.filter_video = &cpymo_tool_convert_ffmpeg_processor;
+        filter.filter_video_userdata = &u_video;
+        u_video.ffmpeg_command = ffmpeg_command;
+        u_video.out_ext = "mp4";
+
+        char scale_ratio_str[64];
+        snprintf(
+            scale_ratio_str,
+            CPYMO_ARR_COUNT(scale_ratio_str),
+            "%lf",
+            u_bg.scale_ratio);
+
+        snprintf(
+            u_video_flag_str,
+            CPYMO_ARR_COUNT(u_video_flag_str),
+            "scale=\"iw * %s : ih * %s\" -c:v mpeg4 -c:a aac",
+            scale_ratio_str,
+            scale_ratio_str);
+
+        u_video.flags = u_video_flag_str;
+    }
+
+    struct cpymo_tool_convert_ffmpeg_processor_userdata u_voice;
+    cpymo_tool_convert_configure_ffmpeg(
+        ffmpeg_command, spec, &filter.filter_voice,
+        &filter.filter_voice_userdata, &u_voice, cfg.voiceformat);
+
+    err = cpymo_tool_asset_filter_run(&filter);
+    if (err != CPYMO_ERR_SUCC) goto CLEAN;
+
+    #define COPY_STR(DST, SRC) \
+        if (SRC != NULL) { \
+            for (size_t i = 0; i < CPYMO_ARR_COUNT(DST); ++i) { \
+                DST[i] = SRC[i]; \
+                if (SRC[i] == '\0') { \
+                    for (; i < CPYMO_ARR_COUNT(DST); ++i) \
+                        DST[i] = '\0'; \
+                    break; \
+                } \
+            } \
+        } \
+        else \
+            for (size_t i = 0; i < CPYMO_ARR_COUNT(DST); ++i) DST[i]= '\0';
+
+    COPY_STR(cfg.bgformat, u_bg.target_format);
+    COPY_STR(cfg.bgmformat, u_bgm.out_ext);
+    COPY_STR(cfg.charaformat, u_chara.target_format);
+    COPY_STR(cfg.charamaskformat, u_chara.mask_format);
+    cfg.imagesize_w = (size_t)(cfg.imagesize_w * u_bg.scale_ratio);
+    cfg.imagesize_h = (size_t)(cfg.imagesize_h * u_bg.scale_ratio);
+    COPY_STR(cfg.platform, spec->platform);
+    if (!cfg.playvideo) cfg.playvideo = false;
+    COPY_STR(cfg.seformat, u_se.out_ext);
+    COPY_STR(cfg.voiceformat, u_voice.out_ext);
+
+    char *path = (char *)malloc(sizeof(dst_gamedir) + 16);
+    if (path == NULL) {
+        err = CPYMO_ERR_OUT_OF_MEM;
+        goto CLEAN;
+    }
+
+    strcpy(path, dst_gamedir);
+    strcat(path, "/gameconfig.txt");
+    err = cpymo_tool_gameconfig_write_to_file(path, &cfg);
+    if (err != CPYMO_ERR_SUCC) goto CLEAN;
+
+    error_t warn = cpymo_tool_utils_copy_gamedir(
+        src_gamedir, dst_gamedir, "icon.png");
+    if (warn != CPYMO_ERR_SUCC) {
+        printf("[Warning] Can not copy icon.png: %s.\n",
+            cpymo_error_message(warn));
+    }
+
+    cpymo_tool_utils_copy_gamedir(
+        src_gamedir, dst_gamedir, "system/default.ttf");
+
+    printf("=> %s\n", dst_gamedir);
+
+    CLEAN:
+    cpymo_tool_asset_filter_free(&filter);
+    return err;
 }
