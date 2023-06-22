@@ -70,7 +70,7 @@ int help(void) {
 	printf("Strip pymo game:\n");
 	printf("    cpymo-tool strip <gamedir> <output-gamedir>\n");
 	printf("Convert pymo game:\n");
-	printf("    cpymo-tool conv <s60v3/s60v5/pymo/3ds/psp/wii> <gamedir> <output-gamedir>\n");
+	printf("    cpymo-tool convert <s60v3/s60v5/pymo/3ds/psp/wii> <gamedir> <output-gamedir>\n");
 	printf("\n");
 	return 0;
 }
@@ -90,6 +90,7 @@ int main(int argc, const char **argv) {
 	}
 	else {
 		extern int cpymo_tool_invoke_strip(int argc, const char **argv);
+		extern int cpymo_tool_invoke_convert(int argc, const char **argv);
 
 		if (strcmp(argv[1], "unpack") == 0)
 			ret = cpymo_tool_invoke_unpack(argc, argv);
@@ -103,6 +104,8 @@ int main(int argc, const char **argv) {
 			ret = cpymo_tool_invoke_generate_album_ui(argc, argv);
 		else if (strcmp(argv[1], "strip") == 0)
 			ret = cpymo_tool_invoke_strip(argc, argv);
+		else if (strcmp(argv[1], "convert") == 0)
+			ret = cpymo_tool_invoke_convert(argc, argv);
 		else ret = help();
 	}
 

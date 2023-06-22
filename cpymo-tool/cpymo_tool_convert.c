@@ -462,3 +462,35 @@ static error_t cpymo_tool_convert(
     cpymo_tool_asset_filter_free(&filter);
     return err;
 }
+
+int cpymo_tool_invoke_convert(int argc, const char **argv)
+{
+    extern int help(void);
+
+    if (argc != 5) {
+        printf("[Error] Invalid arguments.\n");
+        help();
+        return -1;
+    }
+
+    const char *spec_name = argv[2];
+    const char *input = argv[3];
+    const char *output = argv[4];
+
+    const cpymo_tool_convert_spec *spec;
+    error_t err = cpymo_tool_convert_find_spec(
+        &spec, spec_name);
+
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] Can not find spec \'%s\'.\n", spec_name);
+        return -1;
+    }
+
+    err = cpymo_tool_convert(output, input, spec);
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] %s.\n", cpymo_error_message(err));
+        return -1;
+    }
+
+    return 0;
+}

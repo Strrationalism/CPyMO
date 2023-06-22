@@ -37,7 +37,7 @@ typedef struct {
 static void cpymo_tool_asset_analyze_single_command(
     const char *script_name,
     const char *gamedir,
-    cpymo_str command, 
+    cpymo_str command,
     cpymo_parser *parser,
     cpymo_tool_asset_analyzer_result *r,
     cpymo_tool_asset_analyzer_system_asset_table *sat);
@@ -86,10 +86,10 @@ static error_t cpymo_tool_asset_analyze_single_script(
         };
 
         for (size_t i = 0; i < CPYMO_ARR_COUNT(ignore_commands); ++i)
-            if (cpymo_str_equals_str(command, ignore_commands[i])) 
-                continue;
+            if (cpymo_str_equals_str(command, ignore_commands[i]))
+                goto NEXT_COMMAND;
 
-        if (cpymo_str_equals_str(command, "change") 
+        if (cpymo_str_equals_str(command, "change")
             || cpymo_str_equals_str(command, "call"))
         {
             cpymo_str next_script = cpymo_parser_curline_pop_commacell(&parser);
@@ -114,6 +114,8 @@ static error_t cpymo_tool_asset_analyze_single_script(
 
         cpymo_tool_asset_analyze_single_command(
             script_name, gamedir, command, &parser, result, system_asset_table);
+
+        NEXT_COMMAND:
 
     } while (cpymo_parser_next_line(&parser));
 
@@ -146,7 +148,7 @@ static void cpymo_tool_asset_analyzer_add_system_assets(
     cpymo_tool_asset_analyzer_result *r,
     const cpymo_tool_asset_analyzer_system_asset_table *t)
 {
-    ADD_ASSET(r, bg, cpymo_str_pure("logo1"), 
+    ADD_ASSET(r, bg, cpymo_str_pure("logo1"),
         r->gameconfig.bgformat, false, NULL, true);
 
     ADD_ASSET(r, bg, cpymo_str_pure("logo2"),
@@ -157,7 +159,7 @@ static void cpymo_tool_asset_analyzer_add_system_assets(
     ADD_ASSET(r, system, cpymo_str_pure("name"), "png", true, "png", true);
 
     if (t->system_sel_highlight) {
-        ADD_ASSET(r, system, 
+        ADD_ASSET(r, system,
             cpymo_str_pure("sel_highlight"), "png", true, "png", true);
     }
 
@@ -167,17 +169,17 @@ static void cpymo_tool_asset_analyzer_add_system_assets(
     }
 
     if (t->script_music_list) {
-        ADD_ASSET(r, script, 
+        ADD_ASSET(r, script,
             cpymo_str_pure("music_list"), "txt", false, NULL, true);
     }
 
     if (t->system_option) {
-        ADD_ASSET(r, system, 
+        ADD_ASSET(r, system,
             cpymo_str_pure("option"), "png", true, "png", true);
     }
 
     if (t->system_cv_thumb) {
-        ADD_ASSET(r, system, 
+        ADD_ASSET(r, system,
             cpymo_str_pure("cvThumb"), "png", false, NULL, true);
     }
 }
@@ -191,8 +193,8 @@ error_t cpymo_tool_asset_analyze(
 
     strcpy(gameconfig_path, gamedir);
     strcat(gameconfig_path, "/gameconfig.txt");
-    
-    error_t err = 
+
+    error_t err =
         cpymo_gameconfig_parse_from_file(&output->gameconfig, gameconfig_path);
     free(gameconfig_path);
     CPYMO_THROW(err);
@@ -242,7 +244,7 @@ error_t cpymo_tool_asset_analyze(
         output->gameconfig.startscript,
         &system_asset_table);
     cpymo_tool_asset_analyzer_add_system_assets(output, &system_asset_table);
-    if (err != CPYMO_ERR_SUCC) 
+    if (err != CPYMO_ERR_SUCC)
         cpymo_tool_asset_analyzer_free_result(output);
 
     return err;
@@ -251,7 +253,7 @@ error_t cpymo_tool_asset_analyze(
 static void cpymo_tool_asset_analyze_single_command(
     const char *script_name,
     const char *gamedir,
-    cpymo_str cmd, 
+    cpymo_str cmd,
     cpymo_parser *parser,
     cpymo_tool_asset_analyzer_result *r,
     cpymo_tool_asset_analyzer_system_asset_table *system_asset_table)
@@ -276,9 +278,9 @@ static void cpymo_tool_asset_analyze_single_command(
             cpymo_parser_curline_pop_commacell(parser);
             cpymo_parser_curline_pop_commacell(parser);
 
-            if (!cpymo_str_equals_str(file, "NULL") 
+            if (!cpymo_str_equals_str(file, "NULL")
                 && !cpymo_str_equals_str(file, "")) {
-                ADD_ASSET(r, chara, file, r->gameconfig.charaformat, 
+                ADD_ASSET(r, chara, file, r->gameconfig.charaformat,
                     true, r->gameconfig.charamaskformat, true);
             }
         }
@@ -339,7 +341,7 @@ static void cpymo_tool_asset_analyze_single_command(
             cpymo_parser_curline_pop_commacell(parser);
 
             if (!cpymo_str_equals_str(file, "")) {
-                ADD_ASSET(r, chara, file, r->gameconfig.charaformat, 
+                ADD_ASSET(r, chara, file, r->gameconfig.charaformat,
                     true, r->gameconfig.charamaskformat, true);
             }
         }
@@ -353,7 +355,7 @@ static void cpymo_tool_asset_analyze_single_command(
         cpymo_str file = cpymo_parser_curline_pop_commacell(parser);
         cpymo_str_trim(&file);
         if (!cpymo_str_equals_str(file, "")) {
-            ADD_ASSET(r, chara, file, r->gameconfig.charaformat, 
+            ADD_ASSET(r, chara, file, r->gameconfig.charaformat,
                 true, r->gameconfig.charamaskformat, true);
         }
 
@@ -387,16 +389,16 @@ static void cpymo_tool_asset_analyze_single_command(
             hint_pic_cstr[hint_pic.len + 1] = '\0';
             for (char i = '0'; i < '4'; ++i) {
                 hint_pic_cstr[hint_pic.len] = i;
-                ADD_ASSET(r, system, cpymo_str_pure(hint_pic_cstr), 
+                ADD_ASSET(r, system, cpymo_str_pure(hint_pic_cstr),
                     "png", true, "png", true);
             }
 
             free(hint_pic_cstr);
         }
-        
+
         return;
     }
-    
+
 
     if (cpymo_str_equals_str(cmd, "select_text")
         || cpymo_str_equals_str(cmd, "select_var")) {
@@ -450,8 +452,8 @@ static void cpymo_tool_asset_analyze_single_command(
 
     if (cpymo_str_equals_str(cmd, "album")) {
         system_asset_table->system_cv_thumb = true;
-        
-        cpymo_str 
+
+        cpymo_str
             album_png = cpymo_str_pure("albumbg"),
             album_list = cpymo_str_pure("album_list"),
             arg = cpymo_parser_curline_pop_commacell(parser);
@@ -468,10 +470,10 @@ static void cpymo_tool_asset_analyze_single_command(
         // other images
         // 1. load album_list
         char *album_list_path = (char *)malloc(
-            strlen(gamedir) 
-            + strlen("/script/") 
-            + album_list.len 
-            + strlen(".txt") 
+            strlen(gamedir)
+            + strlen("/script/")
+            + album_list.len
+            + strlen(".txt")
             + 1);
 
         if (album_list_path == NULL) {
@@ -481,7 +483,7 @@ static void cpymo_tool_asset_analyze_single_command(
 
         strcpy(album_list_path, gamedir);
         strcat(album_list_path, "/script/");
-        cpymo_str_copy(album_list_path + strlen(album_list_path), 
+        cpymo_str_copy(album_list_path + strlen(album_list_path),
             album_list.len + 1, album_list);
         strcat(album_list_path, ".txt");
 
@@ -516,7 +518,7 @@ static void cpymo_tool_asset_analyze_single_command(
         cpymo_str_copy(assname, album_png.len + 1, album_png);
         for (int i = 0; i < max_page_id; ++i) {
             sprintf(assname + album_png.len, "_%d", i);
-            ADD_ASSET(r, system, cpymo_str_pure(assname), 
+            ADD_ASSET(r, system, cpymo_str_pure(assname),
                 "png", false, NULL, false);
         }
 
@@ -539,10 +541,12 @@ static void cpymo_tool_asset_analyze_single_command(
         return;
     }
 
-    printf("[Error] %s(%u): Unknown command: ", 
+    printf("[Error] %s(%u): Unknown command: ",
         script_name, (unsigned)(parser->cur_line + 1));
+    putchar('\'');
     for (size_t i = 0; i < cmd.len; ++i)
         putchar(cmd.begin[i]);
+    putchar('\'');
     putchar('\n');
 }
 
