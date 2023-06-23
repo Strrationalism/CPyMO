@@ -155,7 +155,7 @@ static error_t cpymo_tool_convert_image_processor(
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
 
         err = cpymo_tool_image_save_to_file_with_mask(
-            &resized, path, u->target_format, u->target_format != NULL, u->target_format);
+            &resized, path, u->target_format, u->mask_format != NULL, u->mask_format);
         free(path);
     }
 
