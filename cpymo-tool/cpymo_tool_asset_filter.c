@@ -331,7 +331,6 @@ error_t cpymo_tool_asset_filter_run(
     error_t err = cpymo_tool_utils_mkdir(f->output_gamedir, "");
     CPYMO_THROW(err);
 
-    #pragma omp parallel for
     for (size_t i = 0; i < CPYMO_ARR_COUNT(params); ++i) {
         printf("Processing %s...\n", params[i].asstype);
         err = cpymo_tool_asset_filter_run_single(f, params + i);

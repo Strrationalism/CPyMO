@@ -305,7 +305,7 @@ static void cpymo_tool_convert_configure_ffmpeg(
     *userdata = NULL;
     u->out_ext = current_format;
 
-    if (cpymo_tool_convert_audio_supported(
+    if (!cpymo_tool_convert_audio_supported(
         spec->audio_support,
         cpymo_str_pure(current_format))
         || spec->forced_audio_convert)
@@ -320,8 +320,8 @@ static void cpymo_tool_convert_configure_ffmpeg(
         u->ffmpeg_command = ffmpeg_command;
         u->flags = NULL;
 
-        if (u->flags && OGG) u->out_ext = "ogg";
-        else if (u->flags && MP3) u->out_ext = "mp3";
+        if (spec->audio_support & OGG) u->out_ext = "ogg";
+        else if (spec->audio_support & MP3) u->out_ext = "mp3";
         else u->out_ext = "wav";
     }
 }
@@ -395,7 +395,7 @@ static error_t cpymo_tool_convert(
         snprintf(
             u_video_flag_str,
             CPYMO_ARR_COUNT(u_video_flag_str),
-            "scale=\"iw * %s : ih * %s\" -c:v mpeg4 -c:a aac",
+            "-vf scale=\"iw * %s : ih * %s\" -c:v mpeg4 -c:a aac",
             scale_ratio_str,
             scale_ratio_str);
 
@@ -435,7 +435,7 @@ static error_t cpymo_tool_convert(
     COPY_STR(cfg.seformat, u_se.out_ext);
     COPY_STR(cfg.voiceformat, u_voice.out_ext);
 
-    char *path = (char *)malloc(sizeof(dst_gamedir) + 16);
+    char *path = (char *)malloc(strlen(dst_gamedir) + 16);
     if (path == NULL) {
         err = CPYMO_ERR_OUT_OF_MEM;
         goto CLEAN;
@@ -444,6 +444,7 @@ static error_t cpymo_tool_convert(
     strcpy(path, dst_gamedir);
     strcat(path, "/gameconfig.txt");
     err = cpymo_tool_gameconfig_write_to_file(path, &cfg);
+    free(path);
     if (err != CPYMO_ERR_SUCC) goto CLEAN;
 
     error_t warn = cpymo_tool_utils_copy_gamedir(

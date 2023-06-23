@@ -269,15 +269,31 @@ error_t cpymo_tool_image_save_to_file_with_mask(
     }
 }
 
+struct cpymo_tool_image_write_memory_context
+{
+    size_t size, cap;
+    uint8_t *buf;
+};
+
 static void cpymo_tool_image_write_memory_function(
     void *context, void *data, int size)
 {
-    uint8_t **ctx = (uint8_t **)context;
-    uint8_t *buf = *ctx;
+    struct cpymo_tool_image_write_memory_context *ctx =
+        (struct cpymo_tool_image_write_memory_context *)context;
 
-    void *dst = arraddnptr(buf, size);
-    memcpy(dst, data, (size_t)size);
-    *ctx = buf;
+    size_t new_size = ctx->size + (size_t)size;
+    if (new_size > ctx->cap) {
+        size_t new_cap = ctx->cap * 2;
+        if (new_cap <= new_size) new_cap = new_size;
+
+        uint8_t *new_buf = (uint8_t *)realloc(ctx->buf, new_cap);
+        if (new_buf == NULL) abort();
+        ctx->buf = new_buf;
+        ctx->cap = new_cap;
+    }
+
+    memcpy(ctx->buf + ctx->size, data, (size_t)size);
+    ctx->size = new_size;
 }
 
 error_t cpymo_tool_image_save_to_memory(
@@ -286,12 +302,16 @@ error_t cpymo_tool_image_save_to_memory(
     void **data,
     size_t *len)
 {
-    void *buffer = NULL;
+    struct cpymo_tool_image_write_memory_context ctx;
+    ctx.buf = NULL;
+    ctx.cap = 0;
+    ctx.size = 0;
+
     int ret;
     if (!strcmp("bmp", format)) {
         ret = stbi_write_bmp_to_func(
             &cpymo_tool_image_write_memory_function,
-            &buffer,
+            &ctx,
             img.width,
             img.height,
             (int)img.channels,
@@ -300,7 +320,7 @@ error_t cpymo_tool_image_save_to_memory(
     else if (!strcmp("png", format)) {
         ret = stbi_write_png_to_func(
             &cpymo_tool_image_write_memory_function,
-            &buffer,
+            &ctx,
             img.width,
             img.height,
             (int)img.channels,
@@ -310,7 +330,7 @@ error_t cpymo_tool_image_save_to_memory(
     else if (!strcmp("jpg", format)) {
         ret = stbi_write_jpg_to_func(
             &cpymo_tool_image_write_memory_function,
-            &buffer,
+            &ctx,
             img.width,
             img.height,
             (int)img.channels,
@@ -321,8 +341,8 @@ error_t cpymo_tool_image_save_to_memory(
         return CPYMO_ERR_UNSUPPORTED;
     }
 
-    *data = buffer;
-    *len = arrlenu(data);
+    *data = ctx.buf;
+    *len = ctx.size;
 
     return CPYMO_ERR_SUCC;
 }

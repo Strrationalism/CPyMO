@@ -17,9 +17,7 @@ error_t cpymo_tool_ffmpeg_search(const char **out_ffmpeg_command)
             return CPYMO_ERR_SUCC; \
         } \
 
-    #ifdef _WIN32
-    TRY("powershell ./ffmpeg");
-    #else
+    #ifndef _WIN32
     TRY("./ffmpeg");
     #endif
 
@@ -45,10 +43,10 @@ error_t cpymo_tool_ffmpeg_call(
         + strlen(src)
         + strlen(dst)
         + flags_len
-        + 16 + strlen(NUL_DEVICE));
+        + 20 + strlen(NUL_DEVICE));
     if (command == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-    sprintf(command, "%s -i \"%s\" %s%s\"%s\" > " NUL_DEVICE,
+    sprintf(command, "%s -i \"%s\" -y  %s%s\"%s\" > " NUL_DEVICE,
         ffmpeg_command,
         src,
         flags == NULL ? "" : flags,
