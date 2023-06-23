@@ -748,6 +748,12 @@ const char * cpymo_audio_get_se_name(cpymo_engine * e)
 	return e->audio.se_name;
 }
 
+bool cpymo_audio_channel_is_playing(size_t cid, cpymo_audio_system *s)
+{ return s->channels[cid].enabled; }
+
+bool cpymo_audio_channel_is_looping(size_t cid, cpymo_audio_system *s)
+{ return s->channels[cid].loop; }
+
 #endif
 
 #ifdef DISABLE_AUDIO
@@ -818,6 +824,12 @@ void cpymo_audio_vo_stop(struct cpymo_engine *e) {}
 
 error_t cpymo_audio_play_video(struct cpymo_engine *e, const char *path) 
 { return CPYMO_ERR_UNSUPPORTED; }
+
+bool cpymo_audio_channel_is_playing(size_t cid, cpymo_audio_system *s)
+{ return false; }
+
+bool cpymo_audio_channel_is_looping(size_t cid, cpymo_audio_system *s)
+{ return false; }
 
 #endif
 

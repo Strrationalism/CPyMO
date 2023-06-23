@@ -48,7 +48,7 @@ typedef struct {
 	unsigned textspeed : 3;
 	unsigned bgmvolume : 4;
 	unsigned vovolume : 4;
-	unsigned namealign : 2;
+	unsigned namealign : 2;	// 0 - middle, 1 - left, 2 - right
 
 	cpymo_pymo_version engineversion;
 } cpymo_gameconfig;
@@ -62,6 +62,15 @@ static inline bool cpymo_gameconfig_is_symbian(const cpymo_gameconfig *g)
 		&& g->platform[1] == '6'
 		&& g->platform[2] == '0'
 		&& (g->platform[3] == 'v' || g->platform[3] == 'V');
+}
+
+static inline bool cpymo_gameconfig_scripttype_is_pymo(const cpymo_gameconfig *g)
+{
+	return
+		g->scripttype[0] == 'p'
+		&& g->scripttype[1] == 'y'
+		&& g->scripttype[2] == 'm'
+		&& g->scripttype[3] == 'o';
 }
 
 static inline float cpymo_gameconfig_font_size(const cpymo_gameconfig *c)

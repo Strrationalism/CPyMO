@@ -53,19 +53,30 @@ float cpymo_utils_lerp(float a, float b, float x)
 	return (b - a) * t + a;
 }
 
-void cpymo_utils_replace_str_newline_n(char *str)
+void cpymo_utils_replace_str_newline_n(char *r)
 {
-	char prev_char = '?';
-	
-	while (*str) {
-		if (prev_char == '\\' && (*str == 'n' || *str == 'r')) {
-			*str = '\n';
-			*(str - 1) = ' ';
+	char *w = r;
+
+	bool got_leader = false;
+	while (*r) {
+		if (got_leader) {
+			if (*r == 'n' || *r == 'r') *(w++) = '\n';
+			else {
+				*(w++) = '\\';
+				*(w++) = *r;
+			}
+
+			got_leader = false;
+		}
+		else {
+			if (*r == '\\') got_leader = true;
+			else *(w++) = *r;
 		}
 
-		prev_char = *str;
-		str++;
+		r++;
 	}
+
+	*w = '\0';
 }
 
 void cpymo_utils_replace_cr(char *text, size_t len)

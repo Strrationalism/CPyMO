@@ -162,6 +162,7 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_str key, cpymo_
 		if (cpymo_str.len >= 1) {
 			if (cpymo_str.begin[0] == 'l' || cpymo_str.begin[0] == 'L') o->namealign = 1;
 			else if (cpymo_str.begin[0] == 'r' || cpymo_str.begin[0] == 'R') o->namealign = 2;
+			else if (cpymo_str.begin[0] == 'm' || cpymo_str.begin[0] == 'M') o->namealign = 0;
 		}
 		return;
 	}
@@ -215,7 +216,7 @@ error_t cpymo_gameconfig_parse(cpymo_gameconfig *out_config, const char *stream,
 	out_config->vovolume = 0;
 	strcpy(out_config->cgprefix, "EV_");
 	out_config->grayselected = 1;
-	out_config->namealign = 1;
+	out_config->namealign = 0;
 	strcpy(out_config->bgmformat, "mp3");
 	strcpy(out_config->voiceformat, "mp3");
 	strcpy(out_config->seformat, "mp3");
