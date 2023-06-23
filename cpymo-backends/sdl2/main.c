@@ -449,15 +449,8 @@ START:
 #endif
 
 #ifdef GAME_SELECTOR_DIR_2
-	{
-		cpymo_game_selector_item *item2 = get_game_list(GAME_SELECTOR_DIR_2);
-		if (item == NULL) item = item2;
-		else {
-			cpymo_game_selector_item *slot = item;
-			while (slot->next != NULL) slot = slot->next;
-			slot->next = item2;
-		}
-	}
+	if (item == NULL)
+		item = get_game_list(GAME_SELECTOR_DIR_2);
 #endif
 	
 	error_t err = cpymo_engine_init_with_game_selector(
