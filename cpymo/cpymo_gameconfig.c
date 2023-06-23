@@ -162,6 +162,7 @@ static void cpymo_dispatch_gameconfig(cpymo_gameconfig *o, cpymo_str key, cpymo_
 		if (cpymo_str.len >= 1) {
 			if (cpymo_str.begin[0] == 'l' || cpymo_str.begin[0] == 'L') o->namealign = 1;
 			else if (cpymo_str.begin[0] == 'r' || cpymo_str.begin[0] == 'R') o->namealign = 2;
+			else if (cpymo_str.begin[0] == 'm' || cpymo_str.begin[0] == 'M') o->namealign = 0;
 		}
 		return;
 	}

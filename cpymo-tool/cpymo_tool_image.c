@@ -8,6 +8,7 @@
 #include "../cpymo/cpymo_assetloader.h"
 #include "../stb/stb_image_write.h"
 #include "../stb/stb_image_resize.h"
+#include "../stb/stb_ds.h"
 
 error_t cpymo_tool_image_load_from_file(
     cpymo_tool_image *out, const char *filename,
@@ -42,6 +43,63 @@ error_t cpymo_tool_image_load_from_file(
         cpymo_utils_attach_mask_to_rgba_ex(pixels, w, h, mask, mw, mh);
         free(mask);
     }
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_image_load_from_memory(
+    cpymo_tool_image *out, void *memory, size_t len, bool is_mask)
+{
+    int w, h;
+    out->channels = is_mask ? 1 : 4;
+    stbi_uc *px = stbi_load_from_memory(memory, (int)len, &w, &h, NULL, out->channels);
+    if (px == NULL) return CPYMO_ERR_INVALID_ARG;
+
+    out->width = w;
+    out->height = h;
+    out->pixels = px;
+    return CPYMO_ERR_SUCC;
+}
+
+void cpymo_tool_image_attach_mask(cpymo_tool_image *img, const cpymo_tool_image *mask)
+{
+    cpymo_utils_attach_mask_to_rgba_ex(
+        img->pixels,
+        img->width,
+        img->height,
+        mask->pixels,
+        mask->width,
+        mask->height);
+}
+
+error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, void *mask_buf, size_t len)
+{
+    cpymo_tool_image mask;
+    error_t err = cpymo_tool_image_load_from_memory(&mask, mask_buf, len, true);
+    CPYMO_THROW(err);
+
+    cpymo_tool_image_attach_mask(img, &mask);
+    cpymo_tool_image_free(mask);
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_image_detach_mask(const cpymo_tool_image *img, cpymo_tool_image *out_mask)
+{
+    out_mask->pixels = (stbi_uc *)malloc(out_mask->width * out_mask->height);
+    if (out_mask->pixels == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    out_mask->channels = 1;
+    out_mask->width = img->width;
+    out_mask->height = img->height;
+    size_t pixels_count = img->width * img->height;
+
+    if (img->channels == 3) {
+        memset(out_mask, 255, pixels_count);
+        return CPYMO_ERR_SUCC;
+    }
+
+    for (size_t p = 0; p < pixels_count; ++p)
+        out_mask->pixels[p] = img->pixels[p * img->channels + 3];
 
     return CPYMO_ERR_SUCC;
 }
@@ -211,6 +269,95 @@ error_t cpymo_tool_image_save_to_file_with_mask(
     }
 }
 
+struct cpymo_tool_image_write_memory_context
+{
+    size_t size, cap;
+    uint8_t *buf;
+};
+
+static void cpymo_tool_image_write_memory_function(
+    void *context, void *data, int size)
+{
+    struct cpymo_tool_image_write_memory_context *ctx =
+        (struct cpymo_tool_image_write_memory_context *)context;
+
+    size_t new_size = ctx->size + (size_t)size;
+    if (new_size > ctx->cap) {
+        size_t new_cap = ctx->cap * 2;
+        if (new_cap <= new_size) new_cap = new_size;
+
+        uint8_t *new_buf = (uint8_t *)realloc(ctx->buf, new_cap);
+        if (new_buf == NULL) abort();
+        ctx->buf = new_buf;
+        ctx->cap = new_cap;
+    }
+
+    memcpy(ctx->buf + ctx->size, data, (size_t)size);
+    ctx->size = new_size;
+}
+
+error_t cpymo_tool_image_save_to_memory(
+    const cpymo_tool_image img,
+    const char *format,
+    void **data,
+    size_t *len)
+{
+    struct cpymo_tool_image_write_memory_context ctx;
+    ctx.buf = NULL;
+    ctx.cap = 0;
+    ctx.size = 0;
+
+    int ret;
+    if (!strcmp("bmp", format)) {
+        ret = stbi_write_bmp_to_func(
+            &cpymo_tool_image_write_memory_function,
+            &ctx,
+            img.width,
+            img.height,
+            (int)img.channels,
+            (void *)img.pixels);
+    }
+    else if (!strcmp("png", format)) {
+        ret = stbi_write_png_to_func(
+            &cpymo_tool_image_write_memory_function,
+            &ctx,
+            img.width,
+            img.height,
+            (int)img.channels,
+            (void *)img.pixels,
+            (int)img.width * img.channels);
+    }
+    else if (!strcmp("jpg", format)) {
+        ret = stbi_write_jpg_to_func(
+            &cpymo_tool_image_write_memory_function,
+            &ctx,
+            img.width,
+            img.height,
+            (int)img.channels,
+            (void *)img.pixels,
+            0);
+    }
+    else {
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+
+    *data = ctx.buf;
+    *len = ctx.size;
+
+    return CPYMO_ERR_SUCC;
+}
+
+error_t cpymo_tool_get_mask_name_noext(
+    char **out_name, const char *assetname)
+{
+    *out_name = (char *)malloc(strlen(assetname) + 6);
+    if (*out_name == NULL) return CPYMO_ERR_OUT_OF_MEM;
+
+    strcpy(*out_name, assetname);
+    strcat(*out_name, "_mask");
+    return CPYMO_ERR_SUCC;
+}
+
 error_t cpymo_tool_get_mask_name(
     char **out_mask_filename, const char *filename, const char *mask_ext)
 {
@@ -247,12 +394,12 @@ static size_t cpymo_tool_generate_album_ui_get_max_page_id(
 
     cpymo_parser parser;
     cpymo_parser_init(
-        &parser, 
+        &parser,
         album_list_content_text.begin,
         album_list_content_text.len);
-    
+
     do {
-        cpymo_str page_id_str = 
+        cpymo_str page_id_str =
             cpymo_parser_curline_pop_commacell(&parser);
         cpymo_str_trim(&page_id_str);
         if (page_id_str.len == 0) continue;
@@ -264,10 +411,10 @@ static size_t cpymo_tool_generate_album_ui_get_max_page_id(
 }
 
 extern error_t cpymo_album_generate_album_ui_image_pixels(
-	void **out_image, 
-	cpymo_str album_list_text, 
+	void **out_image,
+	cpymo_str album_list_text,
 	cpymo_str output_cache_ui_file_name,
-	size_t page, 
+	size_t page,
 	cpymo_assetloader* loader,
 	size_t *ref_w, size_t *ref_h);
 
@@ -291,7 +438,7 @@ static void cpymo_tool_generate_album_ui_generate(
 
     cpymo_str album_list_content = {
         album_list_text,
-        album_list_text_size 
+        album_list_text_size
     };
 
     size_t max_page_id = cpymo_tool_generate_album_ui_get_max_page_id(
@@ -318,7 +465,7 @@ static void cpymo_tool_generate_album_ui_generate(
 }
 
 static int cpymo_tool_generate_album_ui(
-    const char *gamedir, 
+    const char *gamedir,
     const char **additional_album_lists,
     size_t additional_album_lists_count)
 {
@@ -330,7 +477,7 @@ static int cpymo_tool_generate_album_ui(
         sprintf(path, "%s/gameconfig.txt", gamedir);
         error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, path);
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not open file: %s(%s).\n", 
+            printf("[Error] Can not open file: %s(%s).\n",
                 path, cpymo_error_message(err));
             free(path);
             return err;
@@ -340,14 +487,14 @@ static int cpymo_tool_generate_album_ui(
 
         err = cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
         if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not init assetloader: %s %s.\n", 
+            printf("[Error] Can not init assetloader: %s %s.\n",
                 path, cpymo_error_message(err));
             return err;
         }
     }
 
     cpymo_tool_generate_album_ui_generate("album_list", true, &assetloader);
-    for (size_t i = 0; i < additional_album_lists_count; ++i) 
+    for (size_t i = 0; i < additional_album_lists_count; ++i)
         cpymo_tool_generate_album_ui_generate(
             additional_album_lists[i], false, &assetloader);
 

@@ -750,6 +750,10 @@ CPyMO ASCII ART仅支持键盘操作：
 * PyMO数据包打包
 * PyMO数据包解包
 * 游戏图片缩放
+* 制作精灵集
+* 生成相册UI缓存图
+* 删除游戏中不使用的文件
+* 将游戏转换到另外的平台
 
 启动此程序即可看到详细用法。
 
@@ -760,19 +764,6 @@ CPyMO ASCII ART仅支持键盘操作：
 1. 直接使用CMake构建整个项目。
 2. 使用GNU Make在`cpymo-tool`目录中执行`make`命令。
 2. 使用Microsoft NMake在`cpymo-tool`目录中执行`nmake -f Makefile.Win32`命令构建。
-
-## pymo-strip
-
-该工具用于删除PyMO游戏数据包中没有被使用的部分。
-
-## pymo-convert
-
-该工具用于将高分辨率的PyMO游戏数据包转换为适配各种低性能设备的PyMO游戏数据包，并同时转换视频和音频到目标平台。    
-要使用该工具，需要确保你已经安装了最新版本的PowerShell，并已经将`cpymo-tool`、`ffmpeg`、`pymo-convert-audio`安装到命令行中。    
-
-## pymo-convert-audio
-
-由于某些平台上的CPyMO对音频格式支持有限，该脚本可以将所有的音频转换为指定格式，在运行此脚本前需要确保已经将cpymo-tool和ffmpeg安装到命令行中。
 
 ## mo2pymo
 

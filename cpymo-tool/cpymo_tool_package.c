@@ -80,7 +80,7 @@ error_t cpymo_tool_package_packer_open(
 {
 	packer->current_file_count = 0;
 	packer->data_section_start_offset =
-		sizeof(uint32_t) + max_files_count * sizeof(cpymo_package_index);
+		(long)(sizeof(uint32_t) + max_files_count * sizeof(cpymo_package_index));
 	packer->index_section_start_offset = sizeof(uint32_t);
 	packer->max_file_count = max_files_count;
 

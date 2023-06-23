@@ -31,6 +31,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../stb/stb_image_write.h"
 
+#define STB_DS_IMPLEMENTATION
+#include "../stb/stb_ds.h"
+
 #ifdef LEAKCHECK
 #define STB_LEAKCHECK_IMPLEMENTATION
 #include "../stb/stb_leakcheck.h"
@@ -42,7 +45,7 @@ extern int cpymo_tool_invoke_unpack(int argc, const char **argv);
 extern int cpymo_tool_invoke_resize_image(int argc, const char **argv);
 extern int cpymo_tool_invoke_pack_spritesheet(int argc, const char **argv);
 
-int help() {
+int help(void) {
 	printf("cpymo-tool\n");
 	printf("Development tool for PyMO and CPyMO.\n");
 	printf("\n");
@@ -64,6 +67,10 @@ int help() {
 	printf("Generate album UI image cache:\n");
 	printf(
 		"    cpymo-tool gen-album-cache <gamedir> [additional-album-lists...]\n");
+	printf("Strip pymo game:\n");
+	printf("    cpymo-tool strip <gamedir> <output-gamedir>\n");
+	printf("Convert pymo game:\n");
+	printf("    cpymo-tool convert <s60v3/s60v5/pymo/3ds/psp/wii> <gamedir> <output-gamedir>\n");
 	printf("\n");
 	return 0;
 }
@@ -82,6 +89,9 @@ int main(int argc, const char **argv) {
 		ret = help();
 	}
 	else {
+		extern int cpymo_tool_invoke_strip(int argc, const char **argv);
+		extern int cpymo_tool_invoke_convert(int argc, const char **argv);
+
 		if (strcmp(argv[1], "unpack") == 0)
 			ret = cpymo_tool_invoke_unpack(argc, argv);
 		else if (strcmp(argv[1], "pack") == 0)
@@ -92,12 +102,16 @@ int main(int argc, const char **argv) {
 			ret = cpymo_tool_invoke_pack_spritesheet(argc, argv);
 		else if (strcmp(argv[1], "gen-album-cache") == 0)
 			ret = cpymo_tool_invoke_generate_album_ui(argc, argv);
+		else if (strcmp(argv[1], "strip") == 0)
+			ret = cpymo_tool_invoke_strip(argc, argv);
+		else if (strcmp(argv[1], "convert") == 0)
+			ret = cpymo_tool_invoke_convert(argc, argv);
 		else ret = help();
 	}
 
 	#ifdef LEAKCHECK
 	stb_leakcheck_dumpmem();
-	#endif	
+	#endif
 
 	return ret;
 }
