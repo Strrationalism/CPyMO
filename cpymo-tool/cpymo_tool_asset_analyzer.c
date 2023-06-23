@@ -116,6 +116,7 @@ static error_t cpymo_tool_asset_analyze_single_script(
             script_name, gamedir, command, &parser, result, system_asset_table);
 
         NEXT_COMMAND:
+        continue;;
 
     } while (cpymo_parser_next_line(&parser));
 
