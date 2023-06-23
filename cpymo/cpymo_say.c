@@ -89,19 +89,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 		float namebox_h = fontsize * 1.4f;
 		float namebox_w = (float)e->say.namebox_w / ((float)e->say.namebox_h / namebox_h);
 
-		float namebox_x;
-		switch (e->gameconfig.namealign) {
-		case 0:
-			namebox_x = (float)(e->gameconfig.imagesize_w - namebox_w) / 2;
-			break;
-		case 2:
-			namebox_x = (float)(e->gameconfig.imagesize_w - namebox_w);
-			break;
-		default:
-			namebox_x = 0;
-			break;
-		};
-
+		float namebox_x = 0;
 		float namebox_y = y - namebox_h;
 
 		namebox_x += offx;
@@ -139,8 +127,20 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 		}
 
 		if (e->say.name) {
-			float name_x =
-				namebox_w / 2 - (float)e->say.name_width / 2 + namebox_x;
+			float name_x = namebox_x;
+
+			switch (e->gameconfig.namealign)
+			{
+				case 0:	// middle
+					name_x += namebox_w / 2 - (float)e->say.name_width / 2;
+					break;
+				case 1:	// left
+					name_x += cpymo_gameconfig_font_size(&e->gameconfig) / 2;
+					break;
+				case 2:	// right
+					name_x += namebox_w - (float)e->say.name_width;
+					break;
+			}
 
 			if (e->say.namebox) {
 #ifdef DISABLE_IMAGE_SCALING
@@ -165,7 +165,7 @@ void cpymo_say_draw(const struct cpymo_engine *e)
 
 			cpymo_backend_text_draw(
 				e->say.name,
-				name_x, namebox_y + cpymo_gameconfig_font_size(&e->gameconfig),
+				name_x, namebox_y + cpymo_gameconfig_font_size(&e->gameconfig) / 10.0f * 9.0f,
 				e->gameconfig.textcolor,
 				e->say.current_say_is_already_read ? 
 					already_read_text_alpha : 1, 

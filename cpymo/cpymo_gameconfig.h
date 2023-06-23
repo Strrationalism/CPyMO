@@ -48,7 +48,7 @@ typedef struct {
 	unsigned textspeed : 3;
 	unsigned bgmvolume : 4;
 	unsigned vovolume : 4;
-	unsigned namealign : 2;
+	unsigned namealign : 2;	// 0 - middle, 1 - left, 2 - right
 
 	cpymo_pymo_version engineversion;
 } cpymo_gameconfig;
