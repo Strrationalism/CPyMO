@@ -326,7 +326,7 @@ error_t cpymo_tool_image_save_to_memory(
             (int)img.height,
             (int)img.channels,
             (void *)img.pixels,
-            (int)img.width * img.channels);
+            (int)img.width * (int)img.channels);
     }
     else if (!strcmp("jpg", format)) {
         ret = stbi_write_jpg_to_func(

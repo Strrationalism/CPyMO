@@ -194,6 +194,10 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
     struct cpymo_tool_convert_ffmpeg_processor_userdata *u =
         (struct cpymo_tool_convert_ffmpeg_processor_userdata *)userdata;
 
+    #ifdef _WIN32
+    #define tempnam _tempnam
+    #endif
+
     if (io->input_is_package) {
         input_file = (char *)malloc(L_tmpnam);
         if (input_file == NULL) return CPYMO_ERR_OUT_OF_MEM;
