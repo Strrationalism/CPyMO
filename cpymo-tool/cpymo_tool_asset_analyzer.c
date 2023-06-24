@@ -59,6 +59,7 @@ static error_t cpymo_tool_asset_analyze_single_script(
     size_t script_len;
     error_t err = cpymo_utils_loadfile(script_path, &script, &script_len);
     free(script_path);
+    CPYMO_THROW(err);
 
     struct cpymo_tool_asset_analyzer_string_hashset_item item;
     item.key = cpymo_str_copy_malloc(cpymo_str_pure(script_name));

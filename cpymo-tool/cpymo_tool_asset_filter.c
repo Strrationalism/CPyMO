@@ -4,6 +4,7 @@
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_asset_analyzer.h"
 #include "../stb/stb_ds.h"
+#include <time.h>
 
 error_t cpymo_tool_asset_filter_init(
     cpymo_tool_asset_filter *filter,
@@ -131,10 +132,21 @@ static error_t cpymo_tool_asset_filter_run_single(
         CPYMO_THROW(err);
     }
 
+    time_t log_time = time(NULL);
     for (size_t i = 0; i < asset_count; ++i) {
         // setup input
         io.input_mask_file_buf_movein = NULL;
         io.input_mask_len = 0;
+
+        time_t now_time = time(NULL);
+        if (now_time - log_time > 1) {
+            log_time = now_time;
+            printf("%s %.2f%% %u/%u processed.\n",
+                io.asset_type,
+                100.0f * (float)i / (float)asset_count,
+                (unsigned)i,
+                (unsigned)asset_count);
+        }
 
         if (io.input_is_package) {
             io.input.package.data_move_in = NULL;
@@ -347,7 +359,6 @@ error_t cpymo_tool_asset_filter_run(
     CPYMO_THROW(err);
 
     for (size_t i = 0; i < CPYMO_ARR_COUNT(params); ++i) {
-        printf("Processing %s...\n", params[i].asstype);
         err = cpymo_tool_asset_filter_run_single(f, params + i);
 
         if (err != CPYMO_ERR_SUCC) {

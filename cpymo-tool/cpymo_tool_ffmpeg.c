@@ -17,7 +17,9 @@ error_t cpymo_tool_ffmpeg_search(const char **out_ffmpeg_command)
             return CPYMO_ERR_SUCC; \
         } \
 
-    #ifndef _WIN32
+    #ifdef _WIN32
+    TRY("cmd /c ffmpeg");
+    #else
     TRY("./ffmpeg");
     #endif
 
@@ -42,13 +44,16 @@ error_t cpymo_tool_ffmpeg_call(
         strlen(ffmpeg_command)
         + strlen(src)
         + strlen(dst)
+        + strlen(fmt)
+        + strlen(NUL_DEVICE)
         + flags_len
-        + 20 + strlen(NUL_DEVICE));
+        + 32 + strlen(NUL_DEVICE));
     if (command == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-    sprintf(command, "%s -i \"%s\" -y  %s%s\"%s\" > " NUL_DEVICE,
+    sprintf(command, "%s -i \"%s\" -y -v quiet -f %s %s%s\"%s\" > " NUL_DEVICE,
         ffmpeg_command,
         src,
+        fmt,
         flags == NULL ? "" : flags,
         flags == NULL ? "" : " ",
         dst);

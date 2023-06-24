@@ -3,6 +3,7 @@
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_ffmpeg.h"
 #include "cpymo_tool_gameconfig.h"
+#include <io.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -77,6 +78,10 @@ static error_t cpymo_tool_convert_image_processor(
         err = cpymo_tool_image_load_from_memory(
             &image, io->input.package.data_move_in,
             io->input.package.len, false);
+        CPYMO_THROW(err);
+        free(io->input.package.data_move_in);
+        io->input.package.data_move_in = NULL;
+        io->input.package.len = 0;
     }
     else {
         char *path;
@@ -86,9 +91,8 @@ static error_t cpymo_tool_convert_image_processor(
         err = cpymo_tool_image_load_from_file(
             &image, path, false, NULL);
         free(path);
+        CPYMO_THROW(err);
     }
-
-    CPYMO_THROW(err);
 
     if (io->input_mask_file_buf_movein) {
         err = cpymo_tool_image_load_attach_mask_from_memory(
@@ -193,34 +197,59 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
     bool package_output_file = false;
     struct cpymo_tool_convert_ffmpeg_processor_userdata *u =
         (struct cpymo_tool_convert_ffmpeg_processor_userdata *)userdata;
-/* 
+
     #ifdef _WIN32
-    #define tmpnam _tmpnam
-    #endif */
+    #define mktemp _mktemp
+    #endif
 
     if (io->input_is_package) {
-        input_file = (char *)malloc(L_tmpnam);
+        input_file = (char *)malloc(strlen(io->output_gamedir) + 10);
         if (input_file == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-        tmpnam(input_file);
+        strcpy(input_file, io->output_gamedir);
+        strcat(input_file, "/_iXXXXXX");
+
+        if (mktemp(input_file) == NULL) {
+            free(input_file);
+            input_file = NULL;
+            err = CPYMO_ERR_UNKNOWN;
+            goto CLEAN;
+        }
         err = cpymo_tool_utils_writefile(
             input_file, io->input.package.data_move_in, io->input.package.len);
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
+        delete_input_file = true;
+        free(io->input.package.data_move_in);
+        io->input.package.data_move_in = NULL;
+        io->input.package.len = 0;
     }
     else {
         err = cpymo_tool_asset_filter_get_input_file_name(
             &input_file, io);
+        FILE *f = fopen(input_file, "rb");
+        if (f == NULL) {
+            err = CPYMO_ERR_CAN_NOT_OPEN_FILE;
+            goto CLEAN;
+        }
+        fclose(f);
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
     }
 
     if (io->output_to_package) {
-        output_file = (char *)malloc(L_tmpnam);
+        output_file = (char *)malloc(strlen(io->output_gamedir) + 10);
         if (output_file == NULL) {
             err = CPYMO_ERR_OUT_OF_MEM;
             goto CLEAN;
         }
 
-        tmpnam(output_file);
+        strcpy(output_file, io->output_gamedir);
+        strcat(output_file, "/_oXXXXXX");
+        if (mktemp(output_file) == NULL) {
+            free(output_file);
+            output_file = NULL;
+            err = CPYMO_ERR_UNKNOWN;
+            goto CLEAN;
+        }
 
         delete_output_file = true;
         package_output_file = true;
