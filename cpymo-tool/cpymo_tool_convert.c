@@ -193,16 +193,16 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
     bool package_output_file = false;
     struct cpymo_tool_convert_ffmpeg_processor_userdata *u =
         (struct cpymo_tool_convert_ffmpeg_processor_userdata *)userdata;
-
+/* 
     #ifdef _WIN32
-    #define tempnam _tempnam
-    #endif
+    #define tmpnam _tmpnam
+    #endif */
 
     if (io->input_is_package) {
         input_file = (char *)malloc(L_tmpnam);
         if (input_file == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-        tempnam(io->output_gamedir, input_file);
+        tmpnam(input_file);
         err = cpymo_tool_utils_writefile(
             input_file, io->input.package.data_move_in, io->input.package.len);
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
@@ -220,7 +220,7 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
             goto CLEAN;
         }
 
-        tempnam(io->output_gamedir, output_file);
+        tmpnam(output_file);
 
         delete_output_file = true;
         package_output_file = true;
@@ -252,7 +252,7 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
             err = cpymo_utils_loadfile(output_file, &buf, &len);
             if (err == CPYMO_ERR_SUCC) {
                 io->output.package.data_move_out = buf;
-                io->output.package.len = 0;
+                io->output.package.len = len;
             }
         }
 
@@ -343,6 +343,8 @@ static error_t cpymo_tool_convert(
     err = cpymo_tool_asset_filter_init(
         &filter, src_gamedir, dst_gamedir);
     CPYMO_THROW(err);
+
+    filter.output_with_mask = spec->use_mask;
 
     cpymo_gameconfig cfg = filter.asset_list.gameconfig;
 

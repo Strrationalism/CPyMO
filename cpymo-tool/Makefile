@@ -7,7 +7,7 @@ INC := $(wildcard *.h) $(wildcard ../cpymo/*.h)
 SRC_TOOL  := $(wildcard *.c)
 
 OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(SRC_TOOL))
-CFLAGS := -O3 -DNDEBUG -DLEAKCHECK
+CFLAGS := -g -DDEBUG -DLEAKCHECK
 
 CC = cc -c
 LD = cc

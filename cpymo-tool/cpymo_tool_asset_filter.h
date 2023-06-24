@@ -53,6 +53,8 @@ typedef struct {
     const char *output_gamedir;
     bool use_force_pack_unpack_flag;
     bool force_pack_unpack_flag_packed;
+    bool input_with_mask;
+    bool output_with_mask;
 
     // filter function
     cpymo_tool_asset_filter_processor

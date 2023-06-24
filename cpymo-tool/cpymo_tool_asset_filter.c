@@ -25,6 +25,9 @@ error_t cpymo_tool_asset_filter_init(
         return err;
     }
 
+    filter->input_with_mask = cpymo_gameconfig_is_symbian(
+        &filter->asset_list.gameconfig);
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -44,6 +47,7 @@ struct cpymo_tool_asset_filter_run_param
     const char *maskext;
     struct cpymo_tool_asset_analyzer_string_hashset_item *asset_list;
     const cpymo_package *package;
+    bool masked;
 };
 
 
@@ -118,8 +122,11 @@ static error_t cpymo_tool_asset_filter_run_single(
         strcat(pack_path, param->asstype);
         strcat(pack_path, ".pak");
 
+        size_t max_package_files = shlenu(param->asset_list);
+        if (param->masked && filter->output_with_mask && !filter->input_with_mask)
+            max_package_files *= 2;
         error_t err = cpymo_tool_package_packer_open(
-            &packer, pack_path, shlenu(param->asset_list));
+            &packer, pack_path, max_package_files);
         free(pack_path);
         CPYMO_THROW(err);
     }
@@ -298,34 +305,42 @@ error_t cpymo_tool_asset_filter_run(
     struct cpymo_tool_asset_filter_run_param params[] = {
         { "bg", f->filter_bg, f->filter_bg_userdata,
           f->input_assetloader.game_config->bgformat, NULL, f->asset_list.bg,
-          f->input_assetloader.use_pkg_bg ? &f->input_assetloader.pkg_bg : NULL },
+          f->input_assetloader.use_pkg_bg ? &f->input_assetloader.pkg_bg : NULL,
+          false  },
 
         { "bgm", f->filter_bgm, f->filter_bgm_userdata,
-          f->input_assetloader.game_config->bgmformat, NULL, f->asset_list.bgm, NULL },
+          f->input_assetloader.game_config->bgmformat, NULL, f->asset_list.bgm, NULL,
+          false },
 
         { "chara", f->filter_chara, f->filter_chara_userdata,
           f->input_assetloader.game_config->charaformat,
           f->input_assetloader.game_config->charamaskformat,
           f->asset_list.chara,
-          f->input_assetloader.use_pkg_chara ? &f->input_assetloader.pkg_chara : NULL },
+          f->input_assetloader.use_pkg_chara ? &f->input_assetloader.pkg_chara : NULL,
+          true },
 
         { "se", f->filter_se, f->filter_se_userdata,
           f->input_assetloader.game_config->seformat, NULL, f->asset_list.se,
-          f->input_assetloader.use_pkg_se ? &f->input_assetloader.pkg_se : NULL },
+          f->input_assetloader.use_pkg_se ? &f->input_assetloader.pkg_se : NULL,
+          false },
 
         { "system", f->filter_system, f->filter_system_userdata,
-          "png", "png", f->asset_list.system, NULL },
+          "png", "png", f->asset_list.system, NULL,
+          true },
 
         { "video", f->filter_video, f->filter_video_userdata,
-          "mp4", NULL, f->asset_list.video, NULL },
+          "mp4", NULL, f->asset_list.video, NULL,
+          false },
 
         { "voice", f->filter_voice, f->filter_voice_userdata,
           f->input_assetloader.game_config->voiceformat, NULL,
           f->asset_list.voice,
-          f->input_assetloader.use_pkg_voice ? &f->input_assetloader.pkg_voice : NULL },
+          f->input_assetloader.use_pkg_voice ? &f->input_assetloader.pkg_voice : NULL,
+          false },
 
         { "script", &cpymo_tool_asset_filter_function_copy, NULL,
-          "txt", NULL, f->asset_list.script, NULL }
+          "txt", NULL, f->asset_list.script, NULL,
+          false }
     };
 
     error_t err = cpymo_tool_utils_mkdir(f->output_gamedir, "");
