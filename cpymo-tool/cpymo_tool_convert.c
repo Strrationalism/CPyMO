@@ -428,8 +428,8 @@ static error_t cpymo_tool_convert(
     COPY_STR(cfg.bgmformat, u_bgm.out_ext);
     COPY_STR(cfg.charaformat, u_chara.target_format);
     COPY_STR(cfg.charamaskformat, u_chara.mask_format);
-    cfg.imagesize_w = (size_t)(cfg.imagesize_w * u_bg.scale_ratio);
-    cfg.imagesize_h = (size_t)(cfg.imagesize_h * u_bg.scale_ratio);
+    cfg.imagesize_w = (uint16_t)(cfg.imagesize_w * u_bg.scale_ratio);
+    cfg.imagesize_h = (uint16_t)(cfg.imagesize_h * u_bg.scale_ratio);
     COPY_STR(cfg.platform, spec->platform);
     if (!cfg.playvideo) cfg.playvideo = false;
     COPY_STR(cfg.seformat, u_se.out_ext);

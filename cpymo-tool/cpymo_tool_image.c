@@ -52,7 +52,8 @@ error_t cpymo_tool_image_load_from_memory(
 {
     int w, h;
     out->channels = is_mask ? 1 : 4;
-    stbi_uc *px = stbi_load_from_memory(memory, (int)len, &w, &h, NULL, out->channels);
+    stbi_uc *px = stbi_load_from_memory(
+        memory, (int)len, &w, &h, NULL, (int)out->channels);
     if (px == NULL) return CPYMO_ERR_INVALID_ARG;
 
     out->width = w;
@@ -65,11 +66,11 @@ void cpymo_tool_image_attach_mask(cpymo_tool_image *img, const cpymo_tool_image 
 {
     cpymo_utils_attach_mask_to_rgba_ex(
         img->pixels,
-        img->width,
-        img->height,
+        (int)img->width,
+        (int)img->height,
         mask->pixels,
-        mask->width,
-        mask->height);
+        (int)mask->width,
+        (int)mask->height);
 }
 
 error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, void *mask_buf, size_t len)
@@ -312,8 +313,8 @@ error_t cpymo_tool_image_save_to_memory(
         ret = stbi_write_bmp_to_func(
             &cpymo_tool_image_write_memory_function,
             &ctx,
-            img.width,
-            img.height,
+            (int)img.width,
+            (int)img.height,
             (int)img.channels,
             (void *)img.pixels);
     }
@@ -321,8 +322,8 @@ error_t cpymo_tool_image_save_to_memory(
         ret = stbi_write_png_to_func(
             &cpymo_tool_image_write_memory_function,
             &ctx,
-            img.width,
-            img.height,
+            (int)img.width,
+            (int)img.height,
             (int)img.channels,
             (void *)img.pixels,
             (int)img.width * img.channels);
@@ -331,8 +332,8 @@ error_t cpymo_tool_image_save_to_memory(
         ret = stbi_write_jpg_to_func(
             &cpymo_tool_image_write_memory_function,
             &ctx,
-            img.width,
-            img.height,
+            (int)img.width,
+            (int)img.height,
             (int)img.channels,
             (void *)img.pixels,
             0);
