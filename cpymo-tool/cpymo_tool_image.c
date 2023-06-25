@@ -86,7 +86,7 @@ error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, voi
 
 error_t cpymo_tool_image_detach_mask(const cpymo_tool_image *img, cpymo_tool_image *out_mask)
 {
-    out_mask->pixels = (stbi_uc *)malloc(out_mask->width * out_mask->height);
+    out_mask->pixels = (stbi_uc *)malloc(img->width * img->height);
     if (out_mask->pixels == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
     out_mask->channels = 1;

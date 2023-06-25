@@ -3,27 +3,22 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _WIN32
-#define NUL_DEVICE "nul"
-#else
-#define NUL_DEVICE "/dev/null"
-#endif
-
 error_t cpymo_tool_ffmpeg_search(const char **out_ffmpeg_command)
 {
     #define TRY(CMD) \
-        if (system(CMD " -version > " NUL_DEVICE) == 0) { \
+        if (system(CMD " -version") == 0) { \
             *out_ffmpeg_command = CMD; \
             return CPYMO_ERR_SUCC; \
         } \
 
     #ifdef _WIN32
+    TRY("ffmpeg");
     TRY("cmd /c ffmpeg");
+    TRY("powershell ./ffmpeg");
     #else
     TRY("./ffmpeg");
-    #endif
-
     TRY("ffmpeg");
+    #endif
 
     #undef TRY
 
@@ -45,12 +40,11 @@ error_t cpymo_tool_ffmpeg_call(
         + strlen(src)
         + strlen(dst)
         + strlen(fmt)
-        + strlen(NUL_DEVICE)
         + flags_len
-        + 32 + strlen(NUL_DEVICE));
+        + 32);
     if (command == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-    sprintf(command, "%s -i \"%s\" -y -v quiet -f %s %s%s\"%s\" > " NUL_DEVICE,
+    sprintf(command, "%s -i \"%s\" -y -v quiet -f %s %s%s\"%s\"",
         ffmpeg_command,
         src,
         fmt,
