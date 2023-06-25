@@ -3,7 +3,11 @@
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_ffmpeg.h"
 #include "cpymo_tool_gameconfig.h"
+#ifdef _WIN32
 #include <io.h>
+#else
+#include <sys/io.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
