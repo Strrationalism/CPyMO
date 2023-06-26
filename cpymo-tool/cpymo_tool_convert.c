@@ -3,8 +3,10 @@
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_ffmpeg.h"
 #include "cpymo_tool_gameconfig.h"
-#ifdef _WIN32
+#if defined _WIN32
 #include <io.h>
+#elif defined __APPLE__
+#include <sys/uio.h>
 #else
 #include <sys/io.h>
 #endif
@@ -366,7 +368,9 @@ static void cpymo_tool_convert_configure_ffmpeg(
 static error_t cpymo_tool_convert(
     const char *dst_gamedir,
     const char *src_gamedir,
-    const cpymo_tool_convert_spec *spec)
+    const cpymo_tool_convert_spec *spec,
+    bool use_pack_flag,
+    bool pack_flag)
 {
     const char *ffmpeg_command;
     error_t err = cpymo_tool_ffmpeg_search(&ffmpeg_command);
@@ -378,6 +382,8 @@ static error_t cpymo_tool_convert(
     CPYMO_THROW(err);
 
     filter.output_with_mask = spec->use_mask;
+    filter.use_force_pack_unpack_flag = use_pack_flag;
+    filter.force_pack_unpack_flag_packed = pack_flag;
 
     cpymo_gameconfig cfg = filter.asset_list.gameconfig;
 
@@ -507,7 +513,7 @@ int cpymo_tool_invoke_convert(int argc, const char **argv)
 {
     extern int help(void);
 
-    if (argc != 5) {
+    if (argc < 5) {
         printf("[Error] Invalid arguments.\n");
         help();
         return -1;
@@ -526,7 +532,20 @@ int cpymo_tool_invoke_convert(int argc, const char **argv)
         return -1;
     }
 
-    err = cpymo_tool_convert(output, input, spec);
+    bool use_pack_flag, pack_flag;
+    for (int i = 5; i < argc; ++i) {
+        if (!strcmp(argv[i], "--pack")) {
+            use_pack_flag = true;
+            pack_flag = true;
+        }
+        else {
+            printf("[Error] Unknown arg \'%s\'.\n", argv[i]);
+            return -1;
+        }
+    }
+
+
+    err = cpymo_tool_convert(output, input, spec, use_pack_flag, pack_flag);
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] %s.\n", cpymo_error_message(err));
         return -1;

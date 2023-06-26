@@ -68,9 +68,9 @@ int help(void) {
 	printf(
 		"    cpymo-tool gen-album-cache <gamedir> [additional-album-lists...]\n");
 	printf("Strip pymo game:\n");
-	printf("    cpymo-tool strip <gamedir> <output-gamedir>\n");
+	printf("    cpymo-tool strip <gamedir> <output-gamedir> [--pack]\n");
 	printf("Convert pymo game:\n");
-	printf("    cpymo-tool convert <s60v3/s60v5/pymo/3ds/psp/wii> <gamedir> <output-gamedir>\n");
+	printf("    cpymo-tool convert <s60v3/s60v5/pymo/3ds/psp/wii> <gamedir> <output-gamedir> [--pack]\n");
 	printf("\n");
 	return 0;
 }
