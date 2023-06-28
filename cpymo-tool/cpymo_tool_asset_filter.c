@@ -128,7 +128,7 @@ static error_t cpymo_tool_asset_filter_run_single(
         strcat(pack_path, ".pak");
 
         size_t max_package_files = shlenu(param->asset_list);
-        if (param->masked && filter->output_with_mask && !filter->input_with_mask)
+        if (param->masked && filter->output_with_mask)
             max_package_files *= 2;
         error_t err = cpymo_tool_package_packer_open(
             &packer, pack_path, max_package_files);
