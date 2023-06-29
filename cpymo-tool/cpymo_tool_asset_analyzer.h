@@ -23,6 +23,8 @@ typedef struct {
         *video,
         *voice;
 
+    char **album_lists;
+
     cpymo_gameconfig gameconfig;
 } cpymo_tool_asset_analyzer_result;
 

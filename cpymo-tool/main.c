@@ -66,7 +66,7 @@ int help(void) {
 		"        [--load-mask] [--create-mask] [--out-format <png/bmp/jpg>]\n");
 	printf("Generate album UI image cache:\n");
 	printf(
-		"    cpymo-tool gen-album-cache <gamedir> [additional-album-lists...]\n");
+		"    cpymo-tool gen-album-cache <gamedir>\n");
 	printf("Strip pymo game:\n");
 	printf("    cpymo-tool strip <gamedir> <output-gamedir> [--pack]\n");
 	printf("Convert pymo game:\n");
