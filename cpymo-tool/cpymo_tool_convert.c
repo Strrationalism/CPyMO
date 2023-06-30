@@ -135,7 +135,7 @@ static error_t cpymo_tool_convert_image_processor(
         io->output.package.data_move_out = data;
         io->output.package.len = len;
 
-        if (u->mask_format) {
+        if (u->mask_format && io->output_mask_when_symbian) {
             cpymo_tool_image mask;
             err = cpymo_tool_image_detach_mask(&resized, &mask);
             if (err == CPYMO_ERR_SUCC) {
@@ -165,7 +165,8 @@ static error_t cpymo_tool_convert_image_processor(
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
 
         err = cpymo_tool_image_save_to_file_with_mask(
-            &resized, path, u->target_format, u->mask_format != NULL, u->mask_format);
+            &resized, path, u->target_format,
+            io->output_mask_when_symbian && u->mask_format != NULL, u->mask_format);
         free(path);
     }
 

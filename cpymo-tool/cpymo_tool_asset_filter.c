@@ -246,6 +246,8 @@ static error_t cpymo_tool_asset_filter_run_single(
             io.output.file.asset_name = param->asset_list[i].key;
         }
 
+        io.output_mask_when_symbian = param->asset_list[i].mask;
+
         // call filter
         error_t err =
             param->filter_function(&io, param->filter_function_userdata);

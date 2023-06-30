@@ -27,7 +27,7 @@ typedef struct {
     size_t input_mask_len;
 
     // output
-    bool output_to_package;
+    bool output_to_package, output_mask_when_symbian;
     const char *output_gamedir;
     union {
         struct {
