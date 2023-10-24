@@ -14,6 +14,7 @@
 #include <lualib.h>
 #include <lgc.h>
 #include <assert.h>
+#include "../stb/stb_ds.h"
 #include "cpymo_engine.h"
 
 static const char *cpymo_lua_actor_children_table_name = "children";
@@ -110,6 +111,82 @@ static int cpymo_lua_api_cpymo_deserialize(lua_State *l)
     return 1;
 }
 
+static error_t cpymo_lua_serialize(cpymo_lua_context *ctx, char **arrbuf)
+{
+    lua_State *l = ctx->lua_state;
+    int t = lua_type(l, -1);
+    error_t err;
+    const char *str;
+    char ch;
+
+    switch (t) {
+    case LUA_TNIL:
+    case LUA_TSTRING:
+    case LUA_TNUMBER:
+    case LUA_TBOOLEAN:
+        lua_getglobal(l, "string");
+        lua_getfield(l, -1, "format");
+        lua_pushstring(l, "%q");
+        lua_pushvalue(l, -4);
+
+        err = cpymo_lua_context_execute(ctx, 2, 1);
+        CPYMO_THROW(err);
+
+        str = lua_tostring(l, -1);
+        while (ch = *(str++))
+            arrpush(*arrbuf, ch);
+
+        lua_pop(l, 3);
+
+        return CPYMO_ERR_SUCC;
+
+    case LUA_TTABLE:
+        arrpush(*arrbuf, '{');
+
+        lua_pushnil(l);
+        while (lua_next(l, -2)) {
+
+            lua_pushvalue(l, -2);
+
+            arrpush(*arrbuf, '[');
+            cpymo_lua_serialize(ctx, arrbuf);
+            arrpush(*arrbuf, ']');
+
+            arrpush(*arrbuf, '=');
+            cpymo_lua_serialize(ctx, arrbuf);
+            arrpush(*arrbuf, ',');
+        }
+
+        arrpush(*arrbuf, '}');
+        lua_pop(l, 1);
+        return CPYMO_ERR_SUCC;
+
+    default:
+        printf("[Error] Failed to serialize lua %s.\n", lua_typename(l, t));
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+}
+
+static int cpymo_lua_api_cpymo_serialize(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+
+    char *chbuf = NULL;
+    error_t err = cpymo_lua_serialize(
+        cpymo_lua_state_get_lua_context(l), &chbuf);
+
+    arrpush(chbuf, '\0');
+    lua_pushstring(l, chbuf);
+    arrfree(chbuf);
+
+    CPYMO_LUA_THROW(l, err);
+
+    if (err != CPYMO_ERR_SUCC)
+        CPYMO_LUA_PANIC(l, "Failed to serialize lua value.");
+
+    return 1;
+}
+
 static error_t cpymo_lua_context_create_cpymo_package(
     cpymo_lua_context *ctx, cpymo_engine *e)
 {
@@ -135,6 +212,7 @@ static error_t cpymo_lua_context_create_cpymo_package(
         { "is_skipping", &cpymo_lua_api_cpymo_is_skipping },
         { "extract_text", &cpymo_lua_api_cpymo_extract_text },
         { "extract_text_submit", &cpymo_lua_api_cpymo_extract_text_submit },
+        { "serialize", &cpymo_lua_api_cpymo_serialize },
         { "deserialize", &cpymo_lua_api_cpymo_deserialize },
         { "exit", &cpymo_lua_api_cpymo_exit },
         { NULL, NULL }
