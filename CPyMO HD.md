@@ -123,6 +123,8 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 * `is_skipping() : bool` - 检查是否正在跳过
 * `extract_text(string)` - 导出游戏文本以供游戏在CUI模式下运行或提供给视障人员，需要多次调用后使用`extract_text_submit`来进行一次导出
 * `extract_text_submit()` - 提交一次`extract_text`导出的文本
+* `serialize(table | number | string | boolean | nil) : string` - 将lua值序列化为lua表达式字符串
+* `deserialize(string) : table | number | string | boolean` - 将序列化后的lua表达式字符串反序列化为lua值
 * `exit()` - 退出游戏
 
 ### `cpymo.render`

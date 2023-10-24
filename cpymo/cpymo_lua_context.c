@@ -85,6 +85,31 @@ static int cpymo_lua_api_cpymo_get_main_actor(lua_State *l)
     return 1;
 }
 
+static int cpymo_lua_api_cpymo_deserialize(lua_State *l)
+{
+    CPYMO_LUA_ARG_COUNT(l, 1);
+
+    const char *expr = lua_tostring(l, -1);
+
+    lua_getglobal(l, "load");
+
+    luaL_Buffer buf;
+    luaL_buffinit(l, &buf);
+    luaL_addstring(&buf, "return ");
+    luaL_addstring(&buf, expr);
+    luaL_pushresult(&buf);
+
+    cpymo_lua_context *ctx = cpymo_lua_state_get_lua_context(l);
+
+    error_t err = cpymo_lua_context_execute(ctx, 1, 1);
+    CPYMO_LUA_THROW(l, err);
+
+    err = cpymo_lua_context_execute(ctx, 0, 1);
+    CPYMO_LUA_THROW(l, err);
+
+    return 1;
+}
+
 static error_t cpymo_lua_context_create_cpymo_package(
     cpymo_lua_context *ctx, cpymo_engine *e)
 {
@@ -110,6 +135,7 @@ static error_t cpymo_lua_context_create_cpymo_package(
         { "is_skipping", &cpymo_lua_api_cpymo_is_skipping },
         { "extract_text", &cpymo_lua_api_cpymo_extract_text },
         { "extract_text_submit", &cpymo_lua_api_cpymo_extract_text_submit },
+        { "deserialize", &cpymo_lua_api_cpymo_deserialize },
         { "exit", &cpymo_lua_api_cpymo_exit },
         { NULL, NULL }
     };
