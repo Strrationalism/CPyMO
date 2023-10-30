@@ -3,6 +3,13 @@
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_ffmpeg.h"
 #include "cpymo_tool_gameconfig.h"
+#if defined _WIN32
+#include <io.h>
+#elif defined __APPLE__
+#include <sys/uio.h>
+#else
+#include <sys/io.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -77,6 +84,10 @@ static error_t cpymo_tool_convert_image_processor(
         err = cpymo_tool_image_load_from_memory(
             &image, io->input.package.data_move_in,
             io->input.package.len, false);
+        CPYMO_THROW(err);
+        free(io->input.package.data_move_in);
+        io->input.package.data_move_in = NULL;
+        io->input.package.len = 0;
     }
     else {
         char *path;
@@ -86,9 +97,8 @@ static error_t cpymo_tool_convert_image_processor(
         err = cpymo_tool_image_load_from_file(
             &image, path, false, NULL);
         free(path);
+        CPYMO_THROW(err);
     }
-
-    CPYMO_THROW(err);
 
     if (io->input_mask_file_buf_movein) {
         err = cpymo_tool_image_load_attach_mask_from_memory(
@@ -125,7 +135,7 @@ static error_t cpymo_tool_convert_image_processor(
         io->output.package.data_move_out = data;
         io->output.package.len = len;
 
-        if (u->mask_format) {
+        if (u->mask_format && io->output_mask_when_symbian) {
             cpymo_tool_image mask;
             err = cpymo_tool_image_detach_mask(&resized, &mask);
             if (err == CPYMO_ERR_SUCC) {
@@ -155,7 +165,8 @@ static error_t cpymo_tool_convert_image_processor(
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
 
         err = cpymo_tool_image_save_to_file_with_mask(
-            &resized, path, u->target_format, u->mask_format != NULL, u->mask_format);
+            &resized, path, u->target_format,
+            io->output_mask_when_symbian && u->mask_format != NULL, u->mask_format);
         free(path);
     }
 
@@ -194,29 +205,58 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
     struct cpymo_tool_convert_ffmpeg_processor_userdata *u =
         (struct cpymo_tool_convert_ffmpeg_processor_userdata *)userdata;
 
+    #ifdef _WIN32
+    #define mktemp _mktemp
+    #endif
+
     if (io->input_is_package) {
-        input_file = (char *)malloc(L_tmpnam);
+        input_file = (char *)malloc(strlen(io->output_gamedir) + 10);
         if (input_file == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
-        tempnam(io->output_gamedir, input_file);
+        strcpy(input_file, io->output_gamedir);
+        strcat(input_file, "/_iXXXXXX");
+
+        if (mktemp(input_file) == NULL) {
+            free(input_file);
+            input_file = NULL;
+            err = CPYMO_ERR_UNKNOWN;
+            goto CLEAN;
+        }
         err = cpymo_tool_utils_writefile(
             input_file, io->input.package.data_move_in, io->input.package.len);
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
+        delete_input_file = true;
+        free(io->input.package.data_move_in);
+        io->input.package.data_move_in = NULL;
+        io->input.package.len = 0;
     }
     else {
         err = cpymo_tool_asset_filter_get_input_file_name(
             &input_file, io);
+        FILE *f = fopen(input_file, "rb");
+        if (f == NULL) {
+            err = CPYMO_ERR_CAN_NOT_OPEN_FILE;
+            goto CLEAN;
+        }
+        fclose(f);
         if (err != CPYMO_ERR_SUCC) goto CLEAN;
     }
 
     if (io->output_to_package) {
-        output_file = (char *)malloc(L_tmpnam);
+        output_file = (char *)malloc(strlen(io->output_gamedir) + 10);
         if (output_file == NULL) {
             err = CPYMO_ERR_OUT_OF_MEM;
             goto CLEAN;
         }
 
-        tempnam(io->output_gamedir, output_file);
+        strcpy(output_file, io->output_gamedir);
+        strcat(output_file, "/_oXXXXXX");
+        if (mktemp(output_file) == NULL) {
+            free(output_file);
+            output_file = NULL;
+            err = CPYMO_ERR_UNKNOWN;
+            goto CLEAN;
+        }
 
         delete_output_file = true;
         package_output_file = true;
@@ -248,7 +288,7 @@ static error_t cpymo_tool_convert_ffmpeg_processor(
             err = cpymo_utils_loadfile(output_file, &buf, &len);
             if (err == CPYMO_ERR_SUCC) {
                 io->output.package.data_move_out = buf;
-                io->output.package.len = 0;
+                io->output.package.len = len;
             }
         }
 
@@ -329,7 +369,9 @@ static void cpymo_tool_convert_configure_ffmpeg(
 static error_t cpymo_tool_convert(
     const char *dst_gamedir,
     const char *src_gamedir,
-    const cpymo_tool_convert_spec *spec)
+    const cpymo_tool_convert_spec *spec,
+    bool use_pack_flag,
+    bool pack_flag)
 {
     const char *ffmpeg_command;
     error_t err = cpymo_tool_ffmpeg_search(&ffmpeg_command);
@@ -339,6 +381,10 @@ static error_t cpymo_tool_convert(
     err = cpymo_tool_asset_filter_init(
         &filter, src_gamedir, dst_gamedir);
     CPYMO_THROW(err);
+
+    filter.output_with_mask = spec->use_mask;
+    filter.use_force_pack_unpack_flag = use_pack_flag;
+    filter.force_pack_unpack_flag_packed = pack_flag;
 
     cpymo_gameconfig cfg = filter.asset_list.gameconfig;
 
@@ -428,8 +474,8 @@ static error_t cpymo_tool_convert(
     COPY_STR(cfg.bgmformat, u_bgm.out_ext);
     COPY_STR(cfg.charaformat, u_chara.target_format);
     COPY_STR(cfg.charamaskformat, u_chara.mask_format);
-    cfg.imagesize_w = (size_t)(cfg.imagesize_w * u_bg.scale_ratio);
-    cfg.imagesize_h = (size_t)(cfg.imagesize_h * u_bg.scale_ratio);
+    cfg.imagesize_w = (uint16_t)(cfg.imagesize_w * u_bg.scale_ratio);
+    cfg.imagesize_h = (uint16_t)(cfg.imagesize_h * u_bg.scale_ratio);
     COPY_STR(cfg.platform, spec->platform);
     if (!cfg.playvideo) cfg.playvideo = false;
     COPY_STR(cfg.seformat, u_se.out_ext);
@@ -468,7 +514,7 @@ int cpymo_tool_invoke_convert(int argc, const char **argv)
 {
     extern int help(void);
 
-    if (argc != 5) {
+    if (argc < 5) {
         printf("[Error] Invalid arguments.\n");
         help();
         return -1;
@@ -487,7 +533,20 @@ int cpymo_tool_invoke_convert(int argc, const char **argv)
         return -1;
     }
 
-    err = cpymo_tool_convert(output, input, spec);
+    bool use_pack_flag, pack_flag;
+    for (int i = 5; i < argc; ++i) {
+        if (!strcmp(argv[i], "--pack")) {
+            use_pack_flag = true;
+            pack_flag = true;
+        }
+        else {
+            printf("[Error] Unknown arg \'%s\'.\n", argv[i]);
+            return -1;
+        }
+    }
+
+
+    err = cpymo_tool_convert(output, input, spec, use_pack_flag, pack_flag);
     if (err != CPYMO_ERR_SUCC) {
         printf("[Error] %s.\n", cpymo_error_message(err));
         return -1;

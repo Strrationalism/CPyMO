@@ -173,6 +173,25 @@ static error_t cpymo_rmenu_ok(cpymo_engine *e, int sel, uint64_t hash, bool _)
 	return CPYMO_ERR_SUCC;
 }
 
+static inline float cpymo_rmenu_bg_zoom(
+	const cpymo_rmenu *r,
+	float font_size)
+{
+	#ifdef DISABLE_IMAGE_SCALING
+	return 1.0f;
+	#else
+	const size_t menu_items = 9;
+	const float menu_item_padding = 2.0f;
+	const float menu_padding = 16.0f;
+	const float menu_height =
+		(menu_item_padding + font_size) * menu_items + 2.0f * menu_padding;
+
+	float zoom_out = (menu_height / r->bg_h);
+	if (zoom_out < 1.0f) zoom_out = 1.0f;
+	return zoom_out;
+	#endif
+}
+
 error_t cpymo_rmenu_enter(cpymo_engine *e)
 {
 	cpymo_rmenu *rmenu = NULL;
@@ -233,15 +252,8 @@ error_t cpymo_rmenu_enter(cpymo_engine *e)
 		return err;
 	}
 
-	const float max_font_size = 16.0f / 240.0f * e->gameconfig.imagesize_h * 0.8f;
-	float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
-	#ifdef DISABLE_IMAGE_SCALING
-		if (font_size > max_font_size) font_size = max_font_size;
-		rmenu->bg_zoom_out = 1.0f;
-	#else
-		rmenu->bg_zoom_out = font_size / max_font_size;
-		if (rmenu->bg_zoom_out < 1.0f) rmenu->bg_zoom_out = 1.0f;
-	#endif
+	const float font_size = cpymo_gameconfig_font_size(&e->gameconfig);
+	rmenu->bg_zoom_out = cpymo_rmenu_bg_zoom(rmenu, font_size);
 
 	#define RMENU_ITEM(_, TEXT, ENABLED) \
 		err = cpymo_select_img_configuare_select_text( \

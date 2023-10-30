@@ -1,5 +1,6 @@
 ﻿#include "cpymo_tool_prelude.h"
 #include "cpymo_tool_image.h"
+#include "cpymo_tool_asset_analyzer.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -52,7 +53,8 @@ error_t cpymo_tool_image_load_from_memory(
 {
     int w, h;
     out->channels = is_mask ? 1 : 4;
-    stbi_uc *px = stbi_load_from_memory(memory, (int)len, &w, &h, NULL, out->channels);
+    stbi_uc *px = stbi_load_from_memory(
+        memory, (int)len, &w, &h, NULL, (int)out->channels);
     if (px == NULL) return CPYMO_ERR_INVALID_ARG;
 
     out->width = w;
@@ -65,11 +67,11 @@ void cpymo_tool_image_attach_mask(cpymo_tool_image *img, const cpymo_tool_image 
 {
     cpymo_utils_attach_mask_to_rgba_ex(
         img->pixels,
-        img->width,
-        img->height,
+        (int)img->width,
+        (int)img->height,
         mask->pixels,
-        mask->width,
-        mask->height);
+        (int)mask->width,
+        (int)mask->height);
 }
 
 error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, void *mask_buf, size_t len)
@@ -85,7 +87,7 @@ error_t cpymo_tool_image_load_attach_mask_from_memory(cpymo_tool_image *img, voi
 
 error_t cpymo_tool_image_detach_mask(const cpymo_tool_image *img, cpymo_tool_image *out_mask)
 {
-    out_mask->pixels = (stbi_uc *)malloc(out_mask->width * out_mask->height);
+    out_mask->pixels = (stbi_uc *)malloc(img->width * img->height);
     if (out_mask->pixels == NULL) return CPYMO_ERR_OUT_OF_MEM;
 
     out_mask->channels = 1;
@@ -312,8 +314,8 @@ error_t cpymo_tool_image_save_to_memory(
         ret = stbi_write_bmp_to_func(
             &cpymo_tool_image_write_memory_function,
             &ctx,
-            img.width,
-            img.height,
+            (int)img.width,
+            (int)img.height,
             (int)img.channels,
             (void *)img.pixels);
     }
@@ -321,18 +323,18 @@ error_t cpymo_tool_image_save_to_memory(
         ret = stbi_write_png_to_func(
             &cpymo_tool_image_write_memory_function,
             &ctx,
-            img.width,
-            img.height,
+            (int)img.width,
+            (int)img.height,
             (int)img.channels,
             (void *)img.pixels,
-            (int)img.width * img.channels);
+            (int)img.width * (int)img.channels);
     }
     else if (!strcmp("jpg", format)) {
         ret = stbi_write_jpg_to_func(
             &cpymo_tool_image_write_memory_function,
             &ctx,
-            img.width,
-            img.height,
+            (int)img.width,
+            (int)img.height,
             (int)img.channels,
             (void *)img.pixels,
             0);
@@ -464,41 +466,29 @@ static void cpymo_tool_generate_album_ui_generate(
     free(album_list_text);
 }
 
-static int cpymo_tool_generate_album_ui(
-    const char *gamedir,
-    const char **additional_album_lists,
-    size_t additional_album_lists_count)
+static error_t cpymo_tool_generate_album_ui(
+    const char *gamedir)
 {
-    cpymo_gameconfig gameconfig;
-    cpymo_assetloader assetloader;
-    {
-        char *path = (char *)malloc(strlen(gamedir) + 18);
-        if (path == NULL) return CPYMO_ERR_OUT_OF_MEM;
-        sprintf(path, "%s/gameconfig.txt", gamedir);
-        error_t err = cpymo_gameconfig_parse_from_file(&gameconfig, path);
-        if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not open file: %s(%s).\n",
-                path, cpymo_error_message(err));
-            free(path);
-            return err;
-        }
+    cpymo_tool_asset_analyzer_result anal;
+    error_t err = cpymo_tool_asset_analyze(gamedir, &anal);
+    CPYMO_THROW(err);
 
-        free(path);
-
-        err = cpymo_assetloader_init(&assetloader, &gameconfig, gamedir);
-        if (err != CPYMO_ERR_SUCC) {
-            printf("[Error] Can not init assetloader: %s %s.\n",
-                path, cpymo_error_message(err));
-            return err;
-        }
+    cpymo_assetloader l;
+    err = cpymo_assetloader_init(&l, &anal.gameconfig, gamedir);
+    if (err != CPYMO_ERR_SUCC) {
+        cpymo_tool_asset_analyzer_free_result(&anal);
+        return err;
     }
 
-    cpymo_tool_generate_album_ui_generate("album_list", true, &assetloader);
-    for (size_t i = 0; i < additional_album_lists_count; ++i)
+    for (size_t i = 0; i < arrlenu(anal.album_lists); ++i)
         cpymo_tool_generate_album_ui_generate(
-            additional_album_lists[i], false, &assetloader);
+            anal.album_lists[i],
+            !strcmp(anal.album_lists[i], "album_list"),
+            &l);
 
-    cpymo_assetloader_free(&assetloader);
+    cpymo_assetloader_free(&l);
+    cpymo_tool_asset_analyzer_free_result(&anal);
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -507,9 +497,18 @@ extern int help();
 int cpymo_tool_invoke_generate_album_ui(
     int argc, const char **argv)
 {
-    if (argc < 3) return help();
-    const char *gamedir = argv[2];
+    if (argc != 3) {
+        printf("[Error] Unknown arguments.\n");
+        help();
+        return -1;
+    }
 
-    return cpymo_tool_generate_album_ui(gamedir, argv + 3, (size_t)(argc - 3));
+    error_t err = cpymo_tool_generate_album_ui(argv[2]);
+    if (err != CPYMO_ERR_SUCC) {
+        printf("[Error] %s.\n", cpymo_error_message(err));
+        return -1;
+    }
+
+    return 0;
 }
 

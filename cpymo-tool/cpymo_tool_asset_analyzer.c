@@ -24,6 +24,12 @@ void cpymo_tool_asset_analyzer_free_result(
     cpymo_tool_asset_analyzer_free_result_hashset(r->system);
     cpymo_tool_asset_analyzer_free_result_hashset(r->video);
     cpymo_tool_asset_analyzer_free_result_hashset(r->voice);
+
+    if (r->album_lists) {
+        for (size_t i = 0; i < arrlenu(r->album_lists); ++i)
+            free(r->album_lists[i]);
+        arrfree(r->album_lists);
+    }
 }
 
 typedef struct {
@@ -59,6 +65,7 @@ static error_t cpymo_tool_asset_analyze_single_script(
     size_t script_len;
     error_t err = cpymo_utils_loadfile(script_path, &script, &script_len);
     free(script_path);
+    CPYMO_THROW(err);
 
     struct cpymo_tool_asset_analyzer_string_hashset_item item;
     item.key = cpymo_str_copy_malloc(cpymo_str_pure(script_name));
@@ -235,6 +242,7 @@ error_t cpymo_tool_asset_analyze(
     output->system = NULL;
     output->video = NULL;
     output->voice = NULL;
+    output->album_lists = NULL;
 
     cpymo_tool_asset_analyzer_system_asset_table system_asset_table;
     memset(&system_asset_table, 0, sizeof(system_asset_table));
@@ -464,6 +472,9 @@ static void cpymo_tool_asset_analyze_single_command(
             album_png = arg;
             album_list = arg;
         }
+
+        char *album_list_name = cpymo_str_copy_malloc(album_list);
+        if (album_list_name) arrput(r->album_lists, album_list_name);
 
         ADD_ASSET(r, script, album_list, "txt", false, NULL, true);
         ADD_ASSET(r, system, album_png, "png", false, NULL, false);

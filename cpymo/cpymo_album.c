@@ -167,6 +167,16 @@ error_t cpymo_album_generate_album_ui_image_pixels(
 			snprintf(page_str, sizeof(page_str), "%d", (int)page);
 			strcat(path, page_str);
 			strcat(path, ".png");
+
+			#ifdef CPYMO_TOOL
+			if (fopen(path, "rb"))
+			{
+				free(path);
+				*out_image = pixels;
+				return CPYMO_ERR_SUCC;
+			}
+			#endif
+
 			stbi_write_png(path, (int)*ref_w, (int)*ref_h, 3, pixels, (int)*ref_w * 3);
 			free(path);
 		}

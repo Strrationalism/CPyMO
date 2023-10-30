@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18.1)
 project(cpymo
-        VERSION 1.1.3
+        VERSION 1.1.4
         LANGUAGES C OBJC
         )
 

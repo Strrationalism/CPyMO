@@ -27,7 +27,7 @@ typedef struct {
     size_t input_mask_len;
 
     // output
-    bool output_to_package;
+    bool output_to_package, output_mask_when_symbian;
     const char *output_gamedir;
     union {
         struct {
@@ -53,6 +53,8 @@ typedef struct {
     const char *output_gamedir;
     bool use_force_pack_unpack_flag;
     bool force_pack_unpack_flag_packed;
+    bool input_with_mask;
+    bool output_with_mask;
 
     // filter function
     cpymo_tool_asset_filter_processor

@@ -4,6 +4,7 @@
 #include "cpymo_tool_asset_filter.h"
 #include "cpymo_tool_asset_analyzer.h"
 #include "../stb/stb_ds.h"
+#include <time.h>
 
 error_t cpymo_tool_asset_filter_init(
     cpymo_tool_asset_filter *filter,
@@ -25,6 +26,9 @@ error_t cpymo_tool_asset_filter_init(
         return err;
     }
 
+    filter->input_with_mask = cpymo_gameconfig_is_symbian(
+        &filter->asset_list.gameconfig);
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -44,6 +48,7 @@ struct cpymo_tool_asset_filter_run_param
     const char *maskext;
     struct cpymo_tool_asset_analyzer_string_hashset_item *asset_list;
     const cpymo_package *package;
+    bool masked, packable;
 };
 
 
@@ -94,12 +99,16 @@ static error_t cpymo_tool_asset_filter_run_single(
 
     if (filter->use_force_pack_unpack_flag)
         io.output_to_package = filter->force_pack_unpack_flag_packed;
+    if (!param->packable) io.output_to_package = false;
 
     size_t asset_count = shlenu(param->asset_list);
     if (asset_count) {
         error_t err = cpymo_tool_utils_mkdir(
             filter->output_gamedir, param->asstype);
         CPYMO_THROW(err);
+    }
+    else {
+        return CPYMO_ERR_SUCC;
     }
 
     cpymo_tool_package_packer packer;
@@ -118,16 +127,30 @@ static error_t cpymo_tool_asset_filter_run_single(
         strcat(pack_path, param->asstype);
         strcat(pack_path, ".pak");
 
+        size_t max_package_files = shlenu(param->asset_list);
+        if (param->masked && filter->output_with_mask)
+            max_package_files *= 2;
         error_t err = cpymo_tool_package_packer_open(
-            &packer, pack_path, shlenu(param->asset_list));
+            &packer, pack_path, max_package_files);
         free(pack_path);
         CPYMO_THROW(err);
     }
 
+    time_t log_time = time(NULL);
     for (size_t i = 0; i < asset_count; ++i) {
         // setup input
         io.input_mask_file_buf_movein = NULL;
         io.input_mask_len = 0;
+
+        time_t now_time = time(NULL);
+        if (now_time - log_time > 1) {
+            log_time = now_time;
+            printf("%s %.2f%% %u/%u processed.\n",
+                io.asset_type,
+                100.0f * (float)i / (float)asset_count,
+                (unsigned)i,
+                (unsigned)asset_count);
+        }
 
         if (io.input_is_package) {
             io.input.package.data_move_in = NULL;
@@ -223,6 +246,8 @@ static error_t cpymo_tool_asset_filter_run_single(
             io.output.file.asset_name = param->asset_list[i].key;
         }
 
+        io.output_mask_when_symbian = param->asset_list[i].mask;
+
         // call filter
         error_t err =
             param->filter_function(&io, param->filter_function_userdata);
@@ -298,41 +323,48 @@ error_t cpymo_tool_asset_filter_run(
     struct cpymo_tool_asset_filter_run_param params[] = {
         { "bg", f->filter_bg, f->filter_bg_userdata,
           f->input_assetloader.game_config->bgformat, NULL, f->asset_list.bg,
-          f->input_assetloader.use_pkg_bg ? &f->input_assetloader.pkg_bg : NULL },
+          f->input_assetloader.use_pkg_bg ? &f->input_assetloader.pkg_bg : NULL,
+          false, true  },
 
         { "bgm", f->filter_bgm, f->filter_bgm_userdata,
-          f->input_assetloader.game_config->bgmformat, NULL, f->asset_list.bgm, NULL },
+          f->input_assetloader.game_config->bgmformat, NULL, f->asset_list.bgm, NULL,
+          false, false },
 
         { "chara", f->filter_chara, f->filter_chara_userdata,
           f->input_assetloader.game_config->charaformat,
           f->input_assetloader.game_config->charamaskformat,
           f->asset_list.chara,
-          f->input_assetloader.use_pkg_chara ? &f->input_assetloader.pkg_chara : NULL },
+          f->input_assetloader.use_pkg_chara ? &f->input_assetloader.pkg_chara : NULL,
+          true, true },
 
         { "se", f->filter_se, f->filter_se_userdata,
           f->input_assetloader.game_config->seformat, NULL, f->asset_list.se,
-          f->input_assetloader.use_pkg_se ? &f->input_assetloader.pkg_se : NULL },
+          f->input_assetloader.use_pkg_se ? &f->input_assetloader.pkg_se : NULL,
+          false, true },
 
         { "system", f->filter_system, f->filter_system_userdata,
-          "png", "png", f->asset_list.system, NULL },
+          "png", "png", f->asset_list.system, NULL,
+          true, false },
 
         { "video", f->filter_video, f->filter_video_userdata,
-          "mp4", NULL, f->asset_list.video, NULL },
+          "mp4", NULL, f->asset_list.video, NULL,
+          false, false },
 
         { "voice", f->filter_voice, f->filter_voice_userdata,
           f->input_assetloader.game_config->voiceformat, NULL,
           f->asset_list.voice,
-          f->input_assetloader.use_pkg_voice ? &f->input_assetloader.pkg_voice : NULL },
+          f->input_assetloader.use_pkg_voice ? &f->input_assetloader.pkg_voice : NULL,
+          false, true },
 
         { "script", &cpymo_tool_asset_filter_function_copy, NULL,
-          "txt", NULL, f->asset_list.script, NULL }
+          "txt", NULL, f->asset_list.script, NULL,
+          false, false }
     };
 
     error_t err = cpymo_tool_utils_mkdir(f->output_gamedir, "");
     CPYMO_THROW(err);
 
     for (size_t i = 0; i < CPYMO_ARR_COUNT(params); ++i) {
-        printf("Processing %s...\n", params[i].asstype);
         err = cpymo_tool_asset_filter_run_single(f, params + i);
 
         if (err != CPYMO_ERR_SUCC) {
