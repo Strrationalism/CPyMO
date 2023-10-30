@@ -124,6 +124,8 @@ jobs:
         ./vdpm libogg 
         ./vdpm libvorbis 
         ./vdpm libmikmod 
+        ./vdpm opus 
+        ./vdpm opusfile 
         # cd ../cpymo-backends/sdl2
         # chmod +x ./build-psv-ffmpeg.sh
         # ./build-psv-ffmpeg.sh
