@@ -66,7 +66,7 @@ $(BUILD_DIR)/cpymo.elf: $(OBJS_BACKEND) $(OBJS_CPYMO)
 		-lSceTouch_stub \
 		-lSceHid_stub \
 		-lSceMotion_stub \
-		-lSDL2_mixer -lFLAC -lmodplug -lmpg123 -logg -lvorbis -lvorbisfile -lopus -lopusfile -lstdc++ -lmikmod -lpthread \
+		-lSDL2_mixer -lFLAC -lmodplug -lmpg123 -logg -lvorbis -lvorbisfile -lopus -lopusfile -lxmp -lstdc++ -lmikmod -lpthread \
 		-lm \
 		-Xlinker "-)" \
 		-L$(VITASDK)/arm-vita-eabi/lib \
