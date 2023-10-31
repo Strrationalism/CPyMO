@@ -75,13 +75,22 @@ Actor是一种在游戏中可以被作为游戏物体执行的对象，它具有
     -- 该对象内将会被用于递归地存储子actor列表
     children = {},
 
+    -- 仅对于main actor，在存档时调用，返回一个可序列化的值用于保存Lua脚本中需要存档的数据
+    save = function(self)
+        return serializable
+    end
+
+    -- 仅对于main actor，在读档时调用，需要在这里重置Lua脚本状态并读入存档
+    load = function(self, serializable)
+    end
+
     -- 所有的对象均可为nil，CPyMO将会跳过这些处理
     -- 除此之外，还可以放入其他对象用于保存本actor的状态信息
 }
 
 ```
 
-CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时将不会执行`main` actor。
+CPyMO将会从全局的`main`表作为main actor执行，在进入UI状态时将不会执行`main` actor。
 
 
 ## 工具类型
@@ -111,6 +120,8 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 所有的CPyMO Lua API都存储在包`cpymo`中。
 
+其中可序列化类型`serializable`可以为`number`、`nil`、`string`、`bool`以及由这些类型构成的可嵌套`table`。
+
 ### `cpymo`
 
 * `gamedir: string` - 表示游戏所在文件夹
@@ -118,13 +129,12 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
   - 可能会大于`gameconfig.txt`中的值，这种情况下可以访问更高级别的功能
 * `screen_width: int` - 屏幕宽度，用于确定绘图和鼠标的坐标系，读取自`gameconfig.txt`的`imagesize`字段
 * `screen_height: int` - 屏幕高度，用于确定绘图和鼠标的坐标系，读取自`gameconfig.txt`的`imagesize`字段
-* `set_main_actor(actor | nil)` - 设置主actor
 * `readonly(table) : userdata` - 创建表的只读句柄，可以通过该句柄读取表的内容，但不能写入
 * `is_skipping() : bool` - 检查是否正在跳过
 * `extract_text(string)` - 导出游戏文本以供游戏在CUI模式下运行或提供给视障人员，需要多次调用后使用`extract_text_submit`来进行一次导出
 * `extract_text_submit()` - 提交一次`extract_text`导出的文本
-* `serialize(table | number | string | boolean | nil) : string` - 将lua值序列化为lua表达式字符串
-* `deserialize(string) : table | number | string | boolean` - 将序列化后的lua表达式字符串反序列化为lua值
+* `serialize(serializable) : string` - 将lua值序列化为lua表达式字符串
+* `deserialize(string) : serializable` - 将序列化后的lua表达式字符串反序列化为lua值
 * `exit()` - 退出游戏
 
 ### `cpymo.render`
@@ -316,12 +326,7 @@ CPyMO将会从全局的`main`表作为actor进行执行，在进入UI状态时�
 
 ### `cpymo.save` (TODO)
 
-* `save_callback: () -> string` - 存档时调用该回调，需要由用户设置，由用户设置一个字符串，存档时将会将该字符串存入到存档中
-* `load_callback: string -> ()` - 读档时调用该回调，需要由用户设置，读取由用户设置的那个字符串
-* `global_savedata: string` - 你可以从这里读写全局存档中保存的字符串，写入时不一定会立刻保存
-* `global_save()` - 立刻保存全局存档
-* `config_data: string` - 全局设置中保存的字符串，写入时不一定会立刻保存
-* `config_save()` - 立刻保存设置
-* `open_read_savedata(filename: string) : io.file` - 以读取的方式打开自定义存档文件
-* `open_write_savedata(filename: string) : io.file` - 以创建并写入的方式打开自定义存档文件
+* `global: serializable` - 你可以从这里读写全局存档中保存的字符串，写入时不一定会立刻保存
+* `save_global()` - 立刻保存全局存档
 * `save(id: int)` - 保存存档到`id`号存档槽，其中0号槽为自动存档
+* `load(id: int)` - 立刻读取`id`号存档槽，其中0号为自动存档

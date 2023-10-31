@@ -13,7 +13,6 @@ struct cpymo_engine;
 typedef struct {
     lua_State *lua_state;
     int readonly_metatable;
-    int main_actor;
     struct cpymo_engine *engine;
 
     int script_wait_function_ref;
