@@ -62,7 +62,7 @@ void cpymo_lua_actor_draw(
 void cpymo_lua_actor_free(
     cpymo_lua_context *l);
 
-void cpymo_lua_get_main_actor(cpymo_lua_context *l);
+void cpymo_lua_get_main_actor(const cpymo_lua_context *l);
 
 error_t cpymo_lua_actor_update_main(
     cpymo_lua_context *l,

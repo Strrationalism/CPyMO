@@ -66,7 +66,7 @@ static int cpymo_lua_api_cpymo_extract_text_submit(lua_State *l)
     return 0;
 }
 
-static int cpymo_lua_api_cpymo_deserialize(lua_State *l)
+int cpymo_lua_api_cpymo_deserialize(lua_State *l)
 {
     CPYMO_LUA_ARG_COUNT(l, 1);
 
@@ -91,7 +91,7 @@ static int cpymo_lua_api_cpymo_deserialize(lua_State *l)
     return 1;
 }
 
-static error_t cpymo_lua_serialize(cpymo_lua_context *ctx, char **arrbuf)
+error_t cpymo_lua_serialize(cpymo_lua_context *ctx, char **arrbuf)
 {
     lua_State *l = ctx->lua_state;
     int t = lua_type(l, -1);
@@ -154,6 +154,11 @@ static int cpymo_lua_api_cpymo_serialize(lua_State *l)
     char *chbuf = NULL;
     error_t err = cpymo_lua_serialize(
         cpymo_lua_state_get_lua_context(l), &chbuf);
+
+    if (err != CPYMO_ERR_SUCC) {
+        arrfree(chbuf);
+        return err;
+    }
 
     arrpush(chbuf, '\0');
     lua_pushstring(l, chbuf);
@@ -314,7 +319,10 @@ error_t cpymo_lua_context_init(cpymo_lua_context *l, cpymo_engine *e)
 
     error_t err = cpymo_lua_context_create_cpymo_package(l, e);
     CPYMO_THROW(err);
-    
+
+    lua_newtable(l->lua_state);
+    lua_setglobal(l->lua_state, "main");
+
     return CPYMO_ERR_SUCC;
 }
 
@@ -492,7 +500,7 @@ void cpymo_lua_actor_free(
         "late_free", NULL, NULL);
 }
 
-void cpymo_lua_get_main_actor(cpymo_lua_context *l)
+void cpymo_lua_get_main_actor(const cpymo_lua_context *l)
 {
     lua_getglobal(l->lua_state, "main");
 }

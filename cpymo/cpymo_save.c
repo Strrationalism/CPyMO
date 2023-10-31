@@ -9,6 +9,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if CPYMO_FEATURE_LEVEL >= 1
+#include "cpymo_lua_context.h"
+#include "../stb/stb_ds.h"
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -64,7 +69,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 	// MSGBOX IMAGES
 	WRITE_STR(e->say.namebox_name);
 	WRITE_STR(e->say.msgbox_name);
-	
+
 	// BGM
 	const char *bgm_name = cpymo_audio_get_bgm_name(e);
 	WRITE_STR(bgm_name);
@@ -173,7 +178,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 		size_t sz = cpymo_vars_count(&e->vars.locals);
 		for (size_t i = 0; i < sz; ++i) {
 			cpymo_val val;
-			const char *var_name = 
+			const char *var_name =
 				cpymo_vars_get_by_index(e->vars.locals, i, &val);
 			WRITE_STR(var_name);
 			uint32_t val_le = PACK32(val);
@@ -183,7 +188,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 			}
 		}
 
-		
+
 		WRITE_STR(empty);
 	}
 
@@ -196,7 +201,7 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 			uint32_t cur_line = (uint32_t)interpreter->script_parser.cur_line;
 			uint32_t line_end = (uint32_t)interpreter->script_parser.is_line_end;
 			uint32_t checkpoint_line = (uint32_t)interpreter->checkpoint.cur_line;
-			
+
 			uint32_t interpreter_params[] = {
 				PACK32(cur_pos),
 				PACK32(cur_line),
@@ -215,6 +220,26 @@ error_t cpymo_save_write(cpymo_engine * e, unsigned short save_id)
 		WRITE_STR(empty);
 	}
 
+	// LUA
+	#if CPYMO_FEATURE_LEVEL >= 1
+	if (e->feature_level >= 1 && e->lua.lua_state != NULL) {
+		error_t cpymo_lua_context_call_save(
+			const cpymo_engine *e,
+			char **out_save_str);
+
+		char *chbuf = NULL;
+		error_t err = cpymo_lua_context_call_save(
+			(struct cpymo_engine *)e, &chbuf);
+		if (err != CPYMO_ERR_SUCC)
+		{
+			fclose(save);
+			return err;
+		}
+
+		WRITE_STR(chbuf);
+		arrfree(chbuf);
+	}
+	#endif
 
 	#undef PACK32
 	#undef WRITE_STR
@@ -244,7 +269,7 @@ FILE * cpymo_save_open_read(struct cpymo_engine *e, unsigned short save_id)
 	return cpymo_backend_read_save(e->assetloader.gamedir, filename);
 }
 
-static error_t cpymo_save_read_string(char **str, FILE *save) 
+static error_t cpymo_save_read_string(char **str, FILE *save)
 {
 	uint16_t len_le;
 	if (fread(&len_le, sizeof(len_le), 1, save) != 1) {
@@ -301,7 +326,7 @@ error_t cpymo_save_load_title(cpymo_save_title *out, FILE *save)
 error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 {
 	while (e->ui) cpymo_ui_exit(e);
-	
+
 	// reset states
 	cpymo_vars_clear_locals(&e->vars);
 
@@ -319,7 +344,7 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	cpymo_scroll_reset(&e->scroll);
 	cpymo_say_free(&e->say); cpymo_say_init(&e->say);
 	cpymo_text_clear(&e->text);
-	
+
 	cpymo_audio_vo_stop(e);
 	cpymo_audio_bgm_stop(e);
 	cpymo_audio_se_stop(e);
@@ -370,13 +395,13 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
 	if (*strbuf) cpymo_audio_bgm_play(e, cpymo_str_pure(strbuf), true);
-	
-	
+
+
 	// SE
 	err = cpymo_save_read_string(&strbuf, save);
 	FAIL{ THROW; };
 	if (*strbuf) cpymo_audio_se_play(e, cpymo_str_pure(strbuf), true);
-	
+
 
 	// FADEOUT
 	{
@@ -467,12 +492,12 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		int32_t y = CAST(int32_t, anime_params[3]);
 
 		cpymo_anime_on(
-			e, 
-			all_frames, 
-			cpymo_str_pure(strbuf), 
-			((float)x) / (1 << 16) * e->gameconfig.imagesize_w, 
-			((float)y) / (1 << 16) * e->gameconfig.imagesize_h, 
-			interval, 
+			e,
+			all_frames,
+			cpymo_str_pure(strbuf),
+			((float)x) / (1 << 16) * e->gameconfig.imagesize_w,
+			((float)y) / (1 << 16) * e->gameconfig.imagesize_h,
+			interval,
 			true);
 	}
 
@@ -518,12 +543,23 @@ error_t cpymo_save_load_savedata(cpymo_engine *e, FILE *save)
 		caller = *slot;
 	}
 
+	if (e->interpreter == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
+	cpymo_interpreter_goto_line(e->interpreter, (uint64_t)e->interpreter->checkpoint.cur_line);
+
+	// LUA
+#if CPYMO_FEATURE_LEVEL >=1
+	if (e->feature_level >= 1 && e->lua.lua_state != NULL) {
+		err = cpymo_save_read_string(&strbuf, save);
+		FAIL { THROW; }
+
+		error_t cpymo_lua_context_call_load(cpymo_engine *e, const char *str);
+		err = cpymo_lua_context_call_load(e, strbuf);
+		FAIL { THROW; }
+	}
+#endif
+
 	if (strbuf) free(strbuf);
 	strbuf = NULL;
-
-	if (e->interpreter == NULL) return CPYMO_ERR_BAD_FILE_FORMAT;
-
-	cpymo_interpreter_goto_line(e->interpreter, (uint64_t)e->interpreter->checkpoint.cur_line);
 
 	cpymo_engine_request_redraw(e);
 

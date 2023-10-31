@@ -76,12 +76,12 @@ Actor是一种在游戏中可以被作为游戏物体执行的对象，它具有
     children = {},
 
     -- 仅对于main actor，在存档时调用，返回一个可序列化的值用于保存Lua脚本中需要存档的数据
-    save = function(self)
+    save = function()
         return serializable
     end
 
     -- 仅对于main actor，在读档时调用，需要在这里重置Lua脚本状态并读入存档
-    load = function(self, serializable)
+    load = function(serializable)
     end
 
     -- 所有的对象均可为nil，CPyMO将会跳过这些处理
@@ -91,6 +91,7 @@ Actor是一种在游戏中可以被作为游戏物体执行的对象，它具有
 ```
 
 CPyMO将会从全局的`main`表作为main actor执行，在进入UI状态时将不会执行`main` actor。
+CPyMO默认将会把`main`设置为一个空表。
 
 
 ## 工具类型
@@ -324,6 +325,6 @@ CPyMO将会从全局的`main`表作为main actor执行，在进入UI状态时将
   - 在其返回`true`之前不会继续工作，
   - 一旦`finished`返回`true`，则会调用`finish_callback`，并继续执行后面的PyMO代码
 
-### `cpymo.save` (TODO)
+### `cpymo.save`
 
 * `save_global()` - 立刻保存全局存档
