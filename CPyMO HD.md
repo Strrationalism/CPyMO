@@ -326,7 +326,4 @@ CPyMO将会从全局的`main`表作为main actor执行，在进入UI状态时将
 
 ### `cpymo.save` (TODO)
 
-* `global: serializable` - 你可以从这里读写全局存档中保存的字符串，写入时不一定会立刻保存
 * `save_global()` - 立刻保存全局存档
-* `save(id: int)` - 保存存档到`id`号存档槽，其中0号槽为自动存档
-* `load(id: int)` - 立刻读取`id`号存档槽，其中0号为自动存档

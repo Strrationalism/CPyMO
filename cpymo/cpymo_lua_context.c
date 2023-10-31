@@ -212,6 +212,9 @@ static error_t cpymo_lua_context_create_cpymo_package(
     void cpymo_lua_api_script_register(cpymo_lua_context *ctx);
     cpymo_lua_api_script_register(ctx);
 
+    void cpymo_lua_api_save_register(cpymo_lua_context *ctx);
+    cpymo_lua_api_save_register(ctx);
+
     error_t cpymo_lua_api_input_register(cpymo_lua_context *ctx);
     error_t err = cpymo_lua_api_input_register(ctx);
     CPYMO_THROW(err);
