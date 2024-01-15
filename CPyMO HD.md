@@ -1,6 +1,8 @@
 # CPyMO HD
 
-*CPyMO HD*是CPyMO功能增强计划的开发代号，在`hd`分支上开发。  
+CPyMO HD现在使用的Lua版本是`v5.4.6`。
+
+*CPyMO HD*是CPyMO功能增强计划的开发代号，在`hd`分支上开发。
 CPyMO HD将引擎扩展功能划分为四个功能级别，每个级别都基于上个级别进行改动：
 
 - Feature Level 0
@@ -102,7 +104,7 @@ CPyMO默认将会把`main`设置为一个空表。
 
 具有以下字段：
 
-* `x: number` 
+* `x: number`
 * `y: number`
 * `w: number`
 * `h: number`
@@ -167,7 +169,7 @@ CPyMO默认将会把`main`设置为一个空表。
 
 #### 类`cpymo_render_image`
 
-该类表示一个可以渲染到画面上的图像。    
+该类表示一个可以渲染到画面上的图像。
 你可以使用`<close>`在声明中标记该值。
 
 这个类包含以下成员：
@@ -180,7 +182,7 @@ CPyMO默认将会把`main`设置为一个空表。
 
 #### 类`cpymo_render_text`
 
-该类表示一个可以渲染到画面上的文本。    
+该类表示一个可以渲染到画面上的文本。
 你可以使用`<close>`在声明中标记该值。
 
 这个类包含以下成员：
@@ -191,9 +193,9 @@ CPyMO默认将会把`main`设置为一个空表。
 
 #### 类`cpymo_render_masktrans`
 
-该类表示一个过场遮罩。    
-并不是所有的平台都支持创建此对象，**所有返回该对象的函数都有可能返回关于平台不支持的异常**。    
-你可以使用`<close>`在声明中标记该值。    
+该类表示一个过场遮罩。
+并不是所有的平台都支持创建此对象，**所有返回该对象的函数都有可能返回关于平台不支持的异常**。
+你可以使用`<close>`在声明中标记该值。
 
 这个类包含以下成员：
 
@@ -205,32 +207,32 @@ CPyMO默认将会把`main`设置为一个空表。
 
 ### `cpymo.asset`
 
-* `load_bg(bg_name: string) : cpymo_render_image` 
+* `load_bg(bg_name: string) : cpymo_render_image`
   - 通过不带扩展名和路径的名称加载bg图像
-* `load_chara(chara_name: string) : cpymo_render_image` 
+* `load_chara(chara_name: string) : cpymo_render_image`
   - 通过不带扩展名和路径的名称加载chara图像
-* `load_system_image(image_name: string) : cpymo_render_image` 
+* `load_system_image(image_name: string) : cpymo_render_image`
   - 通过不带扩展名和路径的名称加载system图像
-* `load_system_masktrans(masktrans_name: string) : cpymo_render_masktrans` 
+* `load_system_masktrans(masktrans_name: string) : cpymo_render_masktrans`
   - 通过不带扩展名和路径的名称加载过场遮罩
-* `load_image(path: string) : cpymo_render_image` 
+* `load_image(path: string) : cpymo_render_image`
   - 从指定路径加载图片，需要扩展名
   - 请在路径开头处增加`cpymo.gamedir`确保访问正确的目录
-* `open_package(path: string) : cpymo_asset_package` 
+* `open_package(path: string) : cpymo_asset_package`
   - 打开指定路径处的数据包
   - 请在路径开头处增加`cpymo.gamedir`确保访问正确的目录
 
 #### 类`cpymo_asset_package`
 
-该类表示一个被打开的数据包。    
-你可以使用`<close>`在声明中标记该值。    
+该类表示一个被打开的数据包。
+你可以使用`<close>`在声明中标记该值。
 
 该类包含以下成员：
 
-* `load_string(self, filename: string) : string` 
+* `load_string(self, filename: string) : string`
   - 从数据包中加载字符串
   - 其中文件名不带扩展名
-* `load_image(self, filename: string) : cpymo_render_image` 
+* `load_image(self, filename: string) : cpymo_render_image`
   - 从数据包中加载图片
   - 其中文件名不带扩展名
 * `free(self)` - 手动销毁该对象
@@ -240,7 +242,7 @@ CPyMO默认将会把`main`设置为一个空表。
 * `enter(ui: actor)` - 进入一层UI
 * `exit()` - 退出当前UI
 * `msgbox(msg: string)` - 弹出一个消息框
-* `okcancelbox(msg: string, callback: bool -> void)` 
+* `okcancelbox(msg: string, callback: bool -> void)`
   - 弹出“确定/取消”框，当关闭此框时调用`callback`
   - 若选择了“确定”，则`callback`会被传入`true`，其他情况下传入`false`
 
@@ -251,7 +253,7 @@ CPyMO默认将会把`main`设置为一个空表。
 * `open_save_ui()` - 打开存档界面
 * `open_load_ui()` - 打开读档界面
 * `play_movie(name: string)` - 播放video文件夹中的视频
-* `open_album(list_name: string, bg_image: string)` 
+* `open_album(list_name: string, bg_image: string)`
   - 打开album界面
   - `list_name`为CG列表的文件名
   - `bg_image`为system目录下背景图的文件名
@@ -260,14 +262,14 @@ CPyMO默认将会把`main`设置为一个空表。
 
 ### `cpymo.flags`
 
-该包内的功能用于管理Flag，每个Flag由一个字符串组成，可检查其存在或不存在。    
-这些Flag是全局的，将会在全局存档中保存。    
+该包内的功能用于管理Flag，每个Flag由一个字符串组成，可检查其存在或不存在。
+这些Flag是全局的，将会在全局存档中保存。
 这里的Flag最终使用一个Hash值表示，不保证可靠。
 
 * `set(flag: string)` - 设置一个flag
 * `check(flag: string) : bool` - 检查这个flag是否存在
 * `unset(flag: string)` - 取消一个flag
-* `unlock_cg(cg_name: string)` 
+* `unlock_cg(cg_name: string)`
   - 解锁一个CG，不带扩展名
   - 仅`gameconfig.txt`中符合`cgprefix`条件的图片可被解锁
 * `lock_cg(cg_name: string)` - 重新锁定一个CG，不带扩展名
@@ -320,7 +322,7 @@ CPyMO默认将会把`main`设置为一个空表。
   - 则将会在下一帧继续执行后面的PyMO代码
   - 当你重载了PyMO命令之后，将不再可以执行原有的PyMO命令
 * `push_code(pymo_code: string)` - 将PyMO代码压入PyMO调用栈中，在下次PyMO解释器执行时执行PyMO代码`pymo_code`
-* `wait(finished: (delta_time: number) -> bool, finish_callback: () -> ())` 
+* `wait(finished: (delta_time: number) -> bool, finish_callback: () -> ())`
   - 将会使得PyMO解释器每帧执行一次`finished`，参数为已经经过的时间
   - 在其返回`true`之前不会继续工作，
   - 一旦`finished`返回`true`，则会调用`finish_callback`，并继续执行后面的PyMO代码
