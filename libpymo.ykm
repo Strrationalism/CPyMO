@@ -267,6 +267,7 @@
 @__type endx number
 @__type endy number
 @__type time int
+@chara_scroll coord_mode charaID endx endy time
 
 - extern chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha layer time
 - macro  chara_scroll_complex coord_mode charaID filename startx starty endx endy beginalpha=0 layer=0 time=300
