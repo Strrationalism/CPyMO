@@ -162,7 +162,7 @@ jobs:
       run: |
         git clone https://github.com/pspdev/pspdev.git --depth 1
         cd pspdev
-        sudo ./prepare-debian-ubuntu.sh
+        sudo ./prepare.sh
         export PSPDEV=/usr/local/pspdev
         sudo mkdir -p $PSPDEV
         sudo chown -R $USER: $PSPDEV
