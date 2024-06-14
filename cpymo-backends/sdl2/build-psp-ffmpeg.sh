@@ -45,8 +45,8 @@ AUDIO_SUPPORT=vorbis,mp3,pcm,ogg,wav,$PCM_US,$PCM_SS,$PCM_FS
 --cpu=generic \
 --disable-asm \
 --target-os=none \
---extra-cflags=" -O3 -D__PSP__" \
---extra-cxxflags=" -O3 -D__PSP__" \
+--extra-cflags=" -O3 -D__PSP__ -Wno-error=incompatible-pointer-types" \
+--extra-cxxflags=" -O3 -D__PSP__ -Wno-error=incompatible-pointer-types" \
 --disable-bzlib \
 --disable-iconv \
 --disable-lzma \

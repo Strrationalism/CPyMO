@@ -32,8 +32,8 @@ chmod +x ./configure
 		--cpu=cortex-a9 \
 		--disable-armv6t2 \
 		--target-os=none \
-		--extra-cflags=" -Wl,-q -O3 -D_BSD_SOURCE" \
-		--extra-cxxflags=" -Wl,-q -O3 -D_BSD_SOURCE" \
+		--extra-cflags=" -Wl,-q -O3 -D_BSD_SOURCE -Wno-error=incompatible-pointer-types" \
+		--extra-cxxflags=" -Wl,-q -O3 -D_BSD_SOURCE -Wno-error=incompatible-pointer-types" \
 		--extra-ldflags=" -L$VITASDK/lib " \
 		--disable-bzlib \
 		--disable-iconv \
@@ -42,7 +42,7 @@ chmod +x ./configure
 		--disable-xlib \
 		--disable-pthreads \
 		--enable-gpl \
-		--enable-version3 
+		--enable-version3
 
 make install -j
 
