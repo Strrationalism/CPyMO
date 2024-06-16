@@ -15,7 +15,7 @@ jobs:
     name: 'Nintendo Switch'
     runs-on: ubuntu-latest
     container: devkitpro/devkita64:20230507
- 
+
     steps:
     - uses: actions/checkout@v1
       with:
@@ -25,7 +25,7 @@ jobs:
       run: |
         cd ./cpymo-backends/sdl2
         make -j -f Makefile.Switch
-    
+
     - name: Upload
       uses: actions/upload-artifact@v2.3.0
       with:
@@ -36,12 +36,12 @@ jobs:
     name: 'Nintendo 3DS'
     runs-on: ubuntu-latest
     container: devkitpro/devkitarm:latest
- 
+
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: true
-        
+
     - name: Install Makerom
       run: |
         cd ./cpymo-backends/3ds
@@ -61,13 +61,13 @@ jobs:
         make -j
         $DEVKITARM/bin/arm-none-eabi-strip ./build/cpymo.elf
         ./makerom -f cia -o cpymo.cia -elf ./build/cpymo.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
-    
+
     - name: Upload cia
       uses: actions/upload-artifact@v2.3.0
       with:
         name: CPyMO for Nintendo 3DS (cia)
         path: ./cpymo-backends/3ds/cpymo.cia
-        
+
     - name: Upload 3dsx
       uses: actions/upload-artifact@v2.3.0
       with:
@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-        with: 
+        with:
           submodules: true
 
       - name: 'Build'
@@ -103,12 +103,12 @@ jobs:
   build-psv:
     name: 'Sony PSV'
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: true
-    
+
     - name: Install Dependents
       run: |
         git clone https://github.com/vitasdk/vdpm.git --depth 1
@@ -117,16 +117,16 @@ jobs:
         export PATH=$VITASDK/bin:$PATH
         ./bootstrap-vitasdk.sh
         ./vdpm sdl2
-        ./vdpm sdl2_mixer 
-        ./vdpm flac 
-        ./vdpm libmodplug 
-        ./vdpm mpg123 
-        ./vdpm libogg 
-        ./vdpm libvorbis 
-        ./vdpm libmikmod 
-        ./vdpm opus 
-        ./vdpm opusfile 
-        ./vdpm libxmp 
+        ./vdpm sdl2_mixer
+        ./vdpm flac
+        ./vdpm libmodplug
+        ./vdpm mpg123
+        ./vdpm libogg
+        ./vdpm libvorbis
+        ./vdpm libmikmod
+        ./vdpm opus
+        ./vdpm opusfile
+        ./vdpm libxmp
         # cd ../cpymo-backends/sdl2
         # chmod +x ./build-psv-ffmpeg.sh
         # ./build-psv-ffmpeg.sh
@@ -154,10 +154,10 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
-        
+
     - name: Setup Ninja
       uses: ashutoshvarma/setup-ninja@v1.1
-    
+
     - name: Install PSPDEV
       run: |
         git clone https://github.com/pspdev/pspdev.git --depth 1
@@ -213,7 +213,7 @@ jobs:
         cd cpymo-backends/sdl2
         export AUDIO_BACKEND=ffmpeg
         make -f Makefile.Emscripten -j
-        
+
   build-ios:
     name: 'iOS'
     runs-on: macos-latest
@@ -322,10 +322,10 @@ jobs:
 
     - name: Find Visual Studio
       uses: ilammy/msvc-dev-cmd@v1
-        
+
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.3.1
-        
+
     - name: Donwload vcpkg
       run: git clone --depth 1 --branch master -- https://github.com/microsoft/vcpkg
 
@@ -341,7 +341,7 @@ jobs:
     - name: Build
       run: |
         pushd cpymo-backends/uwp
-        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm|arm64" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=CPyMO_TemporaryKey.pfx CPyMO.vcxproj
+        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm|arm64" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=cert.pfx -p:PackageCertificatePassword="123456" CPyMO.vcxproj
         popd
 
     - name: Upload
@@ -385,7 +385,7 @@ jobs:
         export USE_SDL_MIXER=1
         mingw32-make -j
         strip cpymo.exe
-        
+
         wget https://raw.githubusercontent.com/libsdl-org/SDL_mixer/SDL-1.2/COPYING
         mv COPYING COPYING.SDL_mixer.txt
         wget https://raw.githubusercontent.com/libsdl-org/SDL-1.2/main/COPYING
@@ -430,7 +430,7 @@ jobs:
   build-desktop:
     name: 'Desktop'
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       matrix:
         tuple: [ mac-x64, mac-arm64, linux-x64, win-x86, win-x64, win-arm64 ] #, win-arm ]
@@ -481,25 +481,25 @@ jobs:
             package-name: "macOS Apple Silicon"
             cmake-flags: "-DCMAKE_OSX_ARCHITECTURES=arm64"
             vcpkg-path: "/Users/runner/work/CPyMO/CPyMO/vcpkg/scripts/buildsystems/vcpkg.cmake"
-            
+
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-        
+
     - uses: ilammy/msvc-dev-cmd@v1
       if: ${{ runner.os == 'Windows' }}
       with:
         arch: ${{ matrix.arch }}
-        
+
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.3.1
       if: ${{ runner.os != 'Windows' }}
-      
+
     - name: Setup pkg-config
       if: ${{ runner.os == 'macOS' }}
       run: brew install pkg-config
-        
+
     - name: Donwload vcpkg
       run: git clone --depth 1 --branch master -- https://github.com/microsoft/vcpkg
 
@@ -521,7 +521,7 @@ jobs:
       run: ./vcpkg/vcpkg install sdl2:${{ matrix.triplet }}
 
     - name: Install FFMPEG
-      run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}  
+      run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}
 
     - name: Configure CMake
       run: cmake "-DCMAKE_TOOLCHAIN_FILE=${{ matrix.vcpkg-path }}" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
@@ -597,9 +597,9 @@ jobs:
           path: |
             ./cpymo-backends/ascii-art/cpymo-ascii-art
             ./cpymo-backends/ascii-art/cpymo-ascii-art.exe
-          
 
-            
+
+
   build-text:
     name: 'CPyMO Text'
     runs-on: ${{ matrix.os }}
@@ -643,4 +643,4 @@ jobs:
           path: |
             ./cpymo-backends/text/cpymo-text
             ./cpymo-backends/text/cpymo-text.exe
-          
+
