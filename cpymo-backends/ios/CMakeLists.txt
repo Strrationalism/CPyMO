@@ -4,6 +4,9 @@ project(cpymo
         LANGUAGES C OBJC
         )
 
+# fix compile error for `SDL_systimer.c`
+set(EXTRA_CFLAGS "${EXTRA_CFLAGS} -Wno-error=declaration-after-statement")
+
 find_library(LIBZ z)
 find_library(LIBBZ2 bz2)
 find_library(LIBICONV iconv)
