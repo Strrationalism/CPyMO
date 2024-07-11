@@ -38,8 +38,8 @@ chmod +x ./configure
 --disable-armv6t2 \
 --disable-neon \
 --target-os=none \
---extra-cflags=" -O3 -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math $ARCH" \
---extra-cxxflags=" -O3 -DARM11 -D_3DS -mword-relocations -fomit-frame-pointer -ffast-math -fno-rtti -fno-exceptions -std=gnu++11 $ARCH" \
+--extra-cflags=" -O3 -DARM11 -D_3DS -Wno-error=incompatible-pointer-types -mword-relocations -fomit-frame-pointer -ffast-math $ARCH" \
+--extra-cxxflags=" -O3 -DARM11 -D_3DS -Wno-error=incompatible-pointer-types -mword-relocations -fomit-frame-pointer -ffast-math -fno-rtti -fno-exceptions -std=gnu++11 $ARCH" \
 --extra-ldflags=" -specs=3dsx.specs $ARCH -L$DEVKITARM/lib  -L$DEVKITPRO/libctru/lib  -L$DEVKITPRO/portlibs/3ds/lib -lctru " \
 --disable-bzlib \
 --disable-iconv \
@@ -49,7 +49,7 @@ chmod +x ./configure
 --disable-zlib \
 --disable-debug \
 --enable-gpl \
---enable-version3 
+--enable-version3
 
 make install -j
 
