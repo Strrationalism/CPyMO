@@ -374,7 +374,10 @@ void retro_run(void)
     input_poll_cb();
     input_update();
 
-    cpymo_engine_update(&engine, delta, &redraw);
+    error_t err = cpymo_engine_update(&engine, delta, &redraw);
+    if (err == CPYMO_ERR_NO_MORE_CONTENT)
+        environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
+
     if (redraw)
         cpymo_engine_draw(&engine);
     video_cb(soft_image.pixels, soft_image.w, soft_image.h, soft_image.line_stride);
