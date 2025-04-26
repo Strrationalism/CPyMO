@@ -8,9 +8,12 @@
 #include "libretro.h"
 
 #include "../../cpymo/cpymo_engine.h"
+#include "../../endianness.h/endianness.h"
 #include "../software/cpymo_backend_software.h"
 #include "../include/cpymo_backend_audio.h"
+#include "../include/cpymo_backend_movie.h"
 
+#include <libswscale/swscale.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "../../stb/stb_image.h"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
@@ -36,6 +39,8 @@ static cpymo_backend_software_context  soft_context;
 static cpymo_input                     input      = { 0 };
 static float                           delta      = 0;
 static stbtt_fontinfo                  font;
+static struct SwsContext              *movie_sws;
+static size_t                          movie_height;
 
 cpymo_input cpymo_input_snapshot(void)
 {
@@ -60,6 +65,81 @@ const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)
         44100, cpymo_backend_audio_s16, 2
     };
     return &audio_info;
+}
+
+enum cpymo_backend_movie_how_to_play cpymo_backend_movie_how_to_play(void)
+{
+    return cpymo_backend_movie_how_to_play_send_surface;
+}
+
+error_t cpymo_backend_movie_init_surface(size_t width, size_t height, enum cpymo_backend_movie_format format)
+{
+    enum AVPixelFormat src_fmt, dst_fmt;
+    switch (format) {
+    case cpymo_backend_movie_format_yuv420p:
+        src_fmt = AV_PIX_FMT_YUV420P;
+        break;
+    case cpymo_backend_movie_format_yuv422p:
+        src_fmt = AV_PIX_FMT_YUV422P;
+        break;
+    case cpymo_backend_movie_format_yuv420p16:
+        src_fmt = AV_PIX_FMT_YUV420P16;
+        break;
+    case cpymo_backend_movie_format_yuv422p16:
+        src_fmt = AV_PIX_FMT_YUV422P16;
+        break;
+    case cpymo_backend_movie_format_yuyv422:
+        src_fmt = AV_PIX_FMT_YUYV422;
+    default:
+        return CPYMO_ERR_UNSUPPORTED;
+    }
+#if ENDIANNESS_LE
+    dst_fmt = AV_PIX_FMT_BGRA;
+#else
+    dst_fmt = AV_PIX_FMT_RGBA;
+#endif
+    movie_sws = sws_getContext(width, height, src_fmt,
+                               soft_image.w, soft_image.h, dst_fmt,
+                               SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    if (movie_sws == NULL)
+        return CPYMO_ERR_UNSUPPORTED;
+    movie_height = height;
+    return CPYMO_ERR_SUCC;
+}
+
+void cpymo_backend_movie_update_yuyv_surface(const void *p, size_t pitch)
+{
+    const uint8_t *src[] = { p };
+    uint8_t *dst[] = { soft_image.pixels };
+    int src_linesize[] = { pitch };
+    int dst_linesize[] = { soft_image.line_stride };
+    sws_scale(movie_sws,
+              src, src_linesize,
+              0, movie_height,
+              dst, dst_linesize);
+}
+
+void cpymo_backend_movie_update_yuv_surface(const void *y, size_t y_pitch,
+                                            const void *u, size_t u_pitch,
+                                            const void *v, size_t v_pitch)
+{
+    const uint8_t *src[] = { y, u, v };
+    uint8_t *dst[] = { soft_image.pixels };
+    int src_linesize[] = { y_pitch, u_pitch, v_pitch };
+    int dst_linesize[] = { soft_image.line_stride };
+    sws_scale(movie_sws,
+              src, src_linesize,
+              0, movie_height,
+              dst, dst_linesize);
+}
+
+void cpymo_backend_movie_draw_surface(void)
+{
+}
+
+void cpymo_backend_movie_free_surface(void)
+{
+    sws_freeContext(movie_sws);
 }
 
 FILE *cpymo_backend_read_save(const char *gamedir, const char * name)
