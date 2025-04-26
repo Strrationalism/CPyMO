@@ -5,6 +5,8 @@
 #include <alloca.h>
 #include <stdio.h>
 #include <libgen.h>
+#include <unistd.h>
+#include <sys/stat.h>
 #include "libretro.h"
 
 #include "../../cpymo/cpymo_engine.h"
@@ -144,15 +146,15 @@ void cpymo_backend_movie_free_surface(void)
 
 FILE *cpymo_backend_read_save(const char *gamedir, const char * name)
 {
-    char *path = (char *)alloca(strlen(gamedir) + strlen(name) + 8);
-    sprintf(path, "%s/save/%s", gamedir, name);
+    char *path = (char *)alloca(strlen(name) + 8);
+    sprintf(path, "save/%s", name);
     return fopen(path, "rb");
 }
 
 FILE *cpymo_backend_write_save(const char *gamedir, const char * name)
 {
-    char *path = (char *)alloca(strlen(gamedir) + strlen(name) + 8);
-    sprintf(path, "%s/save/%s", gamedir, name);
+    char *path = (char *)alloca(strlen(name) + 8);
+    sprintf(path, "save/%s", name);
     return fopen(path, "wb");
 }
 
@@ -205,7 +207,7 @@ void retro_set_input_state(retro_input_state_t cb)
 void retro_get_system_info(struct retro_system_info *info)
 {
     info->need_fullpath = true;
-    info->valid_extensions = "txt";
+    info->valid_extensions = "txt|/";
     info->library_version = "1.1.9";
     info->library_name = "CPyMO";
     info->block_extract = false;
@@ -287,8 +289,16 @@ bool retro_load_game(const struct retro_game_info *game)
     if (game == NULL || game->path == NULL)
         return false;
 
-    char *gamedir = dirname(strdup(game->path));
+    struct stat sb;
+    if (stat(game->path, &sb) == -1) {
+        log_cb(RETRO_LOG_ERROR, "stat: %s\n", strerror(errno));
+        return false;
+    }
+    const char *gamepath = S_ISDIR(sb.st_mode) ? game->path : dirname(strdup(game->path));
+    char *gamedir = realpath(gamepath, NULL);
+    chdir(gamedir);
     err = cpymo_engine_init(&engine, gamedir);
+    mkdir("save", 0755);
     if (err != CPYMO_ERR_SUCC) {
         log_cb(RETRO_LOG_ERROR, "cpymo_engine_init: %s\n", cpymo_error_message(err));
         return false;
@@ -298,6 +308,7 @@ bool retro_load_game(const struct retro_game_info *game)
         log_cb(RETRO_LOG_ERROR, "cpymo_backend_font_init: %s\n", cpymo_error_message(err));
         return false;
     }
+    free(gamedir);
 
     soft_image.w = engine.gameconfig.imagesize_w;
     soft_image.h = engine.gameconfig.imagesize_h;
