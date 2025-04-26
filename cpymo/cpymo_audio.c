@@ -416,6 +416,7 @@ static error_t cpymo_audio_channel_play_file(
 	}
 
 	assert(c->swr_context == NULL);
+#if LIBAVUTIL_VERSION_MAJOR < 57
 	c->swr_context = swr_alloc_set_opts(
 		NULL,
 		av_get_default_channel_layout((int)info->channels),
@@ -429,6 +430,19 @@ static error_t cpymo_audio_channel_play_file(
 		(enum AVSampleFormat)stream->codecpar->format,
 		stream->codecpar->sample_rate,
 		0, NULL);
+#else
+	AVChannelLayout ch_layout;
+	av_channel_layout_default(&ch_layout, info->channels);
+	swr_alloc_set_opts2(
+		&c->swr_context,
+		&ch_layout,
+		cpymo_audio_fmt2ffmpeg(info->format),
+		(int)info->freq,
+		&stream->codecpar->ch_layout,
+		(enum AVSampleFormat)stream->codecpar->format,
+		stream->codecpar->sample_rate,
+		0, NULL);
+#endif
 	if (c->swr_context == NULL) {
 		cpymo_audio_channel_reset_unsafe(c);
 		return CPYMO_ERR_UNKNOWN;
