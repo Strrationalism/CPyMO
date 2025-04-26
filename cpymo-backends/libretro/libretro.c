@@ -43,6 +43,8 @@ static float                           delta      = 0;
 static stbtt_fontinfo                  font;
 static struct SwsContext              *movie_sws;
 static size_t                          movie_height;
+static bool                            use_audio_callback = false;
+static bool                            audio_enabled = true;
 
 cpymo_input cpymo_input_snapshot(void)
 {
@@ -172,12 +174,32 @@ unsigned retro_api_version(void)
     return RETRO_API_VERSION;
 }
 
+static void audio_callback(void)
+{
+    static const int samples = 2048;
+    static int16_t audio_buffer[2048 * 2];
+    cpymo_audio_copy_mixed_samples(audio_buffer, samples * 4, &engine.audio);
+    audio_batch_cb(audio_buffer, samples);
+}
+
+static void audio_set_state(bool enabled)
+{
+    audio_enabled = enabled;
+}
+
 void retro_set_environment(retro_environment_t cb)
 {
     struct retro_log_callback log;
+    struct retro_audio_callback audio = {
+        .callback = audio_callback,
+        .set_state = audio_set_state,
+    };
     environ_cb = cb;
     if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
         log_cb = log.log;
+
+    if (environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio))
+        use_audio_callback = true;
 }
 
 void retro_set_video_refresh(retro_video_refresh_t cb)
@@ -382,8 +404,10 @@ void retro_run(void)
         cpymo_engine_draw(&engine);
     video_cb(soft_image.pixels, soft_image.w, soft_image.h, soft_image.line_stride);
 
-    cpymo_audio_copy_mixed_samples(audio_buffer, samples * 4, &engine.audio);
-    audio_batch_cb(audio_buffer, samples);
+    if (audio_enabled && !use_audio_callback) {
+        cpymo_audio_copy_mixed_samples(audio_buffer, samples * 4, &engine.audio);
+        audio_batch_cb(audio_buffer, samples);
+    }
 }
 
 size_t retro_serialize_size(void)
