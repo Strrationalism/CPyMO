@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <libgen.h>
 #include <unistd.h>
+#include <threads.h>
 #include <sys/stat.h>
 #include "libretro.h"
 
@@ -45,6 +46,7 @@ static struct SwsContext              *movie_sws;
 static size_t                          movie_height;
 static bool                            use_audio_callback = false;
 static bool                            audio_enabled = true;
+static mtx_t                           audio_mutex;
 
 cpymo_input cpymo_input_snapshot(void)
 {
@@ -53,14 +55,18 @@ cpymo_input cpymo_input_snapshot(void)
 
 void cpymo_backend_audio_free()
 {
+    if (use_audio_callback)
+        mtx_destroy(&audio_mutex);
 }
 
 void cpymo_backend_audio_lock()
 {
+    mtx_lock(&audio_mutex);
 }
 
 void cpymo_backend_audio_unlock()
 {
+    mtx_unlock(&audio_mutex);
 }
 
 const cpymo_backend_audio_info *cpymo_backend_audio_get_info(void)
@@ -178,7 +184,9 @@ static void audio_callback(void)
 {
     static const int samples = 2048;
     static int16_t audio_buffer[2048 * 2];
+    mtx_lock(&audio_mutex);
     cpymo_audio_copy_mixed_samples(audio_buffer, samples * 4, &engine.audio);
+    mtx_unlock(&audio_mutex);
     audio_batch_cb(audio_buffer, samples);
 }
 
@@ -198,8 +206,10 @@ void retro_set_environment(retro_environment_t cb)
     if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
         log_cb = log.log;
 
-    if (environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio))
+    if (environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio)) {
         use_audio_callback = true;
+        mtx_init(&audio_mutex, mtx_plain);
+    }
 }
 
 void retro_set_video_refresh(retro_video_refresh_t cb)
