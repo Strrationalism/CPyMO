@@ -502,7 +502,7 @@ jobs:
 
     - name: Setup Dependents for Ubuntu
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt install autoconf autoconf-archive automake libtool  libltdl-dev
+      run: sudo apt install autoconf autoconf-archive automake libtool libltdl-dev libx11-dev
 
     - name: Donwload vcpkg
       run: git clone --depth 1 --branch master -- https://github.com/microsoft/vcpkg
@@ -526,10 +526,6 @@ jobs:
 
     - name: Install FFMPEG
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}
-
-    - name: Install X11
-      if: ${{ runner.os == 'Linux' }}
-      run: ./vcpkg/vcpkg install libx11:${{ matrix.triplet }}
 
     - name: Configure CMake
       run: cmake "-DCMAKE_TOOLCHAIN_FILE=${{ matrix.vcpkg-path }}" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
