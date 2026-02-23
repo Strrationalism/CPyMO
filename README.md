@@ -825,23 +825,20 @@ CPyMO ASCII ART仅支持键盘操作：
   * 七月缘
   * __
   * 约汉
+  
+# PyMO & CPyMO QQ交流群
+
+如果您对 PyMO & CPyMO 感兴趣，欢迎加入 PyMO & CPyMO 的 QQ 交流群：1013078231。
 
 # 赞助
 
 如果您有兴趣推动本软件的发展，可以对我们进行赞助。
 
-## 弦语蝶梦独立游戏工作室 开源软件事业
+## 弦语蝶梦独立游戏工作室 开源软件
 
 您可以在爱发电对我们进行赞助：
 
 <https://afdian.net/order/create?user_id=4ffe65ae104a11ec9bdf52540025c377>
-
-## 本软件主要作者 许兴逸
-
-您可以通过支付宝或微信对本软件主要作者许兴逸进行赞助：
-
-![alipay](alipay.jpg)
-![wechat](wechatpay.jpg)
 
 ## 帮助我们移植到更多平台
 
