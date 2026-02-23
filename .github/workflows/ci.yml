@@ -336,12 +336,12 @@ jobs:
 
     - name: Install FFmpeg
       run: |
-        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm-uwp ffmpeg:arm64-uwp
+        ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm64-uwp
 
     - name: Build
       run: |
         pushd cpymo-backends/uwp
-        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm|arm64" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=cert.pfx -p:PackageCertificatePassword="123456" CPyMO.vcxproj
+        msbuild -m -p:UapAppxPackageBuildMode=SideLoadOnly -p:AppxBundlePlatforms="x86|x64|arm64" -p:AppxPackageSigningEnabled=true -p:Configuration=Release -p:PackageCertificateKeyFile=cert.pfx -p:PackageCertificatePassword="123456" CPyMO.vcxproj
         popd
 
     - name: Upload
@@ -526,6 +526,10 @@ jobs:
 
     - name: Install FFMPEG
       run: ./vcpkg/vcpkg install ffmpeg:${{ matrix.triplet }}
+
+    - name: Install X11
+      if: ${{ runner.os == 'Linux' }}
+      run: ./vcpkg/vcpkg install libx11:${{ matrix.triplet }}
 
     - name: Configure CMake
       run: cmake "-DCMAKE_TOOLCHAIN_FILE=${{ matrix.vcpkg-path }}" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ${{ matrix.cmake-flags }}
