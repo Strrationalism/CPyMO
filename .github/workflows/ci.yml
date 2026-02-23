@@ -504,7 +504,19 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: |
         sudo apt-get update
-        sudo apt install autoconf autoconf-archive automake libtool libltdl-dev libx11-dev libibus-1.0-dev
+        sudo apt install -y \
+          autoconf \
+          autoconf-archive \
+          automake \
+          libtool \
+          libltdl-dev \
+          libx11-dev \
+          libibus-1.0-dev \
+          libxft-dev \
+          libxext-dev \
+          libwayland-dev \
+          libxkbcommon-dev \
+          libegl1-mesa-dev
 
     - name: Donwload vcpkg
       run: git clone --depth 1 --branch master -- https://github.com/microsoft/vcpkg
