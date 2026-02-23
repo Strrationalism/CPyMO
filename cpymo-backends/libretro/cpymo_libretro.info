@@ -5,7 +5,7 @@ authors = "Seng Jik"
 categories = "Game engine"
 license = "AGPLv3+"
 permissions = ""
-supported_extensions = "txt"
+supported_extensions = "txt|/"
 
 # Hardware Information
 manufacturer = "Strrationalism"

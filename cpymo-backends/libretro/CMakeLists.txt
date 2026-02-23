@@ -16,13 +16,13 @@ else ()
 endif ()
 
 target_compile_definitions(cpymo_libretro PRIVATE
-  -DTEXT_CHARACTER_W_SCALE=1 -DDISABLE_MOVIE
+  -DTEXT_CHARACTER_W_SCALE=1
 )
 target_link_options(cpymo_libretro PRIVATE
   -Wl,--version-script=${CMAKE_SOURCE_DIR}/link.T
   -Wl,--no-undefined -lm
   # TODO: link ffmpeg statically
-  -lavcodec -lavformat -lavutil -lswresample
+  -lavcodec -lavformat -lavutil -lswresample -lswscale
 )
 
 # Follow naming conventions for libretro cores
