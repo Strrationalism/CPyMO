@@ -254,7 +254,7 @@ jobs:
 
   build-android:
     name: 'Android'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v1
