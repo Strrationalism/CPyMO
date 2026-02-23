@@ -27,7 +27,7 @@ jobs:
         make -j -f Makefile.Switch
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Nintendo Switch
         path: ./cpymo-backends/sdl2/cpymo.nro
@@ -63,13 +63,13 @@ jobs:
         ./makerom -f cia -o cpymo.cia -elf ./build/cpymo.elf -rsf cpymo.rsf -exefslogo -target t -icon icon -banner banner
 
     - name: Upload cia
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Nintendo 3DS (cia)
         path: ./cpymo-backends/3ds/cpymo.cia
 
     - name: Upload 3dsx
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Nintendo 3DS (3dsx)
         path: ./cpymo-backends/3ds/cpymo.3dsx
@@ -92,7 +92,7 @@ jobs:
           mv wii-icon.png icon.png
 
       - name: 'Upload'
-        uses: actions/upload-artifact@v2.3.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: CPyMO for Nintendo Wii
           path: |
@@ -140,7 +140,7 @@ jobs:
         make -f Makefile.PSV -j
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Sony PSV
         path: |
@@ -187,7 +187,7 @@ jobs:
         make -f Makefile.PSP -j
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Sony PSP
         path: ./cpymo-backends/sdl2/EBOOT.PBP
@@ -247,7 +247,7 @@ jobs:
           mv ./cpymo.ipa ../../../cpymo.ipa
 
       - name: Upload
-        uses: actions/upload-artifact@v2.3.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: CPyMO for iOS
           path: ./cpymo.ipa
@@ -298,14 +298,14 @@ jobs:
         ENABLE_TEXT_EXTRACT_ANDROID_ACCESSIBILITY: 1
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Android
         path: |
           ./cpymo-signed.apk
 
     - name: Upload (Accessibility)
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Android (Accessibility)
         path: |
@@ -345,7 +345,7 @@ jobs:
         popd
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Universal Windows Platform
         path: ./cpymo-backends/uwp/AppPackages/CPyMO/
@@ -392,7 +392,7 @@ jobs:
         mv COPYING COPYING.SDL.txt
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Windows (SDL 1.2)
         path: |
@@ -422,7 +422,7 @@ jobs:
         strip ./cpymo
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: CPyMO for Linux (SDL 1.2)
         path: ./cpymo-backends/sdl1/cpymo
@@ -536,7 +536,7 @@ jobs:
         strip ./build/build/cpymo-tool
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       if: ${{ runner.os != 'Windows' }}
       with:
         name: CPyMO for ${{ matrix.package-name }}
@@ -547,7 +547,7 @@ jobs:
             ./build/build/MinSizeRel/cpymo-tool.exe
 
     - name: Upload
-      uses: actions/upload-artifact@v2.3.0
+      uses: actions/upload-artifact@v6.0.0
       if: ${{ runner.os == 'Windows' }}
       with:
         name: CPyMO for ${{ matrix.package-name }}
@@ -591,7 +591,7 @@ jobs:
           strip ./cpymo-ascii-art.exe
 
       - name: 'Upload'
-        uses: actions/upload-artifact@v2.3.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: CPyMO ASCII Art for ${{ runner.os }}
           path: |
@@ -637,7 +637,7 @@ jobs:
           strip cpymo-text.exe
 
       - name: 'Upload'
-        uses: actions/upload-artifact@v2.3.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: CPyMO Text for ${{ runner.os }}
           path: |
