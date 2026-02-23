@@ -492,13 +492,17 @@ jobs:
       with:
         arch: ${{ matrix.arch }}
 
-    - name: Set up NASM
+    - name: Setup NASM
       uses: ilammy/setup-nasm@v1.3.1
       if: ${{ runner.os != 'Windows' }}
 
-    - name: Setup pkg-config
+    - name: Setup Dependents for MacOS
       if: ${{ runner.os == 'macOS' }}
-      run: brew install pkg-config
+      run: brew install pkg-config autoconf autoconf-archive automake libtool
+
+    - name: Setup Dependents for Ubuntu
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo apt install autoconf autoconf-archive automake libtool
 
     - name: Donwload vcpkg
       run: git clone --depth 1 --branch master -- https://github.com/microsoft/vcpkg
