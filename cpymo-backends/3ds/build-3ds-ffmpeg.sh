@@ -1,9 +1,9 @@
 #!/bin/sh
 
-curl https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/refs/tags/n8.0.1 --output ffmpeg.tar.gz
+curl https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/refs/tags/n5.1 --output ffmpeg.tar.gz
 tar -xf ffmpeg.tar.gz
 
-cd FFmpeg-n8.0.1
+cd FFmpeg-n5.1
 
 PATH=$DEVKITARM/bin:$PATH
 ARCH="-march=armv6k -mtune=mpcore -mfloat-abi=hard"
@@ -54,4 +54,4 @@ chmod +x ./configure
 make install -j
 
 cd ..
-rm -rf FFmpeg-n8.0.1 ffmpeg.tar.gz
+rm -rf FFmpeg-n5.1 ffmpeg.tar.gz
