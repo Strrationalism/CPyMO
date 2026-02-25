@@ -338,6 +338,17 @@ jobs:
       run: |
         ./vcpkg/vcpkg install ffmpeg:x86-uwp ffmpeg:x64-uwp ffmpeg:arm64-uwp
 
+    - name: Verify Certificate
+      shell: pwsh
+      run: |
+        pushd cpymo-backends/uwp
+        powershell -ExecutionPolicy Bypass -File ".\Verify-Certificate-CI.ps1"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Certificate validation failed, attempting to regenerate..."
+          powershell -ExecutionPolicy Bypass -File ".\Update-Certificate.ps1" -Force
+        }
+        popd
+
     - name: Build
       run: |
         pushd cpymo-backends/uwp
