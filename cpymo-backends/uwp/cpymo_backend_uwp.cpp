@@ -1,7 +1,6 @@
 ﻿#include "../../cpymo/cpymo_prelude.h"
 #include "../../cpymo/cpymo_game_selector.h"
 #include <string>
-#include <cvt/wstring>
 #include <codecvt>
 #include <assert.h>
 #include <SDL.h>
@@ -42,7 +41,7 @@ maybe<T> wait_async(Windows::Foundation::IAsyncOperation<T> ^async) {
 }
 
 std::string w2c(Platform::String ^s) {
-	stdext::cvt::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
 	return convert.to_bytes(s->Data());
 }
 
