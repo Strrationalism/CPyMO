@@ -7,7 +7,7 @@
 #include <io.h>
 #elif defined __APPLE__
 #include <sys/uio.h>
-#else
+#elif defined(__linux__) && (defined(__x86_64__) || defined(__i386__))
 #include <sys/io.h>
 #endif
 #include <string.h>

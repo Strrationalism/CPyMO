@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.8)
 
 project ("cpymo")
 
@@ -12,8 +12,12 @@ add_definitions (-DENABLE_TEXT_EXTRACT_COPY_TO_CLIPBOARD)
 add_definitions (-DENABLE_EXIT_CONFIRM)
 add_definitions (-DLEAKCHECK)
 add_definitions (-DLIMIT_WINDOW_SIZE_TO_SCREEN)
-
-find_package (FFMPEG REQUIRED)
+if(MSVC OR WIN32)
+    find_package(FFMPEG REQUIRED)
+else()
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libavutil libswscale libswresample)
+endif()
 
 if (FFMPEG_FOUND)
 else ()
