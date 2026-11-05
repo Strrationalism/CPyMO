@@ -67,8 +67,9 @@ class App:
         game_row=ttk.Frame(frame);game_row.pack(fill='x')
         self.games=tk.Listbox(game_row,height=3,exportselection=False,activestyle='none',background='#ffffff',foreground='#233247',selectbackground='#27659c',selectforeground='#ffffff',relief='solid',borderwidth=1)
         self.games.pack(side='left',fill='x',expand=True)
-        game_scroll=ttk.Scrollbar(game_row,orient='vertical',command=self.games.yview)
-        game_scroll.pack(side='right',fill='y');self.games.configure(yscrollcommand=game_scroll.set)
+        self.game_scroll=ttk.Scrollbar(game_row,orient='vertical',command=self.games.yview)
+        self.games.configure(yscrollcommand=self.game_scroll.set)
+        self._update_game_list_layout()
         ttk.Label(frame,text='自动识别游戏版本；如果找到多个版本，会优先推荐适合 NDS 的版本。',foreground='#526579',wraplength=780).pack(anchor='w',pady=(5,12))
         ttk.Label(frame,text='2  选择保存位置',font=(ui_font,11,'bold')).pack(anchor='w')
         row=ttk.Frame(frame);row.pack(fill='x',pady=(7,6));ttk.Entry(row,textvariable=self.output,state='readonly').pack(side='left',fill='x',expand=True)
@@ -82,7 +83,7 @@ class App:
         row=ttk.Frame(frame);row.pack(fill='x',pady=(7,0));ttk.Label(row,text='游戏视频：').pack(side='left')
         self.video_box=ttk.Combobox(row,textvariable=self.video,values=self.video_modes,
                      state='readonly',width=47)
-        self.video_box.pack(side='left')
+        self.video_box.pack(side='left',fill='x',expand=True)
         ttk.Label(frame,text='默认保留并转换游戏视频；如不需要视频，也可以选择跳过。',
                   foreground='#526579',wraplength=780).pack(anchor='w',pady=(3,0))
         self.compression=tk.StringVar(value='无损压缩语音与适合的图片（推荐）')
@@ -103,8 +104,9 @@ class App:
         self.convert_button=ttk.Button(row,text='3  开始转换',command=self.begin,state='disabled');self.convert_button.pack(side='left')
         self.cancel_button=ttk.Button(row,text='取消',command=self.cancel,state='disabled');self.cancel_button.pack(side='left',padx=8)
         self.open_button=ttk.Button(row,text='打开结果文件夹',command=self.open_output,state='disabled');self.open_button.pack(side='right')
-        self.progress=ttk.Progressbar(frame,mode='indeterminate');self.progress.pack(fill='x')
-        ttk.Label(frame,textvariable=self.status,wraplength=790).pack(anchor='w',pady=(8,4))
+        self.progress=ttk.Progressbar(frame,mode='indeterminate')  # Show only while a job runs.
+        self.status_label=ttk.Label(frame,textvariable=self.status,wraplength=790)
+        self.status_label.pack(anchor='w',pady=(8,4))
         # Never inherit a white macOS dark-mode foreground over a pale log panel.
         # Give Tk's CJK fallback extra line height on Retina screens and avoid
         # repainting the entire Text control every polling interval.
@@ -195,6 +197,15 @@ class App:
             self.advanced_frame.pack_forget()
         self._update_advanced_caption()
 
+    def _update_game_list_layout(self):
+        """Keep the game picker compact; scroll only for more than three variants."""
+        count=len(self.candidates)
+        self.games.configure(height=max(1,min(count,3)))
+        if count>3:
+            self.game_scroll.pack(side='right',fill='y')
+        else:
+            self.game_scroll.pack_forget()
+
     def pick_zip(self):
         p=filedialog.askopenfilename(title=self.tr('选择 PyMO 游戏包'),filetypes=[(self.tr('游戏包'),'*.zip'),(self.tr('全部文件'),'*.*')])
         if p:self.source.set(p);self.inspect()
@@ -215,8 +226,12 @@ class App:
         for widget in (self.video_box,self.compression_box,self.language_box):
             widget.configure(state='disabled' if value else 'readonly')
         self.advanced_button.configure(state='disabled' if value else 'normal')
-        if value:self.progress.start(12)
-        else:self.progress.stop()
+        if value:
+            self.progress.pack(fill='x',before=self.status_label)
+            self.progress.start(12)
+        else:
+            self.progress.stop()
+            self.progress.pack_forget()
 
     def start(self,job,callback):
         self._log_disk_text=''
@@ -271,12 +286,13 @@ class App:
         self.last_result=report;self.callback(report)
 
     def inspect(self):
-        self.candidates=[];self.games.delete(0,'end');self.set_status('正在识别游戏包里的平台版本……')
+        self.candidates=[];self.games.delete(0,'end');self._update_game_list_layout();self.set_status('正在识别游戏包里的平台版本……')
         self.start({'action':'inspect','source':self.source.get()},self.inspected)
 
     def inspected(self,report):
         if not report['ok']:self.failed(report);return
         self.candidates=report['candidates']
+        self._update_game_list_layout()
         for i,c in enumerate(self.candidates):self.games.insert('end',f"{self.tr('推荐  ') if i==0 else ''}[{c['platform']}]  {c['title']}")
         selected=self.self_test.get('candidate',0) if self.self_test else 0
         self.games.selection_set(selected);self.convert_button.configure(state='normal');self.set_status('已识别游戏。确认保存位置后，点击“开始转换”。')
@@ -317,6 +333,13 @@ class App:
                 self.window.lift();self.window.update()
                 result['ui_title']=self.window.title()
                 result['ui_version_footer']=str(self.version_label.cget('text'))
+                result['ui_layout']={
+                    'progress_visible':bool(self.progress.winfo_ismapped()),
+                    'game_list_rows':int(self.games.cget('height')),
+                    'game_scroll_visible':bool(self.game_scroll.winfo_ismapped()),
+                    'video_right_gap':self.video_box.master.winfo_width()
+                        -self.video_box.winfo_x()-self.video_box.winfo_width(),
+                }
                 from PIL import ImageGrab
                 # Screenshot capture is ancillary on macOS: permissions and
                 # unsupported window capture APIs must not discard the actual

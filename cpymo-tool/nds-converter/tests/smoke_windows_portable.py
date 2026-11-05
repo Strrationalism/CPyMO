@@ -87,6 +87,10 @@ def main():
         assert gui_report['ok'] and gui_report['release_version']==VERSION,gui_report
         assert VERSION in gui_report['ui_version_footer'],gui_report
         assert gui_report['ui_title'],gui_report
+        layout=gui_report['ui_layout']
+        assert layout['progress_visible'] is False,layout
+        assert layout['game_list_rows']==1 and layout['game_scroll_visible'] is False,layout
+        assert abs(layout['video_right_gap'])<=2,layout
         verify(Path(gui_report['game_directory']))
         assert hashes(src)==before,'GUI modified original source'
         assert digest(Path(gui_report['output'])/'cpymo-nds.nds')==digest(rom)
@@ -94,6 +98,7 @@ def main():
             'frames':report['videos'][0]['frames'],'rom_pair':'MATCH',
             'source_preservation':'PASS','release_version':VERSION,
             'frozen_gui':'PASS','actual_ui_version_footer':gui_report['ui_version_footer'],
+            'ui_layout':layout,
             'ui_screenshot':gui_report.get('ui_screenshot')},ensure_ascii=True))
 
 
