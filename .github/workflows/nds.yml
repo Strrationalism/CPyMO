@@ -1,14 +1,17 @@
 name: Nintendo DS
 on:
   workflow_dispatch:
+  # Optional single-file CI request from the 1.2 integration branch.
+  # Ordinary code commits no longer create a build or failure email.
   push:
     branches:
-      - 'codex/nds-*'
+      - 'codex/nds-v1.2-integration'
+      - 'codex/nds-v1.2.1-test-20261030'
     paths:
-      - 'cpymo/**'
-      - 'cpymo-backends/include/**'
-      - 'cpymo-backends/nds/**'
-      - 'cpymo-tool/nds-converter/**'
+      - '.github/ci-requests/nds.txt'
+      - 'cpymo-backends/nds/source/**'
+      - 'cpymo-backends/nds/VERSION'
+      - 'cpymo-tool/nds-converter/tests/**'
       - '.github/workflows/nds.yml'
   pull_request:
     paths:
@@ -29,16 +32,54 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git submodule update --init stb endianness.h
-      - name: Install DS libraries and record SDK
+      - name: Verify bundled DS libraries; install only if absent
         run: |
-          dkp-pacman -Syu --noconfirm --needed libnds libfat-nds maxmod-nds calico ndstool
+          # This pinned image already included all five libraries when run
+          # 39704544801 passed. An unconditional pacman -Syu was touching
+          # pkg.devkitpro.org even with "nothing to do" and failing on HTTP 403.
+          # Preserve the known-good pinned SDK unless a dependency is missing.
+          if dkp-pacman -Q devkitARM libnds libfat-nds maxmod-nds calico ndstool >/dev/null 2>&1; then
+            echo "All DS/DSi build dependencies present in the pinned image; skipping network sync."
+          else
+            echo "Some pinned-image dependencies are absent; attempting SDK installation."
+            dkp-pacman -Syu --noconfirm --needed libnds libfat-nds maxmod-nds calico ndstool
+          fi
           dkp-pacman -Q devkitARM libnds libfat-nds maxmod-nds calico ndstool
+      - name: Refresh four-language UI glyphs for v1.2.1
+        run: python3 cpymo-backends/nds/tools/generate-ui-font.py
       - name: Build original DS ROM
         run: python3 cpymo-backends/nds/build.py
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: CPyMO-for-NDS
           path: cpymo-backends/nds/engine.nds
+      - name: Build DSi experimental ROM (separate output)
+        run: python3 cpymo-backends/nds/build.py --dsi-experiment
+      - name: Inspect experimental NDS header
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          rom = Path('cpymo-backends/nds/cpymo-dsi-experiment.nds').read_bytes()
+          print(f"ROM bytes={len(rom)}, unit code={rom[0x12]}, header size={int.from_bytes(rom[0x84:0x88], 'little'):#x}")
+          PY
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: CPyMO-for-DSi-Experiment
+          path: cpymo-backends/nds/cpymo-dsi-experiment.nds
+      - name: Assemble official-background universal v1.2.1 test ROM
+        if: github.ref_name == 'codex/nds-v1.2.1-test-20261030'
+        run: |
+          mkdir -p out-v121
+          python3 cpymo-backends/nds/tools/patch-rom-bg.py --rom cpymo-backends/nds/cpymo-dsi-experiment.nds --art cpymo-backends/nds/assets/nds-dual-bg.rgb555 --output out-v121/CPyMO-for-NDS-v1.2.1-test4.nds
+          python3 cpymo-backends/nds/tools/verify-release-artifact.py --rom out-v121/CPyMO-for-NDS-v1.2.1-test4.nds
+          sha256sum out-v121/CPyMO-for-NDS-v1.2.1-test4.nds > out-v121/SHA256SUMS.txt
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: github.ref_name == 'codex/nds-v1.2.1-test-20261030'
+        with:
+          name: CPyMO-NDS-v1.2.1-universal-TEST4
+          path: out-v121/
+          retention-days: 30
+          if-no-files-found: error
   converter:
     runs-on: ubuntu-latest
     steps:
@@ -47,5 +88,88 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r cpymo-tool/nds-converter/requirements.txt
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Use hosted FFmpeg or pip wheel (no apt mirror dependency)
+        run: |
+          if command -v ffmpeg >/dev/null 2>&1; then
+            ffmpeg -version | head -n 1
+          else
+            python -m pip install 'imageio-ffmpeg==0.6.0'
+            python - <<'PY'
+          import os
+          from pathlib import Path
+          import imageio_ffmpeg
+          link=Path(os.environ['RUNNER_TEMP'])/'ffmpeg'
+          link.symlink_to(imageio_ffmpeg.get_ffmpeg_exe())
+          with open(os.environ['GITHUB_PATH'],'a',encoding='utf8') as stream:
+              stream.write(str(link.parent)+'\n')
+          print('CI FFmpeg wheel binary:',link.resolve())
+          PY
+          fi
+      - run: python cpymo-backends/nds/tools/generate-ui-font.py
       - run: python -m unittest discover -s cpymo-tool/nds-converter/tests -v
+
+  portable-windows:
+    # Opt in explicitly: only runs when the CI request commit contains
+    # [portable]. All ordinary DS/DSi builds remain fast and unchanged.
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[portable]')
+    # Linux apt/mirror availability must not hold the independent Windows
+    # frozen-worker proof hostage. Full converter suite is a separate gate.
+    needs: [build]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install pinned portable build dependencies
+        run: python -m pip install -r cpymo-tool/nds-converter/requirements-build.txt
+      - name: Download exactly this workflow run's NTR ROM
+        uses: actions/download-artifact@v4
+        with:
+          name: CPyMO-for-NDS
+          path: cpymo-backends/nds
+      - name: Locate video-capable Windows FFmpeg
+        shell: pwsh
+        run: |
+          $ff = (Get-Command ffmpeg.exe -ErrorAction SilentlyContinue).Source
+          if (-not $ff) {
+            choco install ffmpeg -y --no-progress
+            $ff = (Get-ChildItem 'C:\ProgramData\chocolatey\lib\ffmpeg\tools' -Recurse -Filter ffmpeg.exe -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+          }
+          if (-not $ff) { throw 'No FFmpeg found on Windows runner' }
+          & $ff -version
+          "NDS_BUILD_FFMPEG=$ff" >> $env:GITHUB_ENV
+      - name: Build PyInstaller app with real video decoder
+        shell: pwsh
+        run: |
+          python cpymo-tool/nds-converter/build_portable.py --ffmpeg "$env:NDS_BUILD_FFMPEG" --output cpymo-portable
+      - name: Test actual frozen worker with MP4/NVL1 conversion and paired ROM
+        shell: pwsh
+        run: |
+          python cpymo-tool/nds-converter/tests/smoke_windows_portable.py --portable cpymo-portable --ffmpeg "$env:NDS_BUILD_FFMPEG"
+      - name: Include development-only release limitations
+        shell: pwsh
+        run: |
+          Copy-Item cpymo-tool/nds-converter/README.md cpymo-portable/转换助手说明.md
+          @'
+          CPyMO 1.2 Windows portable - INTEGRATION BUILD ONLY.
+          Video-enabled FFmpeg is included. The frozen worker was smoke-tested
+          with ordinary MP4 -> NVL1 and original files were not modified.
+          GUI window and NTR/DSi performance still need device testing.
+          NOT A PUBLIC RELEASE. Collect matching FFmpeg third-party licenses,
+          corresponding source and redistribution notices before distributing.
+          Do not overwrite the save folder of an existing game.
+          '@ | Set-Content -Path cpymo-portable/开发版说明.txt -Encoding UTF8
+      - name: Upload tested Windows portable candidate for review
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: CPyMO-1.2-Windows-Portable-VIDEO-REVIEW-NOT-RELEASE
+          path: |
+            cpymo-portable/app/Converter/
+            cpymo-portable/cpymo-nds.nds
+            cpymo-portable/VERSION.json
+            cpymo-portable/BUILD-COMMAND.json
+            cpymo-portable/helper-build.log
+            cpymo-portable/转换助手说明.md
+            cpymo-portable/开发版说明.txt
+          retention-days: 14

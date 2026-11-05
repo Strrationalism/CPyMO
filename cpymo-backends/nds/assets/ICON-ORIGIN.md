@@ -1,2 +1,24 @@
-Icon motif reference: user-provided PYMO logo, girl and yellow mascot. Simplified icon created with built-in imagegen, then normalized to DS 32x32/4bpp format. Reference artwork rights remain with their holders; AI derivation does not establish a new license to the original motif. Original horizontal logo not included.
-Prompt: simplify the left girl and yellow mascot motif as a legible tiny pixel application icon, transparent, no text or URL.
+# NDS 图标来源与处理
+
+## 1.3.0 已通过用户实机视觉验收的方案
+
+沿用整幅方形插画构图，增加 1 原生像素暖灰棕边框（RGB555 14/12/10，对应显示 RGB 115/98/82）。画面等比例缩入边框内部，不裁切、不增加圆角。32×32 菜单图标保持最多 15 种不透明 RGB555 颜色，并为透明索引 0 留位；24×24 默认列表占位符、64×64 加载页图标独立从高清图派生，避免将低色 32×32 图放大。24/32 像素采用轻度细节增强，64 像素保留平滑缩小效果。
+
+当前测试源原件以 `icon-source-square.png` 保存，1254×1254 RGB，文件 SHA-256 `f3bb25e8d37c8c8201969c8a59d629983544786c80903c5c27de848ffe532312`，RGBA 像素 SHA-256 `7e157efd3272febbd8431f70e9e9fdd80fa13fecd3ef83d0299ba489210b5c10`。此文件为本地下载目录中用于本轮预览、并在用户授权选择方案后采用的方形图；文件身份与下列历史记录不同，分别保留，不能冒称同一文件。
+
+生成入口：`../tools/build_nds_icons.py`。派生参数、各实际输出哈希记录于 `NDS-ICON-MANIFEST.json`。只读检查入口 `../tools/verify_nds_icons.py` 可对真实 ROM 检查 Banner 与三档内部像素数组；桌面转换器的批准母稿、Windows 图标和 Mac 派生规则不变。游戏自带封面/图标不被默认占位符覆盖。
+
+用户于 2026-11-06 完成实机观察，反馈「效果不错，可以继续推进之前的进度了」。验收测试 ROM SHA-256 为 `d1eed5c919d01724f5c48eef4bb952f8c4fa0ab886504943cf8be0788cc15623`，源码为 `46e0aad00df00b9c3c505960b5cb88d49dd0f91a`。这条记录来自用户反馈，不冒称代理独立观察了真实硬件；正式配套构建与发行验收仍按 1.3.0 检查清单执行。
+
+## 历史：1.2.1 无边框图标
+
+本版 NDS 系统菜单 Banner、启动页及默认占位图标使用用户提供并批准的原始方形插画，不增加圆角或文字，不覆盖游戏各自的封面／图标。
+
+原始文件：a_close_up_anime_style_illustration_soft_warm_s(1).png
+原始 PNG SHA-256：c5144d0bc49afdbccb3ce336cbedfecf130eb50574e4df7de35c048db34b9c38
+
+高质量缩小后量化为 32×32、15 种不透明 RGB555 颜色。assets/icon.png、assets/icon.bmp 与 source/app-icon.h 对应相同的 1024 个像素；四角保留完整画面。桌面转换器则采用同一原画的平滑圆角版，这是平台适配而不是三个游戏客户端。
+
+图案母题来自 PyMO 的少女、黄色吉祥物及手柄；高清插画由用户提供，是 AI 辅助衍生画面，不代表原角色独立原创或原作者背书。保留 PyMO 原项目的作者声明和 MIT 许可，详见 ../../../cpymo-tool/nds-converter/assets/ICON-ATTRIBUTION.txt 与 PYMO-ORIGINAL-MIT-LICENSE.txt。
+
+此前简化像素图标已被取代，不作为本版备用图标另行分发；不重写既有 Git 历史。

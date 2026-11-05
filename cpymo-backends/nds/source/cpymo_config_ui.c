@@ -101,14 +101,6 @@ static inline void cpymo_config_ui_calc_layout(
 	float right_edge =
 		(float)e->gameconfig.imagesize_w - side_padding;
 
-	*out_value_display_x =
-		right_edge
-		- inc_dec_btn_space
-		- inc_dec_btn_width
-		- item->show_value_width;
-
-
-
 	out_inc_btn_xywh[0] = right_edge - inc_dec_btn_width;
 	out_inc_btn_xywh[1] = (height - max_font_size) / 2 + y;
 	out_inc_btn_xywh[2] = inc_dec_btn_width;
@@ -123,6 +115,13 @@ static inline void cpymo_config_ui_calc_layout(
 	*out_dec_btn_x =
 		out_inc_btn_xywh[0]
 		- (max_value_width + 1.95f * inc_dec_btn_space + inc_dec_btn_width);
+
+	/* Center all variable-length values in the same space between +/-.
+	 * Buttons and their hit areas remain unchanged. Toggle settings without
+	 * +/- retain right alignment. */
+	*out_value_display_x = item->show_inc_dec_button
+		? (*out_dec_btn_x + inc_dec_btn_width + out_inc_btn_xywh[0] - item->show_value_width) * 0.5f
+		: right_edge - item->show_value_width;
 
 	*out_inc_dec_btn_symbol = y + height / 2 + max_font_size / 4;
 
@@ -227,7 +226,7 @@ static void cpymo_config_ui_draw_node(const cpymo_engine *e, const void *node_to
 
 		cpymo_backend_text_draw(
 			ui->dec_btn,
-			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->inc_btn_w) / 2,
+			inc_dec_btn_xywh[0] + (inc_dec_btn_xywh[2] - ui->dec_btn_w) / 2,
 			inc_dec_btn_symbol_y,
 			is_pointed || dec_pressed ? cpymo_color_black : cpymo_color_white, 1.0f,
 			cpymo_backend_image_draw_type_ui_element);

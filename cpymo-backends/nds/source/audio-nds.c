@@ -15,6 +15,7 @@
 #include "synth.h"
 #include "cache-nds.h"
 #include <errno.h>
+#include "audio-gain-nds.h"
 extern volatile unsigned engine_state[46];
 extern volatile unsigned vblank_count;
 typedef struct {struct mad_stream stream;struct mad_frame frame;struct mad_synth synth;unsigned char input[8192+MAD_BUFFER_GUARD];unsigned used;bool padded;} MP3;
@@ -25,6 +26,7 @@ volatile unsigned audio_bench[12]={0x4e415235};
 typedef struct {NAR* nar;FILE* file;bool loop;int volume;char name[64];s16 cache[1152];unsigned pos,count;unsigned offset,length,remaining,rate,phase;MP3* mp3;} Channel;
 typedef struct {Channel ch[3];int nar_policy;unsigned char* aliases;unsigned alias_count;bool alias_checked;error_t alias_error;} Audio;
 static Audio* active;
+static NdsAudioGain nds_gain;
 #include "audio-aliases.h"
 /* Optional delivered-PCM verification, disabled in normal/performance runs. */
 volatile unsigned movie_audio_check[8]={0x4d414331};static bool movie_verify;
@@ -106,16 +108,37 @@ static mm_word refill(mm_word length,mm_addr dest,mm_stream_formats format){
  if(movie_audio){unsigned want=length;if(want>movie_remaining)want=movie_remaining;unsigned got=0;
   if(movie_channel){while(got<want){Channel* c=movie_channel;if(c->pos==c->count){c->count=refill_pcm(c);c->pos=0;if(!c->count)break;}unsigned n=c->count-c->pos;if(n>want-got)n=want-got;memcpy(out+got,c->cache+c->pos,n*2);c->pos+=n;got+=n;}}
   else got=fread(out,2,want,movie_audio);if(movie_verify&&got){unsigned c=nar_checksum((unsigned char*)out,got*2),a=movie_audio_check[2],b=movie_audio_check[3];movie_audio_check[1]+=got;movie_audio_check[2]=(a+(c&65535)-1)%65521;movie_audio_check[3]=(b+(c>>16)+got*2*(a-1))%65521;}
- if(got!=want){movie_state[7]++;movie_audio_check[4]++;movie_remaining=0;}else movie_remaining-=got;for(unsigned i=0;i<got;i++)if(out[i]){engine_state[18]++;movie_state[14]++;}if(got<length)memset(out+got,0,(length-got)*2);movie_state[13]++;return length;}
+ if(got!=want){movie_state[7]++;movie_audio_check[4]++;movie_remaining=0;}else movie_remaining-=got;
+  for(unsigned i=0;i<got;i++)if(out[i]){engine_state[18]++;movie_state[14]++;}
+  /* Checksum above tests original decoded PCM. Apply gain to playback after
+     the check, including movie PCM and NAR2, not the verification bytes. */
+  for(unsigned done=0;done<got;){
+   unsigned batch=got-done;if(batch>64)batch=64;
+   int32_t raw[64];for(unsigned i=0;i<batch;i++)raw[i]=out[done+i];
+   nds_audio_gain_write(out+done,raw,batch,&nds_gain);
+   done+=batch;
+  }
+  if(got<length)memset(out+got,0,(length-got)*2);
+  movie_state[13]++;return length;}
 
  bool pcm_only=active!=NULL;
  if(active)for(unsigned c=0;c<3;c++)if(active->ch[c].mp3)pcm_only=false;
  if(!pcm_only){
-  for(unsigned i=0;i<length;++i){int sample=0;if(active)for(unsigned c=0;c<3;++c)sample+=next(&active->ch[c]);if(sample>32767)sample=32767;if(sample< -32768)sample=-32768;out[i]=(s16)sample;if(sample)engine_state[18]++;}
+  for(unsigned done=0;done<length;){
+    unsigned batch=length-done;if(batch>64)batch=64;
+    int32_t mixed[64];
+    for(unsigned i=0;i<batch;i++){
+     int sample=0;if(active)for(unsigned c=0;c<3;++c)sample+=next(&active->ch[c]);
+     mixed[i]=sample;
+    }
+    nds_audio_gain_write(out+done,mixed,batch,&nds_gain);
+    for(unsigned i=0;i<batch;i++)if(out[done+i])engine_state[18]++;
+    done+=batch;
+   }
   return length;
  }
  for(unsigned done=0;done<length;){
-  unsigned batch=length-done;if(batch>64)batch=64;int mixed[64]={0};
+  unsigned batch=length-done;if(batch>64)batch=64;int32_t mixed[64]={0};
   for(unsigned channel=0;channel<3;channel++){
    Channel* c=&active->ch[channel];unsigned pos=0;
    while(pos<batch&&c->file){
@@ -128,7 +151,8 @@ static mm_word refill(mm_word length,mm_addr dest,mm_stream_formats format){
     c->pos+=count;pos+=count;
    }
   }
-  for(unsigned i=0;i<batch;i++){int sample=mixed[i];if(sample>32767)sample=32767;if(sample< -32768)sample=-32768;out[done+i]=(s16)sample;if(sample)engine_state[18]++;}
+  nds_audio_gain_write(out+done,mixed,batch,&nds_gain);
+   for(unsigned i=0;i<batch;i++)if(out[done+i])engine_state[18]++;
   done+=batch;
  }return length;
 }
@@ -144,14 +168,14 @@ static bool movie_audio_begin(const char* path,unsigned offset,unsigned samples,
   c=calloc(1,sizeof *c);if(!c){fclose(f);return false;}c->nar=calloc(1,sizeof *c->nar);if(!c->nar){free(c);fclose(f);return false;}
   c->file=f;c->nar->total=c->nar->left=samples;c->nar->modern=true;
  }
- movie_audio_check[5]=compressed;mmStreamClose();movie_channel=c;movie_audio=f;movie_remaining=samples;movie_stream(4096);return true;
+ movie_audio_check[5]=compressed;mmStreamClose();movie_channel=c;movie_audio=f;movie_remaining=samples;nds_audio_gain_reset(&nds_gain);movie_stream(4096);return true;
 }
 bool nds_movie_audio_begin(const char* path,unsigned offset,unsigned samples){return movie_audio_begin(path,offset,samples,false);}
 bool nds_movie_audio_begin_nar(const char* path,unsigned offset,unsigned samples){return movie_audio_begin(path,offset,samples,true);}
 unsigned nds_movie_audio_position(void){return mmStreamGetPosition();}
-void nds_movie_audio_end(void){if(!movie_audio)return;mmStreamClose();if(movie_channel){stop(movie_channel);free(movie_channel);movie_channel=NULL;}else fclose(movie_audio);movie_audio=NULL;movie_stream(nds_cache_enabled?4096:2048);}
+void nds_movie_audio_end(void){if(!movie_audio)return;mmStreamClose();if(movie_channel){stop(movie_channel);free(movie_channel);movie_channel=NULL;}else fclose(movie_audio);movie_audio=NULL;nds_audio_gain_reset(&nds_gain);movie_stream(nds_cache_enabled?4096:2048);}
 void cpymo_audio_init(cpymo_audio_system* s){
- Audio* a=calloc(1,sizeof *a);*s=a;active=a;if(a)a->nar_policy=-2;last_audio_tick=tickGetCount();if(!a)return;
+ Audio* a=calloc(1,sizeof *a);*s=a;active=a;if(a)a->nar_policy=-2;last_audio_tick=tickGetCount();nds_audio_gain_reset(&nds_gain);if(!a)return;
  for(unsigned c=0;c<3;++c)a->ch[c].volume=256;
  mm_ds_system sys={0};mmInit(&sys);
  mm_stream stream={0};stream.sampling_rate=22050;stream.buffer_length=nds_cache_enabled?4096:2048;stream.callback=refill;stream.format=MM_STREAM_16BIT_MONO;stream.timer=MM_TIMER0;stream.manual=true;

@@ -1,0 +1,46 @@
+CPyMO for NDS — NDS program and companion-converter icon refresh (1.3.0)
+=======================================================================
+
+Source motif:
+  PyMO original app icon (girl, yellow mascot and game controller)
+  https://github.com/pymo/pymo/blob/master/images/pymo-icon.png
+  https://github.com/pymo/pymo/blob/master/images/pymo-icon.psd
+  Copyright (c) 2013 pymo.
+  The original project's MIT notice is retained in
+  PYMO-ORIGINAL-MIT-LICENSE.txt. No endorsement is implied.
+
+Current artwork:
+  User-provided, AI-assisted high-resolution interpretation of the PyMO motif,
+  selected and approved for CPyMO for NDS 1.2.1 on 2026-11-05.
+  Original square illustration SHA-256:
+  c5144d0bc49afdbccb3ce336cbedfecf130eb50574e4df7de35c048db34b9c38
+
+Desktop companion converters:
+  The approved 1024x1024 RGBA PNG has a small outer-edge cleanup and a
+  supersampled antialiased rounded-corner mask. No CPyMO wordmark was added;
+  the characters, original colors, layout and internal linework are retained.
+  Canonical file: assets/converter-icon-source.png
+  Canonical PNG SHA-256:
+  133abae11b6d958c8e02d70e67dcf997049b5277bde3c734860e19f80257d90e
+  Decoded 1024x1024 RGBA pixel SHA-256:
+  a5954aa3fb04caecaf3796a314910f1e6fcc6d62d72d2b07a582f50ec15a4460
+  All Windows ICO, macOS ICNS and GUI PNG variants share this source.
+  macOS alone uniformly scales the complete image to 80% and centers it
+  on a transparent canvas. No extra crop, edge erosion, corner mask or
+  horizontal compression is applied. Frozen Mac applications retain the
+  native Bundle ICNS instead of replacing the Dock tile with a Tk PNG.
+  Windows ICO and its small GUI PNG retain the original direct resampling.
+  There is no second round-corner mask, 16px erosion or horizontal compression.
+  The former 04 pixel-art / perimeter-cleanup icon is superseded, not bundled
+  as an alternative design. Git history is not rewritten.
+
+Nintendo DS program:
+  Its external banner, splash and internal fallback icon use the original
+  FULL-SQUARE composition at 32x32, 15 opaque RGB555 colors, with no rounded mask.
+  This desktop icon generator does not write those NDS resources or any
+  game's own cover/icon. See cpymo-backends/nds/assets/ICON-ORIGIN.md.
+
+These are an NDS game program and Windows/macOS companion data converters,
+not three independent game clients or new Windows/macOS playback backends.
+The original creators' rights and notices are retained. This update does not
+claim ownership of the original characters or authors' approval.

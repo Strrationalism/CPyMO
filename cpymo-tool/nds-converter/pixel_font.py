@@ -1,6 +1,5 @@
 """Native bitmap subset generator (MIT); font data retains upstream OFL licenses."""
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
 import gzip, struct, shutil, hashlib
 
 def read_bdf(path, codes=None):
@@ -47,6 +46,7 @@ def read_hex(path, codes=None):
     return glyphs
 
 def pixel_font_cache(codes, target, missing_policy='error'):
+    from PIL import Image, ImageDraw, ImageFont
     fonts=Path(__file__).parent/'fonts/pixel'
     sources=[('small',fonts/'Fusion/fusion-pixel-12px-proportional-zh_hans.bdf.gz',12,13,read_bdf),
              ('large',fonts/'Unifont/unifont-17.0.05.hex.gz',16,14,read_hex)]

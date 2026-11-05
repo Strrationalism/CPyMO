@@ -53,7 +53,8 @@ class ConverterTests(unittest.TestCase):
             (src/'voice').mkdir();shutil.copy2(src/'bgm/tone.wav',src/'voice/line.wav')
             before=hashes(src)
             report=helper_core.run_job({'action':'convert','source':str(src),'output':str(base/'output'),
-                'result':str(base/'job/result.json'),'ffmpeg':os.environ.get('NDS_TEST_FFMPEG') or shutil.which('ffmpeg')})
+                'result':str(base/'job/result.json'),'video_mode':'skip',
+                'ffmpeg':os.environ.get('NDS_TEST_FFMPEG') or shutil.which('ffmpeg')})
             self.assertTrue(report['ok'],report)
             self.assertTrue(report['cache_only']);self.assertEqual(report['lossless']['audio_mode'],'voice')
             dst=Path(report['game_directory'])
@@ -63,6 +64,80 @@ class ConverterTests(unittest.TestCase):
             self.assertTrue(list((dst/'nds-cache/bgm').rglob('*.pcm')))
             self.assertFalse(list((dst/'nds-cache/bgm').rglob('*.nar')))
             convert.verify(dst)
+
+    @unittest.skipUnless(shutil.which('ffmpeg') or os.environ.get('NDS_TEST_FFMPEG'), 'FFmpeg required')
+    def test_unchecked_prune_preserves_output_original_media_even_with_lossless_compression(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base=Path(tmp);src=base/'input';fixture(src,'s60v3')
+            (src/'voice').mkdir();shutil.copy2(src/'bgm/tone.wav',src/'voice/line.wav')
+            before=hashes(src)
+            report=helper_core.run_job({
+                'action':'convert','source':str(src),'output':str(base/'output'),
+                'result':str(base/'job/result.json'),'video_mode':'skip',
+                'cache_only':False,'audio_lossless':'voice',
+                'ffmpeg':os.environ.get('NDS_TEST_FFMPEG') or shutil.which('ffmpeg')})
+            self.assertTrue(report['ok'],report)
+            self.assertFalse(report['cache_only'],
+                'Unchecking the UI option must not be overridden by cache compression')
+            self.assertEqual(report['lossless']['audio_mode'],'voice')
+            output=Path(report['game_directory'])
+            self.assertTrue((output/'bg/scene.png').is_file())
+            self.assertTrue((output/'bgm/tone.wav').is_file())
+            self.assertTrue(list((output/'nds-cache/voice').rglob('*.nar')))
+            self.assertTrue(list((output/'nds-cache/bgm').rglob('*.pcm')))
+            self.assertEqual(before,hashes(src))
+            convert.verify(output)
+
+    @unittest.skipUnless(shutil.which('ffmpeg') or os.environ.get('NDS_TEST_FFMPEG'),
+                         'FFmpeg required')
+    def test_optin_fvds_passthrough_and_default_omission(self):
+        from test_fvds_inspect import sample
+        ffmpeg=os.environ.get('NDS_TEST_FFMPEG') or shutil.which('ffmpeg')
+        with tempfile.TemporaryDirectory() as tmp:
+            base=Path(tmp);src=base/'game';original_script=fixture(src,'s60v3')
+            media=sample()
+            (src/'video/omitted.fv').write_bytes(media)
+            before=hashes(src)
+            dst=base/'converted'
+            opts=argparse.Namespace(source=src,destination=dst,ffmpeg=ffmpeg,font=None,
+                 jobs=1,missing_glyph_policy='box',cache_only=True,video_fvds=True)
+            convert.convert(opts)
+            hashed=convert.key('omitted')
+            actual=dst/'nds-cache/video'/hashed[:2]/(hashed+'.fv')
+            self.assertEqual(actual.read_bytes(),media)
+            self.assertEqual((dst/'script/START.txt').read_bytes(),original_script)
+            self.assertEqual(hashes(src),before)
+            self.assertFalse((dst/'video').exists())
+            manifest=json.loads((dst/'nds-cache/manifest.json').read_text(encoding='utf8'))
+            self.assertEqual(manifest['format'],6)
+            self.assertEqual(manifest['fvds_videos'][0]['frames'],3)
+            self.assertEqual(manifest['fvds_videos'][0]['bytes'],len(media))
+            self.assertNotIn('video/omitted.fv',{r['path'] for r in manifest['omitted_files']})
+            self.assertIn('video/omitted.mp4',{r['path'] for r in manifest['omitted_files']})
+            convert.verify(dst)
+            default=base/'default'
+            opts.destination=default
+            opts.video_fvds=False
+            convert.convert(opts)
+            self.assertFalse((default/'nds-cache/video').exists())
+            self.assertEqual(json.loads((default/'nds-cache/manifest.json').read_text())['fvds_videos'],[])
+            self.assertIn('video/omitted.fv',
+                          {r['path'] for r in json.loads((default/'nds-cache/manifest.json').read_text())['omitted_files']})
+            convert.verify(default)
+
+    @unittest.skipUnless(shutil.which('ffmpeg') or os.environ.get('NDS_TEST_FFMPEG'),
+                         'FFmpeg required')
+    def test_fvds_reject_invalid_preencoded_input(self):
+        from test_fvds_inspect import sample
+        ffmpeg=os.environ.get('NDS_TEST_FFMPEG') or shutil.which('ffmpeg')
+        with tempfile.TemporaryDirectory() as tmp:
+            base=Path(tmp);src=base/'game';fixture(src,'s60v3')
+            (src/'video/omitted.fv').write_bytes(sample(tail=True))
+            opts=argparse.Namespace(source=src,destination=base/'bad',ffmpeg=ffmpeg,font=None,
+                                    jobs=1,missing_glyph_policy='box',video_fvds=True)
+            with self.assertRaises(ValueError):
+                convert.convert(opts)
+            self.assertFalse((base/'bad').exists())
 
     def test_unsafe_archive_paths_are_rejected(self):
         for name in ['../escape','/absolute','C:/escape','a/../../escape']:
@@ -103,12 +178,21 @@ class ConverterTests(unittest.TestCase):
                     with zipfile.ZipFile(nested,'w') as inner:
                         for p in game.rglob('*'):
                             if p.is_file():inner.writestr('Game/'+p.relative_to(game).as_posix(),p.read_bytes())
-                    outer.writestr(platform+('.apk' if platform=='android' else '.zip'),nested.getvalue())
+                    outer.writestr(platform+'.zip',nested.getvalue())
             candidates=helper_core.discover(source,base)
             self.assertEqual([c['platform'] for c in candidates],['s60v3','s60v5','android'])
             dest=helper_core.extract_game(candidates[0],base/'selected')
             self.assertEqual(helper_core.configuration((dest/'gameconfig.txt').read_bytes())['platform'],'s60v3')
             self.assertFalse((dest/'save').exists())
+
+    def test_apk_installers_are_not_game_package_inputs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base=Path(tmp)
+            apk=base/'android-engine.apk'
+            with zipfile.ZipFile(apk,'w') as z:
+                z.writestr('Game/gameconfig.txt','gametitle,example\nplatform,android\n')
+            with self.assertRaisesRegex(ValueError,'ZIP'):
+                helper_core.discover(apk,base)
 
     @unittest.skipUnless(shutil.which('ffmpeg') or os.environ.get('NDS_TEST_FFMPEG'),'FFmpeg required')
     def test_uppercase_packed_and_loose_symbian_masks(self):

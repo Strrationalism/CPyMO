@@ -11,8 +11,8 @@ static void nds_aux_refresh(void){
 }
 static void nds_aux_poll(void){
  int held=keysHeld();if(!(held&KEY_TOUCH))nds_touch_blocked=false;
- if(keysDown()&KEY_Y){nds_aux_override=!nds_aux_override;ui_preferences_state[8]++;nds_aux_refresh();}
+ if(keysDown()&KEY_Y){nds_aux_override=!nds_aux_override;ui_preferences_state[8]++;nds_aux_refresh();cpymo_engine_request_redraw(&engine);}
  if((keysDown()&KEY_TOUCH)&&!screens_swapped&&nds_aux_hidden()){
-  nds_aux_override=!nds_aux_override;nds_touch_blocked=true;ui_preferences_state[7]++;nds_aux_refresh();
+  nds_aux_override=!nds_aux_override;nds_touch_blocked=true;ui_preferences_state[7]++;nds_aux_refresh();cpymo_engine_request_redraw(&engine);
  }
 }

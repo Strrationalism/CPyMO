@@ -9,7 +9,7 @@ from pixel_font import read_bdf,read_hex
 header=backend/'source/ui-fallback-font.h'
 codes=set(range(32,127))
 codes.update(map(int,re.search(r'ui_fallback_codes\[\]=\{([^}]+)',header.read_text(encoding='utf8')).group(1).split(',')))
-files=[backend/'source'/n for n in ('launcher.h','ui-language-nds.c','ui-language-extra.h','cpymo_config_ui.c')]
+files=[backend/'source'/n for n in ('launcher.h','theme-nds.h','ui-language-nds.c','ui-language-extra.h','cpymo_config_ui.c')]
 texts=[p.read_text(encoding='utf8') for p in files]
 core=(repo/'cpymo/cpymo_localization.c').read_text(encoding='utf8')
 texts.append(core[:core.index('STR_I(enu,')])

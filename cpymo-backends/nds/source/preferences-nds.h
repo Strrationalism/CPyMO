@@ -41,7 +41,7 @@ static void nds_preferences_load(const char* dir){
 }
 static void nds_preferences_save(void){
  char path[512];snprintf(path,sizeof path,"%s/save/nds-ui.cfg",engine.assetloader.gamedir);
- FILE* f=fopen(path,"wb");bool ok=false;if(f){ok=fprintf(f,"NDSUI1 %d\n",nds_read_gray)>0;if(fclose(f))ok=false;}
+ FILE* f=nds_save_ensure_directory(engine.assetloader.gamedir)?fopen(path,"wb"):NULL;bool ok=false;if(f){ok=fprintf(f,"NDSUI1 %d\n",nds_read_gray)>0;if(fclose(f))ok=false;}
  ui_preferences_state[5]++;if(!ok){ui_preferences_state[6]++;launcher_toast(nds_ui("设置保存失败"));}nds_preferences_sync();
 }
 int nds_read_gray_get(void){return nds_read_gray;}

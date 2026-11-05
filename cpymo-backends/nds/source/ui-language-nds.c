@@ -56,9 +56,9 @@ int nds_language_take_refresh(void){int value=refresh_pending;refresh_pending=0;
 static const struct {const char* zh;const char* en;} strings[]={
  {"正在读取游戏列表...","Reading game list..."},
  {"游戏资料库","Game library"},{"选择游戏","Select a game"},{"关于与许可","About and licenses"},
- {"A / 轻触：继续","A / Touch: Continue"},{"X：菜单 · B：返回","X: Menu / B: Back"},
+ {"A / DOWN / 轻触：继续","A / DOWN / Touch: Next"},{"X：菜单 · B：返回","X: Menu / B: Back"},
  {"B：按住隐藏文字","Hold B: Hide text"},{"R：按设置快进","R: Skip (per settings)"},
- {"L：交换上下屏","L: Swap screens"},{"Y：隐藏／唤回辅助屏","Y: Toggle info screen"},
+ {"L：切换显示模式","L: Cycle display mode"},{"Y：隐藏／唤回辅助屏","Y: Toggle info screen"},
  {"START：快速保存到存档1","START: Save to slot 1"},{"SELECT：快速读取存档1","SELECT: Load slot 1"},
  {"显示、字号、音量：X 菜单","Display, font, audio: X"},
  {"已快速保存到存档1","Saved to slot 1"},{"已快速读取存档1","Loaded slot 1"},
@@ -92,7 +92,38 @@ static const struct {const char* zh;const char* en;} strings[]={
  {"选择游戏 · X 语言","Select game / X: Language"},
  {"轻触两次启动 · B 关于 · X 语言","Tap twice / B: About / X: Lang"},
  {"语言设置已保存","Language preference saved"},
- {"SELECT: 语言 / B: 返回","SELECT: Language / B: Back"}
+ {"SELECT: 语言 / B: 返回","SELECT: Language / B: Back"},
+ /* Runtime profile: native mode detection, not a console-model guess. */
+ {"DSi 模式 · 16 MiB","DSi mode · 16 MiB"},
+ {"DS 模式 · 4 MiB","DS mode · 4 MiB"},
+ /* Classic-lower: the stylus now targets game coordinates, not virtual A. */
+ {"A：继续 · 触屏操控","A: Next / Touch: Game"},
+ /* 1.2 clean dual-screen guide: controller lettering and explicit mode names. */
+ {"A / DOWN：继续","A / DOWN: Continue"},
+ {"UP：历史对话","UP: History"},
+ {"R：快进 · L：切换模式","R: Skip / L: Cycle modes"},
+ {"上屏游戏 / 下屏游戏 / 增强双屏","Game top / Game bottom / Dual screen"},
+ {"START：快速保存  SELECT：快速读取","START: Save / SELECT: Load"},
+ {"SELECT：快速读取","SELECT: Quick load"},
+ {"退出到游戏库","Exit to library"},
+ {"确定退出到游戏库？\n未保存的进度将丢失。","Exit to library?\nUnsaved progress will be lost."},
+ {"主题设置","Theme settings"},
+ {"默认","Default"},
+ {"主题已保存","Theme saved"},
+ {"游戏列表已刷新","Game list refreshed"},
+ {"A / START 启动 · 轻触两次启动","A/START: Start · Tap twice"},
+ {"上下选择 · B 关于 · X 语言 · Y 主题","UP/DOWN · B Info · X Lang · Y Color"},
+ {"UP / DOWN：选择项目","UP / DOWN: Choose"},
+ {"A：确认","A: Confirm"},
+ {"B：返回","B: Back"},
+ {"标题菜单","Title menu"},
+ {"当前显示：上屏游戏","Display: Upper game"},
+ {"当前显示：下屏游戏","Display: Lower game"},
+ {"当前显示：增强双屏","Display: Dual screen"},
+ {"方向键选择 · A 确定 · B 返回","D-pad: Pick · A: Set · B: Back"},
+ {"R：快进 · L：切换显示模式","R: Skip · L: Cycle display"},
+ {"L：切换显示模式","L: Cycle display mode"},
+ {"NDS 移植：千岚之夏（Blueteemo）","NDS port: 千岚之夏 (Blueteemo)"}
 };
 #include "ui-language-extra.h"
 int nds_language_choice_get(void){return preference;}
