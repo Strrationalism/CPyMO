@@ -1,0 +1,83 @@
+{
+  "source": "icon-source-square.png",
+  "source_sha256": "f3bb25e8d37c8c8201969c8a59d629983544786c80903c5c27de848ffe532312",
+  "source_rgba_sha256": "7e157efd3272febbd8431f70e9e9fdd80fa13fecd3ef83d0299ba489210b5c10",
+  "source_size": [
+    1254,
+    1254
+  ],
+  "border_rgb555": [
+    14,
+    12,
+    10
+  ],
+  "border_rgb": [
+    115,
+    98,
+    82
+  ],
+  "border_pixels": 1,
+  "uniform_scale": true,
+  "crop_or_corner_mask": false,
+  "resampling": "LANCZOS",
+  "small_detail_filter": {
+    "sizes": [
+      24,
+      32
+    ],
+    "radius": 0.55,
+    "percent": 80,
+    "threshold": 2
+  },
+  "banner_quantization": {
+    "art_colors": 14,
+    "border_color": 1,
+    "method": "MEDIANCUT",
+    "kmeans": 8,
+    "dither": "NONE",
+    "transparent_palette_index": 0,
+    "actual_opaque_colors": 15
+  },
+  "runtime_sizes": [
+    24,
+    32,
+    64
+  ],
+  "outputs": {
+    "assets/icon.png": {
+      "bytes": 1235,
+      "sha256": "0d2b51eeb6b91003ac7388de3f5b13515386cfc5f66b5c4cb33bf337b215accb",
+      "size": [
+        32,
+        32
+      ],
+      "rgb_sha256": "797ee3db1666439bf37f294126d12c2b0f74be11701b7bdd0426e887a892aeb7"
+    },
+    "assets/icon-small.png": {
+      "bytes": 1029,
+      "sha256": "9b5abf947a232e54c876892167f24a14d30157f63d5a240bd0ef28477aa96967",
+      "size": [
+        24,
+        24
+      ],
+      "rgb_sha256": "180bb6238baf17f485b5928b3746fdef89a47408881786d627844c8b715fbb43"
+    },
+    "assets/icon-splash.png": {
+      "bytes": 5504,
+      "sha256": "d3d4b3f27a3870807ac59d36f0b66992e9f650d5334ad0aae26e7dc44eb23840",
+      "size": [
+        64,
+        64
+      ],
+      "rgb_sha256": "7f1dbd49e38fb04c9fa4a87a98f08236afcd20005b66ee9f7141b1a2cb58ade7"
+    },
+    "assets/icon.bmp": {
+      "bytes": 2102,
+      "sha256": "4b465cfef21b3a38e782035f9c1f88dc45011c3d0232764dabfaa33b38eb73b0"
+    },
+    "source/app-icon.h": {
+      "bytes": 34803,
+      "sha256": "0080fa33b53a6ddc4e0cd4f714a57ddee300f611169c3168dff370ff3bff92cc"
+    }
+  }
+}

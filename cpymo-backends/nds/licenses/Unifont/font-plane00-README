@@ -1,0 +1,106 @@
+The Unicode Basic Multilingual Plane consists of 2^16 = 65,536 code points.
+Of this number, 2,048 are the Surrogate Pairs, from U+D800..U+DFFF.  This
+leaves 65,536 - 2,048 = 63,488 code points.
+
+==> The total number of lines in the files below should be 63,488 <==
+
+  hangul-syllables.hex
+  omit.hex
+  plane00-nonprinting.hex
+  plane00-unassigned.hex
+  pua.hex
+  spaces.hex
+  unifont-base.hex
+  wqy.hex
+
+The file copyleft.hex contains the Copyleft symbol, which is in the
+Supplemental Multilingual Plane (Plane 1); it is added to the TrueType
+version of Unifont (even though it lies above Plane 0) because of its
+significance.
+
+The file custom00.hex is empty, so it has zero lines.
+
+The file izmg16-plane00.hex contains Japanese versions of glyphs in
+Plane 0 that replace glyphs in corresponding code points in the default
+Unifont build.  As of Unicode 12.1.04, this contains 9,880 glyphs.
+This number is not expected to change.  See the end of this document
+for further discussion of this file.
+
+The number of lines in a .hex file (or any other plain text file) can be
+conveniently determined in this directory with
+
+   wc -l *.hex
+
+The last line will be a grand total.
+
+Here is the output of "wc -l *.hex" with the Unifont 17.0.04 glyph files:
+
+       1 copyleft.hex
+       0 custom00.hex
+   11172 hangul-syllables.hex
+    9968 izmg16-plane00.hex
+       2 omit.hex
+      92 plane00-nonprinting.hex
+    1336 plane00-unassigned.hex
+    6400 pua.hex
+      17 spaces.hex
+   28142 t-source.hex
+   16671 unifont-base.hex
+   27798 wqy.hex
+  ------
+  101599 total
+
+This makes a total of 101,599 lines in all *.hex files in this directory
+as of Unifont 17.0.04.
+
+Subtracting the duplicate code points that exist in izmg16-plane00.hex,
+t-source.hex, and the one Plane 1 glyph in copyleft.hex, the total
+non-duplicate Plane 0 code points amount to 63,488 glyphs.  That subtotal
+should remain constant for Plane 0, as described at the beginning of
+this document.
+
+If there are any duplicates, most likely these will be from new
+glyphs being added to unifont-base.hex that were not removed from
+plane00-unassigned.hex.  A simple comparison using unidup will
+show this:
+
+   sort *.hex | unidup
+
+If there are duplicate code points, unidup will print them.
+
+Note that plane00-nonprinting.hex, pua.hex, and plane00-unassigned.hex
+might not be included in the final generated unifont.hex file.  If desired,
+they can all be added by modifying the make file one level above this
+directory (modify the UNIFILES definition in ../Makefile) or with
+the call to "make" in the top-level directory with a command such as:
+
+     make UNASSIGNED="plane00/unassigned.hex" PUA="plane00/pua.hex"
+
+
+Historical Note on wqy.hex
+--------------------------
+The file "wqy.hex" includes glyphs from the BDF version of Wen Quan Yi
+in the range U+4E00..U+9FA5.  That is the CJK Unified Ideographs script
+range that was introduced in Unicode 1.0.  In March 2005, The Unicode
+Consortium released Unicode 4.1.0, which added 22 new glyphs to that
+script in the range U+9FA6..U+9FBB.  Those glyphs were added to Unifont
+in February 2008 during the effort to attain complete Unicode 5.1 Basic
+Multilingual Plane coverage.  Any additional glyphs added to that Unicode
+script in Unifont continue to be added to wqy.hex even though they were
+not part of the original Wen Quan Yi font.  This allows keeping the whole
+CJK Unified Ideographs script in one file.
+
+
+Note on izmg16-plane00.hex
+----------------------------
+The file "izmg16-plane00.hex" contains glyphs from the public
+domain Izumi BDF font, downloadable at
+
+     http://unifoundry.com/japanese/index.html
+
+That BDF font contains glyphs for the JIS X 0213:2004 Japanese
+standard, and replaces glyphs in the rest of Unifont to produce
+the Japanese version, unifont_jp.
+
+
+Paul Hardy, 2014, 2016, 2018, 2019, 2020

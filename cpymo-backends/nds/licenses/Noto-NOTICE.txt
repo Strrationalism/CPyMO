@@ -1,0 +1,6 @@
+CPyMO DS Glyphs
+Raster subset derived from Noto Sans CJK SC; SIL OFL 1.1.
+Source: https://github.com/notofonts/noto-cjk/tree/main/Sans/OTF/SimplifiedChinese
+
+Version 2.004;hotconv 1.0.118;makeotfexe 2.5.65603
+© 2014-2021 Adobe (http://www.adobe.com/).

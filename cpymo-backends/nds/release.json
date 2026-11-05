@@ -1,0 +1,32 @@
+{
+  "version": "1.3.0",
+  "cache_format": 6,
+  "video_policy": "Default GUI/CLI: FFmpeg source MP4/AVI/MKV/MOV to playable NVL1 PCM; NVA1 NAR2 optional; explicit skip available. Game/device/video compatibility is not universal.",
+  "baseline": "0.5.6.3-test",
+  "core_commit": "5a746bc72a4a8c127e0aee7deb20bf415c385ae2",
+  "audio_policy": "lossless NAR2 voice with NAR1/PCM compatibility; default BGM and SE remain PCM; cautious 1.5 dB post-mix loudness target with 64-sample peak limiter for BGM/SE/voice/video; game volume settings unchanged",
+  "base_release": "1.1.0",
+  "cache_format_compatibility": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "cache_layout": "two-hex prefix directories in format 6; formats 1-5 remain flat",
+  "ui_additions": "Three display modes: upper game, lower game, enhanced top scene + lower story dialogue; preserve authored upper title before first say; original clock and 48px icon; UP/DOWN and single-row START/SELECT auxiliary help; four locale glyph coverage; 16 NDS IPL theme colors with cached Auto preference and four-language centered settings; unified 2px rail with approved final typography; title-stage help reset after restart; START launches from game library; rounded title highlight blend.",
+  "ui_languages": [
+    "zh-Hans",
+    "zh-Hant",
+    "en",
+    "ja"
+  ],
+  "language_menu_order": [
+    "Auto",
+    "简体中文",
+    "繁體中文",
+    "English",
+    "日本語"
+  ]
+}

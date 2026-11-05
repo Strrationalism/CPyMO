@@ -1,0 +1,176 @@
+[
+  {
+    "file": "D.dat",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/D.dat",
+    "git_blob_sha1": "317db3bed162d2b098bde1d2753bed5b55bb1491",
+    "sha256": "9492e5caacf17f024a0517dc5e85749c04980ad469d2296fbea614d35a12cbff"
+  },
+  {
+    "file": "bit.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/bit.c",
+    "git_blob_sha1": "5ee3a3a7e5e7474643ee8891119bedabb2174351",
+    "sha256": "1aa5c4a3524c9365e3b5c7a9e2dd778e35c7318c2438f43545a1d7a7f5d7e2ea"
+  },
+  {
+    "file": "bit.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/bit.h",
+    "git_blob_sha1": "495adb9be130d09999d0ac8d0ea95c935510b5de",
+    "sha256": "4812147e1055ea9c5a524f49a9e49092a2ef1cace109c83143d2b99786a363f9"
+  },
+  {
+    "file": "config.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/config.h",
+    "git_blob_sha1": "5870206bc8ed6b714d4d65baf1bb5248217a41c1",
+    "sha256": "7b6efcbd4e337614ee700e35b10d30d4b143be8856c9b9e17adc9a3a6f5e976c"
+  },
+  {
+    "file": "decoder.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/decoder.c",
+    "git_blob_sha1": "4861aa3cc4741bdaf2390e3dc1f5e88fc1753b07",
+    "sha256": "ac10a739b386af19ac64669c837c2a072c2f5ba4175c6c9c385ae531864a4f49"
+  },
+  {
+    "file": "decoder.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/decoder.h",
+    "git_blob_sha1": "618935467f35b170e050933ec54c7ae435061c67",
+    "sha256": "ecfd9321cedd0f681d55d14afda1dc698cccebd35a9800773399436e24b0c9bd"
+  },
+  {
+    "file": "fixed.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/fixed.c",
+    "git_blob_sha1": "8fe5f217bb80817f53d9ab5196783f5309fca9a7",
+    "sha256": "059b82bde9d8b9074b36598e6667669f14fd99182c059e52366594e9a5ff56b2"
+  },
+  {
+    "file": "fixed.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/fixed.h",
+    "git_blob_sha1": "f71d2ec6e149d2ee5be73f4ee4f5b6d6481206e5",
+    "sha256": "82bf26d8c6c9371e02eb0d0d1573d92eaee19641f928a99cf28650ea69add8a3"
+  },
+  {
+    "file": "frame.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/frame.c",
+    "git_blob_sha1": "2d3b5fc0626e1ebd26c9d61b3eabc4a505e64490",
+    "sha256": "a84c292f8cc421de195552536a4d5ecc089045dbae7a36c5fe3ef4b8f619e156"
+  },
+  {
+    "file": "frame.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/frame.h",
+    "git_blob_sha1": "476270780441bd3fd6574fec3e50c0ff636f201b",
+    "sha256": "370847b11c7d62abeee4ac93c63d991168dfcc8e9b62ce7edc29b3bc66138f3a"
+  },
+  {
+    "file": "global.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/global.h",
+    "git_blob_sha1": "6bd2f2e814d9f7894d0b0f6d5db41a7212649f38",
+    "sha256": "cc9b1f349fb0c4e34c8ff79096ce5cd2fe8ff8e648fa945746e34b0e83725ca9"
+  },
+  {
+    "file": "huffman.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/huffman.c",
+    "git_blob_sha1": "0fc3022ff7e0232d4b9f1f3b6959ac162dd21bc4",
+    "sha256": "553c45069d411773f28d639b8ede415a290374c15ee53c8415509ac99da0491a"
+  },
+  {
+    "file": "huffman.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/huffman.h",
+    "git_blob_sha1": "188dd3973b0372b601b17ee23e93639da8ee2625",
+    "sha256": "48c45e1a9d6d0993a3f300720cb2615b06e5497ee6fb996159f3acf248b47e76"
+  },
+  {
+    "file": "imdct_s.dat",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/imdct_s.dat",
+    "git_blob_sha1": "66d846ceb4021cff8474c9e77227e9ec9d2be2ff",
+    "sha256": "b6928015afe3942e905e48fe08c6670bb30114edb2c417c987bb7780a14ddadd"
+  },
+  {
+    "file": "layer12.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/layer12.c",
+    "git_blob_sha1": "07f1fa4e8404a30c0fdc7cc7a2f91bbc15c8c820",
+    "sha256": "4898fa04a243c1d7a78fe544a2dec2256a89d6c064fbfedf84c271c3bf112aee"
+  },
+  {
+    "file": "layer12.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/layer12.h",
+    "git_blob_sha1": "e924ca13cf1c54a73d61f85e8ccdd460c85246d2",
+    "sha256": "4177f53aa27d025d12d91e45ec294b3e67989341e2fa4fb9ecb00c45bd9cb96a"
+  },
+  {
+    "file": "layer3.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/layer3.c",
+    "git_blob_sha1": "3462cc480ef119b28a66d3e8afb324fc859d6220",
+    "sha256": "bb0a846f19a9177b9d5108971e23a4813a1e334644990e8156c5a61fc95fa40e"
+  },
+  {
+    "file": "layer3.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/layer3.h",
+    "git_blob_sha1": "3e11bdec906a8ce0180cd8ee8405c073ea07df8b",
+    "sha256": "b50b68601073c1d370256a9e9834dad0b853c180523014f0941092d42b6387c1"
+  },
+  {
+    "file": "qc_table.dat",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/qc_table.dat",
+    "git_blob_sha1": "05da0f2eaedee2c2157d281747dbbfedbe816f0c",
+    "sha256": "19ec06cf38fe89cfa8fd142b94c2afd86444faf3972fb010fc97eb3ef55d3817"
+  },
+  {
+    "file": "rq_table.dat",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/rq_table.dat",
+    "git_blob_sha1": "d6b9802be9dc98940caa4e1fa510b341a5af274d",
+    "sha256": "f99504206971febe5550d77ec786b934e7efac0210925930eb489bcbec1c473e"
+  },
+  {
+    "file": "sf_table.dat",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/sf_table.dat",
+    "git_blob_sha1": "ee94cb77d78c711e8dc6c12ebaea5275f2c503a7",
+    "sha256": "130b072cf0c0e96275b0355a4174105bcdf69d70afdd5ae6ef3f7b8301db3385"
+  },
+  {
+    "file": "stream.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/stream.c",
+    "git_blob_sha1": "da58e2cdc06fed4f1d0e412625f659a3fea89815",
+    "sha256": "9e5450bebfdf8c76fd07f081c873bbafd7cf4da6a10c4103e6a0a8edf8655aa5"
+  },
+  {
+    "file": "stream.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/stream.h",
+    "git_blob_sha1": "78af4cb44ecd1527461a43b7a9699f8dc17fc53b",
+    "sha256": "d85e02818ab03d6727cf3008274dcbc2dc175a4e36848aa3cad783a05d5366d1"
+  },
+  {
+    "file": "synth.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/synth.c",
+    "git_blob_sha1": "9f7a2a4da4aac760ec5757f339e6612a8979c149",
+    "sha256": "d91fc345e0b7427089445245c7d63b000d65f05d5c8ee0ad9ee41105483a5edb"
+  },
+  {
+    "file": "synth.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/synth.h",
+    "git_blob_sha1": "5c67aeef3713e53ec67b6fbdbcfc488c3328aad5",
+    "sha256": "2a79f462f3859d2b7da18cb19e1e78a0f5ede70e3bfc7cd8239da58a724fc1be"
+  },
+  {
+    "file": "timer.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/timer.c",
+    "git_blob_sha1": "6590e82926502eab4a42d2901f2596a719b97dcb",
+    "sha256": "4b4a059d989bbff31b74f4bc600ad67979468ac8745a4312469ca0b984a8c5d1"
+  },
+  {
+    "file": "timer.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/timer.h",
+    "git_blob_sha1": "e891a4284e5c337f86de155a0591cacb6e3513af",
+    "sha256": "749d21a5c517688a7477b77f03bab31061e5761dee5786caea87c056870e29a8"
+  },
+  {
+    "file": "version.c",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/version.c",
+    "git_blob_sha1": "40f9002e6d8ae1d74526b25b9c01652b685c115c",
+    "sha256": "4899a5aa70ab5343a71cce1b12da3b887d631fcc4fd58df6f51c4f4b59bc3ca4"
+  },
+  {
+    "file": "version.h",
+    "url": "https://raw.githubusercontent.com/devkitPro/libogc/master/libmad/version.h",
+    "git_blob_sha1": "1c14a90e2711f046c98d1d167f6ecf366cd95269",
+    "sha256": "283811b8b5fcc59b218fe0bb2ca5abe1f5de2df2dfadc2a9464ff29b6786308e"
+  }
+]

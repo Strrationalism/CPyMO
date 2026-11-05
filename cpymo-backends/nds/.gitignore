@@ -1,0 +1,5 @@
+/build/
+/build-records/
+/*.elf
+/*.nds
+/*.map
